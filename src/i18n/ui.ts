@@ -11,7 +11,7 @@ export const ui = {
     'site.subtitle': '民间互联网记忆工程',
     'nav.home': '首页',
     'nav.archive': '档案馆',
-    'nav.arena': '重要时刻',
+    'nav.arena': '职业生涯大事记',
     'nav.quotes': '个人语录与梗',
     'nav.friends': '贵人与朋友',
     'nav.warrior': '孤勇者',
