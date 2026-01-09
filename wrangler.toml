@@ -1,5 +1,2 @@
 name = "fzd-fans-com"
-pages_build_output_dir = "fzd-archive/dist"
-
-[build]
-command = "cd fzd-archive && npm run build"
+pages_build_output_dir = "dist"
