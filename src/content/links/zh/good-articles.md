@@ -1,34 +1,22 @@
 ---
-title: "好文报道收藏"
-titleEn: "Good Articles Collection"
-description: "写樊振东的好文和报道"
+title: "好文报道总览"
+titleEn: "Articles Overview"
+description: "樊振东相关文章和报道的分类导航"
 category: links
-tags: ["报道", "文章", "媒体"]
+tags: ["导航", "分类", "总览"]
 translated: false
 ---
 
-# 好文报道收藏
+# 好文报道总览
 
-## 官方媒体报道
+本页面为樊振东相关文章和报道的分类导航。
 
-- 工人日报
-- 中国日报
-- 中国新闻报
+## 分类导航
 
-（待补充具体链接）
-
-## 自媒体好文
-
-### 推荐博主
-
-- 麒麟
-- jingeli
-- 老王
-
-## 视频收藏
-
-（待补充视频号、B站等链接）
+- **[官方媒体报道](./official-media)** - 权威媒体的正式报道
+- **[自媒体好文](./self-media)** - 优质博主的深度文章
+- **[视频收藏](./video-collection)** - 相关视频内容合集
 
 ---
 
-*素材来源于网络，如有侵权请联系删除*
+*各分类页面持续更新中*

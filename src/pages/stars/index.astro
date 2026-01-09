@@ -3,22 +3,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const stories = await getCollection('stories');
+const stars = await getCollection('stars');
 ---
 
-<BaseLayout title="趣事轶事">
+<BaseLayout title="满天繁星">
   <section class="page-header">
-    <h1>😄 趣事轶事</h1>
-    <p>那些让人会心一笑的瞬间</p>
+    <h1>⭐ 满天繁星</h1>
+    <p>樊星口号，每个赛场见</p>
   </section>
 
   <section class="content-grid">
-    {stories.map(story => (
+    {stars.map(star => (
       <Card 
-        title={story.data.title}
-        href={`/stories/${story.slug.replace('zh/', '')}`}
-        description={story.data.description}
-        tag={story.data.tags?.[0]}
+        title={star.data.title}
+        href={`/stars/${star.slug.replace('zh/', '')}`}
+        description={star.data.description}
+        tag={star.data.tags?.[0]}
       />
     ))}
   </section>

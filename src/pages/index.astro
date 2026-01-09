@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const stories = await getCollection('stories');
 const arena = await getCollection('arena');
 const quotes = await getCollection('quotes');
 const friends = await getCollection('friends');
@@ -12,13 +11,12 @@ const tributes = await getCollection('tributes');
 const links = await getCollection('links');
 
 const allContent = [
-  ...stories.map(s => ({ ...s, category: 'stories', categoryName: '趣闻轶事' })),
-  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '赛场之上' })),
+  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '重要时刻' })),
   ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '个人语录与梗' })),
   ...friends.map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })),
   ...warrior.map(w => ({ ...w, category: 'warrior', categoryName: '孤勇者' })),
   ...tributes.map(t => ({ ...t, category: 'tributes', categoryName: '评价和祝福' })),
-  ...links.map(l => ({ ...l, category: 'links', categoryName: '链接收藏' })),
+  ...links.map(l => ({ ...l, category: 'links', categoryName: '媒体链接' })),
 ];
 ---
 
@@ -38,7 +36,7 @@ const allContent = [
       <span class="label">篇档案</span>
     </div>
     <div class="stat">
-      <span class="num">7</span>
+      <span class="num">6</span>
       <span class="label">个分类</span>
     </div>
   </section>
@@ -46,13 +44,12 @@ const allContent = [
   <section class="categories">
     <h2>📚 档案分类</h2>
     <div class="grid">
-      <Card title="趣闻轶事" href="/stories" tag="故事" description="鸡蛋灌饼、花季少年谁穿衬衫、比周雨唱歌好听..." />
-      <Card title="赛场之上" href="/arena" tag="高光" description="月圆之夜、巴黎奥运、地表最强12人、独一无二的记录..." />
+      <Card title="重要时刻" href="/arena" tag="高光" description="月圆之夜、巴黎奥运、地表最强12人、独一无二的记录..." />
       <Card title="个人语录与梗" href="/quotes" tag="金句" description="老拿冠军就老请呗、奖金都交给爸妈..." />
       <Card title="贵人与朋友" href="/friends" tag="人物" description="吴敬平、王涛、周恺、欢乐谷小分队..." />
       <Card title="孤勇者" href="/warrior" tag="精神" description="独自面对风雨的勇气..." />
       <Card title="评价和祝福" href="/tributes" tag="致敬" description="来自各方的评价与美好祝愿..." />
-      <Card title="链接收藏" href="/links" tag="快照" description="好文报道、视频、微博存档..." />
+      <Card title="媒体链接" href="/links" tag="快照" description="好文报道、视频、微博存档..." />
     </div>
   </section>
 
@@ -72,8 +69,7 @@ const allContent = [
 
   <section class="slogan-section">
     <blockquote>
-      <p>大雪压青松，青松挺且直</p>
-      <p>每个赛场见</p>
+      <p>樊振东，每个赛场见</p>
     </blockquote>
   </section>
 </BaseLayout>
