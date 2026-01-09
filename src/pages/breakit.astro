@@ -1,0 +1,315 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="打破一切">
+  <div id="game-container">
+    <div id="game-intro">
+      <h1>💥 打破一切</h1>
+      <p>流言蜚语铺天盖地袭来，点击击碎它们</p>
+      <button id="start-btn">开始</button>
+    </div>
+    <div id="game-area" style="display: none;">
+      <div id="hud">
+        <div id="score">💥 <span id="count">0</span> / <span id="total">20</span></div>
+      </div>
+    </div>
+    <div id="game-end" style="display: none;">
+      <div class="final-message">
+        <p class="quote">"我不需要证明什么，我只需要做好自己。"</p>
+        <p class="author">—— 樊振东</p>
+        <button id="replay-btn">再来一次</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  #game-container {
+    min-height: 80vh;
+    position: relative;
+  }
+  #game-intro, #game-end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+  }
+  #game-intro h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #c41e3a, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #game-intro p { color: #666; margin-bottom: 2rem; font-size: 1.1rem; }
+  #start-btn, #replay-btn {
+    background: linear-gradient(45deg, #c41e3a, #e63950);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4);
+  }
+  #start-btn:hover, #replay-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(196, 30, 58, 0.6);
+  }
+  #game-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a12 100%);
+    z-index: 1000;
+    overflow: hidden;
+  }
+  #hud {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+  }
+  #score {
+    color: white;
+    font-size: 1.5rem;
+    background: rgba(0,0,0,0.6);
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+  }
+
+  .rumor {
+    position: fixed;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    max-width: 400px;
+    user-select: none;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    z-index: 10;
+    pointer-events: auto;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .rumor:hover {
+    filter: brightness(1.3);
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+  }
+  .rumor.style-0 { background: linear-gradient(135deg, #dc143c, #8b0000); }
+  .rumor.style-1 { background: linear-gradient(135deg, #8b0000, #4a0000); }
+  .rumor.style-2 { background: linear-gradient(135deg, #b22222, #660000); }
+  .rumor.style-3 { background: linear-gradient(135deg, #cd5c5c, #8b0000); }
+  .rumor.style-4 { background: linear-gradient(135deg, #a52a2a, #5c1010); }
+
+  .rumor.breaking {
+    animation: shatter 0.3s forwards;
+    pointer-events: none;
+  }
+  @keyframes shatter {
+    0% { opacity: 1; transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  .particle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  #game-end {
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a12 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+  }
+  .final-message {
+    animation: zoomIn 1.5s ease-out;
+    text-align: center;
+    padding: 2rem;
+  }
+  .final-message .quote {
+    font-size: 2.5rem;
+    color: #ffd700;
+    margin-bottom: 1.5rem;
+    max-width: 700px;
+    line-height: 1.6;
+    text-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+  }
+  .final-message .author {
+    color: #aaa;
+    font-size: 1.3rem;
+    margin-bottom: 3rem;
+  }
+  @keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.3); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+<script>
+  const rumors = [
+    "首先，我爱国，其次樊振东也别想赢",
+    "看演唱会被网暴",
+    "和朋友加油打气被骂提前开香槟",
+    "身份证曝光",
+    "照片被扔垃圾桶",
+    "陌生女子闯入房间",
+    "'你最棒'喊叫被曲解",
+    "输了不行赢了也没那么行",
+    "不扛大旗不爱国",
+    "全球总教练",
+    "研究队友",
+    "专挑对手接不着的地方打",
+    "最强但不是最棒",
+    "最棒的另有安排",
+    "釜山两分难建功",
+    "无缘最佳运动员",
+    "逼退世排无球可打",
+    "不配当一哥",
+    "只会打顺风球",
+    "心态不行",
+  ];
+
+  let brokenCount = 0;
+  let totalRumors = rumors.length;
+  let gameArea: HTMLElement | null;
+
+  const startBtn = document.getElementById('start-btn');
+  const replayBtn = document.getElementById('replay-btn');
+  const gameIntro = document.getElementById('game-intro');
+  const gameEnd = document.getElementById('game-end');
+
+  function startGame() {
+    brokenCount = 0;
+    gameArea = document.getElementById('game-area');
+
+    if (gameIntro) gameIntro.style.display = 'none';
+    if (gameEnd) gameEnd.style.display = 'none';
+    if (gameArea) {
+      gameArea.style.display = 'block';
+      gameArea.innerHTML = `
+        <div id="hud">
+          <div id="score">💥 <span id="count">0</span> / <span id="total">${totalRumors}</span></div>
+        </div>
+      `;
+    }
+
+    rumors.forEach((text, i) => {
+      setTimeout(() => spawnRumor(text, i), i * 400);
+    });
+  }
+
+  function spawnRumor(text: string, index: number) {
+    if (!gameArea) return;
+
+    const rumor = document.createElement('div');
+    rumor.className = `rumor style-${index % 5}`;
+    rumor.textContent = text;
+
+    // Random position within safe viewport bounds
+    const margin = 100;
+    const x = margin + Math.random() * (window.innerWidth - margin * 2 - 400);
+    const y = margin + Math.random() * (window.innerHeight - margin * 2 - 100);
+
+    rumor.style.left = x + 'px';
+    rumor.style.top = y + 'px';
+    rumor.style.opacity = '0';
+    rumor.style.transform = 'scale(0.5)';
+
+    rumor.addEventListener('click', () => breakRumor(rumor));
+
+    gameArea.appendChild(rumor);
+
+    // Fade in animation
+    setTimeout(() => {
+      rumor.style.transition = 'opacity 0.5s, transform 0.5s';
+      rumor.style.opacity = '1';
+      rumor.style.transform = 'scale(1)';
+    }, 50);
+  }
+
+  function breakRumor(rumor: HTMLElement) {
+    createParticles(rumor);
+
+    rumor.classList.add('breaking');
+    brokenCount++;
+
+    const countEl = document.getElementById('count');
+    if (countEl) countEl.textContent = brokenCount.toString();
+
+    setTimeout(() => {
+      rumor.remove();
+      if (brokenCount >= totalRumors) {
+        endGame();
+      }
+    }, 300);
+  }
+
+  function createParticles(rumor: HTMLElement) {
+    const rect = rumor.getBoundingClientRect();
+    const colors = ['#ff4757', '#ffd700', '#ff6b6b', '#fff'];
+
+    for (let i = 0; i < 12; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = rect.left + rect.width / 2 + 'px';
+      particle.style.top = rect.top + rect.height / 2 + 'px';
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.boxShadow = `0 0 6px ${colors[Math.floor(Math.random() * colors.length)]}`;
+
+      document.body.appendChild(particle);
+
+      const angle = (Math.PI * 2 * i) / 12;
+      const velocity = 4 + Math.random() * 6;
+      const vx = Math.cos(angle) * velocity;
+      const vy = Math.sin(angle) * velocity;
+
+      let px = rect.left + rect.width / 2;
+      let py = rect.top + rect.height / 2;
+      let op = 1;
+
+      function animateParticle() {
+        px += vx;
+        py += vy;
+        op -= 0.05;
+
+        particle.style.left = px + 'px';
+        particle.style.top = py + 'px';
+        particle.style.opacity = op.toString();
+
+        if (op > 0) {
+          requestAnimationFrame(animateParticle);
+        } else {
+          particle.remove();
+        }
+      }
+      animateParticle();
+    }
+  }
+
+  function endGame() {
+    setTimeout(() => {
+      if (gameArea) gameArea.style.display = 'none';
+      if (gameEnd) gameEnd.style.display = 'flex';
+    }, 500);
+  }
+
+  startBtn?.addEventListener('click', startGame);
+  replayBtn?.addEventListener('click', startGame);
+</script>

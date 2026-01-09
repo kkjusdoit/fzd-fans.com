@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const warrior = await getCollection('warrior');
+---
+
+<BaseLayout title="孤勇者">
+  <section class="page-header">
+    <h1>⚔️ 孤勇者</h1>
+    <p>独自面对风雨的勇气</p>
+  </section>
+
+  <section class="content-grid">
+    {warrior.map(item => (
+      <Card 
+        title={item.data.title}
+        href={`/warrior/${item.slug.replace('zh/', '')}`}
+        description={item.data.description}
+        tag={item.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>

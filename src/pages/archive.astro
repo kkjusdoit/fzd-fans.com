@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const stories = await getCollection('stories');
+const moments = await getCollection('moments');
+const quotes = await getCollection('quotes');
+const friends = await getCollection('friends');
+const honors = await getCollection('honors');
+const links = await getCollection('links');
+
+const allContent = [
+  ...stories.map(s => ({ ...s, category: 'stories', categoryName: '趣事轶事' })),
+  ...moments.map(m => ({ ...m, category: 'moments', categoryName: '难忘时刻' })),
+  ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '语录' })),
+  ...friends.map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })),
+  ...honors.map(h => ({ ...h, category: 'honors', categoryName: '荣誉战绩' })),
+  ...links.map(l => ({ ...l, category: 'links', categoryName: '链接收藏' })),
+];
+---
+
+<BaseLayout title="档案馆">
+  <section class="page-header">
+    <h1>📚 档案馆</h1>
+    <p>所有内容一览</p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="num">{allContent.length}</span>
+      <span class="label">篇档案</span>
+    </div>
+    <div class="stat">
+      <span class="num">6</span>
+      <span class="label">个分类</span>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    {allContent.map(item => (
+      <Card 
+        title={item.data.title}
+        href={`/${item.category}/${item.slug.replace('zh/', '')}`}
+        description={item.data.description}
+        tag={item.categoryName}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 1rem 0 2rem;
+  }
+  .stat { text-align: center; }
+  .num { display: block; font-size: 2rem; font-weight: bold; color: #c41e3a; }
+  .label { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>

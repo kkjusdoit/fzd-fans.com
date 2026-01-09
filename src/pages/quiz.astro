@@ -1,0 +1,401 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="球迷等级考试">
+  <div id="quiz-container">
+    <div id="quiz-intro">
+      <h1>🏓 球迷等级考试</h1>
+      <p>测测你对樊振东了解多少？</p>
+      <p class="hint">共10道题，包含选择题和判断题</p>
+      <button id="start-btn">开始答题</button>
+    </div>
+    
+    <div id="quiz-area" style="display: none;">
+      <div id="progress">
+        <span id="current-q">1</span> / <span id="total-q">10</span>
+      </div>
+      <div id="question-card">
+        <div id="question-type"></div>
+        <h2 id="question-text"></h2>
+        <div id="options"></div>
+      </div>
+    </div>
+    
+    <div id="quiz-result" style="display: none;">
+      <div class="result-card">
+        <div id="score-display"></div>
+        <div id="rank-display"></div>
+        <div id="rank-desc"></div>
+        <div id="wrong-answers"></div>
+        <button id="retry-btn">再考一次</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  #quiz-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  #quiz-intro {
+    text-align: center;
+    padding: 4rem 0;
+  }
+  #quiz-intro h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #c41e3a;
+  }
+  #quiz-intro p {
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  #quiz-intro .hint {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  #start-btn, #retry-btn {
+    background: linear-gradient(45deg, #c41e3a, #e63950);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(196, 30, 58, 0.3);
+  }
+  #start-btn:hover, #retry-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(196, 30, 58, 0.4);
+  }
+  
+  #progress {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+  }
+  #question-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  #question-type {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #666;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  #question-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  #options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .option-btn {
+    background: #f8f8f8;
+    border: 2px solid #eee;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+  .option-btn:hover {
+    border-color: #c41e3a;
+    background: #fff5f5;
+  }
+  .option-btn.selected {
+    border-color: #c41e3a;
+    background: #fff0f0;
+  }
+  .option-btn.correct {
+    border-color: #2ed573;
+    background: #e8fff0;
+  }
+  .option-btn.wrong {
+    border-color: #ff4757;
+    background: #fff0f0;
+  }
+  
+  #quiz-result {
+    padding: 3rem 0;
+  }
+  .result-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  #score-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #c41e3a;
+    margin-bottom: 0.5rem;
+  }
+  #rank-display {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  #rank-desc {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  #wrong-answers {
+    text-align: left;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #fafafa;
+    border-radius: 12px;
+  }
+  #wrong-answers h3 {
+    color: #c41e3a;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  .wrong-item {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid #eee;
+  }
+  .wrong-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .wrong-item .q {
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .wrong-item .your-answer {
+    color: #ff4757;
+    font-size: 0.9rem;
+  }
+  .wrong-item .correct-answer {
+    color: #2ed573;
+    font-size: 0.9rem;
+  }
+</style>
+
+<script>
+  interface Question {
+    type: 'choice' | 'truefalse';
+    question: string;
+    options: string[];
+    answer: number;
+    explanation?: string;
+  }
+
+  const questions: Question[] = [
+    {
+      type: 'choice',
+      question: '樊振东的出生日期是？',
+      options: ['1995年1月22日', '1997年1月22日', '1996年1月22日', '1998年1月22日'],
+      answer: 1
+    },
+    {
+      type: 'choice',
+      question: '樊振东的外号"小胖"是谁起的？',
+      options: ['刘国梁', '王皓', '吴敬平', '马龙'],
+      answer: 2
+    },
+    {
+      type: 'truefalse',
+      question: '樊振东是历史上最年轻的世乒赛男单冠军。',
+      options: ['正确', '错误'],
+      answer: 0
+    },
+    {
+      type: 'choice',
+      question: '"地表最强12人"赛事，樊振东获得了几次冠军？',
+      options: ['1次', '2次', '3次', '4次'],
+      answer: 2
+    },
+    {
+      type: 'choice',
+      question: '2023年亚运会男单决赛"月圆之夜"，樊振东的对手是？',
+      options: ['王楚钦', '马龙', '张本智和', '林高远'],
+      answer: 1
+    },
+    {
+      type: 'truefalse',
+      question: '樊振东是右手横板两面反胶打法。',
+      options: ['正确', '错误'],
+      answer: 0
+    },
+    {
+      type: 'choice',
+      question: '樊振东首次获得世界排名第一是在哪一年？',
+      options: ['2020年', '2021年', '2022年', '2023年'],
+      answer: 2
+    },
+    {
+      type: 'choice',
+      question: '樊振东在2024年巴黎奥运会获得了什么成绩？',
+      options: ['男单金牌', '男单银牌', '男单铜牌', '男团金牌+男单银牌'],
+      answer: 3
+    },
+    {
+      type: 'truefalse',
+      question: '樊振东曾在世界杯上实现三连冠。',
+      options: ['正确', '错误'],
+      answer: 0
+    },
+    {
+      type: 'choice',
+      question: '樊振东的籍贯是？',
+      options: ['广东广州', '广东深圳', '湖北武汉', '北京'],
+      answer: 0
+    }
+  ];
+
+  const ranks = [
+    { min: 0, max: 2, title: '🌱 路人粉', desc: '刚开始了解小胖，继续加油！' },
+    { min: 3, max: 5, title: '⭐ 普通球迷', desc: '有一定了解，但还需要多看比赛哦~' },
+    { min: 6, max: 7, title: '🌟 资深球迷', desc: '不错不错，对小胖很熟悉了！' },
+    { min: 8, max: 9, title: '💫 铁杆粉丝', desc: '厉害！你是真正的东粉！' },
+    { min: 10, max: 10, title: '🏆 终极迷弟/迷妹', desc: '满分！你比小胖还了解小胖！' }
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let userAnswers: number[] = [];
+  let shuffledQuestions: Question[] = [];
+
+  const startBtn = document.getElementById('start-btn');
+  const retryBtn = document.getElementById('retry-btn');
+  const quizIntro = document.getElementById('quiz-intro');
+  const quizArea = document.getElementById('quiz-area');
+  const quizResult = document.getElementById('quiz-result');
+
+  function shuffle<T>(array: T[]): T[] {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    currentIndex = 0;
+    score = 0;
+    userAnswers = [];
+    shuffledQuestions = shuffle(questions);
+    
+    if (quizIntro) quizIntro.style.display = 'none';
+    if (quizResult) quizResult.style.display = 'none';
+    if (quizArea) quizArea.style.display = 'block';
+    
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = shuffledQuestions[currentIndex];
+    const currentQ = document.getElementById('current-q');
+    const questionType = document.getElementById('question-type');
+    const questionText = document.getElementById('question-text');
+    const optionsDiv = document.getElementById('options');
+    
+    if (currentQ) currentQ.textContent = (currentIndex + 1).toString();
+    if (questionType) questionType.textContent = q.type === 'choice' ? '选择题' : '判断题';
+    if (questionText) questionText.textContent = q.question;
+    
+    if (optionsDiv) {
+      optionsDiv.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = q.type === 'choice' ? `${String.fromCharCode(65 + i)}. ${opt}` : opt;
+        btn.addEventListener('click', () => selectAnswer(i));
+        optionsDiv.appendChild(btn);
+      });
+    }
+  }
+
+  function selectAnswer(index: number) {
+    const q = shuffledQuestions[currentIndex];
+    const buttons = document.querySelectorAll('.option-btn');
+    
+    // 禁用所有按钮
+    buttons.forEach((btn, i) => {
+      (btn as HTMLButtonElement).disabled = true;
+      if (i === q.answer) {
+        btn.classList.add('correct');
+      } else if (i === index && index !== q.answer) {
+        btn.classList.add('wrong');
+      }
+    });
+    
+    userAnswers.push(index);
+    if (index === q.answer) {
+      score++;
+    }
+    
+    // 延迟后进入下一题
+    setTimeout(() => {
+      currentIndex++;
+      if (currentIndex < shuffledQuestions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }, 800);
+  }
+
+  function showResult() {
+    if (quizArea) quizArea.style.display = 'none';
+    if (quizResult) quizResult.style.display = 'block';
+    
+    const scoreDisplay = document.getElementById('score-display');
+    const rankDisplay = document.getElementById('rank-display');
+    const rankDesc = document.getElementById('rank-desc');
+    const wrongAnswers = document.getElementById('wrong-answers');
+    
+    if (scoreDisplay) scoreDisplay.textContent = `${score} / ${shuffledQuestions.length}`;
+    
+    const rank = ranks.find(r => score >= r.min && score <= r.max);
+    if (rank && rankDisplay) rankDisplay.textContent = rank.title;
+    if (rank && rankDesc) rankDesc.textContent = rank.desc;
+    
+    // 显示错题
+    if (wrongAnswers) {
+      const wrongList = shuffledQuestions
+        .map((q, i) => ({ q, userAnswer: userAnswers[i], index: i }))
+        .filter(item => item.userAnswer !== item.q.answer);
+      
+      if (wrongList.length === 0) {
+        wrongAnswers.innerHTML = '<p style="text-align:center;color:#2ed573;">🎉 全部正确！太厉害了！</p>';
+      } else {
+        wrongAnswers.innerHTML = `
+          <h3>📝 错题回顾 (${wrongList.length}题)</h3>
+          ${wrongList.map(item => `
+            <div class="wrong-item">
+              <div class="q">${item.index + 1}. ${item.q.question}</div>
+              <div class="your-answer">❌ 你的答案：${item.q.options[item.userAnswer]}</div>
+              <div class="correct-answer">✅ 正确答案：${item.q.options[item.q.answer]}</div>
+            </div>
+          `).join('')}
+        `;
+      }
+    }
+  }
+
+  startBtn?.addEventListener('click', startQuiz);
+  retryBtn?.addEventListener('click', startQuiz);
+</script>

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const tributes = await getCollection('tributes');
+---
+
+<BaseLayout title="评价和祝福">
+  <section class="page-header">
+    <h1>💝 评价和祝福</h1>
+    <p>来自各方的评价与美好祝愿</p>
+  </section>
+
+  <section class="content-grid">
+    {tributes.map(item => (
+      <Card 
+        title={item.data.title}
+        href={`/tributes/${item.slug.replace('zh/', '')}`}
+        description={item.data.description}
+        tag={item.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>

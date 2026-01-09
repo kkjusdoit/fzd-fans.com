@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const links = await getCollection('links');
+---
+
+<BaseLayout title="链接收藏">
+  <section class="page-header">
+    <h1>🔗 链接收藏</h1>
+    <p>好文报道、视频、快照存档</p>
+  </section>
+
+  <section class="content-grid">
+    {links.map(link => (
+      <Card 
+        title={link.data.title}
+        href={`/links/${link.slug.replace('zh/', '')}`}
+        description={link.data.description}
+        tag={link.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>

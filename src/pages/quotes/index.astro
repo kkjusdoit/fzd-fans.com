@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const quotes = await getCollection('quotes');
+---
+
+<BaseLayout title="语录">
+  <section class="page-header">
+    <h1>💬 语录</h1>
+    <p>朴实话语，高情商回答</p>
+  </section>
+
+  <section class="content-grid">
+    {quotes.map(quote => (
+      <Card 
+        title={quote.data.title}
+        href={`/quotes/${quote.slug.replace('zh/', '')}`}
+        description={quote.data.description}
+        tag={quote.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>
