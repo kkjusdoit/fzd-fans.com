@@ -1,0 +1,33 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+interface Props {
+  zhPath?: string;
+}
+
+const { zhPath } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+{lang === 'en' && (
+  <div class="not-translated">
+    <p>📝 {t('content.not-translated')}</p>
+    {zhPath && <a href={zhPath}>{t('content.view-chinese')}</a>}
+  </div>
+)}
+
+<style>
+  .not-translated {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+  }
+  .not-translated a {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+</style>

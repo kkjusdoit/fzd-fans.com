@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>🏓 樊振东的互联网档案馆</h1>
+    <p class="subtitle">民间互联网记忆工程</p>
+    <p class="intro">
+      这不是一本教科书式的百科，而是一本需要群策群力、不断完善的杂志。<br/>
+      记录的重点不是战绩，而是更耀眼的意志、人品、纯真、良善、幽默、对不公的抗争、对黑暗的不屈服。
+    </p>
+  </section>
+
+  <section class="categories">
+    <h2>📚 档案分类</h2>
+    <div class="grid">
+      <Card title="趣事轶事" href="/zh/stories" tag="故事" description="鸡蛋灌饼、花季少年谁穿衬衫、比周雨唱歌好听..." />
+      <Card title="难忘时刻" href="/zh/moments" tag="高光" description="月圆之夜、巴黎奥运、地表最强12人..." />
+      <Card title="语录" href="/zh/quotes" tag="金句" description="老拿冠军就老请呗、奖金都交给爸妈..." />
+      <Card title="贵人与朋友" href="/zh/friends" tag="人物" description="吴敬平、王涛、周恺、欢乐谷小分队..." />
+      <Card title="荣誉战绩" href="/zh/honors" tag="成就" description="最年轻世乒赛冠军、大满贯、独一无二..." />
+      <Card title="链接收藏" href="/zh/links" tag="快照" description="好文报道、视频、微博存档..." />
+    </div>
+  </section>
+
+  <section class="slogan-section">
+    <blockquote>
+      <p>大雪压青松，青松挺且直</p>
+      <p>每个赛场见</p>
+    </blockquote>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .subtitle { color: #c41e3a; font-size: 1.2rem; margin-bottom: 1rem; }
+  .intro { color: #666; max-width: 600px; margin: 0 auto; }
+  
+  .categories { padding: 2rem 0; }
+  .categories h2 { margin-bottom: 1.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .slogan-section {
+    text-align: center;
+    padding: 3rem 0;
+  }
+  blockquote {
+    font-size: 1.5rem;
+    color: #c41e3a;
+    font-style: italic;
+  }
+  blockquote p { margin: 0.5rem 0; }
+</style>

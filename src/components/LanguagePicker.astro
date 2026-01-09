@@ -1,0 +1,39 @@
+---
+import { languages } from '../i18n/ui';
+import { getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const pathname = Astro.url.pathname.replace(/^\/(zh|en)/, '') || '/';
+
+// 暂时隐藏英文入口
+const visibleLanguages = Object.entries(languages).filter(([code]) => code === 'zh');
+---
+
+<div class="lang-picker">
+  {visibleLanguages.map(([code, label]) => (
+    <a 
+      href={`/${code}${pathname}`} 
+      class:list={['lang-link', { active: code === lang }]}
+    >
+      {label}
+    </a>
+  ))}
+</div>
+
+<style>
+  .lang-picker {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .lang-link {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .lang-link.active {
+    background: #c41e3a;
+    color: #fff;
+  }
+  .lang-link:hover { text-decoration: none; }
+</style>

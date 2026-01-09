@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Card from '../../../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const honors = await getCollection('honors');
+---
+
+<BaseLayout title="荣誉战绩">
+  <section class="page-header">
+    <h1>🏆 荣誉战绩</h1>
+    <p>独一无二的记录与成就</p>
+  </section>
+
+  <section class="content-grid">
+    {honors.map(honor => (
+      <Card 
+        title={honor.data.title}
+        href={`/zh/honors/${honor.slug.replace('zh/', '')}`}
+        description={honor.data.description}
+        tag={honor.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .page-header p { color: #666; }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+</style>

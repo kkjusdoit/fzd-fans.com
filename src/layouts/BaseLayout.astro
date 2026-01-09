@@ -1,0 +1,48 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { languages } from '../i18n/ui';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const pageTitle = title ? `${title} | ${t('site.title')}` : t('site.title');
+const pageDesc = description || t('site.subtitle');
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={pageDesc} />
+  <link rel="alternate" hreflang="zh" href={`https://fzd-fans.com/zh${Astro.url.pathname.replace(/^\/(zh|en)/, '')}`} />
+  <link rel="alternate" hreflang="en" href={`https://fzd-fans.com/en${Astro.url.pathname.replace(/^\/(zh|en)/, '')}`} />
+  <title>{pageTitle}</title>
+  <style is:global>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #fafafa;
+    }
+    a { color: #c41e3a; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+  </style>
+</head>
+<body>
+  <Navigation />
+  <main class="container">
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

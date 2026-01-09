@@ -1,0 +1,73 @@
+---
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/utils';
+import { languages } from '../i18n/ui';
+import LanguagePicker from './LanguagePicker.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const navItems = [
+  { href: '/', label: t('nav.home') },
+  { href: '/archive', label: t('nav.archive') },
+  { href: '/stories', label: t('nav.stories') },
+  { href: '/moments', label: t('nav.moments') },
+  { href: '/quotes', label: t('nav.quotes') },
+  { href: '/friends', label: t('nav.friends') },
+  { href: '/honors', label: t('nav.honors') },
+  { href: '/links', label: t('nav.links') },
+  { href: '/about', label: t('nav.about') },
+];
+---
+
+<header class="header">
+  <div class="container header-inner">
+    <a href={getLocalizedPath('/', lang)} class="logo">
+      <span class="logo-icon">🏓</span>
+      <span class="logo-text">{t('site.title')}</span>
+    </a>
+    <nav class="nav">
+      {navItems.map(item => (
+        <a href={getLocalizedPath(item.href, lang)} class="nav-link">{item.label}</a>
+      ))}
+    </nav>
+    <LanguagePicker />
+  </div>
+</header>
+
+<style>
+  .header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #c41e3a;
+  }
+  .logo:hover { text-decoration: none; }
+  .logo-icon { font-size: 1.5rem; }
+  .nav {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .nav-link {
+    color: #555;
+    font-size: 0.9rem;
+  }
+  .nav-link:hover { color: #c41e3a; }
+</style>
