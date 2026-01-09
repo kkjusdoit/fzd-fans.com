@@ -5,10 +5,10 @@ import LanguagePicker from './LanguagePicker.astro';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
 
 const navItems = [
   { href: '/', label: t('nav.home') },
-  { href: '/archive', label: t('nav.archive') },
   { href: '/stories', label: t('nav.stories') },
   { href: '/arena', label: t('nav.arena') },
   { href: '/quotes', label: t('nav.quotes') },
@@ -20,6 +20,13 @@ const navItems = [
   { href: '/quiz', label: t('nav.quiz') },
   { href: '/about', label: t('nav.about') },
 ];
+
+function isActive(href: string) {
+  if (href === '/') {
+    return currentPath === '/' || currentPath === '/zh' || currentPath === '/zh/';
+  }
+  return currentPath.startsWith(href);
+}
 ---
 
 <header class="header">
@@ -30,7 +37,12 @@ const navItems = [
     </a>
     <nav class="nav">
       {navItems.map(item => (
-        <a href={getLocalizedPath(item.href, lang)} class="nav-link">{item.label}</a>
+        <a 
+          href={getLocalizedPath(item.href, lang)} 
+          class:list={['nav-link', { active: isActive(item.href) }]}
+        >
+          {item.label}
+        </a>
       ))}
     </nav>
     <LanguagePicker />
@@ -71,6 +83,11 @@ const navItems = [
   .nav-link {
     color: #555;
     font-size: 0.9rem;
+    transition: color 0.2s;
   }
   .nav-link:hover { color: #c41e3a; }
+  .nav-link.active {
+    color: #c41e3a;
+    font-weight: 600;
+  }
 </style>

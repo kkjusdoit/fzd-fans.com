@@ -1,6 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const stories = await getCollection('stories');
+const arena = await getCollection('arena');
+const quotes = await getCollection('quotes');
+const friends = await getCollection('friends');
+const warrior = await getCollection('warrior');
+const tributes = await getCollection('tributes');
+const links = await getCollection('links');
+
+const allContent = [
+  ...stories.map(s => ({ ...s, category: 'stories', categoryName: '趣闻轶事' })),
+  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '赛场之上' })),
+  ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '个人语录与梗' })),
+  ...friends.map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })),
+  ...warrior.map(w => ({ ...w, category: 'warrior', categoryName: '孤勇者' })),
+  ...tributes.map(t => ({ ...t, category: 'tributes', categoryName: '评价和祝福' })),
+  ...links.map(l => ({ ...l, category: 'links', categoryName: '链接收藏' })),
+];
 ---
 
 <BaseLayout>
@@ -13,15 +32,41 @@ import Card from '../components/Card.astro';
     </p>
   </section>
 
+  <section class="stats">
+    <div class="stat">
+      <span class="num">{allContent.length}</span>
+      <span class="label">篇档案</span>
+    </div>
+    <div class="stat">
+      <span class="num">7</span>
+      <span class="label">个分类</span>
+    </div>
+  </section>
+
   <section class="categories">
     <h2>📚 档案分类</h2>
     <div class="grid">
-      <Card title="趣事轶事" href="/stories" tag="故事" description="鸡蛋灌饼、花季少年谁穿衬衫、比周雨唱歌好听..." />
-      <Card title="难忘时刻" href="/moments" tag="高光" description="月圆之夜、巴黎奥运、地表最强12人..." />
-      <Card title="语录" href="/quotes" tag="金句" description="老拿冠军就老请呗、奖金都交给爸妈..." />
+      <Card title="趣闻轶事" href="/stories" tag="故事" description="鸡蛋灌饼、花季少年谁穿衬衫、比周雨唱歌好听..." />
+      <Card title="赛场之上" href="/arena" tag="高光" description="月圆之夜、巴黎奥运、地表最强12人、独一无二的记录..." />
+      <Card title="个人语录与梗" href="/quotes" tag="金句" description="老拿冠军就老请呗、奖金都交给爸妈..." />
       <Card title="贵人与朋友" href="/friends" tag="人物" description="吴敬平、王涛、周恺、欢乐谷小分队..." />
-      <Card title="荣誉战绩" href="/honors" tag="成就" description="最年轻世乒赛冠军、大满贯、独一无二..." />
+      <Card title="孤勇者" href="/warrior" tag="精神" description="独自面对风雨的勇气..." />
+      <Card title="评价和祝福" href="/tributes" tag="致敬" description="来自各方的评价与美好祝愿..." />
       <Card title="链接收藏" href="/links" tag="快照" description="好文报道、视频、微博存档..." />
+    </div>
+  </section>
+
+  <section class="all-content">
+    <h2>📖 全部档案</h2>
+    <div class="content-grid">
+      {allContent.map(item => (
+        <Card 
+          title={item.data.title}
+          href={`/${item.category}/${item.slug.replace('zh/', '')}`}
+          description={item.data.description}
+          tag={item.categoryName}
+        />
+      ))}
     </div>
   </section>
 
@@ -40,13 +85,39 @@ import Card from '../components/Card.astro';
   }
   .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .subtitle { color: #c41e3a; font-size: 1.2rem; margin-bottom: 1rem; }
-  .intro { color: #666; max-width: 600px; margin: 0 auto; }
+  .intro { color: #666; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+  
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 1rem 0 2rem;
+  }
+  .stat { text-align: center; }
+  .num { display: block; font-size: 2rem; font-weight: bold; color: #c41e3a; }
+  .label { color: #666; }
   
   .categories { padding: 2rem 0; }
   .categories h2 { margin-bottom: 1.5rem; }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .all-content {
+    padding: 3rem 0;
+    background: #fafafa;
+    margin: 2rem -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .all-content h2 {
+    margin-bottom: 1.5rem;
+  }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
   }
   

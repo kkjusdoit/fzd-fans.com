@@ -18,7 +18,7 @@ export const ui = {
     'nav.warrior': '孤勇者',
     'nav.tributes': '评价和祝福',
     'nav.links': '链接收藏',
-    'nav.breakit': '打破一切',
+    'nav.breakit': '打爆一切',
     'nav.quiz': '球迷等级考试',
     'nav.about': '关于',
     'content.not-translated': '此内容暂无英文版本',
