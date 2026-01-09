@@ -6,10 +6,14 @@ import { getCollection } from 'astro:content';
 const stars = await getCollection('stars');
 ---
 
-<BaseLayout title="满天繁星">
+<BaseLayout title="天际樊星">
   <section class="page-header">
-    <h1>⭐ 满天繁星</h1>
-    <p>樊星口号，每个赛场见</p>
+    <h1>⭐ 天际樊星</h1>
+    <div class="official-link">
+      <a href="https://weibo.com/u/3329910664" target="_blank" rel="noopener noreferrer">
+        樊振东球迷官方微博：樊振东球迷会-天际樊星
+      </a>
+    </div>
   </section>
 
   <section class="content-grid">
@@ -31,6 +35,17 @@ const stars = await getCollection('stars');
   }
   .page-header h1 { margin-bottom: 0.5rem; }
   .page-header p { color: #666; }
+  .official-link {
+    margin-top: 1rem;
+  }
+  .official-link a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .official-link a:hover {
+    text-decoration: underline;
+  }
   .content-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

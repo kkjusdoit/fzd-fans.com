@@ -17,7 +17,7 @@ export const ui = {
     'nav.warrior': '孤勇者',
     'nav.tributes': '评价和祝福',
     'nav.links': '媒体链接',
-    'nav.stars': '满天繁星',
+    'nav.stars': '天际樊星',
     'nav.breakit': '打爆一切',
     'nav.quiz': '球迷等级考试',
     'nav.about': '关于',

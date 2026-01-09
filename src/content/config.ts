@@ -20,6 +20,6 @@ const friends = defineCollection({ type: 'content', schema: archiveSchema });
 const warrior = defineCollection({ type: 'content', schema: archiveSchema }); // 孤勇者
 const tributes = defineCollection({ type: 'content', schema: archiveSchema }); // 评价和祝福
 const links = defineCollection({ type: 'content', schema: archiveSchema });
-const stars = defineCollection({ type: 'content', schema: archiveSchema }); // 满天繁星 (樊星口号)
+const stars = defineCollection({ type: 'content', schema: archiveSchema }); // 天际樊星 (樊星口号)
 
 export const collections = { stories, arena, quotes, friends, warrior, tributes, links, stars };

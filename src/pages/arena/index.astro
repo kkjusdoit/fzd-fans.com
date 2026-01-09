@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Card from '../../components/Card.astro';
+import Timeline from '../../components/Timeline.astro';
 import { getCollection } from 'astro:content';
 
 const arena = await getCollection('arena');
@@ -8,19 +8,12 @@ const arena = await getCollection('arena');
 
 <BaseLayout title="重要时刻">
   <section class="page-header">
-    <h1>🏆 重要时刻</h1>
-    <p>难忘时刻与荣誉战绩</p>
+    <h1>🏆 职业生涯大事记</h1>
+    <p>从少年天才到世界冠军的成长之路</p>
   </section>
 
-  <section class="content-grid">
-    {arena.map(item => (
-      <Card 
-        title={item.data.title}
-        href={`/arena/${item.slug.replace('zh/', '')}`}
-        description={item.data.description}
-        tag={item.data.tags?.[0]}
-      />
-    ))}
+  <section class="timeline-section">
+    <Timeline items={arena} />
   </section>
 </BaseLayout>
 
@@ -28,13 +21,19 @@ const arena = await getCollection('arena');
   .page-header {
     text-align: center;
     padding: 2rem 0;
+    margin-bottom: 2rem;
   }
-  .page-header h1 { margin-bottom: 0.5rem; }
-  .page-header p { color: #666; }
-  .content-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+  .page-header h1 { 
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+  }
+  .page-header p { 
+    color: #666;
+    font-size: 1.1rem;
+  }
+  .timeline-section {
+    max-width: 1000px;
+    margin: 0 auto;
     padding: 2rem 0;
   }
 </style>

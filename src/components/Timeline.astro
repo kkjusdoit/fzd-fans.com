@@ -1,0 +1,195 @@
+---
+interface Props {
+  items: any[];
+}
+
+const { items } = Astro.props;
+
+// 按日期排序
+const sortedItems = items.sort((a, b) => {
+  const dateA = new Date(a.data.date).getTime();
+  const dateB = new Date(b.data.date).getTime();
+  return dateA - dateB;
+});
+---
+
+<div class="timeline-container">
+  <div class="timeline-line"></div>
+  
+  <div class="timeline-items">
+    {sortedItems.map((item, index) => {
+      const year = new Date(item.data.date).getFullYear();
+      const isLeft = index % 2 === 0;
+      
+      return (
+        <div class={`timeline-item ${isLeft ? 'left' : 'right'}`}>
+          <div class="timeline-dot"></div>
+          
+          <div class="timeline-content">
+            <div class="timeline-year">{year}</div>
+            <a href={`/arena/${item.slug.replace('zh/', '')}`} class="timeline-card">
+              <div class="card-header">
+                {item.data.tags?.[0] && (
+                  <span class="card-tag">{item.data.tags[0]}</span>
+                )}
+              </div>
+              <h3 class="card-title">{item.data.title}</h3>
+              <p class="card-description">{item.data.description}</p>
+            </a>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .timeline-container {
+    position: relative;
+    padding: 2rem 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #e91e63, #9c27b0, #673ab7);
+    transform: translateX(-50%);
+  }
+
+  .timeline-items {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .timeline-item {
+    display: flex;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-item.left {
+    flex-direction: row;
+  }
+
+  .timeline-item.right {
+    flex-direction: row-reverse;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 1.5rem;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 4px solid #e91e63;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    box-shadow: 0 0 0 4px rgba(233, 30, 99, 0.1);
+  }
+
+  .timeline-content {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .timeline-item.left .timeline-content {
+    text-align: right;
+    padding-right: 2rem;
+  }
+
+  .timeline-item.right .timeline-content {
+    text-align: left;
+    padding-left: 2rem;
+  }
+
+  .timeline-year {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #e91e63;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-card {
+    display: block;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .timeline-card:hover {
+    box-shadow: 0 8px 16px rgba(233, 30, 99, 0.15);
+    transform: translateY(-4px);
+    border-color: #e91e63;
+  }
+
+  .card-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .card-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #e91e63;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .card-title {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .card-description {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .timeline-line {
+      left: 20px;
+    }
+
+    .timeline-item {
+      flex-direction: column !important;
+    }
+
+    .timeline-item.left,
+    .timeline-item.right {
+      flex-direction: column;
+    }
+
+    .timeline-dot {
+      left: 20px;
+    }
+
+    .timeline-content {
+      width: 100%;
+      text-align: left !important;
+      padding-left: 60px !important;
+      padding-right: 0 !important;
+    }
+
+    .timeline-year {
+      text-align: left;
+    }
+  }
+</style>

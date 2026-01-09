@@ -23,9 +23,16 @@ translated: false
 - 文章链接（待补充）
 - 代表作品（待补充）
 
+### 节之子
+- todo
+
+### 尹航
+- todo:尹航语录。那些自媒体选一个播放量最高的文案。 
+
 ### kkjusdoit（忝列其中, it's me😊）
 - [巴黎奥运樊振东对张本智和观后感](https://mp.weixin.qq.com/s/T5msAX_E6Mx9YjqF-ecU2g)
 - [这世界上没有人不喜欢樊振东](https://mp.weixin.qq.com/s/n3UOapAUzKTQFEEwUlhHfA)
+- [樊振东的身价暴涨：一场“邪不压正”的报复性补偿](https://mp.weixin.qq.com/s/WBCmsU1vUOxKqG3GjtsNig)
 
 ## 其他优质博主
 
@@ -33,4 +40,3 @@ translated: false
 
 ---
 
-*素材来源于网络，如有侵权请联系删除*
