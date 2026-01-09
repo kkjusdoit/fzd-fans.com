@@ -1,2 +1,2 @@
 name = "fzd-fans-com"
-pages_build_output_dir = "dist"
+pages_build_output_dir = "fzd-archive/dist"
