@@ -311,7 +311,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     "多次商业赛无随行主管教练",
     "研究队友一整年,专挑对手接不着的地方打",
     "遭受饭圈攻击时，官方发声迟缓",
-
   ];
 
   let brokenCount = 0;
@@ -319,11 +318,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   let gameArea: HTMLElement | null;
   let balloons: { element: HTMLElement; x: number; y: number; minY: number; speed: number; sway: number; swayOffset: number }[] = [];
   let animationId: number;
+  let usedZones: Set<number> = new Set(); // 记录已使用的水平区域
 
   // 检测是否为移动设备
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-  // 移动端速度倍数
-  const speedMultiplier = isMobile ? 3 : 1;
+  // 移动端速度倍数（更快）
+  const speedMultiplier = isMobile ? 4 : 1;
 
   const startBtn = document.getElementById('start-btn');
   const replayBtn = document.getElementById('replay-btn');
@@ -333,6 +333,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   function startGame() {
     brokenCount = 0;
     balloons = [];
+    usedZones.clear();
     gameArea = document.getElementById('game-area');
 
     if (gameIntro) gameIntro.style.display = 'none';
@@ -347,14 +348,40 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       `;
     }
 
-    // 依次生成热气球，移动端间隔更短
-    const spawnInterval = isMobile ? 400 : 600;
+    // 移动端更快生成，间隔更短
+    const spawnInterval = isMobile ? 150 : 500;
     rumors.forEach((text, i) => {
       setTimeout(() => spawnBalloon(text, i), i * spawnInterval);
     });
 
     // 开始动画循环
     animateBalloons();
+  }
+
+  // 获取不重叠的水平位置
+  function getUniqueX(balloonWidth: number): number {
+    const screenWidth = window.innerWidth;
+    const padding = 30;
+    const zoneWidth = balloonWidth + 20; // 气球宽度 + 间距
+    const numZones = Math.floor((screenWidth - padding * 2) / zoneWidth);
+    
+    // 如果所有区域都用过了，重置
+    if (usedZones.size >= numZones) {
+      usedZones.clear();
+    }
+    
+    // 找一个未使用的区域
+    let zone: number;
+    do {
+      zone = Math.floor(Math.random() * numZones);
+    } while (usedZones.has(zone));
+    
+    usedZones.add(zone);
+    
+    // 在区域内加一点随机偏移
+    const baseX = padding + zone * zoneWidth;
+    const offset = Math.random() * 15;
+    return baseX + offset;
   }
 
   function spawnBalloon(text: string, index: number) {
@@ -370,11 +397,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="balloon-basket"></div>
     `;
 
-    // 随机水平位置
-    const x = 50 + Math.random() * (window.innerWidth - 200);
-    const y = window.innerHeight + 50; // 从屏幕底部开始
-    // 随机停止高度 (在屏幕上半部分的某个位置)
-    const minY = 80 + Math.random() * (window.innerHeight * 0.6);
+    // 使用分区算法获取不重叠的水平位置
+    const balloonWidth = isMobile ? 80 : 100;
+    const x = getUniqueX(balloonWidth);
+    // 错开起始高度，避免同时出现
+    const y = window.innerHeight + 50 + (index % 5) * 80;
+    // 随机停止高度 (在屏幕上半部分的某个位置)，也错开
+    const minY = 80 + (index % 4) * 60 + Math.random() * (window.innerHeight * 0.3);
 
     balloon.style.left = x + 'px';
     balloon.style.top = y + 'px';
@@ -383,15 +412,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     gameArea.appendChild(balloon);
 
-    // 记录气球数据
+    // 记录气球数据，移动端速度更快
     balloons.push({
       element: balloon,
       x: x,
       y: y,
-      minY: minY, // 停止上升的位置
-      speed: (0.3 + Math.random() * 0.3) * speedMultiplier, // 移动端速度更快
-      sway: 15 + Math.random() * 20, // 左右摇摆幅度
-      swayOffset: Math.random() * Math.PI * 2 // 摇摆相位
+      minY: minY,
+      speed: (0.8 + Math.random() * 0.6) * speedMultiplier,
+      sway: isMobile ? 8 : 15 + Math.random() * 20, // 移动端减少摇摆
+      swayOffset: Math.random() * Math.PI * 2
     });
   }
 
@@ -450,22 +479,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     ];
     const fragmentColors = colors[colorIndex % 7];
 
+    // 移动端减少特效数量
+    const fragmentCount = isMobile ? 10 : 25;
+    const sparkCount = isMobile ? 6 : 16;
+    const smokeCount = isMobile ? 2 : 5;
+
     // 爆炸闪光
     const flash = document.createElement('div');
     flash.className = 'explosion-flash';
-    flash.style.left = (centerX - 60) + 'px';
-    flash.style.top = (centerY - 60) + 'px';
-    flash.style.width = '120px';
-    flash.style.height = '120px';
-    flash.style.background = `radial-gradient(circle, white 0%, ${fragmentColors[0]} 50%, transparent 70%)`;
-    flash.style.opacity = '1';
+    flash.style.cssText = `left:${centerX - 60}px;top:${centerY - 60}px;width:120px;height:120px;background:radial-gradient(circle, white 0%, ${fragmentColors[0]} 50%, transparent 70%);opacity:1`;
     document.body.appendChild(flash);
 
     let flashOp = 1;
     let flashScale = 1;
     function animateFlash() {
-      flashOp -= 0.1;
-      flashScale += 0.3;
+      flashOp -= 0.15;
+      flashScale += 0.4;
       flash.style.opacity = flashOp.toString();
       flash.style.transform = `scale(${flashScale})`;
       if (flashOp > 0) {
@@ -476,51 +505,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
     animateFlash();
 
-    // 冲击波
-    const shockwave = document.createElement('div');
-    shockwave.className = 'shockwave';
-    shockwave.style.left = (centerX - 10) + 'px';
-    shockwave.style.top = (centerY - 10) + 'px';
-    shockwave.style.width = '20px';
-    shockwave.style.height = '20px';
-    shockwave.style.borderColor = fragmentColors[0];
-    document.body.appendChild(shockwave);
+    // 冲击波（移动端简化）
+    if (!isMobile) {
+      const shockwave = document.createElement('div');
+      shockwave.className = 'shockwave';
+      shockwave.style.cssText = `left:${centerX - 10}px;top:${centerY - 10}px;width:20px;height:20px;border-color:${fragmentColors[0]}`;
+      document.body.appendChild(shockwave);
 
-    let swScale = 1;
-    let swOp = 1;
-    function animateShockwave() {
-      swScale += 0.8;
-      swOp -= 0.05;
-      shockwave.style.transform = `scale(${swScale})`;
-      shockwave.style.opacity = swOp.toString();
-      if (swOp > 0) {
-        requestAnimationFrame(animateShockwave);
-      } else {
-        shockwave.remove();
+      let swScale = 1;
+      let swOp = 1;
+      function animateShockwave() {
+        swScale += 0.8;
+        swOp -= 0.05;
+        shockwave.style.transform = `scale(${swScale})`;
+        shockwave.style.opacity = swOp.toString();
+        if (swOp > 0) {
+          requestAnimationFrame(animateShockwave);
+        } else {
+          shockwave.remove();
+        }
       }
+      animateShockwave();
     }
-    animateShockwave();
 
     // 爆炸文字
     const boomTexts = ['💥', '砰!', 'BOOM', '爆!'];
     const boomText = document.createElement('div');
     boomText.className = 'boom-text';
     boomText.textContent = boomTexts[Math.floor(Math.random() * boomTexts.length)];
-    boomText.style.left = centerX + 'px';
-    boomText.style.top = centerY + 'px';
-    boomText.style.color = fragmentColors[0];
+    boomText.style.cssText = `left:${centerX}px;top:${centerY}px;color:${fragmentColors[0]}`;
     document.body.appendChild(boomText);
 
     let btOp = 1;
     let btY = centerY;
     let btScale = 0.5;
     function animateBoomText() {
-      btOp -= 0.04;
-      btY -= 3;
-      btScale = Math.min(btScale + 0.15, 1.5);
-      boomText.style.opacity = btOp.toString();
-      boomText.style.top = btY + 'px';
-      boomText.style.transform = `translate(-50%, -50%) scale(${btScale})`;
+      btOp -= 0.06;
+      btY -= 4;
+      btScale = Math.min(btScale + 0.2, 1.5);
+      boomText.style.cssText = `left:${centerX}px;top:${btY}px;color:${fragmentColors[0]};opacity:${btOp};transform:translate(-50%, -50%) scale(${btScale})`;
       if (btOp > 0) {
         requestAnimationFrame(animateBoomText);
       } else {
@@ -529,48 +552,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
     animateBoomText();
 
-    // 创建更多碎片
-    for (let i = 0; i < 25; i++) {
+    // 碎片（移动端减少数量）
+    for (let i = 0; i < fragmentCount; i++) {
       const fragment = document.createElement('div');
       fragment.className = 'fragment';
 
-      const size = 5 + Math.random() * 18;
+      const size = 5 + Math.random() * 15;
       const isRound = Math.random() > 0.4;
 
-      fragment.style.width = size + 'px';
-      fragment.style.height = size + 'px';
-      fragment.style.background = fragmentColors[Math.floor(Math.random() * fragmentColors.length)];
-      fragment.style.borderRadius = isRound ? '50%' : (Math.random() * 8) + 'px';
-      fragment.style.left = centerX + 'px';
-      fragment.style.top = centerY + 'px';
-      fragment.style.boxShadow = `0 0 ${size}px ${fragmentColors[0]}`;
+      fragment.style.cssText = `width:${size}px;height:${size}px;background:${fragmentColors[Math.floor(Math.random() * fragmentColors.length)]};border-radius:${isRound ? '50%' : Math.random() * 8 + 'px'};left:${centerX}px;top:${centerY}px`;
 
       document.body.appendChild(fragment);
 
       const angle = Math.random() * Math.PI * 2;
-      const velocity = 8 + Math.random() * 15;
-      const vx = Math.cos(angle) * velocity;
-      const vy = Math.sin(angle) * velocity - 5;
-      const gravity = 0.4;
-      const rotation = Math.random() * 1080 - 540;
-
+      const velocity = 6 + Math.random() * 12;
+      let vx = Math.cos(angle) * velocity;
+      let vy = Math.sin(angle) * velocity - 4;
       let px = centerX;
       let py = centerY;
-      let vyNow = vy;
       let opacity = 1;
-      let rot = 0;
 
       function animateFragment() {
         px += vx;
-        vyNow += gravity;
-        py += vyNow;
-        opacity -= 0.025;
-        rot += rotation / 40;
+        vy += 0.5;
+        py += vy;
+        opacity -= 0.04;
 
-        fragment.style.left = px + 'px';
-        fragment.style.top = py + 'px';
-        fragment.style.opacity = opacity.toString();
-        fragment.style.transform = `rotate(${rot}deg)`;
+        fragment.style.cssText = `width:${size}px;height:${size}px;background:${fragmentColors[0]};border-radius:${isRound ? '50%' : '4px'};left:${px}px;top:${py}px;opacity:${opacity}`;
 
         if (opacity > 0) {
           requestAnimationFrame(animateFragment);
@@ -581,23 +589,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       animateFragment();
     }
 
-    // 更多火花
-    for (let i = 0; i < 16; i++) {
+    // 火花（移动端减少）
+    for (let i = 0; i < sparkCount; i++) {
       const spark = document.createElement('div');
       spark.className = 'fragment';
-      const sparkSize = 3 + Math.random() * 4;
-      spark.style.width = sparkSize + 'px';
-      spark.style.height = sparkSize + 'px';
-      spark.style.background = i % 2 === 0 ? '#fff' : '#ffd700';
-      spark.style.borderRadius = '50%';
-      spark.style.left = centerX + 'px';
-      spark.style.top = centerY + 'px';
-      spark.style.boxShadow = `0 0 ${sparkSize * 2}px #fff, 0 0 ${sparkSize * 4}px #ffd700`;
+      const sparkSize = 3 + Math.random() * 3;
+      spark.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;background:${i % 2 === 0 ? '#fff' : '#ffd700'};border-radius:50%;left:${centerX}px;top:${centerY}px`;
 
       document.body.appendChild(spark);
 
-      const angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.3;
-      const velocity = 10 + Math.random() * 8;
+      const angle = (Math.PI * 2 * i) / sparkCount;
+      const velocity = 8 + Math.random() * 6;
       let px = centerX;
       let py = centerY;
       let opacity = 1;
@@ -607,13 +609,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       function animateSpark() {
         px += vx;
         py += vy;
-        vy += 0.2; // 轻微重力
-        vx *= 0.98; // 阻力
-        opacity -= 0.05;
+        vy += 0.3;
+        opacity -= 0.07;
 
-        spark.style.left = px + 'px';
-        spark.style.top = py + 'px';
-        spark.style.opacity = opacity.toString();
+        spark.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;background:${i % 2 === 0 ? '#fff' : '#ffd700'};border-radius:50%;left:${px}px;top:${py}px;opacity:${opacity}`;
 
         if (opacity > 0) {
           requestAnimationFrame(animateSpark);
@@ -624,30 +623,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       animateSpark();
     }
 
-    // 烟雾效果
-    for (let i = 0; i < 5; i++) {
+    // 烟雾（移动端减少）
+    for (let i = 0; i < smokeCount; i++) {
       const smoke = document.createElement('div');
       smoke.className = 'fragment';
-      smoke.style.width = '30px';
-      smoke.style.height = '30px';
-      smoke.style.background = 'radial-gradient(circle, rgba(100,100,100,0.6) 0%, transparent 70%)';
-      smoke.style.borderRadius = '50%';
-      smoke.style.left = (centerX - 15 + (Math.random() - 0.5) * 40) + 'px';
-      smoke.style.top = (centerY - 15 + (Math.random() - 0.5) * 40) + 'px';
+      const smokeX = centerX - 15 + (Math.random() - 0.5) * 30;
+      let smokeY = centerY - 15 + (Math.random() - 0.5) * 30;
+      smoke.style.cssText = `width:30px;height:30px;background:radial-gradient(circle, rgba(100,100,100,0.5) 0%, transparent 70%);border-radius:50%;left:${smokeX}px;top:${smokeY}px`;
 
       document.body.appendChild(smoke);
 
-      let smokeOp = 0.6;
+      let smokeOp = 0.5;
       let smokeScale = 1;
-      let smokeY = parseFloat(smoke.style.top);
 
       function animateSmoke() {
-        smokeOp -= 0.015;
-        smokeScale += 0.05;
-        smokeY -= 1;
-        smoke.style.opacity = smokeOp.toString();
-        smoke.style.transform = `scale(${smokeScale})`;
-        smoke.style.top = smokeY + 'px';
+        smokeOp -= 0.025;
+        smokeScale += 0.08;
+        smokeY -= 1.5;
+        smoke.style.cssText = `width:30px;height:30px;background:radial-gradient(circle, rgba(100,100,100,${smokeOp}) 0%, transparent 70%);border-radius:50%;left:${smokeX}px;top:${smokeY}px;transform:scale(${smokeScale})`;
 
         if (smokeOp > 0) {
           requestAnimationFrame(animateSmoke);
