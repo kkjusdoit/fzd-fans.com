@@ -44,6 +44,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </p>
     </section>
 
+    <section>
+      <h2>相关链接</h2>
+      <ul class="related-links">
+        <li><a href="https://www.f-zd.com/" target="_blank" rel="noopener noreferrer">樊振东百科</a> - by 费祎 （致敬先行者）</li>
+        <li><a href="https://mp.weixin.qq.com/s/YpElhONaPWjn1nIx9uMULg" target="_blank" rel="noopener noreferrer">樊振东的互联网档案馆｜fzd-fans.com网站建成纪实</a></li>
+      </ul>
+    </section>
+
     <section class="slogan">
       <!-- 乒乓球动画 -->
       <div class="ping-pong-balls">
@@ -120,6 +128,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 1.3rem;
   }
   p { margin-bottom: 1rem; }
+  
+  .related-links {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .related-links li {
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+  
+  .related-links li::before {
+    content: '🔗';
+    position: absolute;
+    left: 0;
+  }
+  
+  .related-links a {
+    color: #c41e3a;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .related-links a:hover {
+    text-decoration: underline;
+  }
   
   /* 炫酷 Slogan 样式 */
   .slogan {
