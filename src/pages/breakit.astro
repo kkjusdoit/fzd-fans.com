@@ -246,7 +246,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .fragment {
     position: fixed;
     pointer-events: none;
-    z-index: 100;
+    z-index: 2000;
   }
 
   /* 爆炸闪光 */
@@ -254,7 +254,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     position: fixed;
     border-radius: 50%;
     pointer-events: none;
-    z-index: 99;
+    z-index: 1999;
   }
 
   /* 冲击波 */
@@ -263,7 +263,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.8);
     pointer-events: none;
-    z-index: 98;
+    z-index: 1998;
   }
 
   /* 爆炸文字 */
@@ -272,8 +272,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 2rem;
     font-weight: bold;
     pointer-events: none;
-    z-index: 101;
+    z-index: 2001;
     text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  /* 烟花效果 */
+  .firework {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1002;
+  }
+  .firework-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1002;
+  }
+  .firework-trail {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1002;
   }
 </style>
 
@@ -652,13 +673,125 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
   }
 
+  // 烟花效果
+  let fireworkInterval: number;
+  const fireworkColors = [
+    ['#ff6b6b', '#ff8787', '#ffa8a8'],
+    ['#ffd700', '#ffec8b', '#fff8dc'],
+    ['#74b9ff', '#a0d2ff', '#d0e8ff'],
+    ['#a29bfe', '#c4bfff', '#e0ddff'],
+    ['#55efc4', '#81fff0', '#b0fff8'],
+    ['#fd79a8', '#ffb3d1', '#ffd6e7'],
+    ['#00ff88', '#66ffaa', '#99ffcc'],
+  ];
+
+  function createFirework() {
+    const x = Math.random() * window.innerWidth;
+    const startY = window.innerHeight;
+    const targetY = 100 + Math.random() * (window.innerHeight * 0.4);
+    const colors = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+
+    // 上升的火花
+    const rocket = document.createElement('div');
+    rocket.className = 'firework-trail';
+    rocket.style.cssText = `left:${x}px;top:${startY}px;background:${colors[0]};box-shadow:0 0 6px ${colors[0]}`;
+    document.body.appendChild(rocket);
+
+    let rocketY = startY;
+    const rocketSpeed = 8 + Math.random() * 4;
+
+    function animateRocket() {
+      rocketY -= rocketSpeed;
+      rocket.style.top = rocketY + 'px';
+
+      // 拖尾
+      if (Math.random() > 0.5) {
+        const trail = document.createElement('div');
+        trail.className = 'firework-trail';
+        trail.style.cssText = `left:${x + (Math.random() - 0.5) * 4}px;top:${rocketY}px;background:${colors[1]};opacity:0.8`;
+        document.body.appendChild(trail);
+        setTimeout(() => trail.remove(), 200);
+      }
+
+      if (rocketY > targetY) {
+        requestAnimationFrame(animateRocket);
+      } else {
+        rocket.remove();
+        explodeFirework(x, targetY, colors);
+      }
+    }
+    animateRocket();
+  }
+
+  function explodeFirework(x: number, y: number, colors: string[]) {
+    const particleCount = 30 + Math.floor(Math.random() * 20);
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'firework-particle';
+      const size = 3 + Math.random() * 4;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size * 2}px ${color}`;
+      document.body.appendChild(particle);
+
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+      const velocity = 3 + Math.random() * 5;
+      let vx = Math.cos(angle) * velocity;
+      let vy = Math.sin(angle) * velocity;
+      let px = x;
+      let py = y;
+      let opacity = 1;
+      let life = 60 + Math.random() * 40;
+
+      function animateParticle() {
+        px += vx;
+        vy += 0.08; // 重力
+        py += vy;
+        vx *= 0.98; // 阻力
+        opacity -= 1 / life;
+
+        particle.style.left = px + 'px';
+        particle.style.top = py + 'px';
+        particle.style.opacity = opacity.toString();
+
+        if (opacity > 0) {
+          requestAnimationFrame(animateParticle);
+        } else {
+          particle.remove();
+        }
+      }
+      animateParticle();
+    }
+  }
+
+  function startFireworks() {
+    // 立即放几个
+    for (let i = 0; i < 2; i++) {
+      setTimeout(() => createFirework(), i * 500);
+    }
+    // 持续放烟花，间隔拉长
+    fireworkInterval = setInterval(() => {
+      createFirework();
+    }, 1200);
+  }
+
+  function stopFireworks() {
+    if (fireworkInterval) {
+      clearInterval(fireworkInterval);
+    }
+  }
+
   function endGame() {
     setTimeout(() => {
       if (gameArea) gameArea.style.display = 'none';
       if (gameEnd) gameEnd.style.display = 'flex';
+      startFireworks();
     }, 500);
   }
 
   startBtn?.addEventListener('click', startGame);
-  replayBtn?.addEventListener('click', startGame);
+  replayBtn?.addEventListener('click', () => {
+    stopFireworks();
+    startGame();
+  });
 </script>
