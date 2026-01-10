@@ -246,7 +246,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .fragment {
     position: fixed;
     pointer-events: none;
-    z-index: 100;
+    z-index: 2000;
   }
 
   /* 爆炸闪光 */
@@ -254,7 +254,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     position: fixed;
     border-radius: 50%;
     pointer-events: none;
-    z-index: 99;
+    z-index: 1999;
   }
 
   /* 冲击波 */
@@ -263,7 +263,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-radius: 50%;
     border: 3px solid rgba(255, 255, 255, 0.8);
     pointer-events: none;
-    z-index: 98;
+    z-index: 1998;
   }
 
   /* 爆炸文字 */
@@ -272,8 +272,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 2rem;
     font-weight: bold;
     pointer-events: none;
-    z-index: 101;
+    z-index: 2001;
     text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  /* 烟花效果 */
+  .firework {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .firework-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .firework-trail {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
   }
 </style>
 
