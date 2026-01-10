@@ -1,14 +1,11 @@
 ---
-title: "自媒体博主推介"
+title: "自媒体博主"
 titleEn: "Self-Media Articles"
 description: "感谢这些客观公正的正义之声"
 category: links
 tags: ["自媒体", "博主", "文章"]
 translated: false
 ---
-
-## 推荐博主
-
 
 ### 靳个理
 > 体育博主

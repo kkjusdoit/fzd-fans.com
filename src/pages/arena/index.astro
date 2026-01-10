@@ -32,7 +32,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <div class="intro-section">
       <h2>从无可超越到新的征程</h2>
       <p>
-        纵览樊振东的职业生涯，从他创下的<span class="highlight">无可超越的历史记录</span>，到那些定义时代的<span class="highlight">重要赛场时刻</span>，再到近期引发热议的<span class="highlight">退出世界排名</span>与<span class="highlight">出走德甲</span>。通过交互式数据与时间轴，一览这位乒坛巨星的轨迹。
+        纵览樊振东的职业生涯，从他创下的<span class="highlight">无可超越的历史记录</span>，到那些定义时代的<span class="highlight">重要赛场时刻</span>，再到引发热议的<span class="highlight">退出世界排名</span>与<span class="highlight">出走德甲</span>。通过交互式数据与时间轴，一览这位乒坛巨星的轨迹。
       </p>
     </div>
 
@@ -45,7 +45,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </div>
         <div class="stat-card border-gold">
           <div class="stat-label">世界杯冠军</div>
-          <div class="stat-value"><span class="stat-number">4次+</span><span class="stat-unit">历史记录</span></div>
+          <div class="stat-value"><span class="stat-number">4次</span><span class="stat-unit">历史记录</span></div>
         </div>
         <div class="stat-card border-gray">
           <div class="stat-label">九大赛单打</div>
@@ -336,8 +336,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     titlesChartInstance = new Chart(ctxTitles, {
       type: 'bar',
       data: {
-        labels: ['世界杯 (World Cup)', '世乒赛 (WTT)', '奥运会 (Olympics)', '亚运会 (Asian Games)'],
-        datasets: [{ label: '冠军头衔数 (Titles)', data: [4, 2, 1, 2], backgroundColor: '#aa222d', borderRadius: 4, barThickness: 40 }]
+        labels: ['世界杯 (World Cup)', '世乒赛 (WTT)', '奥运会 (Olympics)'],
+        datasets: [{ label: '冠军头衔数 (Titles)', data: [4, 2, 1], backgroundColor: '#aa222d', borderRadius: 4, barThickness: 40 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
