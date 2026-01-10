@@ -523,50 +523,51 @@ const slogans = [
   }
 </style>
 
-<script>
-  // 语录轮播
-  const carousel = document.getElementById('quotesCarousel');
-  const quotes = carousel?.querySelectorAll('.quote-card');
-  const dots = document.querySelectorAll('.carousel-dots .dot');
-  let currentIndex = 0;
-  let autoPlayTimer: ReturnType<typeof setInterval>;
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('quotesCarousel');
+    const quotes = carousel?.querySelectorAll('.quote-card');
+    const dots = document.querySelectorAll('.carousel-dots .dot');
+    let currentIndex = 0;
+    let autoPlayTimer;
 
-  function showQuote(index: number) {
-    quotes?.forEach((q, i) => {
-      q.classList.toggle('active', i === index);
+    function showQuote(index) {
+      quotes?.forEach((q, i) => {
+        q.classList.toggle('active', i === index);
+      });
+      dots?.forEach((d, i) => {
+        d.classList.toggle('active', i === index);
+      });
+      currentIndex = index;
+    }
+
+    function nextQuote() {
+      const next = (currentIndex + 1) % (quotes?.length || 1);
+      showQuote(next);
+    }
+
+    function startAutoPlay() {
+      autoPlayTimer = setInterval(nextQuote, 4000);
+    }
+
+    function stopAutoPlay() {
+      clearInterval(autoPlayTimer);
+    }
+
+    // 点击圆点切换
+    dots?.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        showQuote(i);
+        stopAutoPlay();
+        startAutoPlay();
+      });
     });
-    dots?.forEach((d, i) => {
-      d.classList.toggle('active', i === index);
-    });
-    currentIndex = index;
-  }
 
-  function nextQuote() {
-    const next = (currentIndex + 1) % (quotes?.length || 1);
-    showQuote(next);
-  }
+    // 鼠标悬停暂停
+    carousel?.addEventListener('mouseenter', stopAutoPlay);
+    carousel?.addEventListener('mouseleave', startAutoPlay);
 
-  function startAutoPlay() {
-    autoPlayTimer = setInterval(nextQuote, 4000);
-  }
-
-  function stopAutoPlay() {
-    clearInterval(autoPlayTimer);
-  }
-
-  // 点击圆点切换
-  dots?.forEach((dot, i) => {
-    dot.addEventListener('click', () => {
-      showQuote(i);
-      stopAutoPlay();
-      startAutoPlay();
-    });
+    // 启动自动播放
+    startAutoPlay();
   });
-
-  // 鼠标悬停暂停
-  carousel?.addEventListener('mouseenter', stopAutoPlay);
-  carousel?.addEventListener('mouseleave', startAutoPlay);
-
-  // 启动自动播放
-  startAutoPlay();
 </script>
