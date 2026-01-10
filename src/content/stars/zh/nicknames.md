@@ -7,7 +7,6 @@ tags: ["称号", "外号", "樊星"]
 translated: false
 ---
 
-# 樊振东称号大全
 
 ## 小胖 / Little Fatty
 最亲切的称呼，从小就有的外号。

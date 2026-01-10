@@ -9,50 +9,190 @@ const friends = await getCollection('friends');
 const warrior = await getCollection('warrior');
 const tributes = await getCollection('tributes');
 const links = await getCollection('links');
+const stars = await getCollection('stars');
 
 const allContent = [
-  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '重要时刻' })),
-  ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '个人语录与梗' })),
+  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '职业生涯' })),
+  ...stars.map(s => ({ ...s, category: 'stars', categoryName: '天际樊星' })),
+  ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '语录与梗' })),
   ...friends.map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })),
   ...warrior.map(w => ({ ...w, category: 'warrior', categoryName: '孤勇者' })),
   ...tributes.map(t => ({ ...t, category: 'tributes', categoryName: '评价与祝福' })),
   ...links.map(l => ({ ...l, category: 'links', categoryName: '媒体链接' })),
 ];
+
+// 经典语录
+const featuredQuotes = [
+  "我把一辈子交给国家了，不是说不干就不干的",
+  "老拿冠军就老请呗",
+  "比赛可以有输赢，但绝对不会服输，这就是体育精神",
+  "巴黎很好，未来一定更好",
+];
+
+// 称号列表
+const nicknames = [
+  { name: "小胖", desc: "最亲切的称呼" },
+  { name: "十年铁血一单", desc: "坚守一单位置" },
+  { name: "樊百万", desc: "地表十二人三连冠" },
+  { name: "中国之壁", desc: "坚不可摧的防守" },
+  { name: "国乒责任神", desc: "三大赛外战100%" },
+  { name: "凯撒樊", desc: "德甲新称号" },
+];
+
+// 应援口号
+const slogans = [
+  "樊振东，每个赛场见",
+  "大雪压青松，青松挺且直",
+  "聚沙成塔路，樊星闪耀时",
+  "樊振东，闪耀洛杉矶",
+];
 ---
 
 <BaseLayout>
+  <!-- Hero Section -->
   <section class="hero">
-    <h1>🏓 樊振东的互联网档案馆</h1>
-    <p class="subtitle">民间互联网记忆工程</p>
+    <div class="hero-badge">🏓 民间互联网记忆工程</div>
+    <h1>樊振东的互联网档案馆</h1>
     <p class="intro">
-      这不是一本教科书式的百科，而是一本需要群策群力、不断完善的杂志。<br/>
-      记录的重点不是战绩，而是更耀眼的意志、人品、纯真、良善、幽默、对不公的抗争、对黑暗的不屈服。
+      这不是一本教科书式的百科，而是一本需要集思广益、不断完善的杂志。<br/>
+      记录的重点不是<span class="highlight">战绩</span>，而是更耀眼的<span class="highlight">意志、人品、纯真、良善、机智、幽默</span>，<br/>
+      以及<span class="highlight">对不公的抗争、对黑暗的不屈服</span>。
     </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">{allContent.length}</span>
+        <span class="stat-label">篇档案</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">7</span>
+        <span class="stat-label">个分类</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">樊星的爱</span>
+      </div>
+    </div>
   </section>
 
-  <section class="stats">
-    <div class="stat">
-      <span class="num">{allContent.length}</span>
-      <span class="label">篇档案</span>
-    </div>
-    <div class="stat">
-      <span class="num">6</span>
-      <span class="label">个分类</span>
+  <!-- 滚动应援 -->
+  <section class="slogan-marquee">
+    <div class="marquee-content">
+      {[...slogans, ...slogans].map(s => (
+        <span class="slogan-item">✨ {s}</span>
+      ))}
     </div>
   </section>
 
+  <!-- 称号墙 -->
+  <section class="nicknames-section">
+    <h2>🏅 称号墙</h2>
+    <div class="nicknames-grid">
+      {nicknames.map(n => (
+        <div class="nickname-card">
+          <span class="nickname-name">{n.name}</span>
+          <span class="nickname-desc">{n.desc}</span>
+        </div>
+      ))}
+    </div>
+    <a href="/stars/nicknames" class="view-more">查看全部称号 →</a>
+  </section>
+
+  <!-- 经典语录轮播 -->
+  <section class="quotes-highlight">
+    <h2>💬 经典语录</h2>
+    <div class="quotes-carousel" id="quotesCarousel">
+      {featuredQuotes.map((q, i) => (
+        <blockquote class={`quote-card ${i === 0 ? 'active' : ''}`} data-index={i}>
+          "{q}"
+        </blockquote>
+      ))}
+    </div>
+    <div class="carousel-dots">
+      {featuredQuotes.map((_, i) => (
+        <button class={`dot ${i === 0 ? 'active' : ''}`} data-index={i} aria-label={`切换到第${i + 1}条语录`}></button>
+      ))}
+    </div>
+    <a href="/quotes" class="view-more">更多语录与梗 →</a>
+  </section>
+
+  <!-- 档案分类 -->
   <section class="categories">
     <h2>📚 档案分类</h2>
-    <div class="grid">
-      <Card title="重要时刻" href="/arena" tag="高光" description="粤圆之夜、巴黎奥运、地表最强12人、独一无二的记录..." />
-      <Card title="个人语录与梗" href="/quotes" tag="金句" description="老拿冠军就老请呗、奖金都交给爸妈..." />
-      <Card title="贵人与朋友" href="/friends" tag="人物" description="吴敬平、王涛、周恺、欢乐谷小分队..." />
-      <Card title="孤勇者" href="/warrior" tag="精神" description="独自面对风雨的勇气..." />
-      <Card title="评价与祝福" href="/tributes" tag="致敬" description="来自各方的评价与美好祝愿..." />
-      <Card title="媒体链接" href="/links" tag="快照" description="好文报道、视频、微博存档..." />
+    <div class="category-grid">
+      <a href="/arena" class="category-card arena">
+        <span class="cat-icon">🏆</span>
+        <span class="cat-title">职业生涯</span>
+        <span class="cat-count">{arena.length} 篇</span>
+        <span class="cat-desc">粤圆之夜、巴黎奥运、超级金满贯之路</span>
+      </a>
+      <a href="/stars" class="category-card stars">
+        <span class="cat-icon">⭐</span>
+        <span class="cat-title">天际樊星</span>
+        <span class="cat-count">{stars.length} 篇</span>
+        <span class="cat-desc">称号、技术特点、传奇地位</span>
+      </a>
+      <a href="/quotes" class="category-card quotes">
+        <span class="cat-icon">💬</span>
+        <span class="cat-title">语录与梗</span>
+        <span class="cat-count">{quotes.length} 篇</span>
+        <span class="cat-desc">鸡蛋灌饼、永不起床、减肥日常</span>
+      </a>
+      <a href="/friends" class="category-card friends">
+        <span class="cat-icon">🤝</span>
+        <span class="cat-title">贵人与朋友</span>
+        <span class="cat-count">{friends.length} 篇</span>
+        <span class="cat-desc">吴敬平、王涛、欢乐谷小分队</span>
+      </a>
+      <a href="/warrior" class="category-card warrior">
+        <span class="cat-icon">⚔️</span>
+        <span class="cat-title">孤勇者</span>
+        <span class="cat-count">{warrior.length} 篇</span>
+        <span class="cat-desc">独自面对风雨的勇气与抗争</span>
+      </a>
+      <a href="/tributes" class="category-card tributes">
+        <span class="cat-icon">💝</span>
+        <span class="cat-title">评价与祝福</span>
+        <span class="cat-count">{tributes.length} 篇</span>
+        <span class="cat-desc">来自各方的评价与美好祝愿</span>
+      </a>
+      <a href="/links" class="category-card links">
+        <span class="cat-icon">🔗</span>
+        <span class="cat-title">媒体链接</span>
+        <span class="cat-count">{links.length} 篇</span>
+        <span class="cat-desc">官方媒体、自媒体、视频合集</span>
+      </a>
     </div>
   </section>
 
+  <!-- 精选内容 -->
+  <section class="featured">
+    <h2>✨ 精选档案</h2>
+    <div class="featured-grid">
+      <Card 
+        title="退出世界排名" 
+        href="/warrior/world-ranking-withdrawal" 
+        tag="孤勇者"
+        description="面对不公，选择抗争"
+        image="/img/樊振东被逼退世界排名.avif"
+      />
+      <Card 
+        title="经典梗合集" 
+        href="/quotes/memes" 
+        tag="语录与梗"
+        description="鸡蛋灌饼、永不起床、减肥日常..."
+      />
+      <Card 
+        title="评价与祝福" 
+        href="/tributes" 
+        tag="评价与祝福"
+        description="来自各方的评价与美好祝愿"
+      />
+    </div>
+  </section>
+
+  <!-- 全部档案 -->
   <section class="all-content">
     <h2>📖 全部档案</h2>
     <div class="content-grid">
@@ -67,64 +207,366 @@ const allContent = [
     </div>
   </section>
 
-  <section class="slogan-section">
-    <blockquote>
-      <p>樊振东，每个赛场见</p>
-    </blockquote>
+  <!-- 底部口号 -->
+  <section class="footer-slogan">
+    <div class="slogan-main">樊振东，每个赛场见</div>
+    <div class="slogan-sub">聚沙成塔路，樊星闪耀时</div>
   </section>
 </BaseLayout>
 
 <style>
+  /* Hero */
   .hero {
     text-align: center;
-    padding: 3rem 0;
+    padding: 4rem 1rem 3rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+    border-radius: 0 0 2rem 2rem;
   }
-  .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-  .subtitle { color: #c41e3a; font-size: 1.2rem; margin-bottom: 1rem; }
-  .intro { color: #666; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-  
-  .stats {
+  .hero-badge {
+    display: inline-block;
+    background: #c41e3a;
+    color: #fff;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #c41e3a, #8b0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .intro {
+    color: #555;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+  .highlight {
+    color: #c41e3a;
+    font-weight: 500;
+  }
+  .hero-stats {
     display: flex;
     justify-content: center;
-    gap: 3rem;
-    padding: 1rem 0 2rem;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(196, 30, 58, 0.1);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  .stat { text-align: center; }
-  .num { display: block; font-size: 2rem; font-weight: bold; color: #c41e3a; }
-  .label { color: #666; }
-  
-  .categories { padding: 2rem 0; }
-  .categories h2 { margin-bottom: 1.5rem; }
-  .grid {
+  .stat-item { text-align: center; }
+  .stat-num {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #c41e3a;
+  }
+  .stat-label { color: #888; font-size: 0.9rem; }
+  .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: #eee;
+  }
+
+  /* 滚动应援 */
+  .slogan-marquee {
+    overflow: hidden;
+    background: #c41e3a;
+    padding: 0.8rem 0;
+    margin: 2rem 0;
+  }
+  .marquee-content {
+    display: flex;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  .slogan-item {
+    color: #fff;
+    padding: 0 2rem;
+    font-size: 1rem;
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* 称号墙 */
+  .nicknames-section {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  .nicknames-section h2 { margin-bottom: 1.5rem; }
+  .nicknames-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .nickname-card {
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    border: 1px solid #ffe0e0;
+    border-radius: 2rem;
+    padding: 0.6rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s;
+  }
+  .nickname-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.15);
+  }
+  .nickname-name {
+    font-weight: bold;
+    color: #c41e3a;
+    font-size: 1rem;
+  }
+  .nickname-desc {
+    font-size: 0.75rem;
+    color: #888;
+  }
+  .view-more {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: #c41e3a;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .view-more:hover { text-decoration: underline; }
+
+  /* 经典语录轮播 */
+  .quotes-highlight {
+    background: #fafafa;
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  .quotes-highlight h2 { margin-bottom: 1.5rem; }
+  .quotes-carousel {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100px;
+  }
+  .quote-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-left: 4px solid #c41e3a;
+    padding: 1.5rem 2rem;
+    margin: 0;
+    font-style: italic;
+    color: #444;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    border-radius: 0 12px 12px 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    text-align: left;
+    opacity: 0;
+    transform: translateX(30px);
+    transition: all 0.5s ease;
+    pointer-events: none;
+  }
+  .quote-card.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .carousel-dots .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
+  }
+  .carousel-dots .dot:hover {
+    background: #ffb3b3;
+  }
+  .carousel-dots .dot.active {
+    background: #c41e3a;
+    transform: scale(1.2);
+  }
+
+  /* 档案分类 */
+  .categories {
+    padding: 3rem 1rem;
+  }
+  .categories h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    background: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .category-card.arena:hover { border-color: #ffd700; }
+  .category-card.stars:hover { border-color: #ff6b6b; }
+  .category-card.quotes:hover { border-color: #4ecdc4; }
+  .category-card.friends:hover { border-color: #45b7d1; }
+  .category-card.warrior:hover { border-color: #96ceb4; }
+  .category-card.tributes:hover { border-color: #ff9ff3; }
+  .category-card.links:hover { border-color: #a29bfe; }
+  .cat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .cat-title { font-weight: bold; font-size: 1.1rem; }
+  .cat-count {
+    font-size: 0.8rem;
+    color: #c41e3a;
+    margin: 0.3rem 0;
+  }
+  .cat-desc {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* 精选内容 */
+  .featured {
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  }
+  .featured h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .featured-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  
+
+  /* 全部档案 */
   .all-content {
-    padding: 3rem 0;
-    background: #fafafa;
-    margin: 2rem -1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 3rem 1rem;
   }
   .all-content h2 {
+    text-align: center;
     margin-bottom: 1.5rem;
   }
   .content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  
-  .slogan-section {
+
+  /* 底部口号 */
+  .footer-slogan {
     text-align: center;
-    padding: 3rem 0;
+    padding: 4rem 1rem;
+    background: linear-gradient(135deg, #c41e3a, #8b0000);
+    color: #fff;
+    margin-top: 2rem;
   }
-  blockquote {
-    font-size: 1.5rem;
-    color: #c41e3a;
-    font-style: italic;
+  .slogan-main {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
   }
-  blockquote p { margin: 0.5rem 0; }
+  .slogan-sub {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .intro { font-size: 0.95rem; }
+    .hero-stats { gap: 1rem; padding: 1rem; }
+    .stat-num { font-size: 1.5rem; }
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .slogan-main { font-size: 1.5rem; }
+  }
 </style>
+
+<script>
+  // 语录轮播
+  const carousel = document.getElementById('quotesCarousel');
+  const quotes = carousel?.querySelectorAll('.quote-card');
+  const dots = document.querySelectorAll('.carousel-dots .dot');
+  let currentIndex = 0;
+  let autoPlayTimer: ReturnType<typeof setInterval>;
+
+  function showQuote(index: number) {
+    quotes?.forEach((q, i) => {
+      q.classList.toggle('active', i === index);
+    });
+    dots?.forEach((d, i) => {
+      d.classList.toggle('active', i === index);
+    });
+    currentIndex = index;
+  }
+
+  function nextQuote() {
+    const next = (currentIndex + 1) % (quotes?.length || 1);
+    showQuote(next);
+  }
+
+  function startAutoPlay() {
+    autoPlayTimer = setInterval(nextQuote, 4000);
+  }
+
+  function stopAutoPlay() {
+    clearInterval(autoPlayTimer);
+  }
+
+  // 点击圆点切换
+  dots?.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      showQuote(i);
+      stopAutoPlay();
+      startAutoPlay();
+    });
+  });
+
+  // 鼠标悬停暂停
+  carousel?.addEventListener('mouseenter', stopAutoPlay);
+  carousel?.addEventListener('mouseleave', startAutoPlay);
+
+  // 启动自动播放
+  startAutoPlay();
+</script>

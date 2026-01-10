@@ -18,7 +18,7 @@ const navItems = [
   { href: '/warrior', label: t('nav.warrior') },
   { href: '/breakit', label: t('nav.breakit') },
   { href: '/infographic', label: t('nav.infographic') },
-  { href: '/quiz', label: t('nav.quiz') },
+  // { href: '/quiz', label: t('nav.quiz') }, // 暂时隐藏
   { href: '/about', label: t('nav.about') },
 ];
 
@@ -62,9 +62,9 @@ function isActive(href: string) {
   .header-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
   }
   .logo {
     display: flex;
