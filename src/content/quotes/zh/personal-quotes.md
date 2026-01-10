@@ -1,5 +1,5 @@
 ---
-title: "本人语录"
+title: "经典语录"
 titleEn: "Personal Quotes"
 description: "樊振东的经典语录"
 category: quotes
@@ -98,6 +98,9 @@ translated: false
 ## 21年全运会逆转马龙
 
 > "我在准备的时候就告诉自己，不到最后一个球落地就不要放弃"
+
+## 未来
+> 巴黎很好，未来一定更好
 
 ## 祝福
 

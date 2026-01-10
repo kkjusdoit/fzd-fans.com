@@ -1,0 +1,642 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="数据图鉴 - 樊振东大满贯之路">
+  <div class="infographic-container">
+    <!-- Hero Section -->
+    <header class="hero-section">
+      <div class="hero-inner">
+        <h1 class="hero-title">樊振东 FAN ZHENDONG</h1>
+        <p class="hero-subtitle">The Grand Slam Champion • Super Slam</p>
+        <div class="hero-tags">
+          <span class="tag">World No. 1 Era</span>
+          <span class="tag">4x World Cup Winner</span>
+          <span class="tag">2x World Champion (Singles)</span>
+          <span class="tag">Olympic Gold (Paris 2024)</span>
+        </div>
+        <p class="hero-desc">
+          Known as "Xiao Pang" (Little Fatty) and later the "Violent Panda," Fan Zhendong represents the pinnacle of modern table tennis. Combining brute force with incredible agility, he has completed the career Grand Slam, a feat solidifying his place in history.
+        </p>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Section 1: Key Stats -->
+      <section class="stats-section">
+        <div class="card">
+          <h2 class="section-title">Dominance by the Numbers</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">4</div>
+              <div class="stat-label">World Cup Titles</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">2</div>
+              <div class="stat-label">WTTC Singles Gold</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">1</div>
+              <div class="stat-label">Olympic Singles Gold</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">96.5%</div>
+              <div class="stat-label">Peak Win Rate</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: World Cup Timeline -->
+      <section class="timeline-section">
+        <div class="card">
+          <h3 class="card-title">The World Cup Dynasty</h3>
+          <p class="card-desc">
+            Fan Zhendong is statistically the most dominant World Cup player in modern history. Most notably, he achieved a historic <strong>Three-Peat (Three Consecutive Titles)</strong> from 2018 to 2020.
+          </p>
+          <div class="timeline">
+            <div class="timeline-line"></div>
+            <!-- 2016 -->
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <h4 class="timeline-year">2016 Saarbrücken</h4>
+                <p class="timeline-subtitle">First Major Title</p>
+              </div>
+              <div class="timeline-dot dot-1">1</div>
+              <div class="timeline-right">
+                <div class="timeline-card">
+                  <p class="timeline-result">Defeated Xu Xin (4-1)</p>
+                  <p class="timeline-note">The youngest World Cup champion in history at age 19.</p>
+                </div>
+              </div>
+            </div>
+            <!-- 2018 -->
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-card blue">
+                  <p class="timeline-result">Defeated Timo Boll (4-1)</p>
+                  <p class="timeline-note">Start of the Three-Peat. Reclaimed the throne.</p>
+                </div>
+              </div>
+              <div class="timeline-dot dot-2">2</div>
+              <div class="timeline-right">
+                <h4 class="timeline-year highlight">2018 Paris</h4>
+                <p class="timeline-subtitle">The Reign Begins</p>
+              </div>
+            </div>
+            <!-- 2019 -->
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <h4 class="timeline-year highlight">2019 Chengdu</h4>
+                <p class="timeline-subtitle">Defending the Crown</p>
+              </div>
+              <div class="timeline-dot dot-3">3</div>
+              <div class="timeline-right">
+                <div class="timeline-card blue">
+                  <p class="timeline-result">Defeated Harimoto (4-2)</p>
+                  <p class="timeline-note">Overcame the Japanese prodigy in a high-pressure final.</p>
+                </div>
+              </div>
+            </div>
+            <!-- 2020 -->
+            <div class="timeline-item">
+              <div class="timeline-left">
+                <div class="timeline-card gold">
+                  <p class="timeline-result bold">Defeated Ma Long (4-3)</p>
+                  <p class="timeline-note">A legendary 7-game thriller to seal the Hat-trick.</p>
+                </div>
+              </div>
+              <div class="timeline-dot dot-4">4</div>
+              <div class="timeline-right">
+                <h4 class="timeline-year big">2020 Weihai</h4>
+                <p class="timeline-subtitle bold">Three-Peat Achieved</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <!-- Donut Chart -->
+        <section class="chart-section">
+          <div class="card">
+            <h3 class="card-title">Grand Slam Composition</h3>
+            <p class="card-desc">
+              Fan Zhendong has won every major title available in Table Tennis. This chart visualizes the distribution of his <strong>Major Singles Titles</strong>.
+            </p>
+            <div class="chart-container">
+              <canvas id="titlesDonutChart"></canvas>
+            </div>
+            <p class="chart-note">*Data includes Singles titles only. Team titles excluded.</p>
+          </div>
+        </section>
+
+        <!-- Radar Chart -->
+        <section class="chart-section">
+          <div class="card">
+            <h3 class="card-title">The "Violent Panda" Analysis</h3>
+            <p class="card-desc">
+              Known for his backhand flick (Chiquita) and immense physical strength. This radar chart analyzes the technical profile that allowed him to dominate the sport.
+            </p>
+            <div class="chart-container">
+              <canvas id="skillsRadarChart"></canvas>
+            </div>
+            <p class="chart-note">*Ratings based on ITTF commentary and technical analysis (Scale 1-100)</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Line Chart -->
+      <section class="full-width-section">
+        <div class="card">
+          <h3 class="card-title">World Ranking Dominance</h3>
+          <p class="card-desc">
+            Fan Zhendong spent over 4 consecutive years as the undisputed World Number 1. This chart tracks his points trajectory during his prime years.
+          </p>
+          <div class="chart-container wide">
+            <canvas id="rankingLineChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bar Chart -->
+      <section class="full-width-section">
+        <div class="card">
+          <h3 class="card-title">Vs. Top Rivals (Career Win %)</h3>
+          <p class="card-desc">
+            A champion is defined by their rivals. While Ma Long was his greatest obstacle, Fan Zhendong maintained dominant records against the rest of the world.
+          </p>
+          <div class="chart-container wide">
+            <canvas id="rivalryBarChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .infographic-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-section {
+    background: linear-gradient(135deg, #b71c1c 0%, #c62828 50%, #d32f2f 100%);
+    color: white;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    border-radius: 0 0 1rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-subtitle {
+    color: #ffc107;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tag {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid #ffc107;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .hero-desc {
+    color: rgba(255,255,255,0.9);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .main-content {
+    padding: 0 1rem 2rem;
+  }
+
+  .card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #c41e3a;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #ffc107;
+    padding-left: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .stats-section {
+    margin-bottom: 2rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-item {
+    background: #f8f9fa;
+    padding: 1.5rem 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #1a237e;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #666;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  /* Timeline Styles */
+  .timeline-section {
+    margin-bottom: 2rem;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 1rem 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #c41e3a;
+    transform: translateX(-50%);
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .timeline-line {
+      display: block;
+    }
+  }
+
+  .timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  @media (min-width: 768px) {
+    .timeline-item {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+
+  .timeline-left, .timeline-right {
+    flex: 1;
+    padding: 0.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .timeline-left {
+      text-align: right;
+      padding-right: 2rem;
+    }
+    .timeline-right {
+      text-align: left;
+      padding-left: 2rem;
+    }
+  }
+
+  .timeline-dot {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+    margin: 0.5rem 0;
+  }
+
+  .dot-1 { background: #ffc107; color: #c41e3a; }
+  .dot-2 { background: #c41e3a; width: 3rem; height: 3rem; }
+  .dot-3 { background: #b71c1c; width: 3.5rem; height: 3.5rem; font-size: 1.25rem; }
+  .dot-4 { background: #ffc107; color: #c41e3a; width: 4rem; height: 4rem; font-size: 1.5rem; font-weight: 900; box-shadow: 0 0 0 4px rgba(196,30,58,0.2); }
+
+  .timeline-year {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin: 0;
+  }
+
+  .timeline-year.highlight {
+    color: #c41e3a;
+    font-size: 1.25rem;
+  }
+
+  .timeline-year.big {
+    color: #c41e3a;
+    font-size: 1.5rem;
+  }
+
+  .timeline-subtitle {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0.25rem 0 0;
+  }
+
+  .timeline-subtitle.bold {
+    font-weight: 700;
+  }
+
+  .timeline-card {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .timeline-card.blue {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .timeline-card.gold {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+
+  .timeline-result {
+    font-weight: 600;
+    color: #c41e3a;
+    margin: 0 0 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .timeline-card.blue .timeline-result {
+    color: #1a237e;
+  }
+
+  .timeline-result.bold {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .timeline-note {
+    font-size: 0.75rem;
+    color: #666;
+    margin: 0;
+  }
+
+  /* Charts */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .charts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .chart-container {
+    position: relative;
+    height: 300px;
+  }
+
+  .chart-container.wide {
+    height: 350px;
+  }
+
+  @media (min-width: 768px) {
+    .chart-container {
+      height: 350px;
+    }
+    .chart-container.wide {
+      height: 400px;
+    }
+  }
+
+  .chart-note {
+    font-size: 0.75rem;
+    color: #999;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .full-width-section {
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 3.5rem;
+    }
+    .hero-subtitle {
+      font-size: 1.25rem;
+    }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Common tooltip config
+    const commonTooltipOptions = {
+      backgroundColor: 'rgba(26, 35, 126, 0.9)',
+      titleFont: { size: 14 },
+      bodyFont: { size: 13 },
+      padding: 12,
+      cornerRadius: 8
+    };
+
+    // Donut Chart
+    const ctxDonut = document.getElementById('titlesDonutChart') as HTMLCanvasElement;
+    if (ctxDonut) {
+      new (window as any).Chart(ctxDonut.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ["Men's World Cup", "World Championships", "Olympic Games", "WTT Singapore Smash", "Asian Games"],
+          datasets: [{
+            data: [4, 2, 1, 2, 2],
+            backgroundColor: ['#D32F2F', '#FFC107', '#1A237E', '#4CAF50', '#9E9E9E'],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } },
+            tooltip: commonTooltipOptions
+          }
+        }
+      });
+    }
+
+    // Radar Chart
+    const ctxRadar = document.getElementById('skillsRadarChart') as HTMLCanvasElement;
+    if (ctxRadar) {
+      new (window as any).Chart(ctxRadar.getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: ["Forehand Power", "Backhand Quality", "Footwork/Speed", "Defense", "Mental Strength", "Serve/Receive"],
+          datasets: [{
+            label: 'Fan Zhendong',
+            data: [98, 100, 95, 92, 96, 90],
+            fill: true,
+            backgroundColor: 'rgba(211, 47, 47, 0.2)',
+            borderColor: '#D32F2F',
+            pointBackgroundColor: '#FFC107',
+            pointBorderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' },
+              pointLabels: { font: { size: 11, weight: 'bold' }, color: '#374151' },
+              suggestedMin: 60,
+              suggestedMax: 100
+            }
+          },
+          plugins: { legend: { display: false }, tooltip: commonTooltipOptions }
+        }
+      });
+    }
+
+    // Line Chart
+    const ctxLine = document.getElementById('rankingLineChart') as HTMLCanvasElement;
+    if (ctxLine) {
+      new (window as any).Chart(ctxLine.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: ["2018 Start", "2019 Mid", "2020 End", "2021 Peak", "2022 End", "2023 End", "2024 (Oly)"],
+          datasets: [{
+            label: 'Ranking Points (Approx)',
+            data: [16000, 14500, 18000, 19500, 7500, 7000, 5800],
+            fill: true,
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            borderColor: '#FFC107',
+            borderWidth: 3,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#D32F2F'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: false, grid: { color: '#f3f4f6' }, title: { display: true, text: 'ITTF / WTT Points' } },
+            x: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false }, tooltip: commonTooltipOptions }
+        }
+      });
+    }
+
+    // Bar Chart
+    const ctxBar = document.getElementById('rivalryBarChart') as HTMLCanvasElement;
+    if (ctxBar) {
+      new (window as any).Chart(ctxBar.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ["Ma Long (China)", "Tomokazu Harimoto (Japan)", "Wang Chuqin (China)", "Truls Moregard (Sweden)", "Hugo Calderano (Brazil)"],
+          datasets: [{
+            label: 'Fan Zhendong Win Rate %',
+            data: [45, 78, 55, 100, 92],
+            backgroundColor: ['#9E9E9E', '#D32F2F', '#FFA000', '#1A237E', '#1976D2'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: {
+            x: { beginAtZero: true, max: 100, grid: { color: '#f3f4f6' }, title: { display: true, text: 'Win Percentage (%)' } },
+            y: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false }, tooltip: commonTooltipOptions }
+        }
+      });
+    }
+  });
+</script>

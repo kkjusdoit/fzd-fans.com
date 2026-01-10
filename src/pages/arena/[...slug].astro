@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config/site';
 
 export async function getStaticPaths() {
   const arena = await getCollection('arena');
@@ -22,7 +23,7 @@ const { Content } = await entry.render();
       </div>
       <h1>{entry.data.title}</h1>
       {entry.data.description && <p class="desc">{entry.data.description}</p>}
-      {entry.data.date && <p class="date">{entry.data.date.toLocaleDateString('zh-CN')}</p>}
+      {siteConfig.showDate && entry.data.date && <p class="date">{entry.data.date.toLocaleDateString('zh-CN')}</p>}
     </header>
     <div class="content">
       <Content />

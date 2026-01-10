@@ -1,5 +1,5 @@
 ---
-title: "高情商语录合集"
+title: "高情商合集"
 titleEn: "High EQ Quotes Collection"
 description: "樊振东的高情商回答"
 category: quotes

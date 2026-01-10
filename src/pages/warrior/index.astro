@@ -3,13 +3,17 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const warrior = await getCollection('warrior');
+const warrior = (await getCollection('warrior')).sort((a, b) => {
+  const dateA = a.data.date ? new Date(a.data.date).getTime() : 0;
+  const dateB = b.data.date ? new Date(b.data.date).getTime() : 0;
+  return dateB - dateA; // 倒序：最新的在前
+});
 ---
 
 <BaseLayout title="孤勇者">
   <section class="page-header">
     <h1>⚔️ 孤勇者</h1>
-    <p>独自面对风雨的勇气</p>
+    <p>独自面对风雨，开拓全新征程</p>
   </section>
 
   <section class="content-grid">

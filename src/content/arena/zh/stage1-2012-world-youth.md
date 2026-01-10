@@ -4,7 +4,7 @@ titleEn: "2012 World Youth Championships Triple Crown"
 description: "获得男单、男团、混双三冠王，凭借直通巴黎选拔赛表现年仅15岁直接升入国家一队"
 category: arena
 tags: ["世青赛", "三冠王", "横空出世"]
-date: 2012-01-01
+date: 2025-01-01
 translated: false
 ---
 

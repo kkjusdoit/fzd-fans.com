@@ -18,7 +18,7 @@ const arena = defineCollection({ type: 'content', schema: archiveSchema }); // �
 const quotes = defineCollection({ type: 'content', schema: archiveSchema });
 const friends = defineCollection({ type: 'content', schema: archiveSchema });
 const warrior = defineCollection({ type: 'content', schema: archiveSchema }); // 孤勇者
-const tributes = defineCollection({ type: 'content', schema: archiveSchema }); // 评价和祝福
+const tributes = defineCollection({ type: 'content', schema: archiveSchema }); // 评价与祝福
 const links = defineCollection({ type: 'content', schema: archiveSchema });
 const stars = defineCollection({ type: 'content', schema: archiveSchema }); // 天际樊星 (樊星口号)
 

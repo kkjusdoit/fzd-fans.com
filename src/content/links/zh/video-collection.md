@@ -3,27 +3,19 @@ title: "视频收藏"
 titleEn: "Video Collection"
 description: "樊振东相关的优质视频内容收藏"
 category: links
-tags: ["视频", "B站", "视频号"]
+tags: ["视频", "B站"]
 translated: false
 ---
 
 # 视频收藏
 
-## B站视频
+- [【全场回顾】2024年巴黎奥运会乒乓球男单1/4决赛 樊振东VS张本智和](https://www.bilibili.com/video/BV1a9KczoEZi/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)<br>
 
-（待补充B站链接）
 
-## 微信视频号
+- [樊振东全运会男单卫冕！一口气看完](https://www.bilibili.com/video/BV1VQCiBiEUs/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)<br>
 
-（待补充视频号链接）
+- 未完待续
 
-## 抖音/快手
-
-（待补充短视频链接）
-
-## 官方视频
-
-（待补充官方发布的视频内容）
 
 ---
 
