@@ -1,6 +1,6 @@
 ---
 title: "退出世界排名"
-description: "逼退"
+description: "被逼退"
 date: 2024-12-01
 tags: ["WTT", "中国乒协"]
 category: "warrior"

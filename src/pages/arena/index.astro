@@ -19,7 +19,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn inactive-tab">赛场时刻</button>
           <button onclick="switchTab('transition')" id="nav-transition" class="tab-btn inactive-tab">出走与转变</button>
         </nav>
-        <button class="mobile-menu-btn" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">☰</button>
+        <button class="mobile-menu-btn" onclick="document.getElementById('mobile-nav').classList.toggle('hidden'); this.classList.remove('pulse')">
+          <span class="menu-icon">☰</span>
+          <span class="menu-hint">切换</span>
+        </button>
       </div>
       <div id="mobile-nav" class="mobile-nav hidden">
         <button onclick="switchTab('records')" class="mobile-tab-btn">历史丰碑 (Records)</button>
@@ -147,7 +150,27 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   .inactive-tab { color: #888; }
   .inactive-tab:hover { color: #aa222d; }
   
-  .mobile-menu-btn { display: block; background: none; border: none; font-size: 1.25rem; color: #666; cursor: pointer; padding: 0.25rem; }
+  .mobile-menu-btn { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.25rem;
+    background: #f3f4f6; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 6px;
+    font-size: 1rem; 
+    color: #374151; 
+    cursor: pointer; 
+    padding: 0.4rem 0.6rem;
+  }
+  .mobile-menu-btn.pulse {
+    animation: pulse-btn 2s ease-in-out 3;
+  }
+  @keyframes pulse-btn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(170, 34, 45, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(170, 34, 45, 0); }
+  }
+  .menu-icon { font-size: 1rem; }
+  .menu-hint { font-size: 0.75rem; font-weight: 500; }
   @media (min-width: 768px) { .mobile-menu-btn { display: none; } }
   .mobile-nav { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 0.5rem; }
   .mobile-nav.hidden { display: none; }
@@ -416,5 +439,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   window.addEventListener('DOMContentLoaded', () => {
     renderRecordsCharts();
     initTimeline();
+    // 首次访问时给菜单按钮加脉冲动画
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    if (menuBtn && window.innerWidth < 768) {
+      menuBtn.classList.add('pulse');
+    }
   });
 </script>
