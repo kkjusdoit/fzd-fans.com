@@ -115,7 +115,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           </ul>
           <div class="transition-flow">
             <div class="flow-item"><div class="flow-label"></div><div class="flow-value red">中国国家队</div></div>
-            <div class="flow-arrow">➔</div>
+            <div class="flow-arrow"> </div>
             <div class="flow-item"><div class="flow-label">加盟</div><div class="flow-value blue">德国联赛 (Bundesliga)</div></div>
           </div>
         </div>
@@ -360,7 +360,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     titlesChartInstance = new Chart(ctxTitles, {
       type: 'bar',
       data: {
-        labels: ['世界杯 (World Cup)', '世乒赛 (WTT)', '奥运会 (Olympics)'],
+        labels: ['世界杯 (World Cup)', '世乒赛 (WTTC)', '奥运会 (Olympics)'],
         datasets: [{ label: '冠军头衔数 (Titles)', data: [4, 2, 1], backgroundColor: '#aa222d', borderRadius: 4, barThickness: 40 }]
       },
       options: {
