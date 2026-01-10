@@ -45,9 +45,63 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </section>
 
     <section class="slogan">
+      <!-- 乒乓球动画 -->
+      <div class="ping-pong-balls">
+        <span class="ball ball-1">🏓</span>
+        <span class="ball ball-2">🏓</span>
+        <span class="ball ball-3">🏓</span>
+      </div>
+      
+      <!-- 奥运五环 SVG - 使用mask实现交织 -->
+      <svg class="olympic-rings" viewBox="0 0 504 228" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 蓝环遮罩 - 遮住黄环穿过的部分 -->
+          <mask id="mask-yellow">
+            <rect width="100%" height="100%" fill="white"/>
+            <circle cx="100" cy="88" r="77" fill="black"/>
+          </mask>
+          <!-- 黑环遮罩 - 遮住绿环穿过的部分 -->
+          <mask id="mask-green">
+            <rect width="100%" height="100%" fill="white"/>
+            <circle cx="252" cy="88" r="77" fill="black"/>
+          </mask>
+        </defs>
+        
+        <!-- 上排三环 (蓝、黑、红) -->
+        <circle cx="100" cy="88" r="72" fill="none" stroke="#0085c7" stroke-width="10"/>
+        <circle cx="252" cy="88" r="72" fill="none" stroke="#000000" stroke-width="10"/>
+        <circle cx="404" cy="88" r="72" fill="none" stroke="#df0024" stroke-width="10"/>
+        
+        <!-- 下排两环 (黄、绿) - 完整圆环 -->
+        <circle cx="176" cy="140" r="72" fill="none" stroke="#f4c300" stroke-width="10"/>
+        <circle cx="328" cy="140" r="72" fill="none" stroke="#009f3d" stroke-width="10"/>
+        
+        <!-- 交织部分：上排环覆盖下排环的右下角 -->
+        <!-- 蓝环覆盖黄环 -->
+        <path d="M 100 88 m 0 -72 a 72 72 0 0 1 62 36 a 72 72 0 0 1 10 36 a 72 72 0 0 1 -10 36" fill="none" stroke="#0085c7" stroke-width="10"/>
+        <!-- 黑环覆盖黄环和绿环 -->
+        <path d="M 252 88 m 0 -72 a 72 72 0 0 1 62 36 a 72 72 0 0 1 10 36 a 72 72 0 0 1 -10 36" fill="none" stroke="#000000" stroke-width="10"/>
+        <path d="M 252 88 m 0 -72 a 72 72 0 0 0 -62 36 a 72 72 0 0 0 -10 36 a 72 72 0 0 0 10 36" fill="none" stroke="#000000" stroke-width="10"/>
+        <!-- 红环覆盖绿环 -->
+        <path d="M 404 88 m 0 -72 a 72 72 0 0 0 -62 36 a 72 72 0 0 0 -10 36 a 72 72 0 0 0 10 36" fill="none" stroke="#df0024" stroke-width="10"/>
+      </svg>
+      
+      <!-- 金牌装饰 -->
+      <div class="medal-container">
+        <span class="medal">🥇</span>
+      </div>
+      
       <blockquote>
-        樊振东 每个赛场见
+        <span class="slogan-text">樊振东 闪耀洛杉矶</span>
+        <span class="year">2028</span>
       </blockquote>
+      
+      <!-- 星星装饰 -->
+      <div class="stars">
+        <span class="star">✨</span>
+        <span class="star">⭐</span>
+        <span class="star">✨</span>
+      </div>
     </section>
   </article>
 </BaseLayout>
@@ -66,15 +120,158 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 1.3rem;
   }
   p { margin-bottom: 1rem; }
+  
+  /* 炫酷 Slogan 样式 */
   .slogan {
     text-align: center;
-    padding: 2rem;
-    background: #f5f5f5;
-    border-radius: 12px;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   }
+  
+  .slogan::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(196, 30, 58, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  /* 乒乓球动画 */
+  .ping-pong-balls {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+  
+  .ball {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: bounce 3s ease-in-out infinite;
+    opacity: 0.7;
+  }
+  
+  .ball-1 { top: 10%; left: 10%; animation-delay: 0s; }
+  .ball-2 { top: 20%; right: 15%; animation-delay: 1s; }
+  .ball-3 { bottom: 15%; left: 20%; animation-delay: 2s; }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(180deg); }
+  }
+  
+  /* 奥运五环 SVG */
+  .olympic-rings {
+    width: 180px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 1;
+    animation: ringsPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes ringsPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+  
+  /* 金牌 */
+  .medal-container {
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .medal {
+    font-size: 3.5rem;
+    display: inline-block;
+    animation: medalShine 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  }
+  
+  @keyframes medalShine {
+    0%, 100% { 
+      transform: scale(1) rotateY(0deg); 
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+    }
+    50% { 
+      transform: scale(1.1) rotateY(15deg); 
+      filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9));
+    }
+  }
+  
+  /* Slogan 文字 */
   blockquote {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-style: normal;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .slogan-text {
+    background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+    display: block;
+    text-shadow: none;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  
+  .year {
+    display: block;
+    font-size: 2.5rem;
     color: #c41e3a;
-    font-style: italic;
+    margin-top: 0.5rem;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-shadow: 0 0 10px rgba(196, 30, 58, 0.5);
+    animation: yearGlow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes yearGlow {
+    0% { text-shadow: 0 0 10px rgba(196, 30, 58, 0.5); }
+    100% { text-shadow: 0 0 20px rgba(196, 30, 58, 0.8), 0 0 40px rgba(196, 30, 58, 0.4); }
+  }
+  
+  /* 星星装饰 */
+  .stars {
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .star {
+    font-size: 1.2rem;
+    margin: 0 0.5rem;
+    animation: twinkle 1.5s ease-in-out infinite;
+  }
+  
+  .star:nth-child(1) { animation-delay: 0s; }
+  .star:nth-child(2) { animation-delay: 0.5s; }
+  .star:nth-child(3) { animation-delay: 1s; }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
   }
 </style>
