@@ -8,6 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h1>💥 打爆一切</h1>
       <p>所有的谣言、荒谬、污蔑、诋毁、无稽之谈如热气球般升起，请点击一一击碎它们</p>
       <button id="start-btn">开始</button>
+      <p class="sound-tip">🔊 建议开启声音 有惊喜</p>
     </div>
     <div id="game-area" style="display: none;">
       <div id="hud">
@@ -46,6 +47,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     -webkit-text-fill-color: transparent;
   }
   #game-intro p { color: #666; margin-bottom: 2rem; font-size: 1.1rem; }
+  #game-intro .sound-tip { color: #999; font-size: 0.9rem; margin-top: 1rem; }
   #start-btn, #replay-btn {
     background: linear-gradient(45deg, #c41e3a, #e63950);
     color: white;
@@ -153,13 +155,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   #game-hint {
     position: fixed;
-    top: 35%;
+    top: 70px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     color: rgba(255,255,255,0.6);
     font-size: 0.9rem;
     text-align: center;
     max-width: 80%;
+    z-index: 1001;
+    pointer-events: none;
+  }
+  #sound-hint {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    text-align: center;
     z-index: 1001;
     pointer-events: none;
   }
@@ -324,31 +337,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     "陌生女子闯入房间",
     "重庆冠军赛赛后发言时一分多钟的大喊大叫",
     "输了不行赢了也没那么行",
-    "出国是不扛大旗",
-    "全球总教练，泄密技术",
-    "研究队友一整年,专挑对手接不着的地方打",
+    "出国是不扛大旗？",
+    "全球总教练，泄密技术？",
     "一单两分难建功",
     "2024年无缘最佳运动员",
     "逼退世排无球可打",
-    "把自己位置摆得有点高，真把自己当东哥了",
+    "把自己位置摆得有点高，真把自己当东哥了？",
     "WTT霸王条款",
     "没你爆他",
     "对家人进行骚扰谩骂，扬言焚烧照片和海报",
     "威海全锦赛夺冠后领奖台的尴尬",
     "巴黎奥运时被诅咒一起输",
-    "踩断球拍背后主谋",
-    "釜山世乒赛肚子痛塑料袋子装热水捂着当医疗保障",
+    "踩断球拍背后主谋？",
+    "肚子痛塑料袋子装热水捂着当医疗保障",
     "巴黎奥运会除了赞助商安踏没人希望东子赢",
     "仁川和波尔一起看足球比赛被指责",
     "八一队解散无家可归",
     "向鹏输给弗朗西斯卡背锅",
     "王楚钦输给弗朗西斯卡背锅",
     "世界乒联排名积分赋0",
-    "去德甲打球为了挣钱",
+    "去德甲打球为了挣钱？",
     "新冠阳后38天打41场比赛",
     "多次商业赛无随行主管教练",
-    "研究队友一整年",
-    "专挑对手接不着的地方打",
+    "研究队友一整年？",
+    "专挑对手接不着的地方打？",
   ];
 
   let brokenCount = 0;
@@ -384,6 +396,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div id="score">💥 <span id="count">0</span> / <span id="total">${totalRumors}</span></div>
         </div>
         <div id="game-hint">所有的谣言、荒谬、污蔑、诋毁、无稽之谈如热气球般升起，请点击一一击碎它们</div>
+        <div id="sound-hint">🔊 建议开启声音 有惊喜</div>
       `;
     }
 
