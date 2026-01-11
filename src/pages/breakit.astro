@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div id="game-container">
     <div id="game-intro">
       <h1>💥 打爆一切</h1>
-      <p>所有的谣言、荒谬、污蔑、诋毁、无稽之谈如热气球般升起，点击一一击碎它们</p>
+      <p>所有的谣言、荒谬、污蔑、诋毁、无稽之谈如热气球般升起，请点击一一击碎它们</p>
       <button id="start-btn">开始</button>
     </div>
     <div id="game-area" style="display: none;">
@@ -150,6 +150,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     background: rgba(0,0,0,0.6);
     padding: 0.5rem 1.5rem;
     border-radius: 30px;
+  }
+  #game-hint {
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    text-align: center;
+    max-width: 80%;
+    z-index: 1001;
+    pointer-events: none;
   }
 
   /* 热气球样式 */
@@ -299,6 +311,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </style>
 
 <script>
+  // 音效
+  const explosionSound = new Audio('/audio/new_explosion.wav');
+  const endSound = new Audio('/audio/fanzhendong.wav');
+  explosionSound.volume = 0.3;
+  endSound.volume = 0.6;
+
   const rumors = [
     "新加坡赛前和林昀儒看霉霉演唱会被网暴",
     "巴黎奥运前和朋友加油打气被骂提前开香槟",
@@ -365,6 +383,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <a href="/" id="back-btn">← 返回</a>
           <div id="score">💥 <span id="count">0</span> / <span id="total">${totalRumors}</span></div>
         </div>
+        <div id="game-hint">所有的谣言、荒谬、污蔑、诋毁、无稽之谈如热气球般升起，请点击一一击碎它们</div>
       `;
     }
 
@@ -464,6 +483,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   function explodeBalloon(balloon: HTMLElement, index: number) {
     if (balloon.classList.contains('exploding')) return;
+
+    // 播放爆炸音效
+    explosionSound.currentTime = 0;
+    explosionSound.play().catch(() => {});
 
     createExplosion(balloon, index);
     balloon.classList.add('exploding');
@@ -784,6 +807,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     setTimeout(() => {
       if (gameArea) gameArea.style.display = 'none';
       if (gameEnd) gameEnd.style.display = 'flex';
+      // 播放结束音效
+      endSound.currentTime = 0;
+      endSound.play().catch(() => {});
       startFireworks();
     }, 500);
   }
