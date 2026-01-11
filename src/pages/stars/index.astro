@@ -17,14 +17,18 @@ const stars = await getCollection('stars');
   </section>
 
   <section class="content-grid">
-    {stars.map(star => (
-      <Card 
-        title={star.data.title}
-        href={`/stars/${star.slug.replace('zh/', '')}`}
-        description={star.data.description}
-        tag={star.data.tags?.[0]}
-      />
-    ))}
+    {stars.map(star => {
+      const slug = star.slug.replace('zh/', '');
+      const href = slug === 'porsche-letters' ? '/stars/porsche-letters' : `/stars/${slug}`;
+      return (
+        <Card 
+          title={star.data.title}
+          href={href}
+          description={star.data.description}
+          tag={star.data.tags?.[0]}
+        />
+      );
+    })}
   </section>
 </BaseLayout>
 
