@@ -17,13 +17,27 @@ const pageDesc = description || t('site.subtitle');
 ---
 
 <!DOCTYPE html>
-<html lang={lang}>
+<html lang={lang === 'en' ? 'en' : 'zh-CN'}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={pageDesc} />
-  <link rel="alternate" hreflang="zh" href={`https://fzd-fans.com/zh${Astro.url.pathname.replace(/^\/(zh|en)/, '')}`} />
-  <link rel="alternate" hreflang="en" href={`https://fzd-fans.com/en${Astro.url.pathname.replace(/^\/(zh|en)/, '')}`} />
+  <meta name="robots" content="index, follow" />
+  
+  <!-- Canonical & Alternate Languages -->
+  <link rel="canonical" href={`https://fzd-fans.com${Astro.url.pathname}`} />
+  <link rel="alternate" hreflang="zh-CN" href={`https://fzd-fans.com${Astro.url.pathname.startsWith('/en') ? Astro.url.pathname.replace(/^\/en/, '') || '/' : Astro.url.pathname}`} />
+  <link rel="alternate" hreflang="en" href={`https://fzd-fans.com/en${Astro.url.pathname.replace(/^\/(zh|en)/, '') || '/'}`} />
+  <link rel="alternate" hreflang="x-default" href={`https://fzd-fans.com${Astro.url.pathname.startsWith('/en') ? Astro.url.pathname.replace(/^\/en/, '') || '/' : Astro.url.pathname}`} />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDesc} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={`https://fzd-fans.com${Astro.url.pathname}`} />
+  <meta property="og:site_name" content="樊振东的互联网档案馆" />
+  <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'zh_CN'} />
+  
   <title>{pageTitle}</title>
   <link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png" />
