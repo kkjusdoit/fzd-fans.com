@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="更新日志">
+  <article class="changelog-page">
+    <h1>📋 更新日志</h1>
+    <p class="intro">记录网站的每一次成长与完善</p>
+
+    <section class="todo-section">
+      <h2>🚀 后续计划</h2>
+      <ul class="todo-list">
+        <li><span class="icon">📌</span> 完善英文版内容翻译</li>
+        <li><span class="icon">📌</span> 增加「球迷等级考试」趣味栏目</li>
+        <li><span class="icon">📌</span> 补充各部分内容（欢迎投稿：<a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）</li>
+      </ul>
+    </section>
+
+    <section class="timeline-section">
+      <h2>✅ 更新时间线</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026-01-11</div>
+          <div class="timeline-content">
+            <h3>根据樊星们的建议意见（🌹感谢🌹）对内容进行增加、删除、修改、完善</h3>
+            <p>1.去除“贵人朋友”栏目；2.去除“自媒体”条目；3.增加“保时捷家书”；4.优化“打爆一切”游戏体验；5.其他细节更正</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026-01-10</div>
+          <div class="timeline-content">
+            <h3>🎉 网站正式上线</h3>
+            <p>樊振东互联网档案馆正式发布，包含【职业生涯 语录与梗 贵人与朋友 评价与祝福 媒体链接 天际樊星 孤勇者】这七个页签</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/about">← 返回关于页面</a>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .changelog-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+
+  h1 { margin-bottom: 0.5rem; }
+
+  .intro {
+    color: #666;
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+  }
+
+  .todo-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .todo-section h2 {
+    color: #c41e3a;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .todo-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .todo-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    background: #f8f8f8;
+    border-radius: 8px;
+    border-left: 3px solid #c41e3a;
+  }
+
+  .todo-list .icon { font-size: 0.9rem; }
+
+  .timeline-section h2 {
+    color: #c41e3a;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #c41e3a, #e8a0a0);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0.3rem;
+    width: 14px;
+    height: 14px;
+    background: #c41e3a;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #c41e3a;
+  }
+
+  .timeline-date {
+    font-size: 0.85rem;
+    color: #c41e3a;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-content {
+    background: #f8f8f8;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #eee;
+  }
+
+  .timeline-content h3 {
+    font-size: 1rem;
+    margin: 0 0 0.4rem 0;
+    color: #333;
+  }
+
+  .timeline-content p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .back-link {
+    margin-top: 2.5rem;
+    text-align: center;
+  }
+
+  .back-link a {
+    color: #c41e3a;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .back-link a:hover { text-decoration: underline; }
+
+  @media (prefers-color-scheme: dark) {
+    .intro { color: #aaa; }
+    .todo-list li { background: #2a2a2a; color: #ddd; }
+    .timeline-content { background: #2a2a2a; border-color: #444; }
+    .timeline-content h3 { color: #eee; }
+    .timeline-content p { color: #bbb; }
+    .timeline-item::before { border-color: #2a2a2a; }
+  }
+</style>
