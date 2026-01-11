@@ -20,6 +20,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <a href="/" id="end-back-btn">← 返回首页</a>
       <div class="final-message">
         <p class="quote">2026，樊振东打爆一切！</p>
+        <p class="footnote">如今的樊振东，连太阳都黑不了</p>
         <button id="replay-btn">再来一次</button>
       </div>
     </div>
@@ -105,6 +106,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     color: #aaa;
     font-size: 1.3rem;
     margin-bottom: 3rem;
+  }
+  .final-message .footnote {
+    color: rgba(255, 215, 0, 0.7);
+    font-size: 1.1rem;
+    margin-top: -0.5rem;
+    margin-bottom: 2rem;
+    font-style: italic;
   }
   @keyframes zoomIn {
     from { opacity: 0; transform: scale(0.3); }
