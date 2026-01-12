@@ -7,7 +7,7 @@ category: "ugc"
 ugcType: "letter"
 ugcTag: "纸短情长"
 author: "侯印国教授的学生"
-authorNote: "南京大学研究生"
+authorNote: "研究生"
 featured: false
 ---
 
