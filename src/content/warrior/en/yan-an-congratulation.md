@@ -6,6 +6,7 @@ descriptionZh: "2021闫安祝贺樊振东世乒赛夺冠"
 date: 2024-08-04
 tags: ["Video"]
 category: "warrior"
+translated: true
 ---
 
 # Yan An Congratulates Fan Zhendong on World Championship Victory
