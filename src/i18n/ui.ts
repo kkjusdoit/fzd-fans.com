@@ -60,7 +60,7 @@ export const ui = {
     'back.fzd101': '← 返回 FZD 101',
   },
   en: {
-    'site.title': 'Fan Zhendong Spirit Archive',
+    'site.title': 'Fan Zhendong Archive',
     'site.subtitle': 'A Community Internet Memory Project',
     'nav.home': 'Home',
     'nav.archive': 'Archive',
