@@ -2,6 +2,7 @@
 title: "经典梗合集"
 titleEn: "Classic Memes Collection"
 description: "樊振东的经典名场面和梗"
+descriptionEn: "Fan Zhendong's classic moments and internet memes"
 category: quotes
 tags: ["梗", "名场面", "搞笑"]
 translated: false

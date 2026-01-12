@@ -1,6 +1,8 @@
 ---
 title: "穿越一个又一个周期，抵达圆满"
+titleEn: "Crossing Cycle After Cycle to Reach Perfection"
 description: "即使天赋异禀，但仍前路漫漫"
+descriptionEn: "Even with extraordinary talent, the road ahead is still long"
 date: 2024-08-04
 tags: ["巴黎奥运", "解说评价", "男单夺冠"]
 category: "tributes"

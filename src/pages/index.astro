@@ -179,7 +179,7 @@ const slogans = [
         href="/warrior/world-ranking-withdrawal" 
         tag="孤勇者"
         description="面对不公，选择抗争"
-        image="/img/樊振东被逼退世界排名.avif"
+        image="/img/樊振东退世界排名.avif"
       />
       <Card 
         title="经典梗合集" 
@@ -528,6 +528,18 @@ const slogans = [
 </style>
 
 <script is:inline>
+  // 语言检测与自动跳转
+  (function() {
+    const hasRedirected = sessionStorage.getItem('lang-redirected');
+    if (!hasRedirected && !location.pathname.startsWith('/en')) {
+      const lang = navigator.language || navigator.userLanguage;
+      if (lang && !lang.startsWith('zh')) {
+        sessionStorage.setItem('lang-redirected', '1');
+        location.href = '/en' + location.pathname;
+      }
+    }
+  })();
+
   document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.getElementById('quotesCarousel');
     const quotes = carousel?.querySelectorAll('.quote-card');

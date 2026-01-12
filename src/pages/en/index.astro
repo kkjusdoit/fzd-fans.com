@@ -1,0 +1,276 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+
+// 获取所有内容，优先英文，fallback 到中文
+const arena = await getCollection('arena');
+const quotes = await getCollection('quotes');
+const warrior = await getCollection('warrior');
+const tributes = await getCollection('tributes');
+const links = await getCollection('links');
+const stars = await getCollection('stars');
+
+const categoryMap = {
+  arena: { name: t('nav.arena'), icon: '🏆' },
+  stars: { name: t('nav.stars'), icon: '⭐' },
+  quotes: { name: t('nav.quotes'), icon: '💬' },
+  warrior: { name: t('nav.warrior'), icon: '⚔️' },
+  tributes: { name: t('nav.tributes'), icon: '💝' },
+  links: { name: t('nav.links'), icon: '🔗' },
+};
+
+const allContent = [
+  ...arena.map(m => ({ ...m, category: 'arena' as const })),
+  ...stars.map(s => ({ ...s, category: 'stars' as const })),
+  ...quotes.map(q => ({ ...q, category: 'quotes' as const })),
+  ...warrior.map(w => ({ ...w, category: 'warrior' as const })),
+  ...tributes.map(t => ({ ...t, category: 'tributes' as const })),
+  ...links.map(l => ({ ...l, category: 'links' as const })),
+];
+
+// 经典语录 (英文版)
+const featuredQuotes = [
+  "I've given my whole life to the country. It's not something I can just quit.",
+  "If I keep winning championships, I'll keep treating everyone!",
+  "You can win or lose a match, but you should never give up. That's the spirit of sports.",
+  "Paris was great, and the future will be even better.",
+];
+
+// 称号列表 (英文版)
+const nicknames = [
+  { name: "Xiao Pang", desc: "Little Fatty - the most endearing nickname" },
+  { name: "Iron-Blooded No.1", desc: "10 years as China's top singles player" },
+  { name: "Fan Million", desc: "3-time WTT Grand Smash champion" },
+  { name: "Wall of China", desc: "Impenetrable defense" },
+  { name: "Mr. Reliable", desc: "100% win rate in singles finals at major events against foreign players" },
+  { name: "Kaiser Fan", desc: "Bundesliga nickname" },
+];
+
+// 应援口号 (英文版)
+const slogans = [
+  "Fan Zhendong, see you at every arena",
+  "Heavy snow bends the pine, yet the pine stands tall and straight",
+  "Building greatness grain by grain, Fan stars shine bright",
+  "Fan Zhendong, shine in Los Angeles",
+];
+---
+
+<BaseLayout title={t('site.title')}>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">{t('home.badge')}</div>
+    <h1>{t('site.title')}</h1>
+    <p class="intro">
+      {t('home.intro.line1')}<br/>
+      {t('home.intro.line2')}<span class="highlight">{t('home.intro.achievements')}</span>{t('home.intro.line3')}<span class="highlight">{t('home.intro.qualities')}</span>{t('home.intro.line4')}<br/>
+      {t('home.intro.line5')}<span class="highlight">{t('home.intro.spirit')}</span>{t('home.intro.line6')}
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">{allContent.length}</span>
+        <span class="stat-label">{t('home.stats.archives')}</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">6</span>
+        <span class="stat-label">{t('home.stats.categories')}</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">{t('home.stats.support')}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 滚动应援 -->
+  <section class="slogan-marquee">
+    <div class="marquee-content">
+      {[...slogans, ...slogans].map(s => (
+        <span class="slogan-item">✨ {s}</span>
+      ))}
+    </div>
+  </section>
+
+  <!-- 称号墙 -->
+  <section class="nicknames-section">
+    <h2>{t('home.nicknames.title')}</h2>
+    <div class="nicknames-grid">
+      {nicknames.map(n => (
+        <div class="nickname-card">
+          <span class="nickname-name">{n.name}</span>
+          <span class="nickname-desc">{n.desc}</span>
+        </div>
+      ))}
+    </div>
+    <a href={getLocalizedPath('/stars/nicknames', lang)} class="view-more">{t('home.nicknames.viewAll')}</a>
+  </section>
+
+  <!-- 经典语录轮播 -->
+  <section class="quotes-highlight">
+    <h2>{t('home.quotes.title')}</h2>
+    <div class="quotes-carousel" id="quotesCarousel">
+      {featuredQuotes.map((q, i) => (
+        <blockquote class={`quote-card ${i === 0 ? 'active' : ''}`} data-index={i}>
+          "{q}"
+        </blockquote>
+      ))}
+    </div>
+    <div class="carousel-dots">
+      {featuredQuotes.map((_, i) => (
+        <button class={`dot ${i === 0 ? 'active' : ''}`} data-index={i} aria-label={`Switch to quote ${i + 1}`}></button>
+      ))}
+    </div>
+    <a href={getLocalizedPath('/quotes', lang)} class="view-more">{t('home.quotes.viewAll')}</a>
+  </section>
+
+  <!-- 档案分类 -->
+  <section class="categories">
+    <h2>{t('home.categories.title')}</h2>
+    <div class="category-grid">
+      <a href={getLocalizedPath('/arena', lang)} class="category-card arena">
+        <span class="cat-icon">🏆</span>
+        <span class="cat-title">{t('nav.arena')}</span>
+        <span class="cat-count">1 article</span>
+      </a>
+      <a href={getLocalizedPath('/stars', lang)} class="category-card stars">
+        <span class="cat-icon">⭐</span>
+        <span class="cat-title">{t('nav.stars')}</span>
+        <span class="cat-count">{stars.length} articles</span>
+      </a>
+      <a href={getLocalizedPath('/quotes', lang)} class="category-card quotes">
+        <span class="cat-icon">💬</span>
+        <span class="cat-title">{t('nav.quotes')}</span>
+        <span class="cat-count">{quotes.length} articles</span>
+      </a>
+      <a href={getLocalizedPath('/warrior', lang)} class="category-card warrior">
+        <span class="cat-icon">⚔️</span>
+        <span class="cat-title">{t('nav.warrior')}</span>
+        <span class="cat-count">{warrior.length} articles</span>
+      </a>
+      <a href={getLocalizedPath('/tributes', lang)} class="category-card tributes">
+        <span class="cat-icon">💝</span>
+        <span class="cat-title">{t('nav.tributes')}</span>
+        <span class="cat-count">{tributes.length} articles</span>
+      </a>
+      <a href={getLocalizedPath('/links', lang)} class="category-card links">
+        <span class="cat-icon">🔗</span>
+        <span class="cat-title">{t('nav.links')}</span>
+        <span class="cat-count">{links.length} articles</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 全部档案 -->
+  <section class="all-content">
+    <h2>{t('home.all.title')}</h2>
+    <div class="content-grid">
+      {allContent.map(item => (
+        <Card 
+          title={item.data.titleEn || item.data.title}
+          href={getLocalizedPath(`/${item.category}/${removeLanguagePrefix(item.slug)}`, lang)}
+          description={item.data.descriptionEn || item.data.description}
+          tag={categoryMap[item.category].name}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- 底部口号 -->
+  <section class="footer-slogan">
+    <div class="slogan-main">{t('home.slogan.main')}</div>
+    <div class="slogan-sub">{t('home.slogan.sub')}</div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero { text-align: center; padding: 4rem 1rem 3rem; background: linear-gradient(135deg, #fff5f5 0%, #fff 100%); border-radius: 0 0 2rem 2rem; }
+  .hero-badge { display: inline-block; background: #c41e3a; color: #fff; padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.9rem; margin-bottom: 1rem; }
+  .hero h1 { font-size: 2.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #c41e3a, #8b0000); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .intro { color: #555; max-width: 650px; margin: 0 auto; line-height: 1.8; font-size: 1.05rem; }
+  .highlight { color: #c41e3a; font-weight: 500; }
+  .hero-stats { display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 2rem; padding: 1.5rem; background: #fff; border-radius: 1rem; box-shadow: 0 4px 20px rgba(196, 30, 58, 0.1); max-width: 500px; margin-left: auto; margin-right: auto; }
+  .stat-item { text-align: center; }
+  .stat-num { display: block; font-size: 2rem; font-weight: bold; color: #c41e3a; }
+  .stat-label { color: #888; font-size: 0.9rem; }
+  .stat-divider { width: 1px; height: 40px; background: #eee; }
+  .slogan-marquee { overflow: hidden; background: #c41e3a; padding: 0.8rem 0; margin: 2rem 0; }
+  .marquee-content { display: flex; animation: marquee 20s linear infinite; white-space: nowrap; }
+  .slogan-item { color: #fff; padding: 0 2rem; font-size: 1rem; }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .nicknames-section { padding: 2rem 1rem; text-align: center; }
+  .nicknames-section h2 { margin-bottom: 1.5rem; }
+  .nicknames-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; max-width: 800px; margin: 0 auto; }
+  .nickname-card { background: linear-gradient(135deg, #fff5f5, #fff); border: 1px solid #ffe0e0; border-radius: 2rem; padding: 0.6rem 1.2rem; display: flex; flex-direction: column; transition: all 0.2s; }
+  .nickname-card:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(196, 30, 58, 0.15); }
+  .nickname-name { font-weight: bold; color: #c41e3a; font-size: 1rem; }
+  .nickname-desc { font-size: 0.75rem; color: #888; }
+  .view-more { display: inline-block; margin-top: 1.5rem; color: #c41e3a; text-decoration: none; font-size: 0.9rem; }
+  .view-more:hover { text-decoration: underline; }
+  .quotes-highlight { background: #fafafa; padding: 2rem 1rem; text-align: center; }
+  .quotes-highlight h2 { margin-bottom: 1.5rem; }
+  .quotes-carousel { position: relative; max-width: 600px; margin: 0 auto; min-height: 100px; }
+  .quote-card { position: absolute; top: 0; left: 0; right: 0; background: #fff; border-left: 4px solid #c41e3a; padding: 1.5rem 2rem; margin: 0; font-style: italic; color: #444; font-size: 1.1rem; line-height: 1.6; border-radius: 0 12px 12px 0; box-shadow: 0 4px 16px rgba(0,0,0,0.08); text-align: left; opacity: 0; transform: translateX(30px); transition: all 0.5s ease; pointer-events: none; }
+  .quote-card.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+  .carousel-dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+  .carousel-dots .dot { width: 10px; height: 10px; border-radius: 50%; border: none; background: #ddd; cursor: pointer; transition: all 0.3s; padding: 0; }
+  .carousel-dots .dot:hover { background: #ffb3b3; }
+  .carousel-dots .dot.active { background: #c41e3a; transform: scale(1.2); }
+  .categories { padding: 3rem 1rem; }
+  .categories h2 { text-align: center; margin-bottom: 2rem; }
+  .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; max-width: 1000px; margin: 0 auto; }
+  .category-card { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; background: #fff; border-radius: 12px; text-decoration: none; color: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s; border: 2px solid transparent; }
+  .category-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .category-card.arena:hover { border-color: #ffd700; }
+  .category-card.stars:hover { border-color: #ff6b6b; }
+  .category-card.quotes:hover { border-color: #4ecdc4; }
+  .category-card.warrior:hover { border-color: #96ceb4; }
+  .category-card.tributes:hover { border-color: #ff9ff3; }
+  .category-card.links:hover { border-color: #a29bfe; }
+  .cat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .cat-title { font-weight: bold; font-size: 1.1rem; }
+  .cat-count { font-size: 0.8rem; color: #c41e3a; margin: 0.3rem 0; }
+  .all-content { padding: 3rem 1rem; }
+  .all-content h2 { text-align: center; margin-bottom: 1.5rem; }
+  .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .footer-slogan { text-align: center; padding: 4rem 1rem; background: linear-gradient(135deg, #c41e3a, #8b0000); color: #fff; margin-top: 2rem; }
+  .slogan-main { font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; }
+  .slogan-sub { font-size: 1.2rem; opacity: 0.9; }
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .intro { font-size: 0.95rem; }
+    .hero-stats { gap: 1rem; padding: 1rem; }
+    .stat-num { font-size: 1.5rem; }
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .slogan-main { font-size: 1.5rem; }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('quotesCarousel');
+    const quotes = carousel?.querySelectorAll('.quote-card');
+    const dots = document.querySelectorAll('.carousel-dots .dot');
+    let currentIndex = 0;
+    let autoPlayTimer;
+    function showQuote(index) {
+      quotes?.forEach((q, i) => q.classList.toggle('active', i === index));
+      dots?.forEach((d, i) => d.classList.toggle('active', i === index));
+      currentIndex = index;
+    }
+    function nextQuote() { showQuote((currentIndex + 1) % (quotes?.length || 1)); }
+    function startAutoPlay() { autoPlayTimer = setInterval(nextQuote, 4000); }
+    function stopAutoPlay() { clearInterval(autoPlayTimer); }
+    dots?.forEach((dot, i) => {
+      dot.addEventListener('click', () => { showQuote(i); stopAutoPlay(); startAutoPlay(); });
+    });
+    carousel?.addEventListener('mouseenter', stopAutoPlay);
+    carousel?.addEventListener('mouseleave', startAutoPlay);
+    startAutoPlay();
+  });
+</script>

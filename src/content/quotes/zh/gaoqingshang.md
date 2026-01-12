@@ -2,6 +2,7 @@
 title: "高情商合集"
 titleEn: "High EQ Quotes Collection"
 description: "樊振东的高情商回答"
+descriptionEn: "Fan Zhendong's witty and emotionally intelligent responses"
 category: quotes
 tags: ["语录", "高情商", "采访"]
 translated: false

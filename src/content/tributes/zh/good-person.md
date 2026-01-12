@@ -1,6 +1,8 @@
 ---
 title: "这个人真好"
+titleEn: "What a Good Person"
 description: "好到让人觉得一生忽然有了寄托与希冀"
+descriptionEn: "So good that life suddenly feels meaningful and hopeful"
 date: 2024-01-01
 tags: ["球迷评价"]
 category: "tributes"

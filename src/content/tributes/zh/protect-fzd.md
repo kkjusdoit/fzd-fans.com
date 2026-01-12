@@ -1,6 +1,8 @@
 ---
 title: "这个世界如果不保护好樊振东"
+titleEn: "If the World Doesn't Protect Fan Zhendong"
 description: "樊振东不仅是一位伟大的球员，他是勇士，他是这个世界的一束光"
+descriptionEn: "Fan Zhendong is not just a great player, he is a warrior, a ray of light in this world"
 date: 2024-01-01
 tags: ["球迷评价", "精神象征"]
 category: "tributes"

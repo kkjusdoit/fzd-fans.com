@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const quotes = await getCollection('quotes');
+const allQuotes = await getCollection('quotes');
+const quotes = allQuotes.filter(item => item.slug.startsWith('zh/'));
 ---
 
 <BaseLayout title="语录">

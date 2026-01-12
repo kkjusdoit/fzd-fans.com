@@ -2,6 +2,7 @@
 title: "视频收藏"
 titleEn: "Video Collection"
 description: "樊振东相关的优质视频内容收藏"
+descriptionEn: "Collection of quality video content about Fan Zhendong"
 category: links
 tags: ["视频", "B站"]
 translated: false

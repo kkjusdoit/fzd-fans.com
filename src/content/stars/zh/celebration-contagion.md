@@ -2,6 +2,7 @@
 title: "庆祝动作人传人现象"
 titleEn: "Celebration Contagion Phenomenon"
 description: "樊振东所引发的跨越国界与项目的庆祝动作文化传播现象"
+descriptionEn: "The cross-border celebration culture phenomenon sparked by Fan Zhendong"
 category: stars
 tags: ["庆祝动作", "文化传播", "符号"]
 translated: false

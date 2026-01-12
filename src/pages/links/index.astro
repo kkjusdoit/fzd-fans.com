@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const links = await getCollection('links');
+const allLinks = await getCollection('links');
+const links = allLinks.filter(item => item.slug.startsWith('zh/'));
 ---
 
 <BaseLayout title="媒体链接">

@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations, getLocalizedPath } from '../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+---
+
+<BaseLayout title="About">
+  <article class="about-page">
+    <h1>About This Website</h1>
+    
+    <section>
+      <h2>Purpose</h2>
+      <p>
+        Most people who admire Fan Zhendong are drawn by his achievements, but what I want to document is not his <strong>records</strong>,
+        but rather his more dazzling <strong>willpower, character, innocence, kindness, wit, and humor</strong>, as well as his <strong>clarity and perseverance amid the noise</strong> and <strong>courage when facing adversity</strong>.
+      </p>
+      <p>
+        If <a href="https://www.f-zd.com/">the encyclopedia by Feiyi</a> is the official textbook version, then this website is a magazine that needs collective wisdom and continuous improvement.
+        This kind of subjective documentation is not as indisputable as past achievements; it can only be measured by one's own standards.
+      </p>
+      <p>
+        My principle is to <strong>respect facts as much as possible, not violate public morals, and do everything to promote the spirit of Fan Zhendong, hoping he can become an idol for more people</strong>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Content Sources</h2>
+      <p>
+        Over the past year, I've spent hundreds of hours browsing short videos, Weibo posts, and WeChat articles about Fan Zhendong.
+        This is simply an effort to organize and categorize the content in my mind. Materials are collected from various places on the internet. Please contact us for removal if there are any copyright issues.
+      </p>
+    </section>
+
+    <section>
+      <h2>Contribute</h2>
+      <p>
+        This is an open project, and all Fan Zhendong fans are welcome to contribute content.
+        If you have good materials, stories, or links, please submit them to: <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Disclaimer</h2>
+      <p>
+        This website is purely a personal passion project. Any controversies arising from subjective content are unrelated to Fan Zhendong himself or his team.
+      </p>
+    </section>
+
+    <section>
+      <h2>Related Links</h2>
+      <ul class="related-links">
+        <li><a href="https://www.f-zd.com/" target="_blank" rel="noopener noreferrer">Fan Zhendong Encyclopedia</a> - by Feiyi 🫡</li>
+      </ul>
+    </section>
+
+    <section class="slogan">
+      <div class="medal-container">
+        <span class="medal">🥇</span>
+      </div>
+      <blockquote>
+        <span class="slogan-text">Fan Zhendong, Shine in Los Angeles</span>
+        <span class="year">2028</span>
+      </blockquote>
+      <div class="stars">
+        <span class="star">✨</span>
+        <span class="star">⭐</span>
+        <span class="star">✨</span>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .about-page { max-width: 800px; margin: 0 auto; padding: 2rem 0; }
+  h1 { margin-bottom: 2rem; }
+  section { margin-bottom: 2rem; }
+  h2 { color: #c41e3a; margin-bottom: 1rem; font-size: 1.3rem; }
+  p { margin-bottom: 1rem; }
+  .related-links { list-style: none; padding: 0; }
+  .related-links li { margin-bottom: 0.8rem; padding-left: 1.5rem; position: relative; }
+  .related-links li::before { content: '🔗'; position: absolute; left: 0; }
+  .related-links a { color: #c41e3a; text-decoration: none; font-weight: 500; }
+  .related-links a:hover { text-decoration: underline; }
+  .slogan { text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+  .medal-container { margin-bottom: 1rem; position: relative; z-index: 1; }
+  .medal { font-size: 3.5rem; display: inline-block; animation: medalShine 2s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); }
+  @keyframes medalShine { 0%, 100% { transform: scale(1) rotateY(0deg); filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); } 50% { transform: scale(1.1) rotateY(15deg); filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); } }
+  blockquote { font-size: 1.8rem; font-weight: bold; font-style: normal; margin: 0; position: relative; z-index: 1; }
+  .slogan-text { background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 3s linear infinite; display: block; }
+  @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+  .year { display: block; font-size: 2.5rem; color: #c41e3a; margin-top: 0.5rem; font-weight: 900; letter-spacing: 0.3em; text-shadow: 0 0 10px rgba(196, 30, 58, 0.5); }
+  .stars { margin-top: 1rem; position: relative; z-index: 1; }
+  .star { font-size: 1.2rem; margin: 0 0.5rem; animation: twinkle 1.5s ease-in-out infinite; }
+  .star:nth-child(1) { animation-delay: 0s; }
+  .star:nth-child(2) { animation-delay: 0.5s; }
+  .star:nth-child(3) { animation-delay: 1s; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+</style>

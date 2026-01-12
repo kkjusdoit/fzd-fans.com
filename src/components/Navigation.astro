@@ -17,7 +17,8 @@ const navItems = [
   { href: '/stars', label: t('nav.stars') },
   { href: '/warrior', label: t('nav.warrior') },
   { href: '/breakit', label: t('nav.breakit') },
-  { href: '/infographic', label: t('nav.infographic') },
+  // FZD 101 只在英文版显示
+  ...(lang === 'en' ? [{ href: '/fzd101', label: t('nav.fzd101') }] : []),
   // { href: '/quiz', label: t('nav.quiz') }, // 暂时隐藏
   { href: '/about', label: t('nav.about') },
 ];

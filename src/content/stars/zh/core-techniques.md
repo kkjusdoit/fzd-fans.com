@@ -1,7 +1,9 @@
 ---
 title: "核心技术"
+titleEn: "Core Techniques"
 category: "stars"
 description: "樊振东的标志性技术动作和得分手段，这些硬核标签展现了他独特的技术风格。"
+descriptionEn: "Fan Zhendong's signature techniques and scoring methods that showcase his unique playing style"
 ---
 
 ## 霸王拧/暴力拧拉

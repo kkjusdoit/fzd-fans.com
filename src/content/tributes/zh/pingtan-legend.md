@@ -1,6 +1,8 @@
 ---
 title: "乒坛遮不住，也绕不过的浓墨重彩"
+titleEn: "An Indelible Mark in Table Tennis History"
 description: "他是隆冬风雪中的苍劲青松，是球迷们一心向往的美好"
+descriptionEn: "He is the sturdy pine in winter storms, the beauty fans aspire to"
 date: 2024-01-01
 tags: ["球迷评价", "精神象征"]
 category: "tributes"

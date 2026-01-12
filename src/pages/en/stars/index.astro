@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Card from '../../../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const allStars = await getCollection('stars');
+const stars = allStars.filter(item => item.slug.startsWith('en/'));
+
+// Tag translations
+const tagMap: Record<string, string> = {
+  '称号': 'Nicknames',
+  '外号': 'Titles',
+  '樊星': 'Fan Stars',
+  '口号': 'Slogans',
+  '应援': 'Cheering',
+  '庆祝动作': 'Celebrations',
+  '文化传播': 'Culture',
+  '符号': 'Symbol',
+  '理性追星': 'Rational Fandom',
+};
+---
+
+<BaseLayout title={t('nav.stars')}>
+  <section class="page-header">
+    <h1>⭐ {t('nav.stars')}</h1>
+    <p class="subtitle">Nicknames, playing style, and legendary status</p>
+  </section>
+
+  <section class="content-grid">
+    {stars.map(star => {
+      const slug = removeLanguagePrefix(star.slug);
+      const href = getLocalizedPath(`/stars/${slug}`, lang);
+      return (
+        <Card 
+          title={star.data.titleEn || star.data.title}
+          href={href}
+          description={star.data.descriptionEn || star.data.description}
+          tag={tagMap[star.data.tags?.[0] || ''] || star.data.tags?.[0]}
+        />
+      );
+    })}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .subtitle { color: #666; }
+  .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem 0; }
+</style>

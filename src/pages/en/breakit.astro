@@ -1,0 +1,358 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations, getLocalizedPath } from '../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+---
+
+<BaseLayout title="Break It All">
+  <div id="game-container">
+    <div id="game-intro">
+      <h1>💥 Break It All</h1>
+      <p>All the rumors, absurdities, slanders, and nonsense rise like hot air balloons. Click to burst them one by one!</p>
+      <button id="start-btn">Start</button>
+      <p class="sound-tip">🔊 Turn on sound for a surprise</p>
+    </div>
+    <div id="game-area" style="display: none;">
+      <div id="hud">
+        <a href={getLocalizedPath('/', lang)} id="back-btn">← Back</a>
+        <div id="score">💥 <span id="count">0</span> / <span id="total">19</span></div>
+      </div>
+    </div>
+    <div id="game-end" style="display: none;">
+      <a href={getLocalizedPath('/', lang)} id="end-back-btn">← Back to Home</a>
+      <div class="final-message">
+        <p class="quote">2026, Fan Zhendong breaks through everything!</p>
+        <p class="footnote">Today's Fan Zhendong cannot be overshadowed, not even by the sun</p>
+        <button id="replay-btn">Play Again</button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  #game-container { min-height: 80vh; position: relative; }
+  #game-intro, #game-end { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
+  #game-intro h1 { font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(45deg, #c41e3a, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #game-intro p { color: #666; margin-bottom: 2rem; font-size: 1.1rem; max-width: 600px; }
+  #game-intro .sound-tip { color: #999; font-size: 0.9rem; margin-top: 1rem; }
+  #start-btn, #replay-btn { background: linear-gradient(45deg, #c41e3a, #e63950); color: white; border: none; padding: 1rem 3rem; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4); }
+  #start-btn:hover, #replay-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(196, 30, 58, 0.6); }
+  #game-end { background: linear-gradient(to bottom, #1a1a3e 0%, #2d1b4e 50%, #4a2c5a 100%); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; }
+  #end-back-btn { position: fixed; top: 20px; left: 20px; color: white; font-size: 1rem; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; z-index: 1001; }
+  #end-back-btn:hover { background: rgba(255,255,255,0.2); }
+  .final-message { animation: zoomIn 1.5s ease-out; text-align: center; padding: 2rem; }
+  .final-message .quote { font-size: 2.5rem; color: #ffd700; margin-bottom: 1.5rem; max-width: 700px; line-height: 1.6; text-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+  .final-message .footnote { color: rgba(255, 215, 0, 0.7); font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 2rem; font-style: italic; }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+</style>
+
+<style is:global>
+  #game-area { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(to bottom, #1a1a3e 0%, #2d1b4e 50%, #4a2c5a 100%); z-index: 1000; overflow: hidden; }
+  #hud { position: fixed; top: 20px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1001; }
+  #back-btn { color: white; font-size: 1rem; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; }
+  #back-btn:hover { background: rgba(255,255,255,0.2); }
+  #score { color: white; font-size: 1.5rem; background: rgba(0,0,0,0.6); padding: 0.5rem 1.5rem; border-radius: 30px; }
+  #game-hint { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.9rem; text-align: center; max-width: 80%; z-index: 1001; pointer-events: none; }
+  .balloon { position: fixed; cursor: pointer; user-select: none; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: filter 0.2s; }
+  .balloon:hover { filter: brightness(1.2); }
+  .balloon:hover .balloon-body { transform: scale(1.05); }
+  .balloon-body { position: relative; width: 100px; height: 120px; border-radius: 50% 50% 45% 45%; display: flex; align-items: center; justify-content: center; box-shadow: inset -15px -10px 30px rgba(0,0,0,0.3), inset 10px 10px 20px rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.4); transition: transform 0.2s; }
+  .balloon-body::before { content: ''; position: absolute; top: 15px; left: 20px; width: 20px; height: 25px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+  .balloon-text { color: white; font-size: 0.65rem; font-weight: bold; text-align: center; padding: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); line-height: 1.2; max-width: 85px; word-break: break-word; }
+  .balloon-rope { width: 2px; height: 30px; background: linear-gradient(to bottom, #8b4513, #654321); }
+  .balloon-basket { width: 30px; height: 20px; background: linear-gradient(to bottom, #8b4513, #654321); border-radius: 0 0 5px 5px; border: 2px solid #5a3a1a; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3); }
+  .balloon.color-0 .balloon-body { background: linear-gradient(135deg, #ff6b6b, #c41e3a); }
+  .balloon.color-1 .balloon-body { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+  .balloon.color-2 .balloon-body { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
+  .balloon.color-3 .balloon-body { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
+  .balloon.color-4 .balloon-body { background: linear-gradient(135deg, #55efc4, #00b894); }
+  .balloon.color-5 .balloon-body { background: linear-gradient(135deg, #fd79a8, #e84393); }
+  .balloon.color-6 .balloon-body { background: linear-gradient(135deg, #fab1a0, #e17055); }
+  .balloon.exploding { animation: balloonExplode 0.4s forwards; pointer-events: none; }
+  @keyframes balloonExplode { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.4); } 100% { transform: scale(0); opacity: 0; } }
+  .fragment { position: fixed; pointer-events: none; z-index: 2000; }
+  .explosion-flash { position: fixed; border-radius: 50%; pointer-events: none; z-index: 1999; }
+  .shockwave { position: fixed; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.8); pointer-events: none; z-index: 1998; }
+  .boom-text { position: fixed; font-size: 2rem; font-weight: bold; pointer-events: none; z-index: 2001; text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+  .firework-particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 1002; }
+  .firework-trail { position: fixed; width: 4px; height: 4px; border-radius: 50%; pointer-events: none; z-index: 1002; }
+</style>
+
+<script>
+  const explosionSound = new Audio('/audio/new_explosion.wav');
+  const endSound = new Audio('/audio/fanzhendong.wav');
+  explosionSound.volume = 0.3;
+  endSound.volume = 0.6;
+
+  // English version of rumors
+  const rumors = [
+    "Criticized for attending a concert",
+    "Accused of celebrating too early before Paris Olympics",
+    "Personal info leaked, family harassed",
+    "Stranger broke into his room",
+    "Loud shouting after Chongqing Championship",
+    "Not good enough when losing, not great when winning",
+    "Playing abroad means abandoning the team?",
+    "Accused of leaking techniques",
+    "Singles player can't contribute enough",
+    "Media used shadowed photos after team victory",
+    "Missed 2024 Best Athlete award",
+    "Forced out of world rankings",
+    "Acting too important?",
+    "WTT unfair terms",
+    "Blamed without evidence",
+    "Awkward podium moment at Weihai",
+    "Cursed to lose at Paris Olympics",
+    "Blamed for broken racket incident",
+    "Hot water bag as medical care",
+    "Only sponsors wanted him to win at Paris",
+    "Criticized for watching football in Incheon",
+    "Homeless after Bayi team disbanded",
+    "Blamed for teammate's loss",
+    "World ranking points set to zero",
+    "Playing in Bundesliga just for money?",
+    "41 matches in 38 days after COVID",
+    "No coach at commercial events",
+    "Accused of studying teammates",
+    "Accused of targeting weak spots",
+    "Concern for opponent twisted as curse",
+    "Room intrusion before Xinxiang, officials silent",
+    "Championship poster burned",
+    "Hostile materials brought into venue",
+  ];
+
+  let brokenCount = 0;
+  let totalRumors = rumors.length;
+  let gameArea: HTMLElement | null;
+  let balloons: { element: HTMLElement; x: number; y: number; minY: number; speed: number; sway: number; swayOffset: number }[] = [];
+  let animationId: number;
+  let usedZones: Set<number> = new Set();
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+  const speedMultiplier = isMobile ? 4 : 1;
+
+  const startBtn = document.getElementById('start-btn');
+  const replayBtn = document.getElementById('replay-btn');
+  const gameIntro = document.getElementById('game-intro');
+  const gameEnd = document.getElementById('game-end');
+
+  function startGame() {
+    brokenCount = 0;
+    balloons = [];
+    usedZones.clear();
+    gameArea = document.getElementById('game-area');
+
+    if (gameIntro) gameIntro.style.display = 'none';
+    if (gameEnd) gameEnd.style.display = 'none';
+    if (gameArea) {
+      gameArea.style.display = 'block';
+      gameArea.innerHTML = `
+        <div id="hud">
+          <a href="/en" id="back-btn">← Back</a>
+          <div id="score">💥 <span id="count">0</span> / <span id="total">${totalRumors}</span></div>
+        </div>
+        <div id="game-hint">Click the balloons to burst all the rumors!</div>
+      `;
+    }
+
+    const spawnInterval = isMobile ? 150 : 500;
+    rumors.forEach((text, i) => {
+      setTimeout(() => spawnBalloon(text, i), i * spawnInterval);
+    });
+
+    animateBalloons();
+  }
+
+  function getUniqueX(balloonWidth: number): number {
+    const screenWidth = window.innerWidth;
+    const padding = 30;
+    const zoneWidth = balloonWidth + 20;
+    const numZones = Math.floor((screenWidth - padding * 2) / zoneWidth);
+    
+    if (usedZones.size >= numZones) usedZones.clear();
+    
+    let zone: number;
+    do { zone = Math.floor(Math.random() * numZones); } while (usedZones.has(zone));
+    usedZones.add(zone);
+    
+    return padding + zone * zoneWidth + Math.random() * 15;
+  }
+
+  function spawnBalloon(text: string, index: number) {
+    if (!gameArea) return;
+
+    const balloon = document.createElement('div');
+    balloon.className = `balloon color-${index % 7}`;
+    balloon.innerHTML = `<div class="balloon-body"><span class="balloon-text">${text}</span></div><div class="balloon-rope"></div><div class="balloon-basket"></div>`;
+
+    const balloonWidth = isMobile ? 80 : 100;
+    const x = getUniqueX(balloonWidth);
+    const y = window.innerHeight + 50 + (index % 5) * 80;
+    const minY = 80 + (index % 4) * 60 + Math.random() * (window.innerHeight * 0.3);
+
+    balloon.style.left = x + 'px';
+    balloon.style.top = y + 'px';
+    balloon.addEventListener('click', () => explodeBalloon(balloon, index));
+    gameArea.appendChild(balloon);
+
+    balloons.push({
+      element: balloon, x, y, minY,
+      speed: (0.8 + Math.random() * 0.6) * speedMultiplier,
+      sway: isMobile ? 8 : 15 + Math.random() * 20,
+      swayOffset: Math.random() * Math.PI * 2
+    });
+  }
+
+  function animateBalloons() {
+    const time = Date.now() / 1000;
+    balloons.forEach(b => {
+      if (!b.element.classList.contains('exploding')) {
+        if (b.y > b.minY) b.y -= b.speed;
+        const swayX = Math.sin(time * 1.5 + b.swayOffset) * b.sway;
+        b.element.style.left = (b.x + swayX) + 'px';
+        b.element.style.top = b.y + 'px';
+      }
+    });
+    animationId = requestAnimationFrame(animateBalloons);
+  }
+
+  function explodeBalloon(balloon: HTMLElement, index: number) {
+    if (balloon.classList.contains('exploding')) return;
+    explosionSound.currentTime = 0;
+    explosionSound.play().catch(() => {});
+    createExplosion(balloon, index);
+    balloon.classList.add('exploding');
+    brokenCount++;
+    const countEl = document.getElementById('count');
+    if (countEl) countEl.textContent = brokenCount.toString();
+    setTimeout(() => {
+      balloon.remove();
+      balloons = balloons.filter(b => b.element !== balloon);
+      if (brokenCount >= totalRumors) {
+        cancelAnimationFrame(animationId);
+        endGame();
+      }
+    }, 400);
+  }
+
+  function createExplosion(balloon: HTMLElement, colorIndex: number) {
+    const rect = balloon.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + 60;
+    const colors = [['#ff6b6b', '#c41e3a'], ['#74b9ff', '#0984e3'], ['#ffeaa7', '#fdcb6e'], ['#a29bfe', '#6c5ce7'], ['#55efc4', '#00b894'], ['#fd79a8', '#e84393'], ['#fab1a0', '#e17055']];
+    const fragmentColors = colors[colorIndex % 7];
+    const fragmentCount = isMobile ? 10 : 25;
+
+    const flash = document.createElement('div');
+    flash.className = 'explosion-flash';
+    flash.style.cssText = `left:${centerX - 60}px;top:${centerY - 60}px;width:120px;height:120px;background:radial-gradient(circle, white 0%, ${fragmentColors[0]} 50%, transparent 70%);opacity:1`;
+    document.body.appendChild(flash);
+    let flashOp = 1, flashScale = 1;
+    function animateFlash() {
+      flashOp -= 0.15; flashScale += 0.4;
+      flash.style.opacity = flashOp.toString();
+      flash.style.transform = `scale(${flashScale})`;
+      if (flashOp > 0) requestAnimationFrame(animateFlash); else flash.remove();
+    }
+    animateFlash();
+
+    const boomTexts = ['💥', 'POP!', 'BOOM', 'BAM!'];
+    const boomText = document.createElement('div');
+    boomText.className = 'boom-text';
+    boomText.textContent = boomTexts[Math.floor(Math.random() * boomTexts.length)];
+    boomText.style.cssText = `left:${centerX}px;top:${centerY}px;color:${fragmentColors[0]}`;
+    document.body.appendChild(boomText);
+    let btOp = 1, btY = centerY, btScale = 0.5;
+    function animateBoomText() {
+      btOp -= 0.06; btY -= 4; btScale = Math.min(btScale + 0.2, 1.5);
+      boomText.style.cssText = `left:${centerX}px;top:${btY}px;color:${fragmentColors[0]};opacity:${btOp};transform:translate(-50%, -50%) scale(${btScale})`;
+      if (btOp > 0) requestAnimationFrame(animateBoomText); else boomText.remove();
+    }
+    animateBoomText();
+
+    for (let i = 0; i < fragmentCount; i++) {
+      const fragment = document.createElement('div');
+      fragment.className = 'fragment';
+      const size = 5 + Math.random() * 15;
+      fragment.style.cssText = `width:${size}px;height:${size}px;background:${fragmentColors[Math.floor(Math.random() * fragmentColors.length)]};border-radius:50%;left:${centerX}px;top:${centerY}px`;
+      document.body.appendChild(fragment);
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 6 + Math.random() * 12;
+      let vx = Math.cos(angle) * velocity, vy = Math.sin(angle) * velocity - 4, px = centerX, py = centerY, opacity = 1;
+      function animateFragment() {
+        px += vx; vy += 0.5; py += vy; opacity -= 0.04;
+        fragment.style.cssText = `width:${size}px;height:${size}px;background:${fragmentColors[0]};border-radius:50%;left:${px}px;top:${py}px;opacity:${opacity}`;
+        if (opacity > 0) requestAnimationFrame(animateFragment); else fragment.remove();
+      }
+      animateFragment();
+    }
+  }
+
+  let fireworkInterval: number;
+  const fireworkColors = [['#ff6b6b', '#ff8787'], ['#ffd700', '#ffec8b'], ['#74b9ff', '#a0d2ff'], ['#a29bfe', '#c4bfff'], ['#55efc4', '#81fff0']];
+
+  function createFirework() {
+    const x = Math.random() * window.innerWidth;
+    const startY = window.innerHeight;
+    const targetY = 100 + Math.random() * (window.innerHeight * 0.4);
+    const colors = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+
+    const rocket = document.createElement('div');
+    rocket.className = 'firework-trail';
+    rocket.style.cssText = `left:${x}px;top:${startY}px;background:${colors[0]};box-shadow:0 0 6px ${colors[0]}`;
+    document.body.appendChild(rocket);
+
+    let rocketY = startY;
+    const rocketSpeed = 8 + Math.random() * 4;
+    function animateRocket() {
+      rocketY -= rocketSpeed;
+      rocket.style.top = rocketY + 'px';
+      if (rocketY > targetY) requestAnimationFrame(animateRocket);
+      else { rocket.remove(); explodeFirework(x, targetY, colors); }
+    }
+    animateRocket();
+  }
+
+  function explodeFirework(x: number, y: number, colors: string[]) {
+    const particleCount = 30;
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'firework-particle';
+      const size = 3 + Math.random() * 4;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particle.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size * 2}px ${color}`;
+      document.body.appendChild(particle);
+      const angle = (Math.PI * 2 * i) / particleCount;
+      const velocity = 3 + Math.random() * 5;
+      let vx = Math.cos(angle) * velocity, vy = Math.sin(angle) * velocity, px = x, py = y, opacity = 1;
+      function animateParticle() {
+        px += vx; vy += 0.08; py += vy; vx *= 0.98; opacity -= 0.015;
+        particle.style.left = px + 'px'; particle.style.top = py + 'px'; particle.style.opacity = opacity.toString();
+        if (opacity > 0) requestAnimationFrame(animateParticle); else particle.remove();
+      }
+      animateParticle();
+    }
+  }
+
+  function startFireworks() {
+    for (let i = 0; i < 2; i++) setTimeout(() => createFirework(), i * 500);
+    fireworkInterval = setInterval(() => createFirework(), 1200);
+  }
+
+  function stopFireworks() { if (fireworkInterval) clearInterval(fireworkInterval); }
+
+  function endGame() {
+    setTimeout(() => {
+      if (gameArea) gameArea.style.display = 'none';
+      if (gameEnd) gameEnd.style.display = 'flex';
+      endSound.currentTime = 0;
+      endSound.play().catch(() => {});
+      startFireworks();
+    }, 500);
+  }
+
+  startBtn?.addEventListener('click', startGame);
+  replayBtn?.addEventListener('click', () => { stopFireworks(); startGame(); });
+</script>

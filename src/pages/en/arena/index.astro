@@ -1,0 +1,446 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Career">
+  <div class="career-insight">
+    <!-- Header / Hero -->
+    <header class="insight-header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="avatar">F</div>
+          <div>
+            <h1 class="header-title">Fan Zhendong Analysis</h1>
+            <p class="header-subtitle">Career & Transition Report</p>
+          </div>
+        </div>
+        <nav class="tab-nav">
+          <button onclick="switchTab('records')" id="nav-records" class="tab-btn active-tab">Historic Records</button>
+          <button onclick="switchTab('timeline')" id="nav-timeline" class="tab-btn inactive-tab">Career Moments</button>
+          <button onclick="switchTab('transition')" id="nav-transition" class="tab-btn inactive-tab">Departure & Transition</button>
+        </nav>
+        <button class="mobile-menu-btn" onclick="document.getElementById('mobile-nav').classList.toggle('hidden'); this.classList.remove('pulse')">
+          <span class="menu-icon">☰</span>
+          <span class="menu-hint">Switch</span>
+        </button>
+      </div>
+      <div id="mobile-nav" class="mobile-nav hidden">
+        <button onclick="switchTab('records')" class="mobile-tab-btn">Historic Records</button>
+        <button onclick="switchTab('timeline')" class="mobile-tab-btn">Career Moments</button>
+        <button onclick="switchTab('transition')" class="mobile-tab-btn">Departure & Transition</button>
+      </div>
+    </header>
+
+    <!-- Intro Content -->
+    <div class="intro-section">
+      <h2>From Unparalleled to a New Journey</h2>
+      <p>
+        Explore Fan Zhendong's career journey, from his <span class="highlight">unparalleled historic records</span>, to those <span class="highlight">defining moments on the court</span>, and the much-discussed <span class="highlight">withdrawal from world rankings</span> and <span class="highlight">move to Bundesliga</span>. Through interactive data and timelines, witness the trajectory of this table tennis legend.
+      </p>
+    </div>
+
+    <!-- VIEW 1: RECORDS (Default) -->
+    <div id="view-records" class="view-section fade-in">
+      <div class="stat-cards">
+        <div class="stat-card border-red">
+          <div class="stat-label">World Ranking #1</div>
+          <div class="stat-value"><span class="stat-number">Multi-Year</span><span class="stat-unit">Dominance</span></div>
+        </div>
+        <div class="stat-card border-gold">
+          <div class="stat-label">World Cup Titles</div>
+          <div class="stat-value"><span class="stat-number">4×</span><span class="stat-unit">Historic Record</span></div>
+        </div>
+        <div class="stat-card border-gray">
+          <div class="stat-label">Nine Major Singles</div>
+          <div class="stat-value"><span class="stat-number">Grand Slam</span><span class="stat-unit">Achieved</span></div>
+        </div>
+        <div class="stat-card border-blue">
+          <div class="stat-label">Bundesliga Journey</div>
+          <div class="stat-value"><span class="stat-number">2025</span><span class="stat-unit">Season Start</span></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>Major Tournament Dominance</h3>
+          <p class="chart-desc">Showcasing his absolute dominance at World Cup, World Championships, and Olympics.</p>
+          <div class="chart-container"><canvas id="titlesChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Technical Versatility Analysis</h3>
+          <p class="chart-desc">As "China's Wall", Fan Zhendong has virtually no weaknesses in power, speed, and backhand technique.</p>
+          <div class="chart-container"><canvas id="skillsChart"></canvas></div>
+        </div>
+      </div>
+      
+      <div class="insight-box">
+        <h4>Data Insights</h4>
+        <p>Data shows that Fan Zhendong maintained an extremely high win rate between 2018-2023, especially at the World Cup where he created nearly "unbeatable" records. His playing style combines exceptional shot quality with delicate table control, representing the pinnacle of modern table tennis technique.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 2: TIMELINE (Hidden) -->
+    <div id="view-timeline" class="view-section hidden fade-in">
+      <div class="timeline-layout">
+        <div class="timeline-nav custom-scroll">
+          <h3>Key Milestones</h3>
+          <div class="timeline-list" id="timeline-list"></div>
+        </div>
+        <div class="timeline-detail" id="timeline-detail">
+          <div class="detail-icon">🏆</div>
+          <h2>Click Timeline on Left</h2>
+          <p>Explore the defining moments of Fan Zhendong's career.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: TRANSITION (Hidden) -->
+    <div id="view-transition" class="view-section hidden fade-in">
+      <div class="transition-grid">
+        <div class="chart-card">
+          <h3>World Ranking Points Trend</h3>
+          <p class="chart-desc">Showing points changes over time, currently without world ranking.</p>
+          <div class="chart-container"><canvas id="rankingChart"></canvas></div>
+        </div>
+
+        <div class="chart-card reasons-card">
+          <h3>Move to Bundesliga: Why?</h3>
+          <ul class="reasons-list">
+            <li><span class="reason-num">1</span><span><strong>Rejecting WTT:</strong> Voting with his feet, refusing the over-commercialization and burnout under the WTT system, in exchange for freedom and respect in Bundesliga.</span></li>
+            <li><span class="reason-num">2</span><span><strong>Enjoying Table Tennis:</strong> Escaping the toxic fan culture at home, seeking pure joy in professional leagues.</span></li>
+            <li><span class="reason-num">3</span><span><strong>Staying Sharp:</strong> Bundesliga's high level is the best place to maintain competitive form.</span></li>
+            <li><span class="reason-num">4</span><span><strong>Cultural Exchange:</strong> Promoting table tennis influence in Europe, embarking on personal exploration in the "post-Olympic" era.</span></li>
+          </ul>
+          <div class="transition-flow">
+            <div class="flow-item"><div class="flow-label"></div><div class="flow-value red">Chinese National Team</div></div>
+            <div class="flow-item"><div class="flow-label">Joined</div><div class="flow-value blue">German Bundesliga</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+
+<style>
+  .career-insight { max-width: 1200px; margin: 0 auto; padding: 0 0.5rem; }
+  
+  /* Header Mobile Adaptation */
+  .insight-header { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.75rem 0; margin-bottom: 1rem; border-radius: 8px; }
+  .header-content { display: flex; justify-content: space-between; align-items: center; padding: 0 0.75rem; }
+  .header-left { display: flex; align-items: center; gap: 0.5rem; }
+  .avatar { width: 32px; height: 32px; background: #aa222d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem; flex-shrink: 0; }
+  .header-title { font-size: 0.9rem; font-weight: bold; color: #111; margin: 0; white-space: nowrap; }
+  .header-subtitle { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; display: none; }
+  
+  @media (min-width: 640px) {
+    .insight-header { padding: 1rem 0; margin-bottom: 2rem; }
+    .header-content { padding: 0 1.5rem; }
+    .header-left { gap: 0.75rem; }
+    .avatar { width: 40px; height: 40px; font-size: 1.25rem; }
+    .header-title { font-size: 1.25rem; }
+    .header-subtitle { display: block; font-size: 0.7rem; letter-spacing: 0.1em; }
+  }
+  
+  .tab-nav { display: none; gap: 1rem; }
+  @media (min-width: 768px) { .tab-nav { display: flex; gap: 2rem; } }
+  .tab-btn { background: none; border: none; padding: 0.5rem 0; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+  .active-tab { border-bottom: 3px solid #aa222d; color: #aa222d; font-weight: 700; }
+  .inactive-tab { color: #888; }
+  .inactive-tab:hover { color: #aa222d; }
+  
+  .mobile-menu-btn { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.25rem;
+    background: #f3f4f6; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 6px;
+    font-size: 1rem; 
+    color: #374151; 
+    cursor: pointer; 
+    padding: 0.4rem 0.6rem;
+  }
+  .mobile-menu-btn.pulse {
+    animation: pulse-btn 2s ease-in-out 3;
+  }
+  @keyframes pulse-btn {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(170, 34, 45, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(170, 34, 45, 0); }
+  }
+  .menu-icon { font-size: 1rem; }
+  .menu-hint { font-size: 0.75rem; font-weight: 500; }
+  @media (min-width: 768px) { .mobile-menu-btn { display: none; } }
+  .mobile-nav { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 0.5rem; }
+  .mobile-nav.hidden { display: none; }
+  .mobile-tab-btn { display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; border: none; font-size: 0.9rem; color: #374151; cursor: pointer; border-radius: 4px; }
+  .mobile-tab-btn:hover, .mobile-tab-btn:active { background: #f3f4f6; }
+  
+  /* Intro Mobile Adaptation */
+  .intro-section { text-align: center; max-width: 800px; margin: 0 auto 1.5rem; padding: 0 0.5rem; }
+  .intro-section h2 { font-size: 1.25rem; font-weight: bold; color: #111; margin-bottom: 0.5rem; }
+  .intro-section p { color: #4b5563; line-height: 1.6; font-size: 0.875rem; }
+  .highlight { font-weight: 600; color: #aa222d; }
+  
+  @media (min-width: 640px) {
+    .intro-section { margin: 0 auto 2rem; }
+    .intro-section h2 { font-size: 1.875rem; margin-bottom: 0.75rem; }
+    .intro-section p { line-height: 1.7; font-size: 1rem; }
+  }
+  
+  .view-section { animation: fadeIn 0.5s ease-in-out; }
+  .view-section.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Stat Cards Mobile Adaptation */
+  .stat-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+  @media (min-width: 768px) { .stat-cards { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+  @media (min-width: 1024px) { .stat-cards { grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem; } }
+  .stat-card { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid; }
+  @media (min-width: 640px) { .stat-card { padding: 1.5rem; } }
+  .border-red { border-color: #aa222d; }
+  .border-gold { border-color: #c5a059; }
+  .border-gray { border-color: #9ca3af; }
+  .border-blue { border-color: #3b82f6; }
+  .stat-label { font-size: 0.65rem; color: #6b7280; text-transform: uppercase; font-weight: 500; }
+  @media (min-width: 640px) { .stat-label { font-size: 0.75rem; } }
+  .stat-value { margin-top: 0.25rem; display: flex; align-items: baseline; flex-wrap: wrap; }
+  @media (min-width: 640px) { .stat-value { margin-top: 0.5rem; } }
+  .stat-number { font-size: 1.25rem; font-weight: bold; color: #111; }
+  @media (min-width: 640px) { .stat-number { font-size: 1.875rem; } }
+  .stat-unit { margin-left: 0.25rem; font-size: 0.7rem; color: #6b7280; }
+  @media (min-width: 640px) { .stat-unit { margin-left: 0.5rem; font-size: 0.875rem; } }
+  
+  /* Charts Mobile Adaptation */
+  .charts-row { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  @media (min-width: 1024px) { .charts-row { grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-bottom: 2rem; } }
+  .chart-card { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  @media (min-width: 640px) { .chart-card { padding: 1.5rem; } }
+  .chart-card h3 { font-size: 1rem; font-weight: bold; color: #111; margin: 0 0 0.25rem; }
+  @media (min-width: 640px) { .chart-card h3 { font-size: 1.125rem; margin: 0 0 0.5rem; } }
+  .chart-desc { font-size: 0.75rem; color: #6b7280; margin: 0 0 1rem; }
+  @media (min-width: 640px) { .chart-desc { font-size: 0.875rem; margin: 0 0 1.5rem; } }
+  .chart-container { position: relative; width: 100%; height: 220px; }
+  @media (min-width: 640px) { .chart-container { height: 300px; max-height: 350px; } }
+  
+  /* Insight Box Mobile Adaptation */
+  .insight-box { background: #f8f8f8; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; }
+  @media (min-width: 640px) { .insight-box { padding: 1.5rem; } }
+  .insight-box h4 { font-weight: bold; color: #aa222d; margin: 0 0 0.5rem; font-size: 0.9rem; }
+  .insight-box p { font-size: 0.8rem; color: #374151; margin: 0; line-height: 1.6; }
+  @media (min-width: 640px) { .insight-box p { font-size: 0.875rem; } }
+
+  /* Timeline Mobile Adaptation */
+  .timeline-layout { display: flex; flex-direction: column; gap: 1rem; }
+  @media (min-width: 1024px) { .timeline-layout { flex-direction: row; gap: 2rem; } }
+  .timeline-nav { width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; max-height: 350px; overflow-y: auto; }
+  @media (min-width: 640px) { .timeline-nav { padding: 1.5rem; max-height: 450px; } }
+  @media (min-width: 1024px) { .timeline-nav { width: 33%; max-height: 600px; } }
+  .timeline-nav h3 { font-size: 1rem; font-weight: bold; color: #111; margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 1; }
+  @media (min-width: 640px) { .timeline-nav h3 { font-size: 1.125rem; margin: 0 0 1rem; } }
+  .timeline-list { padding-left: 1rem; border-left: 2px solid #f3f4f6; }
+  
+  .timeline-detail { width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.5rem 1rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 280px; }
+  @media (min-width: 640px) { .timeline-detail { padding: 2rem; min-height: 350px; } }
+  @media (min-width: 1024px) { .timeline-detail { width: 67%; min-height: 400px; } }
+  .detail-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+  @media (min-width: 640px) { .detail-icon { font-size: 4rem; margin-bottom: 1rem; } }
+  .timeline-detail h2 { font-size: 1.25rem; font-weight: bold; color: #111; margin: 0 0 0.5rem; }
+  @media (min-width: 640px) { .timeline-detail h2 { font-size: 1.5rem; } }
+  .timeline-detail p { color: #6b7280; margin: 0; font-size: 0.875rem; }
+  .detail-year { display: inline-block; padding: 0.25rem 0.75rem; background: #f3f4f6; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; color: #4b5563; margin-bottom: 0.75rem; }
+  @media (min-width: 640px) { .detail-year { font-size: 0.875rem; margin-bottom: 1rem; } }
+  .detail-title { font-size: 1.25rem; font-weight: bold; color: #aa222d; margin: 0 0 0.75rem; }
+  @media (min-width: 640px) { .detail-title { font-size: 1.875rem; margin: 0 0 1rem; } }
+  .detail-desc { font-size: 0.9rem; color: #4b5563; max-width: 500px; line-height: 1.6; }
+  @media (min-width: 640px) { .detail-desc { font-size: 1.125rem; line-height: 1.7; } }
+  
+  .custom-scroll::-webkit-scrollbar { width: 4px; }
+  .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+  .custom-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+  /* Transition Mobile Adaptation */
+  .transition-intro { background: white; padding: 1.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center; max-width: 800px; margin: 0 auto 1.5rem; }
+  @media (min-width: 640px) { .transition-intro { padding: 2rem; margin: 0 auto 2rem; } }
+  .transition-intro h2 { font-size: 1.125rem; font-weight: bold; color: #111; margin: 0 0 0.75rem; }
+  @media (min-width: 640px) { .transition-intro h2 { font-size: 1.5rem; margin: 0 0 1rem; } }
+  .transition-intro p { color: #4b5563; margin: 0; line-height: 1.6; font-size: 0.875rem; }
+  @media (min-width: 640px) { .transition-intro p { line-height: 1.7; font-size: 1rem; } }
+  
+  .transition-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  @media (min-width: 1024px) { .transition-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+  
+  .reasons-card { display: flex; flex-direction: column; justify-content: space-between; }
+  .reasons-list { list-style: none; padding: 0; margin: 0 0 1rem; }
+  @media (min-width: 640px) { .reasons-list { margin: 0 0 1.5rem; } }
+  .reasons-list li { display: flex; margin-bottom: 0.75rem; align-items: flex-start; }
+  @media (min-width: 640px) { .reasons-list li { margin-bottom: 1rem; } }
+  .reason-num { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #dbeafe; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; margin-right: 0.5rem; margin-top: 2px; }
+  @media (min-width: 640px) { .reason-num { width: 24px; height: 24px; font-size: 0.75rem; margin-right: 0.75rem; } }
+  .reasons-list span { font-size: 0.8rem; color: #374151; line-height: 1.5; }
+  @media (min-width: 640px) { .reasons-list span { font-size: 0.875rem; } }
+  .reasons-list strong { color: #111; }
+  
+  .transition-flow { margin-top: auto; padding-top: 1rem; border-top: 1px solid #f3f4f6; }
+  .transition-flow { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 8px; gap: 0.5rem; }
+  @media (min-width: 640px) { .transition-flow { padding: 1rem; gap: 1rem; } }
+  .flow-item { text-align: center; flex: 1; }
+  .flow-label { font-size: 0.65rem; color: #6b7280; }
+  @media (min-width: 640px) { .flow-label { font-size: 0.75rem; } }
+  .flow-value { font-weight: bold; font-size: 0.8rem; }
+  @media (min-width: 640px) { .flow-value { font-size: 1rem; } }
+  .flow-value.red { color: #aa222d; }
+  .flow-value.blue { color: #1d4ed8; }
+  .flow-arrow { font-size: 1rem; color: #9ca3af; flex-shrink: 0; }
+  @media (min-width: 640px) { .flow-arrow { font-size: 1.5rem; } }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" is:inline></script>
+<style is:global>
+  .timeline-item { position: relative; padding: 0.4rem 0 0.4rem 1.5rem; cursor: pointer; transition: all 0.2s; border-radius: 4px; }
+  @media (min-width: 640px) { .timeline-item { padding: 0.5rem 0 0.5rem 2rem; } }
+  .timeline-item:hover { background: #f9fafb; }
+  .timeline-item.active { background: #fef2f2 !important; }
+  .timeline-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #aa222d; border-radius: 3px 0 0 3px; }
+  .timeline-dot { position: absolute; left: -6px; top: 0.8rem; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: transform 0.2s; }
+  @media (min-width: 640px) { .timeline-dot { left: -7px; top: 1rem; width: 12px; height: 12px; } }
+  .timeline-item:hover .timeline-dot { transform: scale(1.25); }
+  .timeline-item.active .timeline-dot { transform: scale(1.25); box-shadow: 0 0 0 3px rgba(170, 34, 45, 0.2); }
+  .dot-gray { background: #d1d5db; }
+  .dot-gold { background: #c5a059; }
+  .dot-red { background: #aa222d; }
+  .dot-blue { background: #3b82f6; }
+  .timeline-year { font-size: 0.65rem; font-weight: bold; color: #9ca3af; margin-bottom: 0.125rem; }
+  @media (min-width: 640px) { .timeline-year { font-size: 0.75rem; } }
+  .timeline-item.active .timeline-year { color: #aa222d; }
+  .timeline-title { font-size: 0.8rem; font-weight: 600; color: #1f2937; }
+  @media (min-width: 640px) { .timeline-title { font-size: 0.875rem; } }
+  .timeline-item:hover .timeline-title { color: #aa222d; }
+  .timeline-item.active .timeline-title { color: #aa222d; }
+</style>
+
+<script is:inline>
+  const timelineData = [
+    { year: '2012', title: 'Rising Star', desc: 'Joined the national first team, quickly showcasing remarkable talent and becoming one of the youngest world champions in history.', type: 'start' },
+    { year: '2016', title: 'First World Cup Title', desc: 'Won the Men\'s World Cup, establishing his top-tier status in world table tennis and beginning his dominance of the event.', type: 'win' },
+    { year: '2018', title: 'World No.1', desc: 'First reached world ranking No.1, beginning years of dominance at the top with a significant points lead.', type: 'rank' },
+    { year: '2021', title: 'Houston Triumph', desc: 'Won the Men\'s Singles at Houston World Championships, finally lifting the St. Bride Vase. Not just a technical victory, but a mental breakthrough.', type: 'win' },
+    { year: '2023', title: 'Defending Champion', desc: 'Successfully defended his title at Durban World Championships, proving his absolute dominance and continuing to break historic records.', type: 'win' },
+    { year: '2024', title: 'Paris Olympic Dream', desc: 'Won gold in Men\'s Singles at Paris Olympics under immense pressure, completing his career "Grand Slam" and reaching the peak of his career.', type: 'gold' },
+    { year: '2024 Late', title: 'Ranking Disappears & Penalty', desc: 'Received zero points from ITTF for missing WTT events per regulations, causing rapid ranking decline until disappearance, sparking global discussion.', type: 'loss' },
+    { year: '2025', title: 'Move to Bundesliga', desc: 'Announced joining German Bundesliga, seeking new challenges and environment, marking a new chapter in his career.', type: 'move' }
+  ];
+
+  function switchTab(tabId) {
+    ['records', 'timeline', 'transition'].forEach(t => {
+      const btn = document.getElementById('nav-' + t);
+      const view = document.getElementById('view-' + t);
+      if (t === tabId) {
+        btn.classList.remove('inactive-tab');
+        btn.classList.add('active-tab');
+        view.classList.remove('hidden');
+        if (tabId === 'records') renderRecordsCharts();
+        else if (tabId === 'transition') renderTransitionChart();
+      } else {
+        btn.classList.add('inactive-tab');
+        btn.classList.remove('active-tab');
+        view.classList.add('hidden');
+      }
+    });
+  }
+
+  let titlesChartInstance = null;
+  let skillsChartInstance = null;
+  let rankingChartInstance = null;
+
+  function renderRecordsCharts() {
+    if (titlesChartInstance) return;
+    const ctxTitles = document.getElementById('titlesChart').getContext('2d');
+    titlesChartInstance = new Chart(ctxTitles, {
+      type: 'bar',
+      data: {
+        labels: ['World Cup', 'World Championships', 'Olympics'],
+        datasets: [{ label: 'Titles', data: [4, 2, 1], backgroundColor: '#aa222d', borderRadius: 4, barThickness: 40 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
+      }
+    });
+
+    const ctxSkills = document.getElementById('skillsChart').getContext('2d');
+    skillsChartInstance = new Chart(ctxSkills, {
+      type: 'radar',
+      data: {
+        labels: ['Power', 'Speed', 'Backhand', 'Forehand', 'Mental', 'Experience'],
+        datasets: [{ label: 'Ability', data: [98, 95, 99, 96, 92, 95], fill: true, backgroundColor: 'rgba(197, 160, 89, 0.2)', borderColor: '#c5a059', pointBackgroundColor: '#c5a059', pointBorderColor: '#fff' }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { r: { angleLines: { color: '#e5e7eb' }, grid: { color: '#e5e7eb' }, suggestedMin: 50, suggestedMax: 100 } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  function renderTransitionChart() {
+    if (rankingChartInstance) return;
+    const ctxRank = document.getElementById('rankingChart').getContext('2d');
+    rankingChartInstance = new Chart(ctxRank, {
+      type: 'line',
+      data: {
+        labels: ['2023 Q1', '2023 Q2', '2023 Q3', '2023 Q4', '2024 Q1', '2024 Q2 (Olympic)', '2024 Q3', '2024 Q4 (Now)'],
+        datasets: [{ label: 'World Ranking Points', data: [7500, 7800, 7200, 6500, 5800, 6900, 3000, 0], borderColor: '#aa222d', backgroundColor: 'rgba(170, 34, 45, 0.1)', fill: true, tension: 0.3, pointRadius: 4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { tooltip: { callbacks: { label: function(ctx) { return ctx.raw === 0 ? 'Disappeared/Zero' : 'Points: ' + ctx.raw; } } } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Points' } } }
+      }
+    });
+  }
+
+  function initTimeline() {
+    const container = document.getElementById('timeline-list');
+    timelineData.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'timeline-item';
+      div.onclick = () => showTimelineDetail(index);
+      let dotClass = 'dot-gray';
+      if (item.type === 'win') dotClass = 'dot-gold';
+      if (item.type === 'gold') dotClass = 'dot-red';
+      if (item.type === 'loss') dotClass = 'dot-gray';
+      if (item.type === 'move') dotClass = 'dot-blue';
+      div.innerHTML = '<div class="timeline-dot ' + dotClass + '"></div><div class="timeline-year">' + item.year + '</div><div class="timeline-title">' + item.title + '</div>';
+      container.appendChild(div);
+    });
+    showTimelineDetail(0);
+  }
+
+  function showTimelineDetail(index) {
+    const item = timelineData[index];
+    const detailContainer = document.getElementById('timeline-detail');
+    document.querySelectorAll('.timeline-item').forEach((el, i) => {
+      if (i === index) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+    let icon = '🏓';
+    if (item.type === 'gold' || item.type === 'win') icon = '🏆';
+    if (item.type === 'move') icon = '✈️';
+    if (item.type === 'loss') icon = '📉';
+    detailContainer.innerHTML = '<div class="detail-icon" style="opacity:1">' + icon + '</div><div class="detail-year">' + item.year + '</div><h2 class="detail-title">' + item.title + '</h2><p class="detail-desc">' + item.desc + '</p>';
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    renderRecordsCharts();
+    initTimeline();
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    if (menuBtn && window.innerWidth < 768) {
+      menuBtn.classList.add('pulse');
+    }
+  });
+</script>

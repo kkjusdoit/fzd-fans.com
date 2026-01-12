@@ -1,6 +1,8 @@
 ---
 title: "樊振东已经成为了这个时代的符号"
+titleEn: "Fan Zhendong Has Become a Symbol of This Era"
 description: "顾星宇：梦想其实真的可以不只是梦"
+descriptionEn: "Gu Xingyu: Dreams can truly be more than just dreams"
 date: 2024-01-01
 tags: ["顾星宇", "解说评价"]
 category: "tributes"

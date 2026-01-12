@@ -2,6 +2,7 @@
 title: "樊振东称号大全"
 titleEn: "Fan Zhendong Nicknames Collection"
 description: "小胖的各种称号和外号"
+descriptionEn: "All the nicknames and titles of Fan Zhendong"
 category: stars
 tags: ["称号", "外号", "樊星"]
 translated: false

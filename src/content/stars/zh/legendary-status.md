@@ -1,7 +1,9 @@
 ---
 title: "江湖地位"
+titleEn: "Legendary Status"
 category: "stars"
 description: "樊振东在乒坛的崇高地位。"
+descriptionEn: "Fan Zhendong's legendary status in the table tennis world"
 ---
 
 ## 天降紫微星

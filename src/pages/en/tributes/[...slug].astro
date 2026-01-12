@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+
+// Tag translations
+const tagMap: Record<string, string> = {
+  '球迷评价': 'Fan Tribute',
+  '精神象征': 'Spirit Symbol',
+  '央视': 'CCTV',
+  '巴黎奥运': 'Paris Olympics',
+  '官方评价': 'Official',
+  '天道酬勤': 'Hard Work Pays',
+  '顾星宇': 'Gu Xingyu',
+  '解说评价': 'Commentary',
+  '德甲': 'Bundesliga',
+  '吴敬平': 'Wu Jingping',
+  '教练评价': 'Coach',
+  '波尔': 'Boll',
+  '赵灵敏': 'Zhao Lingmin',
+  '媒体评价': 'Media',
+  '歌词': 'Lyrics',
+  '亿万期待': 'Expectations',
+  '球迷期盼': 'Fan Wishes',
+  '男单夺冠': 'Singles Champion',
+  'Fan Tribute': 'Fan Tribute',
+  'Spirit Symbol': 'Spirit Symbol',
+  'CCTV': 'CCTV',
+  'Paris Olympics': 'Paris Olympics',
+  'Official': 'Official',
+  'Hard Work Pays': 'Hard Work Pays',
+  'Gu Xingyu': 'Gu Xingyu',
+  'Commentary': 'Commentary',
+  'Bundesliga': 'Bundesliga',
+  'Wu Jingping': 'Wu Jingping',
+  'Coach': 'Coach',
+  'Boll': 'Boll',
+  'Zhao Lingmin': 'Zhao Lingmin',
+  'Media': 'Media',
+  'Lyrics': 'Lyrics',
+  'Expectations': 'Expectations',
+  'Fan Wishes': 'Fan Wishes',
+  'Singles Champion': 'Singles Champion',
+};
+
+export async function getStaticPaths() {
+  const allTributes = await getCollection('tributes');
+  
+  // Group by base slug (without language prefix)
+  const grouped = new Map();
+  allTributes.forEach(entry => {
+    const baseSlug = entry.slug.replace(/^(zh|en)\//, '');
+    if (!grouped.has(baseSlug)) {
+      grouped.set(baseSlug, { zh: null, en: null });
+    }
+    if (entry.slug.startsWith('en/')) {
+      grouped.get(baseSlug).en = entry;
+    } else {
+      grouped.get(baseSlug).zh = entry;
+    }
+  });
+  
+  // For English pages, prefer English content, fallback to Chinese
+  return Array.from(grouped.entries()).map(([baseSlug, versions]) => ({
+    params: { slug: baseSlug },
+    props: { entry: versions.en || versions.zh },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const title = entry.data.titleEn || entry.data.title;
+const isTranslated = entry.data.translated;
+---
+
+<BaseLayout title={title}>
+  <article class="content-page">
+    <header>
+      {!isTranslated && (
+        <div class="not-translated-notice">
+          <p>⚠️ {t('content.not-translated')}</p>
+          <a href={`/tributes/${removeLanguagePrefix(entry.slug)}`}>{t('content.view-chinese')}</a>
+        </div>
+      )}
+      <div class="tags">
+        {entry.data.tags?.map(tag => <span class="tag">{tagMap[tag] || tag}</span>)}
+      </div>
+      <h1>{title}</h1>
+      {(entry.data.descriptionEn || entry.data.description) && (
+        <p class="desc">{entry.data.descriptionEn || entry.data.description}</p>
+      )}
+    </header>
+    <div class="content"><Content /></div>
+    <footer><a href={getLocalizedPath('/tributes', lang)}>{t('back.tributes')}</a></footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .content-page { max-width: 800px; margin: 0 auto; padding: 2rem 0; }
+  header { margin-bottom: 2rem; }
+  .not-translated-notice { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; text-align: center; }
+  .not-translated-notice p { margin: 0 0 0.5rem; color: #856404; }
+  .not-translated-notice a { color: #c41e3a; }
+  .tags { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .tag { background: #c41e3a; color: #fff; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+  h1 { margin-bottom: 0.5rem; }
+  .desc { color: #666; }
+  .content { line-height: 1.8; }
+  .content :global(h2) { margin-top: 2rem; color: #c41e3a; }
+  .content :global(blockquote) { border-left: 3px solid #c41e3a; padding-left: 1rem; color: #666; font-style: italic; margin: 1rem 0; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #eee; }
+</style>

@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const tributes = await getCollection('tributes');
+const allTributes = await getCollection('tributes');
+const tributes = allTributes.filter(item => item.slug.startsWith('zh/'));
 ---
 
 <BaseLayout title="评价与祝福">

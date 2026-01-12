@@ -1,6 +1,8 @@
 ---
 title: "孤勇者"
+titleEn: "Lone Warrior"
 description: "为何孤独不可光荣，谁说站在光里的才算英雄"
+descriptionEn: "Why can't solitude be glorious? Who says only those in the light are heroes?"
 date: 2024-01-01
 tags: ["歌词", "精神象征"]
 category: "tributes"

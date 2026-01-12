@@ -1,6 +1,8 @@
 ---
 title: "把中国青年最好的样子展现给了世界"
+titleEn: "Showing the World the Best of Chinese Youth"
 description: "顾星宇：樊振东真正站到了欧洲的赛场"
+descriptionEn: "Gu Xingyu: Fan Zhendong truly stood on the European stage"
 date: 2025-01-01
 tags: ["顾星宇", "德甲", "解说评价"]
 category: "tributes"

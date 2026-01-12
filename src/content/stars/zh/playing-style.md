@@ -1,7 +1,9 @@
 ---
 title: "比赛风格"
+titleEn: "Playing Style"
 category: "stars"
 description: "樊振东打球独特的比赛风格，给人的视觉冲击和感觉。"
+descriptionEn: "Fan Zhendong's unique playing style and the visual impact it creates"
 ---
 
 

@@ -1,7 +1,8 @@
 ---
 title: "媒体报道"
-titleEn: "Official Media Reports"
+titleEn: "Media Reports"
 description: "各大媒体关于樊振东的报道收藏"
+descriptionEn: "Collection of media reports about Fan Zhendong"
 category: links
 tags: ["官方", "媒体", "报道"]
 translated: false

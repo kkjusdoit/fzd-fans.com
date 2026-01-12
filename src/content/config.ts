@@ -7,7 +7,7 @@ const archiveSchema = z.object({
   descriptionEn: z.string().optional(),
   date: z.date().optional(),
   tags: z.array(z.string()).optional(),
-  category: z.enum(['stories', 'arena', 'quotes', 'friends', 'warrior', 'tributes', 'links', 'stars']),
+  category: z.enum(['stories', 'arena', 'quotes', 'friends', 'warrior', 'tributes', 'links', 'stars', 'fzd101']),
   image: z.string().optional(),
   source: z.string().optional(), // 来源链接
   translated: z.boolean().default(false), // 是否已翻译
@@ -21,5 +21,6 @@ const warrior = defineCollection({ type: 'content', schema: archiveSchema }); //
 const tributes = defineCollection({ type: 'content', schema: archiveSchema }); // 评价与祝福
 const links = defineCollection({ type: 'content', schema: archiveSchema });
 const stars = defineCollection({ type: 'content', schema: archiveSchema }); // 天际樊星 (樊星口号)
+const fzd101 = defineCollection({ type: 'content', schema: archiveSchema }); // FZD 101 - 英文入门指南
 
-export const collections = { stories, arena, quotes, friends, warrior, tributes, links, stars };
+export const collections = { stories, arena, quotes, friends, warrior, tributes, links, stars, fzd101 };

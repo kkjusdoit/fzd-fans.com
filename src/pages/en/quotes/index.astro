@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Card from '../../../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const allQuotes = await getCollection('quotes');
+const quotes = allQuotes.filter(item => item.slug.startsWith('en/'));
+
+// Tag translations
+const tagMap: Record<string, string> = {
+  '语录': 'Quotes',
+  '梗': 'Memes',
+  '高情商': 'High EQ',
+  '采访': 'Interview',
+  '金句': 'Golden Words',
+  '名场面': 'Famous Moments',
+  '搞笑': 'Funny',
+};
+---
+
+<BaseLayout title={t('nav.quotes')}>
+  <section class="page-header">
+    <h1>💬 {t('nav.quotes')}</h1>
+    <p class="subtitle">Famous quotes and internet memes</p>
+  </section>
+
+  <section class="content-grid">
+    {quotes.map(item => (
+      <Card 
+        title={item.data.titleEn || item.data.title}
+        href={getLocalizedPath(`/quotes/${removeLanguagePrefix(item.slug)}`, lang)}
+        description={item.data.descriptionEn || item.data.description}
+        tag={tagMap[item.data.tags?.[0] || ''] || item.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .subtitle { color: #666; }
+  .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem 0; }
+</style>

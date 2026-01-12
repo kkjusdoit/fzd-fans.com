@@ -3,7 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
-const stars = await getCollection('stars');
+const allStars = await getCollection('stars');
+const stars = allStars.filter(item => item.slug.startsWith('zh/'));
 ---
 
 <BaseLayout title="天际樊星">

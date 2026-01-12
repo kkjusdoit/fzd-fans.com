@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Card from '../../../components/Card.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const allTributes = await getCollection('tributes');
+const tributes = allTributes.filter(item => item.slug.startsWith('en/'));
+
+// Tag translations
+const tagMap: Record<string, string> = {
+  '球迷评价': 'Fan Tribute',
+  '精神象征': 'Spirit Symbol',
+  '央视': 'CCTV',
+  '巴黎奥运': 'Paris Olympics',
+  '官方评价': 'Official',
+  '天道酬勤': 'Hard Work Pays',
+  '顾星宇': 'Gu Xingyu',
+  '解说评价': 'Commentary',
+  '德甲': 'Bundesliga',
+  '吴敬平': 'Wu Jingping',
+  '教练评价': 'Coach',
+  '波尔': 'Boll',
+  '赵灵敏': 'Zhao Lingmin',
+  '媒体评价': 'Media',
+  '歌词': 'Lyrics',
+  '亿万期待': 'Expectations',
+  '球迷期盼': 'Fan Wishes',
+  '男单夺冠': 'Singles Champion',
+};
+---
+
+<BaseLayout title={t('nav.tributes')}>
+  <section class="page-header">
+    <h1>💝 {t('nav.tributes')}</h1>
+    <p class="subtitle">Tributes and well-wishes from around the world</p>
+  </section>
+
+  <section class="content-grid">
+    {tributes.map(item => (
+      <Card 
+        title={item.data.titleEn || item.data.title}
+        href={getLocalizedPath(`/tributes/${removeLanguagePrefix(item.slug)}`, lang)}
+        description={item.data.descriptionEn || item.data.description}
+        tag={tagMap[item.data.tags?.[0] || ''] || item.data.tags?.[0]}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header { text-align: center; padding: 2rem 0; }
+  .page-header h1 { margin-bottom: 0.5rem; }
+  .subtitle { color: #666; }
+  .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem 0; }
+</style>

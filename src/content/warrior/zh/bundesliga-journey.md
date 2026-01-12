@@ -1,6 +1,8 @@
 ---
 title: "远赴德甲"
+titleEn: "Journey to Bundesliga"
 description: "独自前往德国征战德甲联赛"
+descriptionEn: "Embarking on a solo journey to compete in the German Bundesliga"
 date: 2025-11-01
 tags: ["德甲", "海外征战"]
 category: "warrior"

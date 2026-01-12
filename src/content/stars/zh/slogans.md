@@ -2,6 +2,7 @@
 title: "樊星心声"
 titleEn: "Fan Stars Slogans Collection"
 description: "樊星们的经典应援"
+descriptionEn: "Classic cheering slogans from Fan Zhendong's supporters"
 category: stars
 tags: ["口号", "樊星", "应援"]
 translated: false

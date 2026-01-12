@@ -1,7 +1,9 @@
 ---
 title: "意识与天赋"
+titleEn: "Talent & Awareness"
 category: "stars"
 description: "形容樊振东那些神仙球和赛场反应的高光，展现了他超凡的乒乓球天赋。"
+descriptionEn: "Highlighting Fan Zhendong's incredible shots and court reactions that showcase his extraordinary talent"
 ---
 
 ## 神仙手感

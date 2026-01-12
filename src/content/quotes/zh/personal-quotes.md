@@ -2,6 +2,7 @@
 title: "经典语录"
 titleEn: "Personal Quotes"
 description: "樊振东的经典语录"
+descriptionEn: "Fan Zhendong's classic quotes and sayings"
 category: quotes
 tags: ["语录", "采访", "金句"]
 translated: false
