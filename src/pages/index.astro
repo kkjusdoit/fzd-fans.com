@@ -15,14 +15,15 @@ const ugc = await getCollection('ugc');
 // 精选投稿
 const featuredUgc = ugc.filter(item => item.slug.startsWith('zh/') && item.data.featured).slice(0, 2);
 
+// 只筛选中文内容 (slug 以 'zh/' 开头)
 const allContent = [
-  ...arena.map(m => ({ ...m, category: 'arena', categoryName: '职业生涯' })),
-  ...stars.map(s => ({ ...s, category: 'stars', categoryName: '天际樊星' })),
-  ...quotes.map(q => ({ ...q, category: 'quotes', categoryName: '语录与梗' })),
-  // ...friends.map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })), // 暂时隐藏
-  ...warrior.map(w => ({ ...w, category: 'warrior', categoryName: '孤勇者' })),
-  ...tributes.map(t => ({ ...t, category: 'tributes', categoryName: '评价与祝福' })),
-  ...links.map(l => ({ ...l, category: 'links', categoryName: '媒体链接' })),
+  ...arena.filter(m => m.slug.startsWith('zh/')).map(m => ({ ...m, category: 'arena', categoryName: '职业生涯' })),
+  ...stars.filter(s => s.slug.startsWith('zh/')).map(s => ({ ...s, category: 'stars', categoryName: '天际樊星' })),
+  ...quotes.filter(q => q.slug.startsWith('zh/')).map(q => ({ ...q, category: 'quotes', categoryName: '语录与梗' })),
+  // ...friends.filter(f => f.slug.startsWith('zh/')).map(f => ({ ...f, category: 'friends', categoryName: '贵人与朋友' })), // 暂时隐藏
+  ...warrior.filter(w => w.slug.startsWith('zh/')).map(w => ({ ...w, category: 'warrior', categoryName: '孤勇者' })),
+  ...tributes.filter(t => t.slug.startsWith('zh/')).map(t => ({ ...t, category: 'tributes', categoryName: '评价与祝福' })),
+  ...links.filter(l => l.slug.startsWith('zh/')).map(l => ({ ...l, category: 'links', categoryName: '媒体链接' })),
 ];
 
 // 经典语录
