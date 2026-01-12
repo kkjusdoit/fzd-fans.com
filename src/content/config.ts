@@ -24,7 +24,7 @@ const ugcSchema = z.object({
   category: z.enum(['ugc']).default('ugc'),
   // UGC 特有字段
   ugcType: z.enum(['tactical', 'letter']), // tactical=东风·论剑, letter=樊星·寄语
-  ugcTag: z.string().optional(), // 细分标签：见招拆招/进化之路/高光复盘 或 赛后感言/时光胶囊/纸短情长
+  ugcTag: z.string().optional(), // 细分标签：见招拆招/进化之路/高光复盘 或 赛后感言/时光胶囊/文字创作
   author: z.string(), // 投稿人昵称
   authorNote: z.string().optional(), // 作者简介
   editorNote: z.string().optional(), // 站长按语

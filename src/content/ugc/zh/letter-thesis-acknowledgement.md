@@ -5,7 +5,7 @@ date: 2025-05-25
 tags: ["论文致谢", "粉丝故事"]
 category: "ugc"
 ugcType: "letter"
-ugcTag: "纸短情长"
+ugcTag: "文字创作"
 author: "侯印国教授的学生"
 authorNote: "研究生"
 featured: false

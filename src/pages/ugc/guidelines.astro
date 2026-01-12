@@ -12,7 +12,6 @@ const t = useTranslations(lang);
 
     <header class="page-header">
       <h1>📢 投稿指南</h1>
-      <p class="subtitle">我们在寻找"懂球"也"懂他"的你</p>
     </header>
 
     <div class="intro-section">
@@ -54,7 +53,7 @@ const t = useTranslations(lang);
       <div class="content-type">
         <div class="type-header letter">
           <span class="type-icon">💌</span>
-          <h3>樊星·寄语 — 粉丝来信</h3>
+          <h3>樊星·寄语 — 球迷来信</h3>
         </div>
         <div class="type-body">
           <p class="type-desc">感性、文学、共鸣。宁缺毋滥，走精品化路线。</p>
@@ -68,7 +67,7 @@ const t = useTranslations(lang);
               讲述你是如何粉上樊振东的，以及他带来的力量
             </li>
             <li>
-              <strong>纸短情长：</strong>
+              <strong>文字创作：</strong>
               散文、随笔、诗歌。希望你的文字真挚、理性、温暖
             </li>
           </ul>
@@ -91,14 +90,14 @@ const t = useTranslations(lang);
           <span class="policy-icon">✅</span>
           <div>
             <strong>客观理性</strong>
-            <p>专注自家，专注赛场。严禁拉踩其他运动员，严禁讨论未经证实的私生活八卦。</p>
+            <p>专注自家，专注赛场。严禁拉踩其他运动员，严禁讨论私生活八卦。</p>
           </div>
         </div>
         <div class="policy-item">
           <span class="policy-icon">✅</span>
           <div>
             <strong>排版要求</strong>
-            <p>逻辑清晰，段落分明。战术分析类文章强烈建议配上关键球的 GIF 动图或截图。</p>
+            <p>逻辑清晰，段落分明。</p>
           </div>
         </div>
       </div>
@@ -118,15 +117,18 @@ const t = useTranslations(lang);
           <p><strong>正文：</strong>Word 文档或 Markdown 格式均可，图片请打包附件。</p>
         </div>
         <div class="submit-note">
-          <p>📬 我们会在收到邮件后的 <strong>24小时内</strong> 回复。</p>
+          <p>📬 收到邮件后的 <strong>24小时内</strong> 回复。</p>
           <p>⭐ 入选文章将发布于网站首页及相关栏目。</p>
         </div>
       </div>
     </section>
 
     <section class="cta-section">
-      <p>期待你的来稿！</p>
-      <p class="slogan">樊振东，每个赛场见 ❤️</p>
+      <div class="cta-content">
+        <span class="cta-icon">✨</span>
+        <p class="cta-main">期待你的来稿！</p>
+        <p class="cta-sub">用文字记录热爱，让更多人看见东哥的光芒</p>
+      </div>
     </section>
   </article>
 </BaseLayout>
@@ -322,18 +324,59 @@ const t = useTranslations(lang);
 
   .cta-section {
     text-align: center;
-    padding: 3rem 1rem;
-    background: linear-gradient(135deg, #c41e3a, #8b0000);
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #c41e3a 0%, #8b0000 50%, #c41e3a 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
     color: #fff;
     border-radius: 16px;
     margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
   }
-  .cta-section p {
-    margin: 0.5rem 0;
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    animation: shimmer 4s linear infinite;
   }
-  .slogan {
-    font-size: 1.3rem;
-    font-weight: 600;
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .cta-content {
+    position: relative;
+    z-index: 1;
+  }
+  .cta-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .cta-main {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.05em;
+  }
+  .cta-sub {
+    font-size: 0.95rem;
+    margin: 0;
+    opacity: 0.9;
+    font-weight: 300;
   }
 
   @media (max-width: 768px) {
