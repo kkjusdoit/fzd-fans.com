@@ -8,14 +8,26 @@ tags: ["Video", "Bilibili"]
 translated: true
 ---
 
-# Video Collection
+## 2024 Paris Olympics Men's Singles Quarterfinal: Fan Zhendong vs Zhang Tomokazu
 
-- [Full Match Review: 2024 Paris Olympics Table Tennis Men's Singles Quarterfinal - Fan Zhendong vs Zhang Tomokazu (Highly recommend turning on comments)](https://www.bilibili.com/video/BV1a9KczoEZi/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)
+Full match review - highly recommend turning on comments!
 
-- [Fan Zhendong Defends National Games Men's Singles Title! Watch in One Go](https://www.bilibili.com/video/BV1VQCiBiEUs/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)
-
-- [Fan Zhendong - Karaoke Panda! Cover Song Collection](https://www.bilibili.com/video/BV1wA411P7TQ?spm_id_from=333.788.videopod.episodes&vd_source=293654ead1a645563567c0921dfd3ac2&p=24)
-
-- To be continued...
+<iframe src="//player.bilibili.com/player.html?bvid=BV1a9KczoEZi&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
 
 ---
+
+## Fan Zhendong Defends National Games Men's Singles Title
+
+Watch the full journey in one go!
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1VQCiBiEUs&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+## Fan Zhendong - Karaoke Panda! Cover Song Collection
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1wA411P7TQ&p=24&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+*To be continued...*

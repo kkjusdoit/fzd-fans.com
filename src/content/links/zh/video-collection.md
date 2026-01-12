@@ -8,17 +8,25 @@ tags: ["视频", "B站"]
 translated: false
 ---
 
+## 【全场回顾】2024年巴黎奥运会乒乓球男单1/4决赛 樊振东VS张本智和
 
-- [【全场回顾】2024年巴黎奥运会乒乓球男单1/4决赛 樊振东VS张本智和（强烈建议打开弹幕）](https://www.bilibili.com/video/BV1a9KczoEZi/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)<br>
+强烈建议打开弹幕观看！
 
-
-- [樊振东全运会男单卫冕！一口气看完](https://www.bilibili.com/video/BV1VQCiBiEUs/?spm_id_from=333.337.search-card.all.click&vd_source=293654ead1a645563567c0921dfd3ac2)<br>
-
-
-- [【樊振东】麦霸熊猫！翻唱合集](https://www.bilibili.com/video/BV1wA411P7TQ?spm_id_from=333.788.videopod.episodes&vd_source=293654ead1a645563567c0921dfd3ac2&p=24)<br>
-
-- 未完待续
-
+<iframe src="//player.bilibili.com/player.html?bvid=BV1a9KczoEZi&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
 
 ---
+
+## 樊振东全运会男单卫冕！一口气看完
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1VQCiBiEUs&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+## 【樊振东】麦霸熊猫！翻唱合集
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1wA411P7TQ&p=24&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+*未完待续...*
 

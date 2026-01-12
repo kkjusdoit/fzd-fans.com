@@ -15,13 +15,27 @@ translated: true
 
 - [After Fan Zhendong withdrew from the world rankings](https://eu.36kr.com/en/p/3414319759675014)
 
-- [How to pronounce Fan Zhendong?](https://www.youtube.com/shorts/-yYpwCSKacw)
+---
 
-- [Ask A Pro Anything: Fan Zhendong](https://www.youtube.com/watch?v=rf9A9ot3ZW0)
+## How to pronounce Fan Zhendong?
 
-- [Fan Zhendong Does an All-English Quick Q&A](https://www.youtube.com/shorts/q542zsfe3LM)
+<iframe width="100%" height="500" src="https://www.youtube.com/embed/-yYpwCSKacw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-- To be continued...
+---
+
+## Ask A Pro Anything: Fan Zhendong
+
+<iframe width="100%" height="500" src="https://www.youtube.com/embed/rf9A9ot3ZW0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+## Fan Zhendong Does an All-English Quick Q&A
+
+<iframe width="100%" height="500" src="https://www.youtube.com/embed/q542zsfe3LM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+*To be continued...*
 
 ## Recommended YouTube Channel
 
