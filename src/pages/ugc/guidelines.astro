@@ -1,0 +1,342 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title="投稿指南">
+  <article class="guidelines-page">
+    <a href="/ugc" class="back-link">{t('back.ugc')}</a>
+
+    <header class="page-header">
+      <h1>📢 投稿指南</h1>
+      <p class="subtitle">我们在寻找"懂球"也"懂他"的你</p>
+    </header>
+
+    <div class="intro-section">
+      <p>
+        樊振东的赛场充满了<strong>暴力美学与细腻控制的辩证统一</strong>，而赛场下的他同样值得我们细细品读。
+      </p>
+      <p>
+        如果你有独到的见解或滚烫的文字，欢迎加入我们，让更多人看到属于樊振东的光芒！
+      </p>
+    </div>
+
+    <section class="content-section">
+      <h2>📝 我们期待这样的内容</h2>
+
+      <div class="content-type">
+        <div class="type-header tactical">
+          <span class="type-icon">⚔️</span>
+          <h3>东风·论剑 — 技战术复盘</h3>
+        </div>
+        <div class="type-body">
+          <p class="type-desc">专业、理性、深度。针对比赛的技战术复盘。</p>
+          <ul>
+            <li>
+              <strong>见招拆招：</strong>
+              面对不同风格的对手，东哥是如何拆解招数、确立优势的？
+            </li>
+            <li>
+              <strong>进化之路：</strong>
+              相比以往，这次比赛他在技术或心态上有哪些肉眼可见的升级？
+            </li>
+            <li>
+              <strong>高光复盘：</strong>
+              不止于"打得好"，我们想知道"好在哪里"。是前三板的变化？还是相持段的落点控制？
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-type">
+        <div class="type-header letter">
+          <span class="type-icon">💌</span>
+          <h3>樊星·寄语 — 粉丝来信</h3>
+        </div>
+        <div class="type-body">
+          <p class="type-desc">感性、文学、共鸣。宁缺毋滥，走精品化路线。</p>
+          <ul>
+            <li>
+              <strong>赛后感言：</strong>
+              比赛结束后的情绪宣泄和鼓励
+            </li>
+            <li>
+              <strong>时光胶囊：</strong>
+              讲述你是如何粉上樊振东的，以及他带来的力量
+            </li>
+            <li>
+              <strong>纸短情长：</strong>
+              散文、随笔、诗歌。希望你的文字真挚、理性、温暖
+            </li>
+          </ul>
+          <p class="type-tip">💡 我们欢迎有文学质感的文字，拒绝饭圈拉踩和空洞的彩虹屁</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="policy-section">
+      <h2>🚫 审核标准</h2>
+      <div class="policy-grid">
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>原创性</strong>
+            <p>必须原创，严禁抄袭、洗稿。如系搬运请提供原作者授权证明。</p>
+          </div>
+        </div>
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>客观理性</strong>
+            <p>专注自家，专注赛场。严禁拉踩其他运动员，严禁讨论未经证实的私生活八卦。</p>
+          </div>
+        </div>
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>排版要求</strong>
+            <p>逻辑清晰，段落分明。战术分析类文章强烈建议配上关键球的 GIF 动图或截图。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="submit-section">
+      <h2>📮 投稿方式</h2>
+      <div class="submit-box">
+        <div class="submit-method">
+          <h4>邮箱投稿</h4>
+          <p class="email">kkjusdoit@gmail.com</p>
+        </div>
+        <div class="submit-format">
+          <h4>邮件格式</h4>
+          <p><strong>标题：</strong>[栏目] + 文章标题 + 作者昵称</p>
+          <p class="example">示例：[技战术] 德国杯半决赛复盘：论樊振东的反手统治力 - 作者：小胖的球拍</p>
+          <p><strong>正文：</strong>Word 文档或 Markdown 格式均可，图片请打包附件。</p>
+        </div>
+        <div class="submit-note">
+          <p>📬 我们会在收到邮件后的 <strong>24小时内</strong> 回复。</p>
+          <p>⭐ 入选文章将发布于网站首页及相关栏目。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <p>期待你的来稿！</p>
+      <p class="slogan">樊振东，每个赛场见 ❤️</p>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .guidelines-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #c41e3a;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 1.1rem;
+  }
+
+  .intro-section {
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+  }
+  .intro-section p {
+    margin-bottom: 0.8rem;
+  }
+  .intro-section p:last-child {
+    margin-bottom: 0;
+  }
+  .intro-section strong {
+    color: #c41e3a;
+  }
+
+  .content-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  .content-type {
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .type-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.5rem;
+    color: #fff;
+  }
+  .type-header.tactical { background: linear-gradient(135deg, #4a90d9, #357abd); }
+  .type-header.letter { background: linear-gradient(135deg, #e91e63, #c2185b); }
+  .type-icon { font-size: 1.5rem; }
+  .type-header h3 { margin: 0; font-size: 1.1rem; }
+
+  .type-body {
+    padding: 1.5rem;
+    background: #fff;
+  }
+  .type-desc {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  .type-body ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+  .type-body li {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+  }
+  .type-body strong {
+    color: #333;
+  }
+  .type-tip {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .policy-section {
+    margin: 3rem 0;
+  }
+  .policy-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+  }
+  .policy-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  .policy-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .policy-icon {
+    font-size: 1.5rem;
+  }
+  .policy-item strong {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #333;
+  }
+  .policy-item p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .submit-section {
+    margin: 3rem 0;
+  }
+  .submit-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+  }
+  .submit-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .submit-method {
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #eee;
+    margin-bottom: 1rem;
+  }
+  .submit-method h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  .email {
+    font-size: 1.2rem;
+    color: #c41e3a;
+    font-weight: 600;
+  }
+  .submit-format {
+    margin-bottom: 1rem;
+  }
+  .submit-format h4 {
+    margin-bottom: 0.8rem;
+    color: #333;
+  }
+  .submit-format p {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+  .example {
+    background: #f5f5f5;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  .submit-note {
+    background: #fff9e6;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+  }
+  .submit-note p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+  }
+
+  .cta-section {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #c41e3a, #8b0000);
+    color: #fff;
+    border-radius: 16px;
+    margin-top: 2rem;
+  }
+  .cta-section p {
+    margin: 0.5rem 0;
+  }
+  .slogan {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .page-header h1 { font-size: 1.5rem; }
+  }
+</style>

@@ -1,0 +1,456 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const allUgc = await getCollection('ugc');
+const ugcItems = allUgc.filter(item => item.slug.startsWith('zh/'));
+
+// 分类
+const tacticalItems = ugcItems.filter(item => item.data.ugcType === 'tactical');
+const letterItems = ugcItems.filter(item => item.data.ugcType === 'letter');
+const featuredItems = ugcItems.filter(item => item.data.featured);
+
+// 按日期排序
+const sortedItems = [...ugcItems].sort((a, b) => 
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+function getUgcTagLabel(tag: string) {
+  const tagMap: Record<string, string> = {
+    '见招拆招': t('ugc.tag.breakdown'),
+    '进化之路': t('ugc.tag.evolution'),
+    '高光复盘': t('ugc.tag.highlight'),
+    '赛后感言': t('ugc.tag.postgame'),
+    '时光胶囊': t('ugc.tag.timecapsule'),
+    '纸短情长': t('ugc.tag.prose'),
+  };
+  return tagMap[tag] || tag;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout title={t('ugc.title')}>
+  <!-- 页面头部 -->
+  <section class="page-header">
+    <h1>✍️ {t('ugc.title')}</h1>
+    <p>{t('ugc.subtitle')}</p>
+    <a href="/ugc/guidelines" class="submit-btn">
+      <span class="btn-icon">📝</span>
+      {t('ugc.submit')}
+    </a>
+  </section>
+
+  <!-- 两大板块介绍 -->
+  <section class="sections-intro">
+    <div class="section-card tactical">
+      <div class="section-icon">⚔️</div>
+      <h3>{t('ugc.tactical')}</h3>
+      <p>{t('ugc.tactical.desc')}</p>
+      <div class="section-tags">
+        <span class="tag">{t('ugc.tag.breakdown')}</span>
+        <span class="tag">{t('ugc.tag.evolution')}</span>
+        <span class="tag">{t('ugc.tag.highlight')}</span>
+      </div>
+      <span class="section-count">{tacticalItems.length} 篇</span>
+    </div>
+    <div class="section-card letter">
+      <div class="section-icon">💌</div>
+      <h3>{t('ugc.letter')}</h3>
+      <p>{t('ugc.letter.desc')}</p>
+      <div class="section-tags">
+        <span class="tag">{t('ugc.tag.postgame')}</span>
+        <span class="tag">{t('ugc.tag.timecapsule')}</span>
+        <span class="tag">{t('ugc.tag.prose')}</span>
+      </div>
+      <span class="section-count">{letterItems.length} 篇</span>
+    </div>
+  </section>
+
+  <!-- 精选投稿 -->
+  {featuredItems.length > 0 && (
+    <section class="featured-section">
+      <h2>⭐ {t('ugc.featured')}</h2>
+      <div class="featured-grid">
+        {featuredItems.slice(0, 3).map(item => (
+          <a href={`/ugc/${item.slug.replace('zh/', '')}`} class={`featured-card ${item.data.ugcType}`}>
+            <div class="card-type">
+              {item.data.ugcType === 'tactical' ? '⚔️' : '💌'}
+              {item.data.ugcType === 'tactical' ? t('ugc.tactical') : t('ugc.letter')}
+            </div>
+            <h3>{item.data.title}</h3>
+            <p class="card-desc">{item.data.description}</p>
+            <div class="card-meta">
+              <span class="author">✏️ {item.data.author}</span>
+              {item.data.ugcTag && <span class="ugc-tag">{getUgcTagLabel(item.data.ugcTag)}</span>}
+            </div>
+            {item.data.editorNote && (
+              <div class="editor-note">
+                <span class="note-label">{t('ugc.editorNote')}：</span>
+                {item.data.editorNote}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- 筛选器 -->
+  <section class="filter-section">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" data-filter="all">{t('ugc.filter.all')}</button>
+      <button class="filter-tab" data-filter="tactical">{t('ugc.filter.tactical')}</button>
+      <button class="filter-tab" data-filter="letter">{t('ugc.filter.letter')}</button>
+    </div>
+  </section>
+
+  <!-- 投稿列表 -->
+  <section class="ugc-list">
+    {sortedItems.map(item => (
+      <a 
+        href={`/ugc/${item.slug.replace('zh/', '')}`} 
+        class={`ugc-card ${item.data.ugcType}`}
+        data-type={item.data.ugcType}
+      >
+        <div class="card-header">
+          <span class={`type-badge ${item.data.ugcType}`}>
+            {item.data.ugcType === 'tactical' ? '⚔️ ' + t('ugc.tactical') : '💌 ' + t('ugc.letter')}
+          </span>
+          {item.data.ugcTag && (
+            <span class="ugc-tag-badge">{getUgcTagLabel(item.data.ugcTag)}</span>
+          )}
+          {item.data.featured && <span class="featured-badge">⭐ 精选</span>}
+        </div>
+        <h3 class="card-title">{item.data.title}</h3>
+        <p class="card-excerpt">{item.data.description}</p>
+        <div class="card-footer">
+          <span class="author">{t('ugc.author')}：{item.data.author}</span>
+          <span class="date">{formatDate(item.data.date)}</span>
+        </div>
+      </a>
+    ))}
+  </section>
+
+  <!-- 悬浮投稿按钮 -->
+  <a href="/ugc/guidelines" class="fab" title={t('ugc.submit')}>
+    ✏️
+  </a>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+    border-radius: 0 0 2rem 2rem;
+  }
+  .page-header h1 { margin-bottom: 0.5rem; font-size: 2rem; }
+  .page-header p { color: #666; margin-bottom: 1.5rem; }
+  
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #c41e3a;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .submit-btn:hover {
+    background: #a01830;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+  }
+
+  /* 板块介绍 */
+  .sections-intro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .section-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .section-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .section-card.tactical:hover { border-color: #4a90d9; }
+  .section-card.letter:hover { border-color: #e91e63; }
+  .section-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .section-card h3 { margin-bottom: 0.5rem; color: #333; }
+  .section-card p { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
+  .section-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .section-tags .tag {
+    background: #f5f5f5;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  .section-count {
+    color: #c41e3a;
+    font-weight: 500;
+  }
+
+  /* 精选投稿 */
+  .featured-section {
+    padding: 2rem 1rem;
+    background: #fafafa;
+  }
+  .featured-section h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .featured-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border-left: 4px solid #ccc;
+    transition: all 0.2s;
+  }
+  .featured-card.tactical { border-left-color: #4a90d9; }
+  .featured-card.letter { border-left-color: #e91e63; }
+  .featured-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .card-type {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  .featured-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  .card-desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.8rem;
+  }
+  .ugc-tag {
+    background: #f0f0f0;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+  }
+  .editor-note {
+    background: #fff9e6;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+  }
+  .note-label {
+    color: #c41e3a;
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* 筛选器 */
+  .filter-section {
+    padding: 1rem;
+    text-align: center;
+  }
+  .filter-tabs {
+    display: inline-flex;
+    gap: 0.5rem;
+    background: #f5f5f5;
+    padding: 0.3rem;
+    border-radius: 2rem;
+  }
+  .filter-tab {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    background: transparent;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #666;
+    transition: all 0.2s;
+  }
+  .filter-tab:hover { color: #333; }
+  .filter-tab.active {
+    background: #fff;
+    color: #c41e3a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* 投稿列表 */
+  .ugc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .ugc-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    border: 1px solid #eee;
+  }
+  .ugc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .ugc-card.hidden { display: none; }
+  .card-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .type-badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+  }
+  .type-badge.tactical { background: #e3f2fd; color: #1976d2; }
+  .type-badge.letter { background: #fce4ec; color: #c2185b; }
+  .ugc-tag-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    background: #f5f5f5;
+    color: #666;
+  }
+  .featured-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+    line-height: 1.4;
+  }
+  .card-excerpt {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #999;
+  }
+
+  /* 悬浮按钮 */
+  .fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    background: #c41e3a;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(196, 30, 58, 0.4);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(196, 30, 58, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    .page-header h1 { font-size: 1.5rem; }
+    .sections-intro { padding: 1rem; }
+    .ugc-list { padding: 1rem 0.5rem; }
+    .fab { bottom: 1rem; right: 1rem; }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.filter-tab');
+    const cards = document.querySelectorAll('.ugc-card');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const filter = tab.dataset.filter;
+        
+        // 更新 tab 状态
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // 筛选卡片
+        cards.forEach(card => {
+          if (filter === 'all' || card.dataset.type === filter) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+    });
+  });
+</script>

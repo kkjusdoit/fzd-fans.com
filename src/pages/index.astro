@@ -10,6 +10,10 @@ const warrior = await getCollection('warrior');
 const tributes = await getCollection('tributes');
 const links = await getCollection('links');
 const stars = await getCollection('stars');
+const ugc = await getCollection('ugc');
+
+// 精选投稿
+const featuredUgc = ugc.filter(item => item.slug.startsWith('zh/') && item.data.featured).slice(0, 2);
 
 const allContent = [
   ...arena.map(m => ({ ...m, category: 'arena', categoryName: '职业生涯' })),
@@ -167,8 +171,36 @@ const slogans = [
         <span class="cat-count">{links.length} 篇</span>
         <span class="cat-desc">官方媒体、自媒体、视频合集</span>
       </a>
+      <a href="/ugc" class="category-card ugc">
+        <span class="cat-icon">✍️</span>
+        <span class="cat-title">投稿</span>
+        <span class="cat-count">{ugc.length} 篇</span>
+        <span class="cat-desc">技战术分析、粉丝来信</span>
+      </a>
     </div>
   </section>
+
+  <!-- 精选投稿 -->
+  {featuredUgc.length > 0 && (
+    <section class="ugc-featured">
+      <h2>✍️ 球迷精选</h2>
+      <div class="ugc-grid">
+        {featuredUgc.map(item => (
+          <a href={`/ugc/${item.slug.replace('zh/', '')}`} class={`ugc-card ${item.data.ugcType}`}>
+            <div class="ugc-type">
+              {item.data.ugcType === 'tactical' ? '⚔️ 东风·论剑' : '💌 樊星·寄语'}
+            </div>
+            <h3>{item.data.title}</h3>
+            <p>{item.data.description}</p>
+            <div class="ugc-meta">
+              <span class="author">✏️ {item.data.author}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+      <a href="/ugc" class="view-more">查看全部投稿 →</a>
+    </section>
+  )}
 
   <!-- 精选内容 -->
   <section class="featured">
@@ -451,6 +483,7 @@ const slogans = [
   .category-card.warrior:hover { border-color: #96ceb4; }
   .category-card.tributes:hover { border-color: #ff9ff3; }
   .category-card.links:hover { border-color: #a29bfe; }
+  .category-card.ugc:hover { border-color: #ff6b6b; }
   .cat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
   .cat-title { font-weight: bold; font-size: 1.1rem; }
   .cat-count {
@@ -463,6 +496,57 @@ const slogans = [
     color: #888;
     text-align: center;
     line-height: 1.4;
+  }
+
+  /* 精选投稿 */
+  .ugc-featured {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  .ugc-featured h2 { margin-bottom: 1.5rem; }
+  .ugc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .ugc-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    text-align: left;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border-left: 4px solid #ccc;
+    transition: all 0.2s;
+  }
+  .ugc-card.tactical { border-left-color: #4a90d9; }
+  .ugc-card.letter { border-left-color: #e91e63; }
+  .ugc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .ugc-type {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  .ugc-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  .ugc-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  .ugc-meta {
+    font-size: 0.85rem;
+    color: #888;
   }
 
   /* 精选内容 */
