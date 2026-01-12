@@ -135,6 +135,20 @@ const t = useTranslations(lang);
     </div>
   </section>
 
+  <!-- 4. English Q&A Video -->
+  <section class="section video-qa" id="english-qa">
+    <h2>🎬 Fan Zhendong Does an All-English Quick Q&A</h2>
+    <p class="intro-text">A fun and rare glimpse of Fan Zhendong answering rapid-fire questions entirely in English!</p>
+    
+    <div class="video-card">
+      <a href="https://www.youtube.com/shorts/q542zsfe3LM" target="_blank" rel="noopener noreferrer" class="video-link">
+        <span class="play-icon">▶️</span>
+        <span class="video-title">Watch on YouTube</span>
+      </a>
+      <p class="video-desc">This Q&A showcases his personality and gives international fans a chance to hear him speak in English.</p>
+    </div>
+  </section>
+
   <section class="cta-section">
     <p>Now you know the basics! Ready to explore more?</p>
     <div class="cta-buttons">
@@ -570,6 +584,40 @@ const t = useTranslations(lang);
   }
   .trait-icon {
     font-size: 1.2rem;
+  }
+
+  /* Video Q&A Section */
+  .video-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #c41e3a, #a01830);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+  }
+  .video-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(196, 30, 58, 0.4);
+  }
+  .play-icon {
+    font-size: 1.3rem;
+  }
+  .video-desc {
+    color: #64748b;
+    margin: 1rem 0 0;
   }
 
   /* CTA Section */
