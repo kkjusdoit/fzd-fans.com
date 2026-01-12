@@ -1,7 +1,7 @@
 ---
 title: "退出世界排名"
 titleEn: "Withdrawal from World Rankings"
-description: "被逼退"
+description: "「我还是我，不会退役，会继续努力参与到更多不同的赛场中」"
 descriptionEn: "Forced out of the world ranking system"
 date: 2024-12-01
 tags: ["WTT", "中国乒协"]
