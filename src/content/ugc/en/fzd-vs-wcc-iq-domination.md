@@ -8,7 +8,7 @@ tags: ["Tactics", "IQ", "National Games", "Mental Game"]
 category: "ugc"
 ugcType: "tactical"
 ugcTag: "Tactical Analysis"
-author: "WeChat: 「Do You Know Ball」"
+author: "WeChat Official Accounts: 「你懂球吗」"
 authorNote: "Table Tennis Technical Analyst"
 featured: false
 ---
