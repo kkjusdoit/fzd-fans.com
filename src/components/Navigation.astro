@@ -16,8 +16,7 @@ const navItems = [
   { href: '/links', label: t('nav.links') },
   { href: '/stars', label: t('nav.stars') },
   { href: '/warrior', label: t('nav.warrior') },
-  // 粉丝投稿只在中文版显示
-  ...(lang === 'zh' ? [{ href: '/ugc', label: t('nav.ugc') }] : []),
+  { href: '/ugc', label: t('nav.ugc') },
   { href: '/breakit', label: t('nav.breakit') },
   // FZD 101 只在英文版显示
   ...(lang === 'en' ? [{ href: '/fzd101', label: t('nav.fzd101') }] : []),

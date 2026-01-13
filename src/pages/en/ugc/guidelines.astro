@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { useTranslations, getLocalizedPath } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+---
+
+<BaseLayout title="Submission Guidelines">
+  <article class="guidelines-page">
+    <a href={getLocalizedPath('/ugc', lang)} class="back-link">{t('back.ugc')}</a>
+
+    <header class="page-header">
+      <h1>📢 Submission Guidelines</h1>
+    </header>
+
+    <div class="intro-section">
+      <p>
+        Fan Zhendong's matches are filled with <strong>the dialectical unity of explosive power and delicate control</strong>, and his life off the court is equally worth exploring.
+      </p>
+      <p>
+        If you have unique insights or passionate words to share, join us and let more people see the brilliance of Fan Zhendong!
+      </p>
+    </div>
+
+    <section class="content-section">
+      <h2>📝 What We're Looking For</h2>
+
+      <div class="content-type">
+        <div class="type-header tactical">
+          <span class="type-icon">⚔️</span>
+          <h3>Tactical Analysis</h3>
+        </div>
+        <div class="type-body">
+          <p class="type-desc">Professional, rational, in-depth match analysis.</p>
+          <ul>
+            <li>
+              <strong>Strategy Breakdown:</strong>
+              How does Fan Zhendong dismantle different opponents' styles and establish advantages?
+            </li>
+            <li>
+              <strong>Evolution Path:</strong>
+              What visible upgrades in technique or mentality has he shown compared to before?
+            </li>
+            <li>
+              <strong>Highlight Review:</strong>
+              Beyond "great play," we want to know "what made it great." Was it the variation in the first three shots? Or the placement control during rallies?
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-type">
+        <div class="type-header letter">
+          <span class="type-icon">💌</span>
+          <h3>Fan Letters</h3>
+        </div>
+        <div class="type-body">
+          <p class="type-desc">Emotional, literary, resonant. Quality over quantity.</p>
+          <ul>
+            <li>
+              <strong>Post-Match Thoughts:</strong>
+              Emotional release and encouragement after matches
+            </li>
+            <li>
+              <strong>Time Capsule:</strong>
+              Share how you became a fan and the strength he's given you
+            </li>
+            <li>
+              <strong>Creative Writing:</strong>
+              Essays, prose, poetry. We hope your words are sincere, rational, and warm
+            </li>
+          </ul>
+          <p class="type-tip">💡 We welcome writing with literary quality. No fan wars or empty flattery.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="policy-section">
+      <h2>🚫 Review Standards</h2>
+      <div class="policy-grid">
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>Originality</strong>
+            <p>Must be original. No plagiarism. If reposting, provide author authorization.</p>
+          </div>
+        </div>
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>Objectivity</strong>
+            <p>Focus on Fan Zhendong and the sport. No bashing other athletes or discussing private life gossip.</p>
+          </div>
+        </div>
+        <div class="policy-item">
+          <span class="policy-icon">✅</span>
+          <div>
+            <strong>Formatting</strong>
+            <p>Clear logic, well-organized paragraphs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="submit-section">
+      <h2>📮 How to Submit</h2>
+      <div class="submit-box">
+        <div class="submit-method">
+          <h4>Email Submission</h4>
+          <p class="email">kkjusdoit@gmail.com</p>
+        </div>
+        <div class="submit-format">
+          <h4>Email Format</h4>
+          <p><strong>Subject:</strong> [Category] + Article Title + Author Name</p>
+          <p class="example">Example: [Tactical] German Cup Semi-Final Analysis: Fan Zhendong's Backhand Dominance - By: PaddleFan</p>
+          <p><strong>Body:</strong> Word document or Markdown format. Please attach images as a zip file.</p>
+        </div>
+        <div class="submit-note">
+          <p>📬 We'll respond within <strong>24 hours</strong> of receiving your email.</p>
+          <p>⭐ Selected articles will be published on the homepage and relevant sections.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="cta-content">
+        <span class="cta-icon">✨</span>
+        <p class="cta-main">We look forward to your submission!</p>
+        <p class="cta-sub">Record your passion in words, let more people see Fan Zhendong's brilliance</p>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .guidelines-page { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+  .back-link { display: inline-block; color: #c41e3a; text-decoration: none; margin-bottom: 2rem; font-size: 0.9rem; }
+  .back-link:hover { text-decoration: underline; }
+  .page-header { text-align: center; margin-bottom: 2rem; }
+  .page-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  .intro-section { background: linear-gradient(135deg, #fff5f5, #fff); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; line-height: 1.8; }
+  .intro-section p { margin-bottom: 0.8rem; }
+  .intro-section p:last-child { margin-bottom: 0; }
+  .intro-section strong { color: #c41e3a; }
+
+  .content-section h2 { margin-bottom: 1.5rem; font-size: 1.3rem; }
+  .content-type { margin-bottom: 2rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .type-header { display: flex; align-items: center; gap: 0.8rem; padding: 1rem 1.5rem; color: #fff; }
+  .type-header.tactical { background: linear-gradient(135deg, #4a90d9, #357abd); }
+  .type-header.letter { background: linear-gradient(135deg, #e91e63, #c2185b); }
+  .type-icon { font-size: 1.5rem; }
+  .type-header h3 { margin: 0; font-size: 1.1rem; }
+  .type-body { padding: 1.5rem; background: #fff; }
+  .type-desc { color: #666; margin-bottom: 1rem; }
+  .type-body ul { margin: 0; padding-left: 1.2rem; }
+  .type-body li { margin-bottom: 0.8rem; line-height: 1.6; }
+  .type-body strong { color: #333; }
+  .type-tip { margin-top: 1rem; padding: 0.8rem; background: #f5f5f5; border-radius: 8px; font-size: 0.9rem; color: #666; }
+
+  .policy-section { margin: 3rem 0; }
+  .policy-section h2 { margin-bottom: 1.5rem; font-size: 1.3rem; }
+  .policy-grid { display: grid; gap: 1rem; }
+  .policy-item { display: flex; gap: 1rem; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .policy-icon { font-size: 1.5rem; }
+  .policy-item strong { display: block; margin-bottom: 0.3rem; color: #333; }
+  .policy-item p { margin: 0; color: #666; font-size: 0.9rem; line-height: 1.5; }
+
+  .submit-section { margin: 3rem 0; }
+  .submit-section h2 { margin-bottom: 1.5rem; font-size: 1.3rem; }
+  .submit-box { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .submit-method { text-align: center; padding-bottom: 1rem; border-bottom: 1px dashed #eee; margin-bottom: 1rem; }
+  .submit-method h4 { margin-bottom: 0.5rem; color: #333; }
+  .email { font-size: 1.2rem; color: #c41e3a; font-weight: 600; }
+  .submit-format { margin-bottom: 1rem; }
+  .submit-format h4 { margin-bottom: 0.8rem; color: #333; }
+  .submit-format p { margin-bottom: 0.5rem; line-height: 1.6; }
+  .example { background: #f5f5f5; padding: 0.8rem; border-radius: 8px; font-size: 0.9rem; color: #666; }
+  .submit-note { background: #fff9e6; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+  .submit-note p { margin: 0.3rem 0; font-size: 0.9rem; }
+
+  .cta-section { text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, #c41e3a 0%, #8b0000 50%, #c41e3a 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite; color: #fff; border-radius: 16px; margin-top: 2rem; position: relative; overflow: hidden; }
+  .cta-section::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: shimmer 4s linear infinite; }
+  @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes shimmer { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .cta-content { position: relative; z-index: 1; }
+  .cta-icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .cta-main { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; letter-spacing: 0.05em; }
+  .cta-sub { font-size: 0.95rem; margin: 0; opacity: 0.9; font-weight: 300; }
+
+  @media (max-width: 768px) { .page-header h1 { font-size: 1.5rem; } }
+</style>

@@ -14,6 +14,7 @@ const warrior = await getCollection('warrior');
 const tributes = await getCollection('tributes');
 const links = await getCollection('links');
 const stars = await getCollection('stars');
+const ugc = await getCollection('ugc');
 
 const categoryMap = {
   arena: { name: t('nav.arena'), icon: '🏆' },
@@ -163,7 +164,51 @@ const slogans = [
         <span class="cat-title">{t('nav.links')}</span>
         <span class="cat-count">{links.length} articles</span>
       </a>
+      <a href={getLocalizedPath('/ugc', lang)} class="category-card ugc">
+        <span class="cat-icon">✍️</span>
+        <span class="cat-title">{t('nav.ugc')}</span>
+        <span class="cat-count">{ugc.length} articles</span>
+      </a>
     </div>
+  </section>
+
+  <!-- Featured Submissions -->
+  <section class="ugc-featured">
+    <h2>✍️ Featured Submissions</h2>
+    
+    <!-- Fan Letters -->
+    <div class="ugc-category-block">
+      <h3 class="ugc-category-title">💌 Fan Letters</h3>
+      <div class="letter-highlight">
+        <a href={getLocalizedPath('/ugc/letter-to-fzd-gaalgaal', lang)} class="letter-card">
+          <div class="letter-icon">💌</div>
+          <div class="letter-content">
+            <h3>A Letter to Fan Zhendong</h3>
+            <p class="letter-excerpt">"When I think of you, the first image that jumps into my mind is that moment after you won the championship at the Paris Olympics..."</p>
+            <span class="letter-author">—— Gaalgaal</span>
+          </div>
+          <span class="letter-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tactical Analysis -->
+    <div class="ugc-category-block">
+      <h3 class="ugc-category-title">⚔️ Tactical Analysis</h3>
+      <div class="letter-highlight">
+        <a href={getLocalizedPath('/ugc/fzd-vs-wcc-iq-domination', lang)} class="letter-card tactical">
+          <div class="letter-icon">🏓</div>
+          <div class="letter-content">
+            <h3>Fan Zhendong 4-2 Wang Chuqin: A Victory of Table Tennis IQ</h3>
+            <p class="letter-excerpt">"This wasn't a pure technical victory—it was a complete domination of table tennis IQ!"</p>
+            <span class="letter-author">—— WeChat「Do You Know Ball」</span>
+          </div>
+          <span class="letter-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <a href={getLocalizedPath('/ugc', lang)} class="view-more">View all submissions →</a>
   </section>
 
   <!-- 全部档案 -->
@@ -232,9 +277,28 @@ const slogans = [
   .category-card.warrior:hover { border-color: #96ceb4; }
   .category-card.tributes:hover { border-color: #ff9ff3; }
   .category-card.links:hover { border-color: #a29bfe; }
+  .category-card.ugc:hover { border-color: #ff6b6b; }
   .cat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
   .cat-title { font-weight: bold; font-size: 1.1rem; }
   .cat-count { font-size: 0.8rem; color: #c41e3a; margin: 0.3rem 0; }
+  
+  /* Featured Submissions */
+  .ugc-featured { padding: 2rem 1rem; text-align: center; }
+  .ugc-featured h2 { margin-bottom: 1.5rem; }
+  .ugc-featured .letter-highlight { max-width: 700px; margin: 0 auto; padding: 0; }
+  .ugc-category-block { margin-bottom: 2rem; }
+  .ugc-category-title { font-size: 1.1rem; color: #666; margin-bottom: 1rem; font-weight: 500; }
+  .letter-highlight { padding: 1.5rem 1rem; max-width: 700px; margin: 0 auto; }
+  .letter-card { display: flex; align-items: center; gap: 1rem; background: linear-gradient(135deg, #fff9f0 0%, #fff 100%); border: 1px solid #ffe4c4; border-radius: 16px; padding: 1.5rem; text-decoration: none; color: inherit; transition: all 0.3s; box-shadow: 0 4px 16px rgba(196, 30, 58, 0.08); }
+  .letter-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(196, 30, 58, 0.15); border-color: #c41e3a; }
+  .letter-card.tactical { background: linear-gradient(135deg, #f0f8ff 0%, #fff 100%); border-color: #b8d4e8; }
+  .letter-card.tactical:hover { border-color: #4a90d9; }
+  .letter-icon { font-size: 2.5rem; flex-shrink: 0; }
+  .letter-content { flex: 1; text-align: left; }
+  .letter-content h3 { font-size: 1.2rem; color: #c41e3a; margin-bottom: 0.5rem; }
+  .letter-excerpt { color: #666; font-size: 0.95rem; line-height: 1.6; font-style: italic; margin-bottom: 0.5rem; }
+  .letter-author { color: #999; font-size: 0.85rem; }
+  .letter-arrow { font-size: 1.5rem; color: #c41e3a; flex-shrink: 0; }
   .all-content { padding: 3rem 1rem; }
   .all-content h2 { text-align: center; margin-bottom: 1.5rem; }
   .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }

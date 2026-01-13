@@ -1,0 +1,224 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations, getLocalizedPath } from '../../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+
+export async function getStaticPaths() {
+  const ugcEntries = await getCollection('ugc');
+  return ugcEntries
+    .filter(entry => entry.slug.startsWith('en/'))
+    .map(entry => ({
+      params: { slug: entry.slug.replace('en/', '') },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout title={entry.data.titleEn || entry.data.title}>
+  <article class="ugc-article">
+    <!-- 返回链接 -->
+    <a href={getLocalizedPath('/ugc', lang)} class="back-link">{t('back.ugc')}</a>
+
+    <!-- 文章头部 -->
+    <header class="article-header">
+      <div class="article-meta">
+        <span class={`type-badge ${entry.data.ugcType}`}>
+          {entry.data.ugcType === 'tactical' ? '⚔️ ' + t('ugc.tactical') : '💌 ' + t('ugc.letter')}
+        </span>
+        {entry.data.ugcTag && (
+          <span class="ugc-tag">{entry.data.ugcTag}</span>
+        )}
+        {entry.data.featured && <span class="featured-badge">⭐ Featured</span>}
+      </div>
+      <h1>{entry.data.titleEn || entry.data.title}</h1>
+      {(entry.data.descriptionEn || entry.data.description) && (
+        <p class="article-desc">{entry.data.descriptionEn || entry.data.description}</p>
+      )}
+      <div class="author-info">
+        <div class="author-avatar">✏️</div>
+        <div class="author-details">
+          <span class="author-name">{entry.data.author}</span>
+          {entry.data.authorNote && (
+            <span class="author-note">{entry.data.authorNote}</span>
+          )}
+        </div>
+        <span class="article-date">{formatDate(entry.data.date)}</span>
+      </div>
+    </header>
+
+    <!-- 站长按语 -->
+    {entry.data.editorNote && (
+      <div class="editor-note">
+        <span class="note-icon">💬</span>
+        <div class="note-content">
+          <span class="note-label">{t('ugc.editorNote')}</span>
+          <p>{entry.data.editorNote}</p>
+        </div>
+      </div>
+    )}
+
+    <!-- 文章内容 -->
+    <div class="article-content">
+      <Content />
+    </div>
+
+    <!-- 文章底部 -->
+    <footer class="article-footer">
+      <div class="tags">
+        {entry.data.tags?.map(tag => (
+          <span class="tag">#{tag}</span>
+        ))}
+      </div>
+      <div class="share-section">
+        <span>Thanks for reading! Feel free to share ❤️</span>
+      </div>
+    </footer>
+
+    <!-- 投稿引导 -->
+    <div class="submit-cta">
+      <p>Have something to share?</p>
+      <a href={getLocalizedPath('/ugc/guidelines', lang)} class="submit-btn">📝 Submit</a>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .ugc-article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #c41e3a;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .article-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .type-badge {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+  }
+  .type-badge.tactical { background: #e3f2fd; color: #1976d2; }
+  .type-badge.letter { background: #fce4ec; color: #c2185b; }
+
+  .ugc-tag {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    background: #f5f5f5;
+    color: #666;
+  }
+
+  .featured-badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    background: #fff3e0;
+    color: #e65100;
+  }
+
+  .article-header h1 {
+    font-size: 2rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: #222;
+  }
+
+  .article-desc {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .author-details { flex: 1; }
+  .author-name { display: block; font-weight: 600; color: #333; }
+  .author-note { display: block; font-size: 0.85rem; color: #888; }
+  .article-date { color: #999; font-size: 0.9rem; }
+
+  .editor-note {
+    display: flex;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fff9e6, #fff);
+    border: 1px solid #ffe0b2;
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .note-icon { font-size: 1.5rem; }
+  .note-content { flex: 1; }
+  .note-label { display: block; font-weight: 600; color: #c41e3a; margin-bottom: 0.3rem; font-size: 0.9rem; }
+  .note-content p { margin: 0; color: #666; font-style: italic; line-height: 1.6; }
+
+  .article-content { line-height: 1.8; color: #333; }
+  .article-content :global(h2) { font-size: 1.4rem; margin: 2rem 0 1rem; color: #222; border-left: 4px solid #c41e3a; padding-left: 1rem; }
+  .article-content :global(h3) { font-size: 1.2rem; margin: 1.5rem 0 0.8rem; color: #333; }
+  .article-content :global(p) { margin-bottom: 1.2rem; }
+  .article-content :global(blockquote) { border-left: 4px solid #c41e3a; padding: 1rem 1.5rem; margin: 1.5rem 0; background: #fafafa; border-radius: 0 8px 8px 0; font-style: italic; color: #555; }
+  .article-content :global(ul), .article-content :global(ol) { margin: 1rem 0; padding-left: 1.5rem; }
+  .article-content :global(li) { margin-bottom: 0.5rem; }
+  .article-content :global(strong) { color: #c41e3a; }
+  .article-content :global(hr) { border: none; border-top: 1px dashed #ddd; margin: 2rem 0; }
+  .article-content :global(em) { color: #666; }
+
+  .article-footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .tag { background: #f5f5f5; padding: 0.3rem 0.8rem; border-radius: 1rem; font-size: 0.85rem; color: #666; }
+  .share-section { text-align: center; color: #888; font-size: 0.9rem; }
+
+  .submit-cta { margin-top: 3rem; text-align: center; padding: 2rem; background: linear-gradient(135deg, #fff5f5, #fff); border-radius: 16px; }
+  .submit-cta p { color: #666; margin-bottom: 1rem; }
+  .submit-btn { display: inline-block; background: #c41e3a; color: #fff; padding: 0.8rem 1.5rem; border-radius: 2rem; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+  .submit-btn:hover { background: #a01830; transform: translateY(-2px); }
+
+  @media (max-width: 768px) {
+    .article-header h1 { font-size: 1.5rem; }
+    .author-info { flex-wrap: wrap; }
+    .article-date { width: 100%; margin-top: 0.5rem; }
+  }
+</style>
