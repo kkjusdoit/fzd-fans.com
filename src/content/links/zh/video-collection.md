@@ -28,5 +28,17 @@ translated: false
 
 ---
 
+## 八一之心 人生百态
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV17rhHzXEQE&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+## 【樊振东】2017年生贺视频 原创歌曲《一路同行》
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1g4411g7UF&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
 *未完待续...*
 

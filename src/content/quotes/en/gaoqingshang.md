@@ -38,13 +38,13 @@ Chen Meng couldn't stop laughing. While she was still organizing her thoughts sa
 
 > "Your expectation is my expectation"
 
-## 4. Greater Bay Area Gala (Part 1)
+## 4. Weibo Night
 
 When the host "challenged" him to evaluate whose Cantonese was most standard among Ma Li and others:
 
 > "Mine is the most standard"
 
-## 5. Greater Bay Area Gala (Part 2)
+## 5. Greater Bay Area Gala
 
 Host Lan Yu asked: Which performance are you most looking forward to?
 

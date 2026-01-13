@@ -30,4 +30,16 @@ Watch the full journey in one go!
 
 ---
 
+## Heart of Bayi, Life in All Its Forms
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV17rhHzXEQE&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
+## Fan Zhendong 2017 Birthday Tribute - Original Song "Walking Together"
+
+<iframe src="//player.bilibili.com/player.html?bvid=BV1g4411g7UF&autoplay=0" width="100%" height="500" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+---
+
 *To be continued...*
