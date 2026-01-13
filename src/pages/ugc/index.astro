@@ -73,35 +73,6 @@ function formatDate(date: Date) {
     </div>
   </section>
 
-  <!-- 精选投稿 -->
-  {featuredItems.length > 0 && (
-    <section class="featured-section">
-      <h2>⭐ {t('ugc.featured')}</h2>
-      <div class="featured-grid">
-        {featuredItems.slice(0, 3).map(item => (
-          <a href={`/ugc/${item.slug.replace('zh/', '')}`} class={`featured-card ${item.data.ugcType}`}>
-            <div class="card-type">
-              {item.data.ugcType === 'tactical' ? '⚔️' : '💌'}
-              {item.data.ugcType === 'tactical' ? t('ugc.tactical') : t('ugc.letter')}
-            </div>
-            <h3>{item.data.title}</h3>
-            <p class="card-desc">{item.data.description}</p>
-            <div class="card-meta">
-              <span class="author">✏️ {item.data.author}</span>
-              {item.data.ugcTag && <span class="ugc-tag">{getUgcTagLabel(item.data.ugcTag)}</span>}
-            </div>
-            {item.data.editorNote && (
-              <div class="editor-note">
-                <span class="note-label">{t('ugc.editorNote')}：</span>
-                {item.data.editorNote}
-              </div>
-            )}
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
-
   <!-- 筛选器 -->
   <section class="filter-section">
     <div class="filter-tabs" id="filterTabs">
@@ -126,7 +97,6 @@ function formatDate(date: Date) {
           {item.data.ugcTag && (
             <span class="ugc-tag-badge">{getUgcTagLabel(item.data.ugcTag)}</span>
           )}
-          {item.data.featured && <span class="featured-badge">⭐ 精选</span>}
         </div>
         <h3 class="card-title">{item.data.title}</h3>
         <p class="card-excerpt">{item.data.description}</p>
