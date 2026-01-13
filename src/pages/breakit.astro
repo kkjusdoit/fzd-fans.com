@@ -43,14 +43,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   #game-intro h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #c41e3a, #ff6b6b);
+    background: linear-gradient(45deg, #1e88e5, #64b5f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   #game-intro p { color: #666; margin-bottom: 2rem; font-size: 1.1rem; }
   #game-intro .sound-tip { color: #999; font-size: 0.9rem; margin-top: 1rem; }
   #start-btn, #replay-btn {
-    background: linear-gradient(45deg, #c41e3a, #e63950);
+    background: linear-gradient(45deg, #1e88e5, #42a5f5);
     color: white;
     border: none;
     padding: 1rem 3rem;
@@ -58,11 +58,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4);
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.4);
   }
   #start-btn:hover, #replay-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(196, 30, 58, 0.6);
+    box-shadow: 0 6px 30px rgba(30, 136, 229, 0.6);
   }
   #game-end {
     background: linear-gradient(to bottom, #1a1a3e 0%, #2d1b4e 50%, #4a2c5a 100%);
@@ -256,7 +256,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   /* 不同颜色的气球 */
-  .balloon.color-0 .balloon-body { background: linear-gradient(135deg, #ff6b6b, #c41e3a); }
+  .balloon.color-0 .balloon-body { background: linear-gradient(135deg, #64b5f6, #1e88e5); }
   .balloon.color-1 .balloon-body { background: linear-gradient(135deg, #74b9ff, #0984e3); }
   .balloon.color-2 .balloon-body { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
   .balloon.color-3 .balloon-body { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
@@ -537,7 +537,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const centerY = rect.top + 60;
 
     const colors = [
-      ['#ff6b6b', '#c41e3a', '#ff8787'],
+      ['#64b5f6', '#1e88e5', '#90caf9'],
       ['#74b9ff', '#0984e3', '#a0d2ff'],
       ['#ffeaa7', '#fdcb6e', '#fff3b0'],
       ['#a29bfe', '#6c5ce7', '#c4bfff'],
@@ -723,7 +723,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   // 烟花效果
   let fireworkInterval: number;
   const fireworkColors = [
-    ['#ff6b6b', '#ff8787', '#ffa8a8'],
+    ['#64b5f6', '#90caf9', '#bbdefb'],
     ['#ffd700', '#ffec8b', '#fff8dc'],
     ['#74b9ff', '#a0d2ff', '#d0e8ff'],
     ['#a29bfe', '#c4bfff', '#e0ddff'],

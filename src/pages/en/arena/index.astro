@@ -129,7 +129,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   .insight-header { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.75rem 0; margin-bottom: 1rem; border-radius: 8px; }
   .header-content { display: flex; justify-content: space-between; align-items: center; padding: 0 0.75rem; }
   .header-left { display: flex; align-items: center; gap: 0.5rem; }
-  .avatar { width: 32px; height: 32px; background: #aa222d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem; flex-shrink: 0; }
+  .avatar { width: 32px; height: 32px; background: #1e88e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem; flex-shrink: 0; }
   .header-title { font-size: 0.9rem; font-weight: bold; color: #111; margin: 0; white-space: nowrap; }
   .header-subtitle { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; display: none; }
   
@@ -145,9 +145,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   .tab-nav { display: none; gap: 1rem; }
   @media (min-width: 768px) { .tab-nav { display: flex; gap: 2rem; } }
   .tab-btn { background: none; border: none; padding: 0.5rem 0; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
-  .active-tab { border-bottom: 3px solid #aa222d; color: #aa222d; font-weight: 700; }
+  .active-tab { border-bottom: 3px solid #1e88e5; color: #1e88e5; font-weight: 700; }
   .inactive-tab { color: #888; }
-  .inactive-tab:hover { color: #aa222d; }
+  .inactive-tab:hover { color: #1e88e5; }
   
   .mobile-menu-btn { 
     display: flex; 
@@ -165,8 +165,8 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     animation: pulse-btn 2s ease-in-out 3;
   }
   @keyframes pulse-btn {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(170, 34, 45, 0.4); }
-    50% { box-shadow: 0 0 0 8px rgba(170, 34, 45, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(30, 136, 229, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(30, 136, 229, 0); }
   }
   .menu-icon { font-size: 1rem; }
   .menu-hint { font-size: 0.75rem; font-weight: 500; }
@@ -180,7 +180,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   .intro-section { text-align: center; max-width: 800px; margin: 0 auto 1.5rem; padding: 0 0.5rem; }
   .intro-section h2 { font-size: 1.25rem; font-weight: bold; color: #111; margin-bottom: 0.5rem; }
   .intro-section p { color: #4b5563; line-height: 1.6; font-size: 0.875rem; }
-  .highlight { font-weight: 600; color: #aa222d; }
+  .highlight { font-weight: 600; color: #1e88e5; }
   
   @media (min-width: 640px) {
     .intro-section { margin: 0 auto 2rem; }
@@ -198,7 +198,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   @media (min-width: 1024px) { .stat-cards { grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem; } }
   .stat-card { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid; }
   @media (min-width: 640px) { .stat-card { padding: 1.5rem; } }
-  .border-red { border-color: #aa222d; }
+  .border-red { border-color: #1e88e5; }
   .border-gold { border-color: #c5a059; }
   .border-gray { border-color: #9ca3af; }
   .border-blue { border-color: #3b82f6; }
@@ -226,7 +226,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   /* Insight Box Mobile Adaptation */
   .insight-box { background: #f8f8f8; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; }
   @media (min-width: 640px) { .insight-box { padding: 1.5rem; } }
-  .insight-box h4 { font-weight: bold; color: #aa222d; margin: 0 0 0.5rem; font-size: 0.9rem; }
+  .insight-box h4 { font-weight: bold; color: #1e88e5; margin: 0 0 0.5rem; font-size: 0.9rem; }
   .insight-box p { font-size: 0.8rem; color: #374151; margin: 0; line-height: 1.6; }
   @media (min-width: 640px) { .insight-box p { font-size: 0.875rem; } }
 
@@ -250,7 +250,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   .timeline-detail p { color: #6b7280; margin: 0; font-size: 0.875rem; }
   .detail-year { display: inline-block; padding: 0.25rem 0.75rem; background: #f3f4f6; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; color: #4b5563; margin-bottom: 0.75rem; }
   @media (min-width: 640px) { .detail-year { font-size: 0.875rem; margin-bottom: 1rem; } }
-  .detail-title { font-size: 1.25rem; font-weight: bold; color: #aa222d; margin: 0 0 0.75rem; }
+  .detail-title { font-size: 1.25rem; font-weight: bold; color: #1e88e5; margin: 0 0 0.75rem; }
   @media (min-width: 640px) { .detail-title { font-size: 1.875rem; margin: 0 0 1rem; } }
   .detail-desc { font-size: 0.9rem; color: #4b5563; max-width: 500px; line-height: 1.6; }
   @media (min-width: 640px) { .detail-desc { font-size: 1.125rem; line-height: 1.7; } }
@@ -289,7 +289,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   @media (min-width: 640px) { .flow-label { font-size: 0.75rem; } }
   .flow-value { font-weight: bold; font-size: 0.8rem; }
   @media (min-width: 640px) { .flow-value { font-size: 1rem; } }
-  .flow-value.red { color: #aa222d; }
+  .flow-value.red { color: #1e88e5; }
   .flow-value.blue { color: #1d4ed8; }
   .flow-arrow { font-size: 1rem; color: #9ca3af; flex-shrink: 0; }
   @media (min-width: 640px) { .flow-arrow { font-size: 1.5rem; } }
@@ -300,23 +300,23 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   .timeline-item { position: relative; padding: 0.4rem 0 0.4rem 1.5rem; cursor: pointer; transition: all 0.2s; border-radius: 4px; }
   @media (min-width: 640px) { .timeline-item { padding: 0.5rem 0 0.5rem 2rem; } }
   .timeline-item:hover { background: #f9fafb; }
-  .timeline-item.active { background: #fef2f2 !important; }
-  .timeline-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #aa222d; border-radius: 3px 0 0 3px; }
+  .timeline-item.active { background: #e3f2fd !important; }
+  .timeline-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #1e88e5; border-radius: 3px 0 0 3px; }
   .timeline-dot { position: absolute; left: -6px; top: 0.8rem; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: transform 0.2s; }
   @media (min-width: 640px) { .timeline-dot { left: -7px; top: 1rem; width: 12px; height: 12px; } }
   .timeline-item:hover .timeline-dot { transform: scale(1.25); }
-  .timeline-item.active .timeline-dot { transform: scale(1.25); box-shadow: 0 0 0 3px rgba(170, 34, 45, 0.2); }
+  .timeline-item.active .timeline-dot { transform: scale(1.25); box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2); }
   .dot-gray { background: #d1d5db; }
   .dot-gold { background: #c5a059; }
-  .dot-red { background: #aa222d; }
+  .dot-red { background: #1e88e5; }
   .dot-blue { background: #3b82f6; }
   .timeline-year { font-size: 0.65rem; font-weight: bold; color: #9ca3af; margin-bottom: 0.125rem; }
   @media (min-width: 640px) { .timeline-year { font-size: 0.75rem; } }
-  .timeline-item.active .timeline-year { color: #aa222d; }
+  .timeline-item.active .timeline-year { color: #1e88e5; }
   .timeline-title { font-size: 0.8rem; font-weight: 600; color: #1f2937; }
   @media (min-width: 640px) { .timeline-title { font-size: 0.875rem; } }
-  .timeline-item:hover .timeline-title { color: #aa222d; }
-  .timeline-item.active .timeline-title { color: #aa222d; }
+  .timeline-item:hover .timeline-title { color: #1e88e5; }
+  .timeline-item.active .timeline-title { color: #1e88e5; }
 </style>
 
 <script is:inline>
@@ -360,7 +360,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       type: 'bar',
       data: {
         labels: ['World Cup', 'World Championships', 'Olympics'],
-        datasets: [{ label: 'Titles', data: [4, 2, 1], backgroundColor: '#aa222d', borderRadius: 4, barThickness: 40 }]
+        datasets: [{ label: 'Titles', data: [4, 2, 1], backgroundColor: '#1e88e5', borderRadius: 4, barThickness: 40 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -391,7 +391,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       type: 'line',
       data: {
         labels: ['2023 Q1', '2023 Q2', '2023 Q3', '2023 Q4', '2024 Q1', '2024 Q2 (Olympic)', '2024 Q3', '2024 Q4 (Now)'],
-        datasets: [{ label: 'World Ranking Points', data: [7500, 7800, 7200, 6500, 5800, 6900, 3000, 0], borderColor: '#aa222d', backgroundColor: 'rgba(170, 34, 45, 0.1)', fill: true, tension: 0.3, pointRadius: 4 }]
+        datasets: [{ label: 'World Ranking Points', data: [7500, 7800, 7200, 6500, 5800, 6900, 3000, 0], borderColor: '#1e88e5', backgroundColor: 'rgba(30, 136, 229, 0.1)', fill: true, tension: 0.3, pointRadius: 4 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,

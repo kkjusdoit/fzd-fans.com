@@ -34,11 +34,11 @@ const t = useTranslations(lang);
 <style>
   #game-container { min-height: 80vh; position: relative; }
   #game-intro, #game-end { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; text-align: center; }
-  #game-intro h1 { font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(45deg, #c41e3a, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #game-intro h1 { font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(45deg, #1e88e5, #64b5f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   #game-intro p { color: #666; margin-bottom: 2rem; font-size: 1.1rem; max-width: 600px; }
   #game-intro .sound-tip { color: #999; font-size: 0.9rem; margin-top: 1rem; }
-  #start-btn, #replay-btn { background: linear-gradient(45deg, #c41e3a, #e63950); color: white; border: none; padding: 1rem 3rem; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(196, 30, 58, 0.4); }
-  #start-btn:hover, #replay-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(196, 30, 58, 0.6); }
+  #start-btn, #replay-btn { background: linear-gradient(45deg, #1e88e5, #42a5f5); color: white; border: none; padding: 1rem 3rem; font-size: 1.3rem; border-radius: 50px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(30, 136, 229, 0.4); }
+  #start-btn:hover, #replay-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(30, 136, 229, 0.6); }
   #game-end { background: linear-gradient(to bottom, #1a1a3e 0%, #2d1b4e 50%, #4a2c5a 100%); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; }
   #end-back-btn { position: fixed; top: 20px; left: 20px; color: white; font-size: 1rem; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; transition: all 0.3s; z-index: 1001; }
   #end-back-btn:hover { background: rgba(255,255,255,0.2); }
@@ -63,7 +63,7 @@ const t = useTranslations(lang);
   .balloon-text { color: white; font-size: 0.65rem; font-weight: bold; text-align: center; padding: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); line-height: 1.2; max-width: 85px; word-break: break-word; }
   .balloon-rope { width: 2px; height: 30px; background: linear-gradient(to bottom, #8b4513, #654321); }
   .balloon-basket { width: 30px; height: 20px; background: linear-gradient(to bottom, #8b4513, #654321); border-radius: 0 0 5px 5px; border: 2px solid #5a3a1a; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3); }
-  .balloon.color-0 .balloon-body { background: linear-gradient(135deg, #ff6b6b, #c41e3a); }
+  .balloon.color-0 .balloon-body { background: linear-gradient(135deg, #64b5f6, #1e88e5); }
   .balloon.color-1 .balloon-body { background: linear-gradient(135deg, #74b9ff, #0984e3); }
   .balloon.color-2 .balloon-body { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
   .balloon.color-3 .balloon-body { background: linear-gradient(135deg, #a29bfe, #6c5ce7); }
@@ -241,7 +241,7 @@ const t = useTranslations(lang);
     const rect = balloon.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + 60;
-    const colors = [['#ff6b6b', '#c41e3a'], ['#74b9ff', '#0984e3'], ['#ffeaa7', '#fdcb6e'], ['#a29bfe', '#6c5ce7'], ['#55efc4', '#00b894'], ['#fd79a8', '#e84393'], ['#fab1a0', '#e17055']];
+    const colors = [['#64b5f6', '#1e88e5'], ['#74b9ff', '#0984e3'], ['#ffeaa7', '#fdcb6e'], ['#a29bfe', '#6c5ce7'], ['#55efc4', '#00b894'], ['#fd79a8', '#e84393'], ['#fab1a0', '#e17055']];
     const fragmentColors = colors[colorIndex % 7];
     const fragmentCount = isMobile ? 10 : 25;
 
@@ -291,7 +291,7 @@ const t = useTranslations(lang);
   }
 
   let fireworkInterval: number;
-  const fireworkColors = [['#ff6b6b', '#ff8787'], ['#ffd700', '#ffec8b'], ['#74b9ff', '#a0d2ff'], ['#a29bfe', '#c4bfff'], ['#55efc4', '#81fff0']];
+  const fireworkColors = [['#64b5f6', '#90caf9'], ['#ffd700', '#ffec8b'], ['#74b9ff', '#a0d2ff'], ['#a29bfe', '#c4bfff'], ['#55efc4', '#81fff0']];
 
   function createFirework() {
     const x = Math.random() * window.innerWidth;

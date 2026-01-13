@@ -2,41 +2,127 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="更新日志">
+<BaseLayout title="更新日志&共创致谢">
   <article class="changelog-page">
-    <h1>📋 更新日志</h1>
-    <p class="intro">记录网站的每一次成长与完善</p>
+    <header class="page-header">
+      <h1>📋 更新日志 & 共创致谢</h1>
+      <p class="intro">记录网站的每一次成长与完善</p>
+    </header>
 
-    <section class="todo-section">
-      <h2>🚀 后续计划</h2>
-      <ul class="todo-list">
-        <li><span class="icon">📌</span> 增加「球迷等级考试」趣味栏目</li>
-        <li><span class="icon">📌</span> 补充各部分内容（欢迎提出宝贵意见&建议：<a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）</li>
-      </ul>
-    </section>
+    <div class="content-grid">
+      <section class="card thanks-card">
+        <div class="card-header">
+          <span class="card-icon">🤝</span>
+          <h2>集思共创</h2>
+        </div>
+        <ul class="contributor-list">
+          <li>
+            <span class="contributor-badge">@younijiok</span>
+            <span class="contribution">网站主题色变为东哥喜欢的蓝色</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@我相信</span>
+            <span class="contribution">「打爆一切」游戏加上音效和东哥原声</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@Gaalgaal</span>
+            <span class="contribution">加【投稿】栏目</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@Z-Hong</span>
+            <span class="contribution">加【保时捷家书】</span>
+          </li>
+        </ul>
+        <p class="thanks-note">还有诸多宝贵建议，因前两天过于繁忙，记不得太多，恕不一一列举，谨致诚挚感谢 🌹</p>
+      </section>
+
+      <section class="card todo-card">
+        <div class="card-header">
+          <span class="card-icon">🚀</span>
+          <h2>后续计划</h2>
+        </div>
+        <ul class="todo-list">
+          <li>
+            <span class="todo-status">📌</span>
+            <span>增加「球迷等级考试」趣味栏目</span>
+          </li>
+          <li>
+            <span class="todo-status">📌</span>
+            <span>补充各部分内容</span>
+          </li>
+                    <li>
+            <span class="todo-status">📌</span>
+            <span>随时吸纳建议和意见</span>
+          </li>
+        </ul>
+        <p class="contact-note">
+          欢迎提出宝贵意见 👉 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>
+        </p>
+      </section>
+    </div>
 
     <section class="timeline-section">
-      <h2>✅ 更新时间线</h2>
+      <div class="section-header">
+        <span class="section-icon">✅</span>
+        <h2>更新时间线</h2>
+      </div>
       <div class="timeline">
+        <div class="timeline-item latest">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-13</span>
+              <span class="tag new">最新</span>
+            </div>
+            <h3>内容补充 & 界面优化</h3>
+            <ul class="update-list">
+              <li>补充投稿内容</li>
+              <li>网站色调更换</li>
+              <li>投稿加英文版</li>
+              <li>天际樊星界面加上繁星点点背景</li>
+              <li>修复了个别bug</li>
+            </ul>
+          </div>
+        </div>
         <div class="timeline-item">
-          <div class="timeline-date">2026-01-12</div>
-          <div class="timeline-content">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-12</span>
+            </div>
             <h3>英文版本上线 & 投稿栏目</h3>
-            <p>1.英文版本上线；2.增加投稿栏目</p>
+            <ul class="update-list">
+              <li>英文版本上线</li>
+              <li>增加投稿栏目</li>
+            </ul>
           </div>
         </div>
         <div class="timeline-item">
-          <div class="timeline-date">2026-01-11</div>
-          <div class="timeline-content">
-            <h3>根据樊星们的建议意见（🌹感谢🌹）对内容进行增加、删除、修改、完善</h3>
-            <p>1.去除“贵人朋友”栏目；2.去除“自媒体”条目；3.增加“保时捷家书”；4.优化“打爆一切”游戏体验；5.增加“庆祝动作人传人现象”；6.其他细节更正</p>
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-11</span>
+            </div>
+            <h3>根据樊星们的建议完善内容</h3>
+            <ul class="update-list">
+              <li>去除"贵人朋友"栏目</li>
+              <li>去除"自媒体"条目</li>
+              <li>增加"保时捷家书"</li>
+              <li>优化"打爆一切"游戏体验</li>
+              <li>增加"庆祝动作人传人现象"</li>
+              <li>其他细节更正</li>
+            </ul>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-date">2026-01-10</div>
-          <div class="timeline-content">
-            <h3>🎉 网站正式上线</h3>
-            <p>樊振东互联网档案馆正式发布，包含【职业生涯 语录与梗 贵人与朋友 评价与祝福 媒体链接 天际樊星 孤勇者】这七个页签</p>
+        <div class="timeline-item first">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-10</span>
+              <span class="tag launch">🎉 上线</span>
+            </div>
+            <h3>网站正式上线</h3>
+            <p class="launch-desc">樊振东互联网档案馆正式发布，包含职业生涯、语录与梗、贵人与朋友、评价与祝福、媒体链接、天际樊星、孤勇者七个页签</p>
           </div>
         </div>
       </div>
@@ -50,67 +136,195 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <style>
   .changelog-page {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 2rem 1rem;
   }
 
-  h1 { margin-bottom: 0.5rem; }
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #1e88e5, #64b5f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   .intro {
-    color: #666;
-    margin-bottom: 2.5rem;
-    font-size: 1.1rem;
+    color: #888;
+    font-size: 1rem;
   }
 
-  .todo-section {
-    margin-bottom: 2.5rem;
+  /* 卡片网格布局 */
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
   }
 
-  .todo-section h2 {
-    color: #c41e3a;
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
+  .card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.08);
+    border: 1px solid rgba(30, 136, 229, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(30, 136, 229, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(30, 136, 229, 0.1);
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.2rem;
+    color: #1e88e5;
+    margin: 0;
+  }
+
+  /* 贡献者列表 */
+  .contributor-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .contributor-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: rgba(30, 136, 229, 0.05);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  .contributor-list li:hover {
+    background: rgba(30, 136, 229, 0.1);
+  }
+
+  .contributor-badge {
+    font-size: 0.8rem;
+    color: #1e88e5;
+    font-weight: 600;
+  }
+
+  .contribution {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .thanks-note {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(30, 136, 229, 0.2);
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* 待办列表 */
   .todo-list {
     list-style: none;
     padding: 0;
-    display: grid;
-    gap: 0.6rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   .todo-list li {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 1rem;
-    background: #f8f8f8;
-    border-radius: 8px;
-    border-left: 3px solid #c41e3a;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(30, 136, 229, 0.05);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #555;
   }
 
-  .todo-list .icon { font-size: 0.9rem; }
+  .todo-status {
+    font-size: 1rem;
+  }
 
-  .timeline-section h2 {
-    color: #c41e3a;
+  .contact-note {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(30, 136, 229, 0.2);
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  .contact-note a {
+    color: #1e88e5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .contact-note a:hover {
+    text-decoration: underline;
+  }
+
+  /* 时间线部分 */
+  .timeline-section {
+    margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-icon {
+    font-size: 1.5rem;
+  }
+
+  .section-header h2 {
     font-size: 1.3rem;
-    margin-bottom: 1.5rem;
+    color: #1e88e5;
+    margin: 0;
   }
 
   .timeline {
     position: relative;
-    padding-left: 2rem;
+    padding-left: 2.5rem;
   }
 
   .timeline::before {
     content: '';
     position: absolute;
-    left: 6px;
+    left: 8px;
     top: 0;
     bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom, #c41e3a, #e8a0a0);
+    width: 3px;
+    background: linear-gradient(to bottom, #1e88e5, #90caf9);
+    border-radius: 3px;
   }
 
   .timeline-item {
@@ -118,67 +332,221 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding-bottom: 2rem;
   }
 
-  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
 
-  .timeline-item::before {
-    content: '';
+  .timeline-marker {
     position: absolute;
-    left: -2rem;
-    top: 0.3rem;
-    width: 14px;
-    height: 14px;
-    background: #c41e3a;
+    left: -2.5rem;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: #1e88e5;
     border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px #c41e3a;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3);
+    z-index: 1;
+  }
+
+  .timeline-item.latest .timeline-marker {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    animation: pulse 2s infinite;
+  }
+
+  .timeline-item.first .timeline-marker {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(30, 136, 229, 0.15); }
+  }
+
+  .timeline-card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(30, 136, 229, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .timeline-card:hover {
+    transform: translateX(4px);
   }
 
   .timeline-date {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-date .date {
     font-size: 0.85rem;
-    color: #c41e3a;
+    color: #1e88e5;
     font-weight: 600;
-    margin-bottom: 0.3rem;
   }
 
-  .timeline-content {
-    background: #f8f8f8;
-    padding: 1rem 1.2rem;
-    border-radius: 10px;
-    border: 1px solid #eee;
+  .timeline-date .tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-weight: 500;
   }
 
-  .timeline-content h3 {
-    font-size: 1rem;
-    margin: 0 0 0.4rem 0;
+  .tag.new {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    color: white;
+  }
+
+  .tag.launch {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
     color: #333;
   }
 
-  .timeline-content p {
+  .timeline-card h3 {
+    font-size: 1rem;
+    color: #333;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .update-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .update-list li {
+    font-size: 0.8rem;
+    color: #666;
+    background: rgba(30, 136, 229, 0.08);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .launch-desc {
     font-size: 0.9rem;
     color: #666;
+    line-height: 1.6;
     margin: 0;
-    line-height: 1.5;
   }
 
   .back-link {
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     text-align: center;
   }
 
   .back-link a {
-    color: #c41e3a;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1e88e5;
     text-decoration: none;
     font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    background: rgba(30, 136, 229, 0.08);
+    transition: all 0.3s ease;
   }
 
-  .back-link a:hover { text-decoration: underline; }
+  .back-link a:hover {
+    background: rgba(30, 136, 229, 0.15);
+    transform: translateX(-4px);
+  }
 
+  /* 暗色模式 */
   @media (prefers-color-scheme: dark) {
+    .page-header h1 {
+      background: linear-gradient(135deg, #64b5f6, #90caf9);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
     .intro { color: #aaa; }
-    .todo-list li { background: #2a2a2a; color: #ddd; }
-    .timeline-content { background: #2a2a2a; border-color: #444; }
-    .timeline-content h3 { color: #eee; }
-    .timeline-content p { color: #bbb; }
-    .timeline-item::before { border-color: #2a2a2a; }
+
+    .card {
+      background: linear-gradient(145deg, #1a2a3a, #152535);
+      border-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .card-header {
+      border-bottom-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .contributor-list li,
+    .todo-list li {
+      background: rgba(100, 181, 246, 0.1);
+    }
+
+    .contributor-list li:hover {
+      background: rgba(100, 181, 246, 0.15);
+    }
+
+    .contribution,
+    .todo-list li {
+      color: #ccc;
+    }
+
+    .thanks-note,
+    .contact-note {
+      color: #999;
+      border-top-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .timeline-card {
+      background: linear-gradient(145deg, #1a2a3a, #152535);
+      border-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .timeline-card h3 { color: #eee; }
+
+    .update-list li {
+      background: rgba(100, 181, 246, 0.15);
+      color: #bbb;
+    }
+
+    .launch-desc { color: #bbb; }
+
+    .timeline-marker {
+      border-color: #1a2a3a;
+    }
+
+    .back-link a {
+      background: rgba(100, 181, 246, 0.15);
+    }
+
+    .back-link a:hover {
+      background: rgba(100, 181, 246, 0.25);
+    }
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 640px) {
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .content-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline {
+      padding-left: 2rem;
+    }
+
+    .timeline-marker {
+      left: -2rem;
+      width: 16px;
+      height: 16px;
+    }
+
+    .update-list {
+      flex-direction: column;
+    }
   }
 </style>
