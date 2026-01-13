@@ -6,8 +6,9 @@ const lang = getLangFromUrl(Astro.url);
 // 移除语言前缀获取纯路径
 const pathname = Astro.url.pathname.replace(/^\/(en)/, '') || '/';
 
-// 启用语言选择器
-const visibleLanguages = Object.entries(languages) as [string, string][];
+// 只显示另一种语言：中文时显示 English，英文时显示中文
+const targetLang = lang === 'zh' ? 'en' : 'zh';
+const targetLabel = languages[targetLang];
 
 function getLanguageHref(code: string) {
   // 中文是默认语言，不需要前缀
@@ -19,14 +20,9 @@ function getLanguageHref(code: string) {
 ---
 
 <div class="lang-picker">
-  {visibleLanguages.map(([code, label]) => (
-    <a 
-      href={getLanguageHref(code)} 
-      class:list={['lang-link', { active: code === lang }]}
-    >
-      {label}
-    </a>
-  ))}
+  <a href={getLanguageHref(targetLang)} class="lang-link">
+    {targetLabel}
+  </a>
 </div>
 
 <style>
@@ -39,10 +35,12 @@ function getLanguageHref(code: string) {
     border-radius: 4px;
     font-size: 0.85rem;
     color: #666;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
   }
-  .lang-link.active {
-    background: #c41e3a;
-    color: #fff;
+  .lang-link:hover { 
+    text-decoration: none;
+    color: #c41e3a;
+    border-color: #c41e3a;
   }
-  .lang-link:hover { text-decoration: none; }
 </style>
