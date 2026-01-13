@@ -10,9 +10,13 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
 <BaseLayout title="天际樊星">
   <section class="page-header">
     <h1>⭐ 天际樊星</h1>
-    <div class="official-link">
-      <a href="https://weibo.com/u/3329910664" target="_blank" rel="noopener noreferrer">
-        樊振东球迷官方微博：樊振东球迷会-天际樊星
+    <div class="official-links">
+      <a href="https://weibo.com/u/7888222767" target="_blank" rel="noopener noreferrer">
+        樊振东微博
+      </a>
+      <span class="separator">|</span>
+      <a href="https://weibo.com/fanzhendongglobal" target="_blank" rel="noopener noreferrer">
+        球迷官方微博：樊振东球迷会-天际樊星
       </a>
     </div>
   </section>
@@ -40,16 +44,24 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
   }
   .page-header h1 { margin-bottom: 0.5rem; }
   .page-header p { color: #666; }
-  .official-link {
+  .official-links {
     margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
-  .official-link a {
+  .official-links a {
     color: #0066cc;
     text-decoration: none;
     font-weight: 500;
   }
-  .official-link a:hover {
+  .official-links a:hover {
     text-decoration: underline;
+  }
+  .official-links .separator {
+    color: #999;
   }
   .content-grid {
     display: grid;

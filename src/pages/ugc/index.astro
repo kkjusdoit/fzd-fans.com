@@ -94,9 +94,6 @@ function formatDate(date: Date) {
           <span class={`type-badge ${item.data.ugcType}`}>
             {item.data.ugcType === 'tactical' ? '⚔️ ' + t('ugc.tactical') : '💌 ' + t('ugc.letter')}
           </span>
-          {item.data.ugcTag && (
-            <span class="ugc-tag-badge">{getUgcTagLabel(item.data.ugcTag)}</span>
-          )}
         </div>
         <h3 class="card-title">{item.data.title}</h3>
         <p class="card-excerpt">{item.data.description}</p>
