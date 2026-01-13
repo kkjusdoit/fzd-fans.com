@@ -182,23 +182,43 @@ const slogans = [
   </section>
 
   <!-- 精选投稿 -->
-  {featuredUgc.length > 0 && (
-    <section class="ugc-featured">
-      <h2>✍️ 投稿精选</h2>
-      <div class="ugc-grid">
-        {featuredUgc.map(item => (
-          <a href={`/ugc/${item.slug.replace('zh/', '')}`} class="ugc-card">
-            <h3>{item.data.title}</h3>
-            <p>{item.data.description}</p>
-            <div class="ugc-meta">
-              <span class="author">✏️ {item.data.author}</span>
-            </div>
-          </a>
-        ))}
+  <section class="ugc-featured">
+    <h2>✍️ 投稿精选</h2>
+    
+    <!-- 繁星寄语 - 给樊振东的一封信 -->
+    <div class="ugc-category-block">
+      <h3 class="ugc-category-title">💌 繁星寄语</h3>
+      <div class="letter-highlight">
+        <a href="/ugc/letter-to-fzd-gaalgaal" class="letter-card">
+          <div class="letter-icon">💌</div>
+          <div class="letter-content">
+            <h3>给樊振东的一封信</h3>
+            <p class="letter-excerpt">"当我想起你，最先跳入我脑海的，是你在巴黎奥运会夺得冠军后的那一幕..."</p>
+            <span class="letter-author">—— Gaalgaal</span>
+          </div>
+          <span class="letter-arrow">→</span>
+        </a>
       </div>
-      <a href="/ugc" class="view-more">查看全部投稿 →</a>
-    </section>
-  )}
+    </div>
+
+    <!-- 东风论剑 - 技战术分析 -->
+    <div class="ugc-category-block">
+      <h3 class="ugc-category-title">⚔️ 东风论剑</h3>
+      <div class="letter-highlight">
+        <a href="/ugc/fzd-vs-wcc-iq-domination" class="letter-card tactical">
+          <div class="letter-icon">🏓</div>
+          <div class="letter-content">
+            <h3>樊振东 4-2 王楚钦：球商碾压的胜利</h3>
+            <p class="letter-excerpt">"这不是纯技术的胜利，是纯球商的碾压！樊振东乒乓球的理解是碾压式存在的！"</p>
+            <span class="letter-author">—— 公众号「你懂球吗」</span>
+          </div>
+          <span class="letter-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <a href="/ugc" class="view-more">查看全部投稿 →</a>
+  </section>
 
   <!-- 精选内容 -->
   <section class="featured">
@@ -310,6 +330,59 @@ const slogans = [
     width: 1px;
     height: 40px;
     background: #eee;
+  }
+
+  /* 给樊振东的一封信 */
+  .letter-highlight {
+    padding: 1.5rem 1rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .letter-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff 100%);
+    border: 1px solid #ffe4c4;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(196, 30, 58, 0.08);
+  }
+  .letter-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(196, 30, 58, 0.15);
+    border-color: #c41e3a;
+  }
+  .letter-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+  .letter-content {
+    flex: 1;
+  }
+  .letter-content h3 {
+    font-size: 1.2rem;
+    color: #c41e3a;
+    margin-bottom: 0.5rem;
+  }
+  .letter-excerpt {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+  .letter-author {
+    color: #999;
+    font-size: 0.85rem;
+  }
+  .letter-arrow {
+    font-size: 1.5rem;
+    color: #c41e3a;
+    flex-shrink: 0;
   }
 
   /* 滚动应援 */
@@ -502,6 +575,27 @@ const slogans = [
     text-align: center;
   }
   .ugc-featured h2 { margin-bottom: 1.5rem; }
+  .ugc-featured .letter-highlight {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0;
+  }
+  .ugc-category-block {
+    margin-bottom: 2rem;
+  }
+  .ugc-category-title {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  .letter-card.tactical {
+    background: linear-gradient(135deg, #f0f8ff 0%, #fff 100%);
+    border-color: #b8d4e8;
+  }
+  .letter-card.tactical:hover {
+    border-color: #4a90d9;
+  }
   .ugc-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

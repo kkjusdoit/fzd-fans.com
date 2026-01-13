@@ -8,6 +8,11 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
 ---
 
 <BaseLayout title="天际樊星">
+  <div class="starry-background">
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+  </div>
   <section class="page-header">
     <h1>⭐ 天际樊星</h1>
     <div class="official-links">
@@ -15,8 +20,12 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
         樊振东微博
       </a>
       <span class="separator">|</span>
+      <a href="https://www.instagram.com/fanzhendong9248/" target="_blank" rel="noopener noreferrer">
+        Instagram
+      </a>
+      <span class="separator">|</span>
       <a href="https://weibo.com/fanzhendongglobal" target="_blank" rel="noopener noreferrer">
-        球迷官方微博：樊振东球迷会-天际樊星
+        球迷会-天际樊星
       </a>
     </div>
   </section>
@@ -38,12 +47,82 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
 </BaseLayout>
 
 <style>
+  .starry-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #0a0a1a 0%, #1a1a3a 50%, #0d0d2b 100%);
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  .stars, .stars2, .stars3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: repeat;
+  }
+
+  .stars {
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, white, transparent),
+      radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1px 1px at 90px 40px, white, transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 160px 120px, white, transparent),
+      radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 220px 150px, white, transparent),
+      radial-gradient(1px 1px at 260px 90px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1.5px 1.5px at 300px 180px, white, transparent);
+    background-size: 320px 200px;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  .stars2 {
+    background-image: 
+      radial-gradient(1px 1px at 10px 10px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1.5px 1.5px at 60px 120px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 110px 60px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 170px 30px, rgba(255,255,255,0.5), transparent),
+      radial-gradient(2px 2px at 230px 100px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1px 1px at 280px 170px, rgba(255,255,255,0.6), transparent);
+    background-size: 300px 180px;
+    animation: twinkle 5s ease-in-out infinite 1s;
+  }
+
+  .stars3 {
+    background-image: 
+      radial-gradient(1.5px 1.5px at 30px 80px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(2px 2px at 80px 20px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1px 1px at 140px 140px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1.5px 1.5px at 190px 70px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 250px 130px, rgba(255,255,255,0.5), transparent);
+    background-size: 280px 160px;
+    animation: twinkle 6s ease-in-out infinite 2s;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
   .page-header {
     text-align: center;
     padding: 2rem 0;
+    position: relative;
+    z-index: 1;
   }
-  .page-header h1 { margin-bottom: 0.5rem; }
-  .page-header p { color: #666; }
+  .page-header h1 { 
+    margin-bottom: 0.5rem; 
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+  .page-header p { color: #ccc; }
   .official-links {
     margin-top: 1rem;
     display: flex;
@@ -53,20 +132,23 @@ const stars = allStars.filter(item => item.slug.startsWith('zh/'));
     flex-wrap: wrap;
   }
   .official-links a {
-    color: #0066cc;
+    color: #7db9ff;
     text-decoration: none;
     font-weight: 500;
   }
   .official-links a:hover {
     text-decoration: underline;
+    color: #a8d4ff;
   }
   .official-links .separator {
-    color: #999;
+    color: #666;
   }
   .content-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
     padding: 2rem 0;
+    position: relative;
+    z-index: 1;
   }
 </style>
