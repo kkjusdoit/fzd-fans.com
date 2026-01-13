@@ -25,10 +25,16 @@ const navItems = [
 ];
 
 function isActive(href: string) {
+  // 获取本地化后的路径进行比较
+  const localizedHref = getLocalizedPath(href, lang);
+  
   if (href === '/') {
-    return currentPath === '/' || currentPath === '/zh' || currentPath === '/zh/';
+    // 首页特殊处理：精确匹配
+    return currentPath === '/' || currentPath === '/en' || currentPath === '/en/';
   }
-  return currentPath.startsWith(href);
+  
+  // 其他页面：检查当前路径是否以本地化后的 href 开头
+  return currentPath.startsWith(localizedHref);
 }
 ---
 
