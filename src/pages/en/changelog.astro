@@ -1,0 +1,543 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Changelog & Acknowledgments">
+  <article class="changelog-page">
+    <header class="page-header">
+      <h1>📋 Changelog & Acknowledgments</h1>
+      <p class="intro">Recording every step of the website's growth and improvement</p>
+    </header>
+
+    <div class="content-grid">
+      <section class="card thanks-card">
+        <div class="card-header">
+          <span class="card-icon">🤝</span>
+          <h2>Co-Creation</h2>
+        </div>
+        <ul class="contributor-list">
+          <li>
+            <span class="contributor-badge">@younijiok</span>
+            <span class="contribution">Changed the website theme to Dongge's favorite blue color</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@我相信</span>
+            <span class="contribution">Added sound effects and Dongge's voice to the "Break It All" game</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@Gaalgaal</span>
+            <span class="contribution">Added the [Submissions] section</span>
+          </li>
+          <li>
+            <span class="contributor-badge">@Z-Hong</span>
+            <span class="contribution">Added [Porsche Family Letters]</span>
+          </li>
+        </ul>
+        <p class="thanks-note">There are many more valuable suggestions. Due to being extremely busy the past few days, I can't remember them all. Sincere thanks to everyone 🌹</p>
+      </section>
+
+      <section class="card todo-card">
+        <div class="card-header">
+          <span class="card-icon">🚀</span>
+          <h2>Future Plans</h2>
+        </div>
+        <ul class="todo-list">
+          <li>
+            <span class="todo-status">📌</span>
+            <span>Add more content to each section</span>
+          </li>
+          <li>
+            <span class="todo-status">📌</span>
+            <span>Always open to suggestions and feedback</span>
+          </li>
+        </ul>
+        <p class="contact-note">
+          Welcome to share your valuable suggestions 👉 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>
+        </p>
+      </section>
+    </div>
+
+    <section class="timeline-section">
+      <div class="section-header">
+        <span class="section-icon">✅</span>
+        <h2>Update Timeline</h2>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item latest">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-13</span>
+              <span class="tag new">Latest</span>
+            </div>
+            <h3>Content Updates & UI Improvements</h3>
+            <ul class="update-list">
+              <li>Added submission content</li>
+              <li>Changed website color scheme</li>
+              <li>Added English version for submissions</li>
+              <li>Added starry background to Stardom section</li>
+              <li>Fixed some bugs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-12</span>
+            </div>
+            <h3>English Version Launch & Submissions Section</h3>
+            <ul class="update-list">
+              <li>English version launched</li>
+              <li>Added submissions section</li>
+            </ul>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-11</span>
+            </div>
+            <h3>Improvements Based on Fan Suggestions</h3>
+            <ul class="update-list">
+              <li>Removed "Mentors & Friends" section</li>
+              <li>Removed "Self-media" entries</li>
+              <li>Added "Porsche Family Letters"</li>
+              <li>Improved "Break It All" game experience</li>
+              <li>Added "Celebration Contagion" phenomenon</li>
+              <li>Other detail corrections</li>
+            </ul>
+          </div>
+        </div>
+        <div class="timeline-item first">
+          <div class="timeline-marker"></div>
+          <div class="timeline-card">
+            <div class="timeline-date">
+              <span class="date">2026-01-10</span>
+              <span class="tag launch">🎉 Launch</span>
+            </div>
+            <h3>Website Official Launch</h3>
+            <p class="launch-desc">Fan Zhendong Internet Archive officially launched, featuring seven sections: Career, Quotes & Memes, Mentors & Friends, Tributes & Blessings, Media Links, Stardom, and Warrior</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/en/about">← Back to About Page</a>
+    </div>
+  </article>
+</BaseLayout>
+
+
+<style>
+  .changelog-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #1e88e5, #64b5f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .intro {
+    color: #888;
+    font-size: 1rem;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.08);
+    border: 1px solid rgba(30, 136, 229, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(30, 136, 229, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(30, 136, 229, 0.1);
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.2rem;
+    color: #1e88e5;
+    margin: 0;
+  }
+
+  .contributor-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .contributor-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: rgba(30, 136, 229, 0.05);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  .contributor-list li:hover {
+    background: rgba(30, 136, 229, 0.1);
+  }
+
+  .contributor-badge {
+    font-size: 0.8rem;
+    color: #1e88e5;
+    font-weight: 600;
+  }
+
+  .contribution {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .thanks-note {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(30, 136, 229, 0.2);
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  .todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .todo-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(30, 136, 229, 0.05);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .todo-status {
+    font-size: 1rem;
+  }
+
+  .contact-note {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(30, 136, 229, 0.2);
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  .contact-note a {
+    color: #1e88e5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .contact-note a:hover {
+    text-decoration: underline;
+  }
+
+  .timeline-section {
+    margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-icon {
+    font-size: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.3rem;
+    color: #1e88e5;
+    margin: 0;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2.5rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #1e88e5, #90caf9);
+    border-radius: 3px;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -2.5rem;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: #1e88e5;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3);
+    z-index: 1;
+  }
+
+  .timeline-item.latest .timeline-marker {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    animation: pulse 2s infinite;
+  }
+
+  .timeline-item.first .timeline-marker {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(30, 136, 229, 0.15); }
+  }
+
+  .timeline-card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(30, 136, 229, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .timeline-card:hover {
+    transform: translateX(4px);
+  }
+
+  .timeline-date {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-date .date {
+    font-size: 0.85rem;
+    color: #1e88e5;
+    font-weight: 600;
+  }
+
+  .timeline-date .tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .tag.new {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    color: white;
+  }
+
+  .tag.launch {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+    color: #333;
+  }
+
+  .timeline-card h3 {
+    font-size: 1rem;
+    color: #333;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .update-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .update-list li {
+    font-size: 0.8rem;
+    color: #666;
+    background: rgba(30, 136, 229, 0.08);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .launch-desc {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .back-link {
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .back-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1e88e5;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    background: rgba(30, 136, 229, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .back-link a:hover {
+    background: rgba(30, 136, 229, 0.15);
+    transform: translateX(-4px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .page-header h1 {
+      background: linear-gradient(135deg, #64b5f6, #90caf9);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .intro { color: #aaa; }
+
+    .card {
+      background: linear-gradient(145deg, #1a2a3a, #152535);
+      border-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .card-header {
+      border-bottom-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .contributor-list li,
+    .todo-list li {
+      background: rgba(100, 181, 246, 0.1);
+    }
+
+    .contributor-list li:hover {
+      background: rgba(100, 181, 246, 0.15);
+    }
+
+    .contribution,
+    .todo-list li {
+      color: #ccc;
+    }
+
+    .thanks-note,
+    .contact-note {
+      color: #999;
+      border-top-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .timeline-card {
+      background: linear-gradient(145deg, #1a2a3a, #152535);
+      border-color: rgba(100, 181, 246, 0.2);
+    }
+
+    .timeline-card h3 { color: #eee; }
+
+    .update-list li {
+      background: rgba(100, 181, 246, 0.15);
+      color: #bbb;
+    }
+
+    .launch-desc { color: #bbb; }
+
+    .timeline-marker {
+      border-color: #1a2a3a;
+    }
+
+    .back-link a {
+      background: rgba(100, 181, 246, 0.15);
+    }
+
+    .back-link a:hover {
+      background: rgba(100, 181, 246, 0.25);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .content-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline {
+      padding-left: 2rem;
+    }
+
+    .timeline-marker {
+      left: -2rem;
+      width: 16px;
+      height: 16px;
+    }
+
+    .update-list {
+      flex-direction: column;
+    }
+  }
+</style>
