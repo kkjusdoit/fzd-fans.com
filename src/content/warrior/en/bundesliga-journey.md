@@ -25,8 +25,5 @@ His arrival greatly increased Bundesliga's attention and commercial value, with 
 
 His professional attitude and personal charm both on and off the court have promoted deep sports and cultural exchange between China and Germany, providing a win-win model for future Chinese athletes' overseas development.
 
-## Professional Autonomy
-
-Meanwhile, his decision to withdraw from world rankings and focus on Bundesliga is seen as a response to the current WTT system, demonstrating individual autonomy in career paths and sparking deeper reflection on table tennis professionalization reform.
 
 ---
