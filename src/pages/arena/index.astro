@@ -445,5 +445,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     if (menuBtn && window.innerWidth < 768) {
       menuBtn.classList.add('pulse');
     }
+    
+    // 播放介绍音频
+    const audio = new Audio('/audio/introduction.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(() => {
+      // 自动播放被阻止，等待用户首次交互时播放
+      const playOnInteraction = () => {
+        audio.play();
+        document.removeEventListener('click', playOnInteraction);
+        document.removeEventListener('keydown', playOnInteraction);
+      };
+      document.addEventListener('click', playOnInteraction, { once: true });
+      document.addEventListener('keydown', playOnInteraction, { once: true });
+    });
   });
 </script>

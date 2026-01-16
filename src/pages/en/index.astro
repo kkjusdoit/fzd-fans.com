@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
+import BirthdayCountdown from '../../components/BirthdayCountdownEn.astro';
 import { getCollection } from 'astro:content';
 import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../i18n/utils';
 
@@ -88,6 +89,9 @@ const slogans = [
       </div>
     </div>
   </section>
+
+  <!-- Birthday Countdown -->
+  <BirthdayCountdown />
 
   <!-- 滚动应援 -->
   <section class="slogan-marquee">

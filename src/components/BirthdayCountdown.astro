@@ -1,0 +1,273 @@
+---
+// 生日倒计时组件 - 临时模块
+// 生日：2026年1月22日 (东八区)
+---
+
+<section class="birthday-countdown" id="birthdayCountdown">
+  <div class="countdown-container">
+    <div class="countdown-header">
+      <span class="countdown-icon">🎂</span>
+      <span class="countdown-title">小胖生日倒计时</span>
+    </div>
+    <div class="countdown-timer" id="countdownTimer">
+      <div class="time-block">
+        <span class="time-value" id="days">--</span>
+        <span class="time-label">天</span>
+      </div>
+      <div class="time-separator">:</div>
+      <div class="time-block">
+        <span class="time-value" id="hours">--</span>
+        <span class="time-label">时</span>
+      </div>
+      <div class="time-separator">:</div>
+      <div class="time-block">
+        <span class="time-value" id="minutes">--</span>
+        <span class="time-label">分</span>
+      </div>
+      <div class="time-separator">:</div>
+      <div class="time-block">
+        <span class="time-value" id="seconds">--</span>
+        <span class="time-label">秒</span>
+      </div>
+    </div>
+    <div class="countdown-date">2026年1月22日</div>
+    
+    <!-- 繁星共创活动引导 -->
+    <div class="birthday-event">
+      <div class="event-slogan">「丹忱破浪，星耀重关」</div>
+      <p class="event-desc">点滴美好，汇聚力量。让我们用温暖的碎片，拼成一份特别的礼物。</p>
+      <a href="https://weibo.com/3329910664/QncLb3xKb" target="_blank" rel="noopener noreferrer" class="event-link">
+        <span class="event-icon">✨</span>
+        <span>参与「繁星共创」微博活动</span>
+        <span class="event-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .birthday-countdown {
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e6 50%, #ffd6e0 100%);
+    border-radius: 1rem;
+    margin: 1.5rem auto;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(255, 107, 129, 0.15);
+    border: 1px solid rgba(255, 107, 129, 0.2);
+  }
+
+  .countdown-container {
+    text-align: center;
+  }
+
+  .countdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .countdown-icon {
+    font-size: 1.5rem;
+    animation: bounce 1s ease infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .countdown-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e91e63;
+  }
+
+  .countdown-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    min-width: 60px;
+    box-shadow: 0 2px 10px rgba(233, 30, 99, 0.1);
+  }
+
+  .time-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e91e63;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+  }
+
+  .time-label {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 0.3rem;
+  }
+
+  .time-separator {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e91e63;
+    opacity: 0.6;
+  }
+
+  .countdown-date {
+    font-size: 0.9rem;
+    color: #999;
+  }
+
+  /* 繁星共创活动 */
+  .birthday-event {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px dashed rgba(233, 30, 99, 0.2);
+  }
+
+  .event-slogan {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #e91e63;
+    margin-bottom: 0.5rem;
+  }
+
+  .event-desc {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .event-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+  }
+
+  .event-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+  }
+
+  .event-icon {
+    animation: sparkle 1.5s ease infinite;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+  }
+
+  .event-arrow {
+    transition: transform 0.3s;
+  }
+
+  .event-link:hover .event-arrow {
+    transform: translateX(4px);
+  }
+
+  /* 生日当天样式 */
+  .birthday-countdown.is-birthday {
+    background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 50%, #ffe082 100%);
+    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
+  }
+
+  .birthday-countdown.is-birthday .countdown-title {
+    color: #f57c00;
+  }
+
+  .birthday-countdown.is-birthday .time-value {
+    color: #f57c00;
+  }
+
+  /* 响应式 */
+  @media (max-width: 480px) {
+    .time-block {
+      min-width: 50px;
+      padding: 0.6rem 0.8rem;
+    }
+    .time-value {
+      font-size: 1.4rem;
+    }
+    .countdown-title {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    // 生日日期：2026年1月22日 00:00:00 东八区
+    const birthdayDate = new Date('2026-01-22T00:00:00+08:00');
+    const birthdayEnd = new Date('2026-01-23T00:00:00+08:00');
+    
+    const container = document.getElementById('birthdayCountdown');
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    function updateCountdown() {
+      // 获取东八区当前时间
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const chinaTime = new Date(utc + (8 * 3600000));
+      
+      const diff = birthdayDate - chinaTime;
+      
+      // 检查是否是生日当天
+      if (chinaTime >= birthdayDate && chinaTime < birthdayEnd) {
+        container.classList.add('is-birthday');
+        daysEl.textContent = '🎉';
+        hoursEl.textContent = '生';
+        minutesEl.textContent = '日';
+        secondsEl.textContent = '快';
+        document.querySelector('.countdown-date').textContent = '乐！祝小胖生日快乐！🎂';
+        return;
+      }
+      
+      // 生日已过，隐藏组件
+      if (diff < 0 && chinaTime >= birthdayEnd) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      daysEl.textContent = String(days).padStart(2, '0');
+      hoursEl.textContent = String(hours).padStart(2, '0');
+      minutesEl.textContent = String(minutes).padStart(2, '0');
+      secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+    
+    // 初始更新
+    updateCountdown();
+    // 每秒更新
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
