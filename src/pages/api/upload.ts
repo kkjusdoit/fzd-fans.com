@@ -60,21 +60,42 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const src = Array.isArray(result) && result[0]?.src ? result[0].src : null;
     if (src) {
       const fullUrl = `https://cloudflare-imgbed-cvs.pages.dev${src}`;
-      const fileName = file.name; // Define fileName from file.name
+      const fileName = file.name;
 
       // 4. 将元数据存入 Cloudflare D1
-      const runtime = locals.runtime as any; // Use 'locals' from Astro context
+      const runtime = locals.runtime as any;
       const DB = runtime?.env?.DB;
-      
-      // 如果有数据库绑定，则写入数据库
+      const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+
+      // 5. Rate Limiting Check
       if (DB) {
         try {
+          // Check uploads in last 10 minutes (600000 ms)
+          const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+          const { count } = await DB.prepare(
+            'SELECT COUNT(*) as count FROM photos WHERE ip = ? AND created_at > ?'
+          ).bind(clientIP, tenMinutesAgo).first();
+
+          console.log(`IP ${clientIP} uploaded ${count} images in last 10 mins`);
+
+          if (count >= 10) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'Rate limit exceeded. Please try again later.'
+            }), {
+              status: 429,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+
+          // Insert with ip and reviewed = 0 (pending)
           await DB.prepare(
-            'INSERT INTO photos (name, url, created_at) VALUES (?, ?, ?)'
-          ).bind(fileName, fullUrl, Date.now()).run();
-          console.log('元数据已写入 D1 数据库');
+            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 0)'
+          ).bind(fileName, fullUrl, Date.now(), clientIP).run();
+          console.log('元数据已写入 D1 数据库 (Pending Review)');
+
         } catch (dbError) {
-          console.error('D1 写入失败:', dbError);
+          console.error('D1 操作失败:', dbError);
           // 数据库写入失败不应阻碍上传返回，但应记录错误
         }
       } else {

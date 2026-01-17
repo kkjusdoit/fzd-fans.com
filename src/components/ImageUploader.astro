@@ -4,6 +4,15 @@
  * 支持拖拽上传和粘贴上传
  */
 
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
 interface UploadedImage {
   url: string;
   name: string;
@@ -12,6 +21,14 @@ interface UploadedImage {
 let uploadedImages: UploadedImage[] = [];
 let isUploading = false;
 let uploadStatus = '';
+
+const trans = {
+  valUnsupported: t('imgupload.val.unsupported'),
+  valInvalidName: t('imgupload.val.invalidName'),
+  valReqTitle: t('imgupload.val.reqTitle'),
+  valReqDetail: t('imgupload.val.reqDetail'),
+  successAudit: t('imgupload.successAudit'),
+};
 ---
 
 <div id="image-uploader" class="image-uploader">
@@ -24,22 +41,23 @@ let uploadStatus = '';
       class:uploading={isUploading}
     >
       <div class="upload-icon">📸</div>
-      <h3>拖拽图片到这里上传</h3>
-      <p class="upload-hint">或者点击选择文件 · 支持粘贴图片</p>
+      <h3>{t('imgupload.dragTitle')}</h3>
+      <p class="upload-hint">{t('imgupload.dragHint')}</p>
       <div class="naming-rules">
-        <p>⚠️ <strong>命名规范要求：</strong></p>
-        <p>格式必须为：<code>@作者-描述-日期.jpg</code> (注意⚠️以@开头)</p>
-        <p>1. <strong>作者</strong>：名字 或 "未知"</p>
-        <p>2. <strong>描述</strong>：必须填写 (不能包含横杠-)</p>
-        <p>3. <strong>日期</strong>：8位数字(20260101) 或 "未知"</p>
-        <p>✅ <strong>正确示例：</strong></p>
+        <p set:html={t('imgupload.rules.title')} />
+        <p set:html={t('imgupload.rules.format')} />
+        <p set:html={t('imgupload.rules.author')} />
+        <p set:html={t('imgupload.rules.desc')} />
+        <p set:html={t('imgupload.rules.date')} />
+        <p set:html={t('imgupload.rules.example')} />
         <ul style="margin: 0; padding-left: 1.2rem; color: #388e3c;">
           <li><code>@小刘-吃饭-20240102.jpg</code></li>
           <li><code>@未知-握拳庆祝-20240804.jpg</code></li>
           <li><code>@樊振东-夺冠-未知.jpg</code></li>
           <li><code>@未知-背影-未知.jpg</code></li>
         </ul>
-        <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">📢 如您是照片版权所有者，建议加上水印上传</p>
+        <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">{t('imgupload.watermark')}</p>
+        <p style="margin-top: 0.5rem; color: #666; font-size: 0.85rem; border-top: 1px dashed #e0e0e0; padding-top: 0.5rem;">{t('imgupload.auditNotice')}</p>
       </div>
       <input
         type="file"
@@ -48,14 +66,14 @@ let uploadStatus = '';
         multiple
         style="display: none;"
       />
-      <button id="select-btn" class="select-btn">选择图片</button>
+      <button id="select-btn" class="select-btn">{t('imgupload.selectBtn')}</button>
     </div>
 
     <!-- 上传遮罩层 (进度条) -->
     <div id="upload-overlay" class="upload-overlay" style="display: none;">
       <div class="progress-box">
-        <h3>正在上传...</h3>
-        <p>请勿关闭页面</p>
+        <h3>{t('imgupload.overlay.uploading')}</h3>
+        <p>{t('imgupload.overlay.stay')}</p>
         <div class="progress-bar-container">
           <div id="progress-bar" class="progress-bar"></div>
         </div>
@@ -395,7 +413,7 @@ let uploadStatus = '';
   }
 </style>
 
-<script>
+<script define:vars={{ trans }}>
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
@@ -451,15 +469,13 @@ let uploadStatus = '';
 
       let errorMsg = '';
       if (invalidTypeFiles.length > 0) {
-        errorMsg += `不支持的文件格式 (仅支持 JPG, PNG, GIF, WEBP):\n${invalidTypeFiles.join('\n')}\n\n`;
+        errorMsg += `${trans.valUnsupported}${invalidTypeFiles.join('\n')}\n\n`;
       }
       if (invalidNameFiles.length > 0) {
-        errorMsg += `文件名格式不规范:\n${invalidNameFiles.join('\n')}\n` +
-                    `------------------------\n` +
-                    `要求格式: @作者-描述-日期.扩展名\n` +
-                    `注意: 必须以 @ 开头，使用横杠 - 分隔\n` +
-                    `日期: 8位数字或"未知"\n\n` +
-                    `✅ 正确示例:\n` +
+        errorMsg += `${trans.valInvalidName}${invalidNameFiles.join('\n')}\n` +
+                    `${trans.valReqTitle}` +
+                    `${trans.valReqDetail}` +
+                    `✅ 正确示例:\n` + // Examples kept as is or can be translated too if strictly needed, but examples are file names mostly.
                     `@小刘-吃饭-20240102.jpg\n` +
                     `@未知-握拳庆祝-20240804.jpg\n` +
                     `@樊振东-夺冠-未知.jpg\n` +
@@ -513,7 +529,7 @@ let uploadStatus = '';
       const items = e.clipboardData?.items;
       if (!items) return;
 
-      const files: File[] = [];
+      const files = [];
 
       for (const item of items) {
         if (item.type.startsWith('image/')) {
@@ -536,7 +552,7 @@ let uploadStatus = '';
     }
 
     // 上传文件
-    async function uploadFiles(files: File[]) {
+    async function uploadFiles(files) {
       if (files.length === 0) return;
 
       // 显示遮罩层
@@ -581,7 +597,7 @@ let uploadStatus = '';
       }
     }
 
-    async function uploadFile(file: File) {
+    async function uploadFile(file) {
       const formData = new FormData();
       formData.append('file', file);
       console.log('开始上传:', file.name);
@@ -599,6 +615,12 @@ let uploadStatus = '';
 
         const result = await response.json();
         console.log('上传成功:', result);
+        
+        // Use timeout to allow progress bar to finish visual update
+        setTimeout(() => {
+          alert(trans.successAudit);
+          window.location.reload();
+        }, 500);
         
       } catch (error) {
         console.error('上传错误:', error);

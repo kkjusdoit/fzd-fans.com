@@ -1,13 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ImageUploader from '../components/ImageUploader.astro';
-import { useTranslations } from '../i18n/utils';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ImageUploader from '../../components/ImageUploader.astro';
+import { useTranslations, getLocalizedPath } from '../../i18n/utils';
 
-const lang = 'zh';
+const lang = 'en';
 const t = useTranslations(lang);
 
-// 从 Cloudflare D1 获取数据
+// Get data from Cloudflare D1
 let photos = [];
 try {
   const runtime = Astro.locals.runtime as any;
@@ -17,22 +16,26 @@ try {
     const { results } = await DB.prepare('SELECT * FROM photos WHERE reviewed = 1 ORDER BY created_at DESC').all();
     photos = results;
   } else {
-    // 开发环境回退或无绑定情况
+    // Fallback for dev environment or missing binding
     console.warn('D1 Database binding not found');
   }
 } catch (error) {
   console.error('Failed to load photos from D1:', error);
 }
 
-// 过滤仅支持的图片格式
+// Filter supported image formats
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-// 过滤非法的命名格式 (@作者-描述-日期)
-// 允许 "Unknown" 但仍需符合结构，或严格符合格式
-const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知)\.(jpg|jpeg|png|gif|webp)$/i;
+// Filter illegal naming format (@Author-Desc-Date)
+// Allow "Unknown" but must match structure
+const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知|Unknown)\.(jpg|jpeg|png|gif|webp)$/i;
 
 photos = photos.filter((photo: any) => {
   const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
   if (!ALLOWED_EXTS.includes(ext)) return false;
+  // Use a slightly more lenient regex or the same one if we enforce Chinese format even on English site?
+  // The implementing plan said "Format must be...", implying we keep the structure.
+  // The regex in ImageUploader is strictly checking. I should keep it consistent.
+  // However, for display, we just show what's there.
   if (!FILENAME_REGEX.test(photo.name)) return false;
   return true;
 });
@@ -42,7 +45,7 @@ photos = photos.filter((photo: any) => {
 <BaseLayout title={t('imgupload.title')}>
   <div class="page-header">
     <div class="warning-banner">
-      ⚠️ 温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
+      ⚠️ Note: Gallery contains high-res images, Wi-Fi recommended.
     </div>
     <h1>📸 {t('imgupload.title')}</h1>
     <p class="page-subtitle">
@@ -50,15 +53,15 @@ photos = photos.filter((photo: any) => {
     </p>
   </div>
 
-  <!-- 上传组件 -->
+  <!-- Upload Component -->
   <ImageUploader lang={lang} />
 
-  <!-- 照片墙 -->
+  <!-- Photo Wall -->
   <div class="photo-wall">
-    <h2>所有照片 ({photos.length})</h2>
+    <h2>All Photos ({photos.length})</h2>
     
     <div class="gallery-grid" id="gallery-grid">
-      {/* 初始只渲染前 20 张 (服务端渲染) - JS 接管后会处理后续 */}
+      {/* Initial render first 20 (SSR) - JS takes over for load more */}
       {photos.slice(0, 20).map((photo: any) => (
         <div class="photo-item">
           <a href={photo.url} target="_blank" rel="noopener noreferrer" class="photo-link">
@@ -69,10 +72,10 @@ photos = photos.filter((photo: any) => {
           <div class="photo-info">
             <span class="photo-name">{photo.name}</span>
             <div class="button-group">
-              <a href={photo.url} download={photo.name} class="action-btn download-btn" title="下载原图" target="_blank">
+              <a href={photo.url} download={photo.name} class="action-btn download-btn" title="Download Original" target="_blank">
                 ⬇️
               </a>
-              <button class="action-btn copy-btn" data-url={photo.url} title="复制链接">📋</button>
+              <button class="action-btn copy-btn" data-url={photo.url} title="Copy Link">📋</button>
             </div>
           </div>
         </div>
@@ -80,37 +83,37 @@ photos = photos.filter((photo: any) => {
       
       {photos.length === 0 && (
         <div class="empty-state">
-          <p>还没有照片，或照片不符合命名规范。</p>
-          <p class="small-hint">请确保上传的文件名格式为：<code>@作者-描述-日期.jpg</code></p>
+          <p>No photos yet, or photos do not meet naming conventions.</p>
+          <p class="small-hint">Check format: <code>@Author-Desc-Date.jpg</code></p>
         </div>
       )}
     </div>
 
-    {/* 加载更多按钮 */}
+    {/* Load More Button */}
     {photos.length > 20 && (
       <div class="load-more-container">
         <button id="load-more-btn" class="load-more-btn">
-          加载更多 ({photos.length - 20})
+          Load More ({photos.length - 20})
         </button>
       </div>
     )}
   </div>
 
-  <!-- 版权与免责声明 -->
+  <!-- Disclaimer Footer -->
   <div class="disclaimer-footer">
-    <h3>⚖️ 版权与免责声明</h3>
+    <h3>⚖️ Copyright & Disclaimer</h3>
     <p>
-      本站所有图片均由用户自行上传，版权归原作者所有。<br/>
-      上传者需确保拥有图片版权或已获得授权，并严格遵守命名规范 (<code>@作者-描述-日期</code>)。
+      All images are uploaded by users. Copyright belongs to original authors.<br/>
+      Uploaders must ensure they own the copyright or have authorization, and strictly follow naming rules (<code>@Author-Desc-Date</code>).
     </p>
     <p>
-      如发现任何侵犯您权益的内容，或描述有误需要更正/删除，<br/>
-      请及时联系我们进行处理，我们将会在第一时间配合删除或更正。
+      If you find any content that infringes on your rights, or errors needing correction/deletion,<br/>
+      please contact us immediately. We will process removal or correction ASAP.
     </p>
   </div>
 </BaseLayout>
 
-<!-- 注入所有照片数据供 JS 使用 -->
+<!-- Inject photos for JS -->
 <script define:vars={{ allPhotos: photos }}>
   window.PHOTO_DATA = allPhotos;
 </script>
@@ -118,11 +121,11 @@ photos = photos.filter((photo: any) => {
 <script>
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', () => {
-    // 简单的复制功能
+    // Simple copy functionality
     document.body.addEventListener('click', async (e) => {
       const target = e.target as HTMLElement;
       
-      // 复制功能
+      // Copy
       if (target.classList.contains('copy-btn')) {
         e.stopPropagation(); 
         e.preventDefault(); 
@@ -135,7 +138,7 @@ photos = photos.filter((photo: any) => {
         }
       }
 
-      // 下载功能
+      // Download
       if (target.closest('.download-btn')) {
         e.preventDefault();
         const link = target.closest('.download-btn') as HTMLAnchorElement;
@@ -161,7 +164,7 @@ photos = photos.filter((photo: any) => {
       }
     });
 
-    // 分页加载逻辑
+    // Pagination logic
     let currentLimit = 20;
     const PAGE_SIZE = 20;
     const loadMoreBtn = document.getElementById('load-more-btn');
@@ -185,10 +188,10 @@ photos = photos.filter((photo: any) => {
             <div class="photo-info">
               <span class="photo-name">${photo.name}</span>
               <div class="button-group">
-                <a href="${photo.url}" download="${photo.name}" class="action-btn download-btn" title="下载原图" target="_blank">
+                <a href="${photo.url}" download="${photo.name}" class="action-btn download-btn" title="Download Original" target="_blank">
                   ⬇️
                 </a>
-                <button class="action-btn copy-btn" data-url="${photo.url}" title="复制链接">📋</button>
+                <button class="action-btn copy-btn" data-url="${photo.url}" title="Copy Link">📋</button>
               </div>
             </div>
           `;
@@ -197,12 +200,12 @@ photos = photos.filter((photo: any) => {
 
         currentLimit = nextLimit;
         
-        // 更新按钮状态
+        // Update button status
         const remaining = allPhotos.length - currentLimit;
         if (remaining <= 0) {
           loadMoreBtn.style.display = 'none';
         } else {
-          loadMoreBtn.textContent = `加载更多 (${remaining})`;
+          loadMoreBtn.textContent = `Load More (${remaining})`;
         }
       });
     }
@@ -210,9 +213,11 @@ photos = photos.filter((photo: any) => {
 </script>
 
 <style>
-  /* ... (保留之前的样式) ... */
+  /* ... (keeping previous styles by importing or copy-pasting? Since Astro styles are scoped, I should copy paste or ensure global styles are used if common.
+     The original file had many styles. I should copy them.)
+     Wait, I can just copy the styles from the original file.
+  */
 
-  /* 照片墙样式优化 */
   .photo-wall {
     max-width: 1400px;
     margin: 3rem auto;
@@ -249,8 +254,8 @@ photos = photos.filter((photo: any) => {
   .photo-wrapper {
     position: relative;
     overflow: hidden;
-    cursor: zoom-in; /* 提示可放大 */
-    max-height: 500px; /* 限制由于长图导致的高度过高 */
+    cursor: zoom-in;
+    max-height: 500px;
   }
 
   .photo-wrapper img {
@@ -259,14 +264,12 @@ photos = photos.filter((photo: any) => {
     display: block;
     transition: transform 0.5s ease;
     object-fit: cover;
-    object-position: top; /* 长图优先显示顶部 */
+    object-position: top;
   }
 
   .photo-item:hover .photo-wrapper img {
     transform: scale(1.05);
   }
-
-  /* ... (保留其他样式) ... */
 
   .page-header {
     text-align: center;
@@ -274,10 +277,9 @@ photos = photos.filter((photo: any) => {
     background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
     border-radius: 0 0 2rem 2rem;
     margin-bottom: 2rem;
-    position: relative; /* For banner positioning */
+    position: relative;
   }
 
-  /* 警告横幅 */
   .warning-banner {
     background: #fff3e0;
     color: #e65100;
@@ -354,7 +356,6 @@ photos = photos.filter((photo: any) => {
     max-width: 80%;
   }
 
-  /* 按钮组 */
   .button-group {
     display: flex;
     gap: 0.5rem;
@@ -368,7 +369,7 @@ photos = photos.filter((photo: any) => {
     padding: 4px;
     border-radius: 4px;
     transition: background 0.2s;
-    text-decoration: none; /* for <a> tag */
+    text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -378,7 +379,6 @@ photos = photos.filter((photo: any) => {
     background: #f0f0f0;
   }
 
-  /* 免责声明 */
   .disclaimer-footer {
     max-width: 800px;
     margin: 4rem auto 2rem;
@@ -419,7 +419,6 @@ photos = photos.filter((photo: any) => {
     color: #999;
   }
 
-  /* 响应式布局 */
   @media (max-width: 1200px) {
     .gallery-grid {
       column-count: 3;
