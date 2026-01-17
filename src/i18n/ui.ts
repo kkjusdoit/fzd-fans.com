@@ -83,8 +83,8 @@ export const ui = {
     'ugc.guidelines': '投稿指南',
     'ugc.featured': '精选投稿',
     // 图片上传
-    'nav.imgupload': '世界上照片最多的男人',
-    'imgupload.title': '世界上照片最多的男人',
+    'nav.imgupload': '照片墙',
+    'imgupload.title': '照片墙',
     'imgupload.subtitle': '上传樊振东相关图片，自动生成 Markdown 链接',
     'imgupload.drag': '拖拽图片到这里',
     'imgupload.or': '或',
@@ -175,8 +175,8 @@ export const ui = {
     'ugc.guidelines': 'Guidelines',
     'ugc.featured': 'Featured',
     // Image Upload
-    'nav.imgupload': 'Gallery',
-    'imgupload.title': 'The Man with Most Photos',
+    'nav.imgupload': 'Photo Wall',
+    'imgupload.title': 'Photo Wall',
     'imgupload.subtitle': 'Upload Fan Zhendong photos, auto-generate Markdown links',
     'imgupload.drag': 'Drag images here',
     'imgupload.or': 'or',
