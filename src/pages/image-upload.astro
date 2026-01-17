@@ -1,0 +1,440 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ImageUploader from '../components/ImageUploader.astro';
+
+// 从 Cloudflare D1 获取数据
+let photos = [];
+try {
+  const runtime = Astro.locals.runtime as any;
+  const DB = runtime?.env?.DB;
+  
+  if (DB) {
+    const { results } = await DB.prepare('SELECT * FROM photos ORDER BY created_at DESC').all();
+    photos = results;
+  } else {
+    // 开发环境回退或无绑定情况
+    console.warn('D1 Database binding not found');
+  }
+} catch (error) {
+  console.error('Failed to load photos from D1:', error);
+}
+
+// 过滤仅支持的图片格式
+const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+// 过滤非法的命名格式 (@作者-描述-日期)
+// 允许 "Unknown" 但仍需符合结构，或严格符合格式
+const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知)\.(jpg|jpeg|png|gif|webp)$/i;
+
+photos = photos.filter((photo: any) => {
+  const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
+  if (!ALLOWED_EXTS.includes(ext)) return false;
+  if (!FILENAME_REGEX.test(photo.name)) return false;
+  return true;
+});
+
+---
+
+<BaseLayout title="世界上照片最多的男人">
+  <div class="page-header">
+    <div class="warning-banner">
+      ⚠️ 温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
+    </div>
+    <h1>📸 世界上照片最多的男人</h1>
+    <p class="page-subtitle">
+      这里收藏了樊振东的所有精彩瞬间
+    </p>
+  </div>
+
+  <!-- 上传组件 -->
+  <ImageUploader />
+
+  <!-- 照片墙 -->
+  <div class="photo-wall">
+    <h2>所有照片 ({photos.length})</h2>
+    
+    <div class="gallery-grid" id="gallery-grid">
+      {/* 初始只渲染前 20 张 (服务端渲染) - JS 接管后会处理后续 */}
+      {photos.slice(0, 20).map((photo: any) => (
+        <div class="photo-item">
+          <a href={photo.url} target="_blank" rel="noopener noreferrer" class="photo-link">
+            <div class="photo-wrapper" data-url={photo.url}>
+              <img src={photo.url} alt={photo.name} loading="lazy" />
+            </div>
+          </a>
+          <div class="photo-info">
+            <span class="photo-name">{photo.name}</span>
+            <div class="button-group">
+              <a href={photo.url} download={photo.name} class="action-btn download-btn" title="下载原图" target="_blank">
+                ⬇️
+              </a>
+              <button class="action-btn copy-btn" data-url={photo.url} title="复制链接">📋</button>
+            </div>
+          </div>
+        </div>
+      ))}
+      
+      {photos.length === 0 && (
+        <div class="empty-state">
+          <p>还没有照片，或照片不符合命名规范。</p>
+          <p class="small-hint">请确保上传的文件名格式为：<code>@作者-描述-日期.jpg</code></p>
+        </div>
+      )}
+    </div>
+
+    {/* 加载更多按钮 */}
+    {photos.length > 20 && (
+      <div class="load-more-container">
+        <button id="load-more-btn" class="load-more-btn">
+          加载更多 ({photos.length - 20})
+        </button>
+      </div>
+    )}
+  </div>
+
+  <!-- 版权与免责声明 -->
+  <div class="disclaimer-footer">
+    <h3>⚖️ 版权与免责声明</h3>
+    <p>
+      本站所有图片均由用户自行上传，版权归原作者所有。<br/>
+      上传者需确保拥有图片版权或已获得授权，并严格遵守命名规范 (<code>@作者-描述-日期</code>)。
+    </p>
+    <p>
+      如发现任何侵犯您权益的内容，或描述有误需要更正/删除，<br/>
+      请及时联系我们进行处理，我们将会在第一时间配合删除或更正。
+    </p>
+  </div>
+</BaseLayout>
+
+<!-- 注入所有照片数据供 JS 使用 -->
+<script define:vars={{ allPhotos: photos }}>
+  window.PHOTO_DATA = allPhotos;
+</script>
+
+<script>
+  // @ts-nocheck
+  document.addEventListener('DOMContentLoaded', () => {
+    // 简单的复制功能
+    document.body.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      
+      // 复制功能
+      if (target.classList.contains('copy-btn')) {
+        e.stopPropagation(); 
+        e.preventDefault(); 
+        const url = target.dataset.url;
+        if (url) {
+          await navigator.clipboard.writeText(url);
+          const originalText = target.textContent;
+          target.textContent = '✅';
+          setTimeout(() => { target.textContent = originalText; }, 1000);
+        }
+      }
+
+      // 下载功能
+      if (target.closest('.download-btn')) {
+        e.preventDefault();
+        const link = target.closest('.download-btn') as HTMLAnchorElement;
+        const url = link.href;
+        const filename = link.download;
+        
+        try {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          
+          const tempLink = document.createElement('a');
+          tempLink.href = blobUrl;
+          tempLink.download = filename;
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          document.body.removeChild(tempLink);
+          window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+          console.error('Download failed, falling back to direct link:', err);
+          window.open(url, '_blank');
+        }
+      }
+    });
+
+    // 分页加载逻辑
+    let currentLimit = 20;
+    const PAGE_SIZE = 20;
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const galleryGrid = document.getElementById('gallery-grid');
+    const allPhotos = window.PHOTO_DATA || [];
+
+    if (loadMoreBtn && galleryGrid) {
+      loadMoreBtn.addEventListener('click', () => {
+        const nextLimit = currentLimit + PAGE_SIZE;
+        const nextBatch = allPhotos.slice(currentLimit, nextLimit);
+        
+        nextBatch.forEach(photo => {
+          const div = document.createElement('div');
+          div.className = 'photo-item';
+          div.innerHTML = `
+            <a href="${photo.url}" target="_blank" rel="noopener noreferrer" class="photo-link">
+              <div class="photo-wrapper" data-url="${photo.url}">
+                <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
+              </div>
+            </a>
+            <div class="photo-info">
+              <span class="photo-name">${photo.name}</span>
+              <div class="button-group">
+                <a href="${photo.url}" download="${photo.name}" class="action-btn download-btn" title="下载原图" target="_blank">
+                  ⬇️
+                </a>
+                <button class="action-btn copy-btn" data-url="${photo.url}" title="复制链接">📋</button>
+              </div>
+            </div>
+          `;
+          galleryGrid.appendChild(div);
+        });
+
+        currentLimit = nextLimit;
+        
+        // 更新按钮状态
+        const remaining = allPhotos.length - currentLimit;
+        if (remaining <= 0) {
+          loadMoreBtn.style.display = 'none';
+        } else {
+          loadMoreBtn.textContent = `加载更多 (${remaining})`;
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  /* ... (保留之前的样式) ... */
+
+  /* 照片墙样式优化 */
+  .photo-wall {
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
+
+  .photo-wall h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+  }
+
+  .gallery-grid {
+    column-count: 4;
+    column-gap: 1.5rem;
+  }
+
+  .photo-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .photo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+
+  .photo-wrapper {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in; /* 提示可放大 */
+    max-height: 500px; /* 限制由于长图导致的高度过高 */
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+    object-fit: cover;
+    object-position: top; /* 长图优先显示顶部 */
+  }
+
+  .photo-item:hover .photo-wrapper img {
+    transform: scale(1.05);
+  }
+
+  /* ... (保留其他样式) ... */
+
+  .page-header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+    border-radius: 0 0 2rem 2rem;
+    margin-bottom: 2rem;
+    position: relative; /* For banner positioning */
+  }
+
+  /* 警告横幅 */
+  .warning-banner {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 20px;
+    border: 1px solid #ffe0b2;
+    animation: fadeInDown 0.5s ease;
+  }
+
+  .load-more-container {
+    text-align: center;
+    margin: 3rem 0;
+  }
+
+  .load-more-btn {
+    background: #fff;
+    border: 2px solid #1e88e5;
+    color: #1e88e5;
+    padding: 0.8rem 2.5rem;
+    border-radius: 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+  }
+
+  .load-more-btn:hover {
+    background: #1e88e5;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #1e88e5, #0d47a1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+
+  .photo-info {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .photo-name {
+    font-size: 0.9rem;
+    color: #444;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+  }
+
+  /* 按钮组 */
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    text-decoration: none; /* for <a> tag */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-btn:hover {
+    background: #f0f0f0;
+  }
+
+  /* 免责声明 */
+  .disclaimer-footer {
+    max-width: 800px;
+    margin: 4rem auto 2rem;
+    padding: 2rem;
+    background: #f5f5f5;
+    border-radius: 12px;
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .disclaimer-footer h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .disclaimer-footer p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  .disclaimer-footer code {
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #c62828;
+  }
+  
+  .empty-state .small-hint {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #999;
+  }
+
+  /* 响应式布局 */
+  @media (max-width: 1200px) {
+    .gallery-grid {
+      column-count: 3;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .gallery-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .gallery-grid {
+      column-count: 1;
+    }
+    
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+</style>

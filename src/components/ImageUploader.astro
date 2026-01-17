@@ -1,0 +1,609 @@
+---
+/**
+ * 图片上传组件
+ * 支持拖拽上传和粘贴上传
+ */
+
+interface UploadedImage {
+  url: string;
+  name: string;
+}
+
+let uploadedImages: UploadedImage[] = [];
+let isUploading = false;
+let uploadStatus = '';
+---
+
+<div id="image-uploader" class="image-uploader">
+  <div class="uploader-container">
+    <!-- 上传区域 -->
+    <div
+      id="drop-zone"
+      class="drop-zone"
+      class:dragging={false}
+      class:uploading={isUploading}
+    >
+      <div class="upload-icon">📸</div>
+      <h3>拖拽图片到这里上传</h3>
+      <p class="upload-hint">或者点击选择文件 · 支持粘贴图片</p>
+      <div class="naming-rules">
+        <p>⚠️ <strong>命名规范要求：</strong></p>
+        <p>格式必须为：<code>@作者-描述-日期.jpg</code> (注意⚠️以@开头)</p>
+        <p>1. <strong>作者</strong>：名字 或 "未知"</p>
+        <p>2. <strong>描述</strong>：必须填写 (不能包含横杠-)</p>
+        <p>3. <strong>日期</strong>：8位数字(20260101) 或 "未知"</p>
+        <p>✅ <strong>正确示例：</strong></p>
+        <ul style="margin: 0; padding-left: 1.2rem; color: #388e3c;">
+          <li><code>@小刘-吃饭-20240102.jpg</code></li>
+          <li><code>@未知-握拳庆祝-20240804.jpg</code></li>
+          <li><code>@樊振东-夺冠-未知.jpg</code></li>
+          <li><code>@未知-背影-未知.jpg</code></li>
+        </ul>
+        <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">📢 如您是照片版权所有者，建议加上水印上传</p>
+      </div>
+      <input
+        type="file"
+        id="file-input"
+        accept=".jpg,.jpeg,.png,.gif,.webp"
+        multiple
+        style="display: none;"
+      />
+      <button id="select-btn" class="select-btn">选择图片</button>
+    </div>
+
+    <!-- 上传遮罩层 (进度条) -->
+    <div id="upload-overlay" class="upload-overlay" style="display: none;">
+      <div class="progress-box">
+        <h3>正在上传...</h3>
+        <p>请勿关闭页面</p>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="progress-text" class="progress-text">0%</div>
+      </div>
+    </div>
+
+    {uploadStatus && !isUploading && (
+      <div class={`upload-status ${uploadStatus.includes('成功') ? 'success' : 'error'}`}>
+        {uploadStatus}
+      </div>
+    )}
+
+<style>
+  /* 遮罩层 */
+  .upload-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+  }
+
+  .progress-box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: slideUp 0.3s ease;
+  }
+
+  .progress-box h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.5rem;
+  }
+
+  .progress-box p {
+    margin: 0 0 1.5rem 0;
+    color: #666;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 10px;
+    background: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1e88e5, #42a5f5);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 0.9rem;
+    color: #1e88e5;
+    font-weight: bold;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .image-uploader {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .uploader-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  /* 上传区域 */
+  .drop-zone {
+    border: 3px dashed #bbdefb;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+  }
+
+  .drop-zone:hover,
+  .drop-zone.dragging {
+    border-color: #1e88e5;
+    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
+    transform: scale(1.02);
+  }
+
+  .drop-zone.uploading {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .drop-zone h3 {
+    color: #1e88e5;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+  }
+
+  .upload-hint {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .select-btn {
+    background: #1e88e5;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .select-btn:hover {
+    background: #0d47a1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+  }
+
+  /* 上传状态 */
+  .upload-status {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .upload-status.uploading {
+    background: #e3f2fd;
+    color: #1e88e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .upload-status.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .upload-status.error {
+    background: #ffebee;
+    color: #c62828;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #bbdefb;
+    border-top-color: #1e88e5;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* 已上传图片 */
+  .uploaded-images {
+    margin-top: 2rem;
+  }
+
+  .uploaded-images h4 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .image-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #fff;
+  }
+
+  .image-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .image-actions {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: #f5f5f5;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 0.5rem 0.25rem;
+    border: none;
+    background: #fff;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .action-btn:hover {
+    background: #1e88e5;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .delete-btn:hover {
+    background: #c62828;
+  }
+
+  /* Markdown 输出 */
+  .markdown-output {
+    margin-top: 2rem;
+  }
+
+  .markdown-output h4 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .copy-all-btn {
+    background: #1e88e5;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-all-btn:hover {
+    background: #0d47a1;
+  }
+
+  #markdown-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    resize: vertical;
+    background: #fafafa;
+  }
+
+  #markdown-textarea:focus {
+    outline: none;
+    border-color: #1e88e5;
+    background: #fff;
+  }
+
+  .naming-rules {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    text-align: left;
+    font-size: 0.9rem;
+    border: 1px solid #ffe0b2;
+  }
+
+  .naming-rules p {
+    margin: 0.4rem 0;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .image-uploader {
+      padding: 1rem;
+    }
+
+    .uploader-container {
+      padding: 1rem;
+    }
+
+    .drop-zone {
+      padding: 2rem 1rem;
+    }
+
+    .images-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .action-btn {
+      font-size: 0.7rem;
+      padding: 0.4rem 0.2rem;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const selectBtn = document.getElementById('select-btn');
+    const overlay = document.getElementById('upload-overlay');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+
+    // 点击选择文件
+    selectBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput?.click();
+    });
+
+    dropZone?.addEventListener('click', () => {
+      fileInput?.click();
+    });
+
+      // 允许的文件类型
+    const ALLOWED_TYPES = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp'
+    ];
+
+    // 文件名格式正则: @作者-描述-日期.扩展名
+    // 作者/描述: 不能包含连字符(-)
+    // 日期: 8位数字 或 "未知"
+    const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知)\.(jpg|jpeg|png|gif|webp)$/i;
+
+    function validateFiles(files) {
+      const validFiles = [];
+      const invalidTypeFiles = [];
+      const invalidNameFiles = [];
+
+      files.forEach(file => {
+        // 1. 检查类型
+        if (!ALLOWED_TYPES.includes(file.type)) {
+          invalidTypeFiles.push(file.name);
+          return;
+        }
+
+        // 2. 检查文件名格式
+        if (!FILENAME_REGEX.test(file.name)) {
+          invalidNameFiles.push(file.name);
+          return;
+        }
+
+        validFiles.push(file);
+      });
+
+      let errorMsg = '';
+      if (invalidTypeFiles.length > 0) {
+        errorMsg += `不支持的文件格式 (仅支持 JPG, PNG, GIF, WEBP):\n${invalidTypeFiles.join('\n')}\n\n`;
+      }
+      if (invalidNameFiles.length > 0) {
+        errorMsg += `文件名格式不规范:\n${invalidNameFiles.join('\n')}\n` +
+                    `------------------------\n` +
+                    `要求格式: @作者-描述-日期.扩展名\n` +
+                    `注意: 必须以 @ 开头，使用横杠 - 分隔\n` +
+                    `日期: 8位数字或"未知"\n\n` +
+                    `✅ 正确示例:\n` +
+                    `@小刘-吃饭-20240102.jpg\n` +
+                    `@未知-握拳庆祝-20240804.jpg\n` +
+                    `@樊振东-夺冠-未知.jpg\n` +
+                    `@未知-背影-未知.jpg`;
+      }
+
+      if (errorMsg) {
+        alert(errorMsg);
+      }
+
+      return validFiles;
+    }
+
+    // 文件选择
+    fileInput?.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      const validFiles = validateFiles(files);
+      if (validFiles.length > 0) {
+        uploadFiles(validFiles);
+      } else {
+        // 清空选择，防止再次选择同个无效文件不触发 change
+        fileInput.value = '';
+      }
+    });
+
+    // 拖拽上传
+    dropZone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragging');
+    });
+
+    dropZone?.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragging');
+    });
+
+    dropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragging');
+
+      const files = Array.from(e.dataTransfer?.files || []);
+      const validFiles = validateFiles(files);
+
+      if (validFiles.length > 0) {
+        uploadFiles(validFiles);
+      }
+    });
+
+    // 粘贴上传
+    document.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      const files: File[] = [];
+
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) files.push(file);
+        }
+      }
+
+      const validFiles = validateFiles(files);
+
+      if (validFiles.length > 0) {
+        uploadFiles(validFiles);
+      }
+    });
+
+    // 更新进度条
+    function updateProgress(percent) {
+      if (progressBar) progressBar.style.width = `${percent}%`;
+      if (progressText) progressText.textContent = `${percent}%`;
+    }
+
+    // 上传文件
+    async function uploadFiles(files: File[]) {
+      if (files.length === 0) return;
+
+      // 显示遮罩层
+      if (overlay) overlay.style.display = 'flex';
+      
+      // 这里的逻辑是串行上传，为了演示进度条，只针对当前单个或总进度
+      // 简单起见，我们对所有文件统一处理，或者只上传第一个
+      // 假设一次上传一个或多个，我们用一个总进度假象
+      
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        // 假进度：快速到 30%，然后慢速到 90%
+        if (progress < 30) {
+          progress += 5;
+        } else if (progress < 80) {
+          progress += 1;
+        } else if (progress < 95) {
+          progress += 0.5;
+        }
+        updateProgress(Math.min(95, Math.round(progress)));
+      }, 100);
+
+      try {
+        for (const file of files) {
+          await uploadFile(file);
+        }
+        
+        // 上传完成
+        clearInterval(progressInterval);
+        updateProgress(100);
+        
+        setTimeout(() => {
+          // 刷新页面
+          window.location.reload();
+        }, 500);
+
+      } catch (error) {
+        clearInterval(progressInterval);
+        if (overlay) overlay.style.display = 'none';
+        updateProgress(0);
+        alert(error.message || '上传失败');
+      }
+    }
+
+    async function uploadFile(file: File) {
+      const formData = new FormData();
+      formData.append('file', file);
+      console.log('开始上传:', file.name);
+
+      try {
+        // 通过本地 API 代理上传（避免 CORS 问题）
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('上传成功:', result);
+        
+      } catch (error) {
+        console.error('上传错误:', error);
+        throw error;
+      }
+    }
+  });
+</script>

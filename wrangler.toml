@@ -1,2 +1,7 @@
 name = "fzd-fans-com"
 pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fzd-photos-db"
+database_id = "5337ea22-a722-424f-9479-cc08613108ca"
