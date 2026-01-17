@@ -18,7 +18,6 @@ translated: false
 
 - [2026-01-07 工人日报：声音｜有一种想念叫"樊振东"](https://www.workercn.cn/c/2026-01-07/8702379.shtml)
 
-- 未完待续
-
+*未完待续...(欢迎投稿推荐 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）* 
 ---
 

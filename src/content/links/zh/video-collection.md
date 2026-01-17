@@ -40,5 +40,5 @@ translated: false
 
 ---
 
-*未完待续...*
+*未完待续...(欢迎投稿推荐 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）* 
 
