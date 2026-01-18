@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "debug:remote": "astro build && wrangler pages dev dist --remote",
+    "debug:remote": "astro build && wrangler pages dev dist --d1 DB=5337ea22-a722-424f-9479-cc08613108ca --compatibility-flags nodejs_compat",
     "astro": "astro"
   },
   "dependencies": {

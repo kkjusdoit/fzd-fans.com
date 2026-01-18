@@ -9,7 +9,11 @@ const lang = 'zh';
 const t = useTranslations(lang);
 
 // 从 Cloudflare D1 获取数据
-let photos = [];
+let photos = [
+  { name: 'test.jpg', url: 'https://placehold.co/600x400.jpg', created_at: Date.now() }
+];
+
+/*
 try {
   const runtime = Astro.locals.runtime as any;
   const DB = runtime?.env?.DB;
@@ -30,10 +34,11 @@ try {
   console.error('Failed to load photos from D1:', error);
   // Keep photos as empty array so page renders
 }
-
+*/
 // 过滤仅支持的图片格式
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
+/*
 // 防御性编程：确保 photos 是数组
 if (!Array.isArray(photos)) {
   console.error('Photos is not an array, resetting to empty');
@@ -51,6 +56,7 @@ photos = photos.filter((photo: any) => {
   
   return true;
 });
+*/
 
 ---
 
