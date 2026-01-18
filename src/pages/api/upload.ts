@@ -27,7 +27,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // 在服务器端，直接使用 File 对象创建 FormData
     // Astro 使用 undici 的 FormData 实现，支持 File 对象
     const uploadFormData = new FormData();
-    uploadFormData.append('file', file, fileNameToUse);
+    // Use the sanitized file.name for the upstream transfer to avoid encoding issues
+    uploadFormData.append('file', file, file.name);
 
     console.log('准备发送到图床服务器...');
 
@@ -93,9 +94,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
           // Insert with ip and reviewed = 1 (auto-approved since upstream handles moderation)
           await DB.prepare(
-            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
+            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 0)'
           ).bind(fileName, fullUrl, Date.now(), clientIP).run();
-          console.log('元数据已写入 D1 数据库 (Auto Reviewed)');
+          console.log('元数据已写入 D1 数据库 (Pending Review)');
 
         } catch (dbError) {
           console.error('D1 操作失败:', dbError);
@@ -114,10 +115,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.log('Upload success response:', JSON.stringify(finalResult));
 
       // --- AUTO SYNC TRIGGER ---
-      // Background execution to ensure DB consistency
-      // Note: In Cloudflare Workers/pages, background tasks might need ctx.waitUntil
-      // But for simplicity and immediate consistency we can await it or fire-and-forget
-      // Given the user request, we'll try to execute it.
+      // Disabled: Admin manually syncs to approve
+      /*
       try {
         const { syncWithImageBed } = await import('../../lib/sync-helper');
         console.log('Triggering auto-sync after upload...');
@@ -126,6 +125,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         console.error('Post-upload sync failed:', syncErr);
         // Do not fail the upload request itself
       }
+      */
       // -------------------------
 
       return new Response(JSON.stringify(finalResult), {

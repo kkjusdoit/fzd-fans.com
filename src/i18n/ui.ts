@@ -110,7 +110,7 @@ export const ui = {
     'imgupload.val.reqTitle': '------------------------\n要求格式: @作者-描述-日期.扩展名\n',
     'imgupload.val.reqDetail': '注意: 必须以 @ 开头，使用横杠 - 分隔\n日期: 8位数字或"未知"\n\n',
     'imgupload.auditNotice': '🔒 图片请确保内容合规，上传后暂不可见，审核后会进行展示。违规图片将被图床自动清理。',
-    'imgupload.successAudit': '上传成功！刷新页面即可在下方看到您的照片。',
+    'imgupload.successAudit': '上传成功！请耐心等待审核，审核通过后即可在下方看到您的照片。',
   },
   en: {
     'site.title': 'Fan Zhendong Archive',

@@ -32,9 +32,15 @@ export async function syncWithImageBed(DB: any) {
       
       let displayName = file.metadata?.FileName || file.name;
 
-      const exists = await DB.prepare('SELECT 1 FROM photos WHERE url = ?').bind(publicUrl).first();
+      const existing = await DB.prepare('SELECT id, reviewed FROM photos WHERE url = ?').bind(publicUrl).first();
 
-      if (exists) {
+      if (existing) {
+        // If exists but not reviewed, approve it (since it exists on the image bed which is the source of truth)
+        if (existing.reviewed !== 1) {
+           await DB.prepare('UPDATE photos SET reviewed = 1 WHERE id = ?').bind(existing.id).run();
+           console.log(`SyncHelper: Auto-approved existing photo: ${displayName}`);
+           details.push({ name: displayName, status: 'approved' });
+        }
         skipped++;
       } else {
         await DB.prepare(
