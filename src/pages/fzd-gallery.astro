@@ -183,38 +183,28 @@ const t = useTranslations(lang);
         const globalIndex = photosList.length + index; 
         
         div.innerHTML = `
+        div.innerHTML = `
           <div class="photo-wrapper" data-index="${globalIndex}">
             <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
-          </div>
-          <div class="card-footer">
-            <span class="file-name" title="${photo.name || ''}">${photo.name || ''}</span>
-            <div class="actions">
-              <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}"
-                 class="action-btn"
-                 title="下载原图"
-                 target="_blank"
-                 onclick="event.stopPropagation()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-              </a>
-              <button class="action-btn copy-btn" data-url="${photo.url}" title="复制链接" onclick="event.stopPropagation()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-              </button>
-            </div>
+            <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}"
+               class="action-btn download-btn"
+               title="下载原图"
+               target="_blank"
+               onclick="event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </a>
           </div>
         `;
         
         // Add click event for lightbox
         const wrapper = div.querySelector('.photo-wrapper');
         wrapper.addEventListener('click', (e) => {
-            // Safety check: don't open if clicking the download button (though it has stopPropagation)
-            if (e.target.closest('.action-btn')) return;
+            // Safety check: don't open if clicking the download button
+            if (e.target.closest('.download-btn')) return;
             openLightbox(globalIndex);
         });
         
@@ -295,24 +285,7 @@ const t = useTranslations(lang);
       }
     });
 
-    // Copy link handler
-    document.body.addEventListener('click', async (e) => {
-      const target = e.target;
-      if (target && (target as HTMLElement).classList && (target as HTMLElement).classList.contains('copy-btn')) {
-        e.preventDefault();
-        e.stopPropagation();
-        const btn = target as HTMLElement;
-        const url = (btn as HTMLButtonElement).dataset?.url;
-        if (url) {
-          try {
-            await navigator.clipboard.writeText(url);
-            const original = btn.innerHTML;
-            btn.innerHTML = '✅';
-            setTimeout(() => { btn.innerHTML = original; }, 1000);
-          } catch {}
-        }
-      }
-    });
+
   });
 </script>
 
@@ -388,48 +361,46 @@ const t = useTranslations(lang);
     transition: filter 0.3s ease;
   }
 
-  .card-footer {
+  /* Card Styles */
+  .download-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.75rem 0.9rem;
-    border-top: 1px solid #f0f0f0;
-    background: #fff;
-  }
-  .file-name {
-    flex: 1;
-    min-width: 0;
-    font-size: 0.92rem;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .actions {
-    display: flex;
-    gap: 0.25rem;
-  }
-  .action-btn {
-    appearance: none;
-    border: none;
-    background: #fff;
-    color: #333;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 1px #eee inset;
+    color: #333;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
   }
-  .action-btn:hover {
-    background: #f6f6f6;
+
+  .download-btn:hover {
+    background: #1e88e5;
+    color: white;
+    transform: translateY(0) scale(1.1);
   }
-  .action-btn:active {
-    transform: scale(0.98);
+
+  .photo-item:hover .download-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Show on touch devices always or handle via active state - keeping hover for simplicity */
+  @media (hover: none) {
+    .download-btn {
+        opacity: 0.8;
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.9);
+    }
   }
   
   /* Lightbox Styles */
@@ -600,9 +571,25 @@ const t = useTranslations(lang);
     line-height: 1.6;
   }
 
-  @media (hover: none) {
-    .action-btn {
-      background: rgba(255, 255, 255, 0.95);
+  @media (max-width: 1200px) {
+    .gallery-grid {
+      column-count: 3;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .gallery-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .gallery-grid {
+      column-count: 1;
+    }
+    
+    .page-header h1 {
+      font-size: 1.8rem;
     }
   }
 
