@@ -22,20 +22,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Cloudflare Workers/Pages specific handling:
-    // Sometimes 'file' comes as a string path or unexpected object if parsing fails
-    // or if the environment differs.
-    
-    // If it's a File object (ideal case)
-    let fileObj = file instanceof File ? file : null;
+    // Duck typing check for File-like object to support various runtime implementations
+    const isFileLike = file && typeof file === 'object' && 'name' in file && 'size' in file && 'type' in file;
 
-    // Fallback: Check if it's a blob-like object that we can treat as file
-    if (!fileObj && file && typeof file === 'object' && 'arrayBuffer' in file) {
-         console.log('Treating object as File/Blob');
-         fileObj = file as File;
-    }
-
-    if (!fileObj) {
-      console.error('无效的文件: File is not a valid File instance');
+    if (!isFileLike) {
+      console.error('无效的文件: File does not look like a File object');
       return new Response(JSON.stringify({ 
         success: false, 
         error: 'No valid file provided',
@@ -51,6 +42,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
+    const fileObj = file as File;
     const fileNameToUse = originalName || fileObj.name;
     console.log('Internal filename:', fileObj.name, 'Original filename:', fileNameToUse, 'Size:', fileObj.size);
 
