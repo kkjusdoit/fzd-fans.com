@@ -69,12 +69,10 @@ photos = photos.filter((photo: any) => {
             </div>
           </a>
           <div class="photo-info">
-            <span class="photo-name">{photo.name}</span>
             <div class="button-group">
-              <a href={photo.url} download={photo.name} class="action-btn download-btn" title="下载原图" target="_blank">
+              <a href={`/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}`} class="action-btn download-btn" title="下载原图" target="_blank">
                 ⬇️
               </a>
-              <button class="action-btn copy-btn" data-url={photo.url} title="复制链接">📋</button>
             </div>
           </div>
         </div>
@@ -125,42 +123,14 @@ photos = photos.filter((photo: any) => {
       const target = e.target as HTMLElement;
       
       // 复制功能
-      if (target.classList.contains('copy-btn')) {
-        e.stopPropagation(); 
-        e.preventDefault(); 
-        const url = target.dataset.url;
-        if (url) {
-          await navigator.clipboard.writeText(url);
-          const originalText = target.textContent;
-          target.textContent = '✅';
-          setTimeout(() => { target.textContent = originalText; }, 1000);
-        }
-      }
+      // 复制功能 (Copy button removed, but keeping logic just in case or we can remove it)
+      // Since button is removed, this block won't be triggered, we can keep or remove. 
+      // Safe to leave or remove. Let's remove to clean up.
 
-      // 下载功能
-      if (target.closest('.download-btn')) {
-        e.preventDefault();
-        const link = target.closest('.download-btn') as HTMLAnchorElement;
-        const url = link.href;
-        const filename = link.download;
-        
-        try {
-          const response = await fetch(url);
-          const blob = await response.blob();
-          const blobUrl = window.URL.createObjectURL(blob);
-          
-          const tempLink = document.createElement('a');
-          tempLink.href = blobUrl;
-          tempLink.download = filename;
-          document.body.appendChild(tempLink);
-          tempLink.click();
-          document.body.removeChild(tempLink);
-          window.URL.revokeObjectURL(blobUrl);
-        } catch (err) {
-          console.error('Download failed, falling back to direct link:', err);
-          window.open(url, '_blank');
-        }
-      }
+
+      // Download functionality is now handled by the href link pointing to /api/download
+      // No client-side JS needed for it.
+
     });
 
     // 分页加载逻辑
@@ -185,12 +155,10 @@ photos = photos.filter((photo: any) => {
               </div>
             </a>
             <div class="photo-info">
-              <span class="photo-name">${photo.name}</span>
               <div class="button-group">
-                <a href="${photo.url}" download="${photo.name}" class="action-btn download-btn" title="下载原图" target="_blank">
+                <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}" class="action-btn download-btn" title="下载原图" target="_blank">
                   ⬇️
                 </a>
-                <button class="action-btn copy-btn" data-url="${photo.url}" title="复制链接">📋</button>
               </div>
             </div>
           `;
@@ -340,9 +308,9 @@ photos = photos.filter((photo: any) => {
 
 
   .photo-info {
-    padding: 1rem;
+    padding: 0.5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     border-top: 1px solid #f0f0f0;
   }
