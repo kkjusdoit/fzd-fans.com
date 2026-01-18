@@ -14,22 +14,35 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const file = formData.get('file');
     const originalName = formData.get('originalName') as string | null;
 
-    console.log('File raw:', file);
+    // console.log('File raw:', file); // Log too large
     if (file) {
         console.log('Type of file:', typeof file);
         // @ts-ignore
         console.log('Constructor:', file.constructor ? file.constructor.name : 'unknown');
     }
 
-    if (!file || typeof file === 'string') {
-      console.error('无效的文件: File is missing or is a string');
+    // Cloudflare Workers/Pages specific handling:
+    // Sometimes 'file' comes as a string path or unexpected object if parsing fails
+    // or if the environment differs.
+    
+    // If it's a File object (ideal case)
+    let fileObj = file instanceof File ? file : null;
+
+    // Fallback: Check if it's a blob-like object that we can treat as file
+    if (!fileObj && file && typeof file === 'object' && 'arrayBuffer' in file) {
+         console.log('Treating object as File/Blob');
+         fileObj = file as File;
+    }
+
+    if (!fileObj) {
+      console.error('无效的文件: File is not a valid File instance');
       return new Response(JSON.stringify({ 
         success: false, 
         error: 'No valid file provided',
         debug: {
             keys: Array.from(formData.keys()),
             fileType: file ? typeof file : 'undefined',
-            fileValue: file ? String(file) : 'null',
+            constructor: file && file.constructor ? file.constructor.name : 'null',
             contentType: request.headers.get('content-type')
         }
       }), {
@@ -38,7 +51,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    const fileObj = file as File;
     const fileNameToUse = originalName || fileObj.name;
     console.log('Internal filename:', fileObj.name, 'Original filename:', fileNameToUse, 'Size:', fileObj.size);
 
