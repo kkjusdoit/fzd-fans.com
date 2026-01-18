@@ -1,7 +1,6 @@
 ---
 // Static page with client-side fetching
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ImageUploader from '../../components/ImageUploader.astro';
 import { useTranslations } from '../../i18n/utils';
 
 const lang = 'en';
@@ -16,18 +15,11 @@ const t = useTranslations(lang);
     <div class="view-options">
       <!-- Future: Add view switching controls if needed -->
     </div>
-    <h1>{t('imgupload.title')}</h1>
-    <p class="page-subtitle">
-      {t('imgupload.subtitle')}
-    </p>
   </div>
-
-  <!-- Upload Component -->
-  <ImageUploader lang={lang} />
 
   <!-- Photo Wall -->
   <div class="photo-wall">
-    <h2>All Photos (<span id="photo-count">--</span>)</h2>
+    <h2>{t('imgupload.subtitle')}</h2>
     
     <div id="loading-indicator" class="loading-state">
       <div class="spinner"></div>
@@ -47,7 +39,22 @@ const t = useTranslations(lang);
         Load More
       </button>
     </div>
+
+    <div class="gallery-stats">
+      Total <span id="photo-count">--</span> photos
+    </div>
+
+    <!-- Upload CTA -->
+    <div class="submit-cta">
+      <p>{t('imgupload.cta.text')}</p>
+      <a href="/en/upload-photo" class="submit-btn">{t('imgupload.cta.btn')}</a>
+    </div>
   </div>
+
+  <!-- Upload FAB -->
+  <a href="/en/upload-photo" class="fab" title="Upload Photo">
+    📷
+  </a>
 
   <!-- Disclaimer Footer -->
   <div class="disclaimer-footer">
@@ -253,7 +260,7 @@ const t = useTranslations(lang);
       const photo = photosList[currentLightboxIndex];
       lightboxImg.style.opacity = '0';
       lightboxImg.src = photo.url;
-      lightboxCaption.textContent = (photo.name || `Photo ${currentLightboxIndex + 1}`).replace(/\.[^/.]+$/, "");
+      lightboxCaption.textContent = photo.name || `Photo ${currentLightboxIndex + 1}`;
       
       // Update nav buttons
       prevBtn.style.visibility = currentLightboxIndex > 0 ? 'visible' : 'hidden';
@@ -348,6 +355,30 @@ const t = useTranslations(lang);
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
     width: 100%;
+  }
+
+  /* Upload FAB */
+  .fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    background: #1e88e5;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(30, 136, 229, 0.4);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.5);
   }
 
   /* Lightbox Styles */
@@ -445,6 +476,7 @@ const t = useTranslations(lang);
     .photo-item {
       max-width: 100%; /* Allow full width on mobile if needed */
     }
+    .fab { bottom: 1rem; right: 1rem; }
   }
   
   /* Page Header */
@@ -491,6 +523,48 @@ const t = useTranslations(lang);
     color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+  }
+
+  .gallery-stats {
+    text-align: center;
+    margin: 1rem 0 3rem;
+    color: #999;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  /* Upload CTA */
+  .submit-cta {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #e3f2fd, #fff);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+  }
+
+  .submit-cta p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .submit-btn {
+    display: inline-block;
+    background: #1e88e5;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+  }
+
+  .submit-btn:hover {
+    background: #1565c0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 136, 229, 0.3);
   }
 
   @keyframes fadeInDown {

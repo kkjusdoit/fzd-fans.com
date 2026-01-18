@@ -29,27 +29,51 @@ export const GET: APIRoute = async ({ locals, request }) => {
     
     // Runtime Accessibility Check (Parallel)
     // Filter out images that are no longer accessible (e.g. blocked in image bed but still in DB)
+    const invalidIds: number[] = [];
     const checkedResults = await Promise.all(
       (results || []).map(async (photo: any) => {
         try {
           // Use redirect: 'manual' to catch 302 redirects (block pages) as non-200
           const res = await fetch(photo.url, { method: 'HEAD', redirect: 'manual' });
-          return res.status === 200 ? photo : null;
+          if (res.status === 200) {
+            return photo;
+          } else {
+             invalidIds.push(photo.id);
+             return null;
+          }
         } catch (e) {
           console.warn(`API: Accessibility check failed for ${photo.url}`, e);
+          invalidIds.push(photo.id);
           return null;
         }
       })
     );
 
-    const validResults = checkedResults.filter((p: any) => p !== null);
+    // Update invalid photos in DB so they don't count next time
+    // We set reviewed = 2 (or 0) to hide them.
+    if (invalidIds.length > 0) {
+       try {
+         const stmt = DB.prepare('UPDATE photos SET reviewed = 2 WHERE id = ?');
+         for (const id of invalidIds) {
+             console.log(`Marking photo ${id} as invalid/unreachable`);
+             await stmt.bind(id).run();
+         }
+       } catch (dbErr) {
+         console.error('Failed to update invalid photos status:', dbErr);
+       }
+    }
 
-    console.log(`API /api/photos: fetched page ${page} with ${results?.length || 0} photos, returning ${validResults.length} accessible`);
+    const validResults = checkedResults.filter((p: any) => p !== null);
+    
+    // Adjust total to reflect the invalid items found on this page
+    const adjustedTotal = Math.max(0, total - invalidIds.length);
+
+    console.log(`API /api/photos: fetched page ${page} with ${results?.length || 0} photos, returning ${validResults.length} accessible. Total adjusted from ${total} to ${adjustedTotal}`);
     
     return new Response(JSON.stringify({
       data: validResults,
       meta: {
-        total,
+        total: adjustedTotal,
         page,
         limit,
         // Update hasMore logic slightly since we might have filtered some out, 

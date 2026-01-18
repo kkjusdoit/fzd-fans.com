@@ -111,6 +111,8 @@ export const ui = {
     'imgupload.val.reqDetail': '注意: 必须以 @ 开头，使用横杠 - 分隔\n日期: 8位数字或"未知"\n\n',
     'imgupload.auditNotice': '🔒 图片请确保内容合规，上传后暂不可见，审核后会进行展示。违规图片将被图床自动清理。',
     'imgupload.successAudit': '上传成功！请耐心等待审核，审核通过后即可在下方看到您的照片。',
+    'imgupload.cta.text': '你也有照片想分享？',
+    'imgupload.cta.btn': '📷 上传照片',
   },
   en: {
     'site.title': 'Fan Zhendong Archive',
@@ -191,7 +193,7 @@ export const ui = {
     // Image Upload
     'nav.imgupload': 'Photo Wall',
     'imgupload.title': 'Photo Wall',
-    'imgupload.subtitle': 'Upload Fan Zhendong photos, auto-generate Markdown links',
+    'imgupload.subtitle': 'The Man With The Most Photos In The World',
     'imgupload.dragTitle': 'Drag images here to upload',
     'imgupload.dragHint': 'Or click to select · Paste supported',
     'imgupload.rules.title': '⚠️ Naming Rules:',
@@ -215,7 +217,9 @@ export const ui = {
     'imgupload.val.invalidName': 'Invalid filename format:\n',
     'imgupload.val.reqTitle': '------------------------\nRequired: @Author-Desc-Date.ext\n',
     'imgupload.val.reqDetail': 'Note: Must start with @, separated by -\nDate: 8 digits or "Unknown"\n\n',
-    'imgupload.auditNotice': '🔒 All uploaded photos require manual approval before being displayed to ensure compliance. Please check back later.',
-    'imgupload.successAudit': 'Upload successful! Your photo will be displayed after approval.',
+    'imgupload.auditNotice': '🔒 Please ensure content compliance. Photos are hidden until approved. Violations will be automatically removed.',
+    'imgupload.successAudit': 'Upload successful! Please wait for approval, your photo will be displayed below after approval.',
+    'imgupload.cta.text': 'Do you have photos to share?',
+    'imgupload.cta.btn': '📷 Upload Photo',
   },
 } as const;

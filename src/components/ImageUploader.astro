@@ -27,39 +27,49 @@ const trans = {
     valInvalidName: t('imgupload.val.invalidName'),
     valReqTitle: t('imgupload.val.reqTitle'),
     valReqDetail: t('imgupload.val.reqDetail'),
-    successAudit: '上传成功！照片将在审核通过后展示。', // Hardcoded fallback if translation missing
+    successAudit: t('imgupload.successAudit'),
   };
 ---
 
 <div id="image-uploader" class="image-uploader">
-  <div class="uploader-container">
-    <!-- 上传区域 -->
-    <div
-      id="drop-zone"
-      class="drop-zone"
-      class:dragging={false}
-      class:uploading={isUploading}
-    >
-      <div class="upload-icon">📸</div>
+  <!-- 紧凑型上传区域 -->
+  <div
+    id="drop-zone"
+    class="drop-zone"
+    class:dragging={false}
+    class:uploading={isUploading}
+  >
+    <div class="upload-icon-large">
+      📸
+    </div>
+    <div class="upload-content">
       <h3>{t('imgupload.dragTitle')}</h3>
       <p class="upload-hint">{t('imgupload.dragHint')}</p>
-      <div class="naming-rules">
-         <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">{t('imgupload.watermark')}</p>
-         <p style="margin-top: 0.5rem; color: #666; font-size: 0.85rem; border-top: 1px dashed #e0e0e0; padding-top: 0.5rem;">{t('imgupload.auditNotice')}</p>
+    </div>
+    
+    <div class="warning-section">
+      <div class="warning-item text-orange">
+        ⚠️ {t('imgupload.watermark')}
       </div>
-      <input
-        type="file"
-        id="file-input"
-        accept=".jpg,.jpeg,.png,.gif,.webp"
-        multiple
-        style="display: none;"
-      />
-      <button id="select-btn" class="select-btn">{t('imgupload.selectBtn')}</button>
+      <div class="warning-item text-gray">
+        ℹ️ {t('imgupload.auditNotice')}
+      </div>
     </div>
 
-    <!-- 上传遮罩层 (进度条) -->
-    <div id="upload-overlay" class="upload-overlay" style="display: none;">
-      <div class="progress-box">
+    <input
+      type="file"
+      id="file-input"
+      accept=".jpg,.jpeg,.png,.gif,.webp"
+      multiple
+      style="display: none;"
+    />
+  </div>
+
+  <!-- 上传遮罩层 (进度条) -->
+  <div id="upload-overlay" class="upload-overlay" style="display: none;">
+    <div class="progress-box">
+      <!-- 上传中状态 -->
+      <div id="uploading-state">
         <h3>{t('imgupload.overlay.uploading')}</h3>
         <p>{t('imgupload.overlay.stay')}</p>
         <div class="progress-bar-container">
@@ -67,16 +77,133 @@ const trans = {
         </div>
         <div id="progress-text" class="progress-text">0%</div>
       </div>
-    </div>
 
-    {uploadStatus && !isUploading && (
-      <div class={`upload-status ${uploadStatus.includes('成功') ? 'success' : 'error'}`}>
-        {uploadStatus}
+      <!-- 成功状态 -->
+      <div id="success-state" style="display: none;">
+        <div class="success-icon">✅</div>
+        <h3>{t('imgupload.success')}</h3>
+        <p class="success-hint">{t('imgupload.successAudit')}</p>
+        <button id="confirm-btn" class="select-btn" style="margin-top: 1rem; width: 100%;">
+          确定
+        </button>
       </div>
-    )}
+    </div>
+  </div>
+
+  {uploadStatus && !isUploading && (
+    <div class={`upload-status ${uploadStatus.includes('成功') ? 'success' : 'error'}`}>
+      {uploadStatus}
+    </div>
+  )}
+</div>
 
 <style>
-  /* 遮罩层 */
+  .image-uploader {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    padding: 0 1rem;
+  }
+
+  /* Drop Zone Style */
+  .drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8f9fa; /* Light gray background for generic look */
+    border: 2px dashed #dee2e6; /* Gray dashed border */
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 1.5rem;
+    min-height: 300px;
+    justify-content: center;
+    color: #495057;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.dragging {
+    background: #e9ecef;
+    border-color: #adb5bd;
+  }
+
+  .drop-zone.uploading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .upload-icon-large {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .upload-icon-large img {
+    width: 80px;
+    height: auto;
+  }
+
+  .upload-content h3 {
+    font-size: 1.5rem;
+    color: #343a40;
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+  }
+
+  .upload-hint {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* Warning Box Style */
+  .warning-section {
+    background: #fff3cd; /* Light yellow */
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 100%;
+    max-width: 500px;
+    margin: 1rem 0 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .warning-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.5;
+  }
+  
+  .warning-item .icon {
+    font-size: 1.1rem;
+  }
+
+  .text-orange { color: #d46b08; font-weight: bold; }
+  .text-gray { color: #666; }
+
+  /* Select Button */
+  .select-btn {
+    background: #1890ff;
+    color: white;
+    border: none;
+    padding: 0.8rem 3rem;
+    border-radius: 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  }
+
+  .select-btn:hover {
+    background: #096dd9;
+  }
+
+  /* 遮罩层 & 进度条 (保持原样) */
   .upload-overlay {
     position: fixed;
     top: 0;
@@ -102,16 +229,8 @@ const trans = {
     animation: slideUp 0.3s ease;
   }
 
-  .progress-box h3 {
-    margin: 0 0 0.5rem 0;
-    color: #333;
-    font-size: 1.5rem;
-  }
-
-  .progress-box p {
-    margin: 0 0 1.5rem 0;
-    color: #666;
-  }
+  .progress-box h3 { margin: 0 0 0.5rem 0; color: #333; font-size: 1.5rem; }
+  .progress-box p { margin: 0 0 1.5rem 0; color: #666; }
 
   .progress-bar-container {
     width: 100%;
@@ -130,10 +249,18 @@ const trans = {
     transition: width 0.3s ease;
   }
 
-  .progress-text {
-    font-size: 0.9rem;
-    color: #1e88e5;
-    font-weight: bold;
+  .progress-text { font-size: 0.9rem; color: #1e88e5; font-weight: bold; }
+
+  .success-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .success-hint {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
   }
 
   @keyframes slideUp {
@@ -141,263 +268,16 @@ const trans = {
     to { transform: translateY(0); opacity: 1; }
   }
 
-  .image-uploader {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-  }
-
-  .uploader-container {
-    background: #fff;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  /* 上传区域 */
-  .drop-zone {
-    border: 3px dashed #bbdefb;
-    border-radius: 12px;
-    padding: 3rem 2rem;
-    text-align: center;
-    transition: all 0.3s;
-    cursor: pointer;
-    background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
-  }
-
-  .drop-zone:hover,
-  .drop-zone.dragging {
-    border-color: #1e88e5;
-    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
-    transform: scale(1.02);
-  }
-
-  .drop-zone.uploading {
-    pointer-events: none;
-    opacity: 0.6;
-  }
-
-  .upload-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-
-  .drop-zone h3 {
-    color: #1e88e5;
-    margin-bottom: 0.5rem;
-    font-size: 1.3rem;
-  }
-
-  .upload-hint {
-    color: #888;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .select-btn {
-    background: #1e88e5;
-    color: #fff;
-    border: none;
-    padding: 0.8rem 2rem;
-    border-radius: 2rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .select-btn:hover {
-    background: #0d47a1;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
-  }
-
-  /* 上传状态 */
-  .upload-status {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 0.95rem;
-  }
-
-  .upload-status.uploading {
-    background: #e3f2fd;
-    color: #1e88e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .upload-status.success {
-    background: #e8f5e9;
-    color: #2e7d32;
-  }
-
-  .upload-status.error {
-    background: #ffebee;
-    color: #c62828;
-  }
-
-  .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #bbdefb;
-    border-top-color: #1e88e5;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* 已上传图片 */
-  .uploaded-images {
-    margin-top: 2rem;
-  }
-
-  .uploaded-images h4 {
-    color: #333;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-  }
-
-  .images-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .image-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background: #fff;
-  }
-
-  .image-item img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .image-actions {
-    display: flex;
-    gap: 0.25rem;
-    padding: 0.5rem;
-    background: #f5f5f5;
-  }
-
-  .action-btn {
-    flex: 1;
-    padding: 0.5rem 0.25rem;
-    border: none;
-    background: #fff;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .action-btn:hover {
-    background: #1e88e5;
-    color: #fff;
-    transform: translateY(-1px);
-  }
-
-  .delete-btn:hover {
-    background: #c62828;
-  }
-
-  /* Markdown 输出 */
-  .markdown-output {
-    margin-top: 2rem;
-  }
-
-  .markdown-output h4 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #333;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-  }
-
-  .copy-all-btn {
-    background: #1e88e5;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .copy-all-btn:hover {
-    background: #0d47a1;
-  }
-
-  #markdown-textarea {
-    width: 100%;
-    min-height: 150px;
-    padding: 1rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.9rem;
-    resize: vertical;
-    background: #fafafa;
-  }
-
-  #markdown-textarea:focus {
-    outline: none;
-    border-color: #1e88e5;
-    background: #fff;
-  }
-
-  .naming-rules {
-    background: #fff3e0;
-    color: #e65100;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    text-align: left;
-    font-size: 0.9rem;
-    border: 1px solid #ffe0b2;
-  }
-
-  .naming-rules p {
-    margin: 0.4rem 0;
-  }
-
-  /* 响应式 */
+  /* 响应式适配 */
   @media (max-width: 768px) {
-    .image-uploader {
-      padding: 1rem;
-    }
-
-    .uploader-container {
-      padding: 1rem;
-    }
-
     .drop-zone {
-      padding: 2rem 1rem;
+      padding: 1.5rem 1rem;
+      min-height: 250px;
     }
-
-    .images-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .action-btn {
-      font-size: 0.7rem;
-      padding: 0.4rem 0.2rem;
-    }
+    
+    .upload-content h3 { font-size: 1rem; }
+    .upload-hint { font-size: 0.8rem; }
+    .warning-item { font-size: 0.75rem; }
   }
 </style>
 
@@ -406,22 +286,24 @@ const trans = {
   document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
-    const selectBtn = document.getElementById('select-btn');
     const overlay = document.getElementById('upload-overlay');
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
+    const uploadingState = document.getElementById('uploading-state');
+    const successState = document.getElementById('success-state');
+    const confirmBtn = document.getElementById('confirm-btn');
 
-    // 点击选择文件
-    selectBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput?.click();
+    // 绑定确定按钮事件
+    confirmBtn?.addEventListener('click', () => {
+      window.location.reload();
     });
 
+    // 点击整个区域触发选择
     dropZone?.addEventListener('click', () => {
       fileInput?.click();
     });
 
-      // 允许的文件类型
+    // 允许的文件类型
     const ALLOWED_TYPES = [
       'image/jpeg',
       'image/png',
@@ -451,10 +333,6 @@ const trans = {
         alert(errorMsg);
       }
 
-      if (errorMsg) {
-        alert(errorMsg);
-      }
-
       return validFiles;
     }
 
@@ -465,7 +343,6 @@ const trans = {
       if (validFiles.length > 0) {
         uploadFiles(validFiles);
       } else {
-        // 清空选择，防止再次选择同个无效文件不触发 change
         fileInput.value = '';
       }
     });
@@ -484,6 +361,7 @@ const trans = {
     dropZone?.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('dragging');
+      e.stopPropagation(); // 防止浏览器打开图片
 
       const files = Array.from(e.dataTransfer?.files || []);
       const validFiles = validateFiles(files);
@@ -524,16 +402,13 @@ const trans = {
     async function uploadFiles(files) {
       if (files.length === 0) return;
 
-      // 显示遮罩层
+      // 重置状态
+      if (uploadingState) uploadingState.style.display = 'block';
+      if (successState) successState.style.display = 'none';
       if (overlay) overlay.style.display = 'flex';
-      
-      // 这里的逻辑是串行上传，为了演示进度条，只针对当前单个或总进度
-      // 简单起见，我们对所有文件统一处理，或者只上传第一个
-      // 假设一次上传一个或多个，我们用一个总进度假象
       
       let progress = 0;
       const progressInterval = setInterval(() => {
-        // 假进度：快速到 30%，然后慢速到 90%
         if (progress < 30) {
           progress += 5;
         } else if (progress < 80) {
@@ -554,9 +429,10 @@ const trans = {
         updateProgress(100);
         
         setTimeout(() => {
-          // 刷新页面
-          window.location.reload();
-        }, 500);
+          // 切换到成功状态
+          if (uploadingState) uploadingState.style.display = 'none';
+          if (successState) successState.style.display = 'block';
+        }, 200);
 
       } catch (error) {
         clearInterval(progressInterval);
@@ -612,13 +488,6 @@ const trans = {
 
             const result = await response.json();
             console.log('Upload success result:', result);
-            
-            // Use timeout to allow progress bar to finish visual update
-            setTimeout(() => {
-              alert(trans.successAudit);
-              console.log('Reloading page after successful upload');
-              window.location.reload();
-            }, 500);
             
             resolve(result);
           } catch (error) {

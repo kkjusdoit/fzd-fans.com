@@ -1,14 +1,13 @@
 ---
 // 静态页面，客户端获取数据
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ImageUploader from '../components/ImageUploader.astro';
 import { useTranslations } from '../i18n/utils';
 
 const lang = 'zh';
 const t = useTranslations(lang);
 ---
 
-<BaseLayout title={t('imgupload.title')}>
+<BaseLayout title={t('nav.imgupload')}>
   <div class="page-header">
     <div class="warning-banner">
       温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
@@ -16,18 +15,11 @@ const t = useTranslations(lang);
     <div class="view-options">
       <!-- Future: Add view switching controls if needed -->
     </div>
-    <h1>{t('imgupload.title')}</h1>
-    <p class="page-subtitle">
-      {t('imgupload.subtitle')}
-    </p>
   </div>
-
-  <!-- 上传组件 -->
-  <ImageUploader lang={lang} />
 
   <!-- 照片墙 -->
   <div class="photo-wall">
-    <h2>所有照片 (<span id="photo-count">--</span>)</h2>
+    <h2>世界上 照片 最多的 男人</h2>
     
     <div id="loading-indicator" class="loading-state">
       <div class="spinner"></div>
@@ -47,7 +39,22 @@ const t = useTranslations(lang);
         加载更多
       </button>
     </div>
+
+    <div class="gallery-stats">
+      共 <span id="photo-count">--</span> 张照片
+    </div>
+
+    <!-- 投稿引导 -->
+    <div class="submit-cta">
+      <p>{t('imgupload.cta.text')}</p>
+      <a href="/upload-photo" class="submit-btn">{t('imgupload.cta.btn')}</a>
+    </div>
   </div>
+
+  <!-- 悬浮投稿按钮 -->
+  <a href="/upload-photo" class="fab" title="上传照片">
+    📷
+  </a>
 
   <!-- 版权与免责声明 -->
   <div class="disclaimer-footer">
@@ -351,6 +358,30 @@ const t = useTranslations(lang);
     width: 100%;
   }
 
+  /* 悬浮按钮 */
+  .fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    background: #1e88e5;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(30, 136, 229, 0.4);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.5);
+  }
+
   /* Lightbox Styles */
   .lightbox {
     position: fixed;
@@ -446,6 +477,7 @@ const t = useTranslations(lang);
     .photo-item {
       max-width: 100%; /* Allow full width on mobile if needed */
     }
+    .fab { bottom: 1rem; right: 1rem; }
   }
   
   /* Page Header */
@@ -492,6 +524,48 @@ const t = useTranslations(lang);
     color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+  }
+
+  .gallery-stats {
+    text-align: center;
+    margin: 1rem 0 3rem;
+    color: #999;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  /* 投稿引导 */
+  .submit-cta {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #e3f2fd, #fff);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+  }
+
+  .submit-cta p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .submit-btn {
+    display: inline-block;
+    background: #1e88e5;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+  }
+
+  .submit-btn:hover {
+    background: #1565c0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 136, 229, 0.3);
   }
 
   @keyframes fadeInDown {
@@ -715,4 +789,3 @@ const t = useTranslations(lang);
       max-width: 100%;
     }
   }
-
