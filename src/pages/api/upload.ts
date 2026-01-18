@@ -152,7 +152,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             });
           }
 
-          // Insert with ip and reviewed = 1 (auto-approved since upstream handles moderation)
+          // Insert with ip and reviewed = 0 (pending review)
           await DB.prepare(
             'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 0)'
           ).bind(fileName, fullUrl, Date.now(), clientIP).run();
