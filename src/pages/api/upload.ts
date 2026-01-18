@@ -92,7 +92,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     console.log('准备发送到图床服务器...');
 
-    const response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/upload', {
+    // add serverCompress=false to force upload as file (original quality)
+    const response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/upload?serverCompress=false', {
       method: 'POST',
       headers: {
         'authCode': 'kkjusdoit'
