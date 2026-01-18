@@ -593,6 +593,7 @@ const trans = {
              if (errorData.error) {
                errorMessage += `\nDetails: ${errorData.error}`;
                if (errorData.details) errorMessage += `\n${errorData.details}`;
+               if (errorData.debug) errorMessage += `\nDebug: ${JSON.stringify(errorData.debug, null, 2)}`;
              }
           } catch (e) {
             // Ignore JSON parse error
