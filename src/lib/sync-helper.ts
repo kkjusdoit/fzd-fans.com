@@ -45,10 +45,38 @@ export async function syncWithImageBed(DB: any, env: any) {
       }
 
       const publicUrl = `https://cloudflare-imgbed-cvs.pages.dev/file/${file.name}`;
-      validRemoteUrls.add(publicUrl);
-      
       let displayName = file.metadata?.FileName || file.name;
 
+      // Accessibility Check: Filter out blocked/inaccessible images
+      // 1. Check metadata for explicit blocks
+      if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
+          console.log(`SyncHelper: Skipping explicitly blocked file: ${displayName}`);
+          continue;
+      }
+
+      // 2. Check metadata for explicit whitelist (always accessible) or fallback to HTTP check
+      let isAccessible = false;
+      if (file.metadata?.ListType === 'White') {
+          isAccessible = true;
+      } else {
+          // 3. Fallback to HTTP HEAD check (verifies if server allows access under current mode)
+          try {
+             // redirect: 'manual' ensures we treat 302 redirects (e.g. to block page) as inaccessible
+             const headRes = await fetch(publicUrl, { method: 'HEAD', redirect: 'manual' });
+             if (headRes.status === 200) {
+                 isAccessible = true;
+             } else {
+                 console.warn(`SyncHelper: Skipping inaccessible file (Status ${headRes.status}): ${displayName}`);
+             }
+          } catch (e) {
+             console.warn(`SyncHelper: Error checking accessibility for ${displayName}, skipping. Error: ${(e as Error).message}`);
+          }
+      }
+
+      if (!isAccessible) continue;
+
+      validRemoteUrls.add(publicUrl);
+      
       const existing = await DB.prepare('SELECT id, reviewed FROM photos WHERE url = ?').bind(publicUrl).first();
 
       if (existing) {
