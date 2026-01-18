@@ -587,7 +587,17 @@ const trans = {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+             const errorData = await response.json();
+             if (errorData.error) {
+               errorMessage += `\nDetails: ${errorData.error}`;
+               if (errorData.details) errorMessage += `\n${errorData.details}`;
+             }
+          } catch (e) {
+            // Ignore JSON parse error
+          }
+          throw new Error(errorMessage);
         }
 
         const result = await response.json();

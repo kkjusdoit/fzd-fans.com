@@ -13,22 +13,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     console.log('文件信息:', file);
 
-    if (!file || !(file instanceof File)) {
-      console.error('无效的文件');
+    if (!file || typeof file === 'string') {
+      console.error('无效的文件: File is missing or is a string');
       return new Response(JSON.stringify({ success: false, error: 'No valid file provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const fileNameToUse = originalName || file.name;
-    console.log('Internal filename:', file.name, 'Original filename:', fileNameToUse, 'Size:', file.size);
+    const fileObj = file as File;
+    const fileNameToUse = originalName || fileObj.name;
+    console.log('Internal filename:', fileObj.name, 'Original filename:', fileNameToUse, 'Size:', fileObj.size);
 
     // 在服务器端，直接使用 File 对象创建 FormData
     // Astro 使用 undici 的 FormData 实现，支持 File 对象
     const uploadFormData = new FormData();
     // Use the sanitized file.name for the upstream transfer to avoid encoding issues
-    uploadFormData.append('file', file, file.name);
+    uploadFormData.append('file', fileObj, fileObj.name);
 
     console.log('准备发送到图床服务器...');
 
@@ -67,7 +68,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const fileName = fileNameToUse;
 
       // 4. 将元数据存入 Cloudflare D1
-      const runtime = locals.runtime as any;
+      const runtime = (locals as any).runtime;
       const DB = runtime?.env?.DB;
       const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
 
