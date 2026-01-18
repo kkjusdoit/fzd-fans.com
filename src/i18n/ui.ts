@@ -113,6 +113,7 @@ export const ui = {
     'imgupload.successAudit': '上传成功！请耐心等待审核，审核通过后即可在下方看到您的照片。',
     'imgupload.cta.text': '你也有照片想分享？',
     'imgupload.cta.btn': '📷 上传照片',
+    'imgupload.disclaimer': '本站由个人在本职工作之余出于热爱持续维护，精力有限，将尽力及时进行审核同步，但暂无法做到所有内容的实时更新，敬请理解，感谢支持 ❤️',
   },
   en: {
     'site.title': 'Fan Zhendong Archive',
@@ -221,5 +222,6 @@ export const ui = {
     'imgupload.successAudit': 'Upload successful! Please wait for approval, your photo will be displayed below after approval.',
     'imgupload.cta.text': 'Do you have photos to share?',
     'imgupload.cta.btn': '📷 Upload Photo',
+    'imgupload.disclaimer': 'This site is maintained by an individual in their spare time out of love. Due to limited energy, we will try our best to review content in a timely manner, but cannot guarantee real-time review and updates for all content. Thank you for your understanding and support ❤️.',
   },
 } as const;
