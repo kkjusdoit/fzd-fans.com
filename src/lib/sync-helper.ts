@@ -37,6 +37,13 @@ export async function syncWithImageBed(DB: any, env: any) {
 
     // 2. Process Remote Files (Add missing)
     for (const file of remoteFiles) {
+      // Filter out tiny files (likely error artifacts or corrupted uploads)
+      // 1KB = 1024 bytes. Photos should be much larger.
+      if (file.size && file.size < 1024) {
+          console.warn(`SyncHelper: Skipping invalid small file: ${file.name} (${file.size} bytes)`);
+          continue;
+      }
+
       const publicUrl = `https://cloudflare-imgbed-cvs.pages.dev/file/${file.name}`;
       validRemoteUrls.add(publicUrl);
       
