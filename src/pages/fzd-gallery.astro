@@ -11,12 +11,12 @@ const t = useTranslations(lang);
 <BaseLayout title={t('imgupload.title')}>
   <div class="page-header">
     <div class="warning-banner">
-      ⚠️ 温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
+      温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
     </div>
     <div class="view-options">
       <!-- Future: Add view switching controls if needed -->
     </div>
-    <h1>📸 {t('imgupload.title')}</h1>
+    <h1>{t('imgupload.title')}</h1>
     <p class="page-subtitle">
       {t('imgupload.subtitle')}
     </p>
@@ -51,7 +51,7 @@ const t = useTranslations(lang);
 
   <!-- 版权与免责声明 -->
   <div class="disclaimer-footer">
-    <h3>⚖️ 版权与免责声明</h3>
+    <h3>版权与免责声明</h3>
     <p>
       本站所有图片均由用户自行上传，版权归原作者所有。<br/>
       上传者需确保拥有图片版权或已获得授权。
@@ -186,39 +186,28 @@ const t = useTranslations(lang);
           <div class="photo-wrapper" data-index="${globalIndex}">
             <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
             <div class="photo-overlay">
-               <span class="zoom-icon">🔍</span>
+               <!-- Zoom icon can remain or be removed if purely minimalist. Keeping it subtle. -->
             </div>
-          </div>
-          <div class="photo-footer">
-            <div class="photo-meta">
-               <span class="photo-name" title="${photo.name}">${photo.name.length > 15 ? photo.name.substring(0, 12) + '...' : photo.name}</span>
-            </div>
-            <div class="photo-actions">
-              <button class="action-btn copy-btn" data-url="${photo.url}" title="复制链接" onclick="event.stopPropagation()">
-                🔗
-              </button>
-              <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}" class="action-btn download-btn" title="下载原图" target="_blank" onclick="event.stopPropagation()">
-                ⬇️
-              </a>
-            </div>
+            <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}" 
+               class="action-btn download-btn" 
+               title="下载原图" 
+               target="_blank" 
+               onclick="event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </a>
           </div>
         `;
         
         // Add click event for lightbox
         const wrapper = div.querySelector('.photo-wrapper');
-        wrapper.addEventListener('click', () => openLightbox(globalIndex));
-
-        // Add copy event
-        const copyBtn = div.querySelector('.copy-btn');
-        copyBtn.addEventListener('click', (e) => {
-            const url = e.target.dataset.url;
-            if (url) {
-                navigator.clipboard.writeText(window.location.origin + url).then(() => {
-                    const originalText = e.target.textContent;
-                    e.target.textContent = '✅';
-                    setTimeout(() => e.target.textContent = originalText, 2000);
-                });
-            }
+        wrapper.addEventListener('click', (e) => {
+            // Safety check: don't open if clicking the download button (though it has stopPropagation)
+            if (e.target.closest('.download-btn')) return;
+            openLightbox(globalIndex);
         });
         
         galleryGrid.appendChild(div);
@@ -565,63 +554,45 @@ const t = useTranslations(lang);
   }
 
   /* Card Styles */
-  .photo-footer {
-    padding: 12px 16px;
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .photo-meta {
-    flex: 1;
-    overflow: hidden;
-    margin-right: 10px;
-  }
-
-  .photo-name {
-    font-size: 0.85rem;
-    color: #666;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .photo-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .action-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-    background: #fff;
-    color: #666;
+  .download-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #333;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2;
     cursor: pointer;
-    transition: all 0.2s;
     text-decoration: none;
-    font-size: 1rem;
-    padding: 0;
   }
 
-  .action-btn:hover {
-    background: #f5f5f5;
-    color: #1e88e5;
-    border-color: #1e88e5;
+  .download-btn:hover {
+    background: #1e88e5;
+    color: white;
+    transform: translateY(0) scale(1.1);
   }
 
-  /* Specific style for download btn to match unified action-btn style */
-  .download-btn {
-     font-size: 1rem;
-     color: #666;
-     gap: 0;
+  .photo-item:hover .download-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Show on touch devices always or handle via active state - keeping hover for simplicity */
+  @media (hover: none) {
+    .download-btn {
+        opacity: 0.8;
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.9);
+    }
   }
 
   .disclaimer-footer {
