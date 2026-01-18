@@ -12,6 +12,11 @@ const t = useTranslations(lang);
     <div class="warning-banner">
       温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
     </div>
+
+    <div class="page-subtitle">
+      <p>1. 支持原图上传、无损下载；2. 共创、共享、公益、公开、不限容量；3. 致力于打造全网最全的樊振东图库。</p>
+    </div>
+
     <div class="view-options">
       <!-- Future: Add view switching controls if needed -->
     </div>
@@ -61,7 +66,6 @@ const t = useTranslations(lang);
     <h3>版权与免责声明</h3>
     <p>
       本站所有图片均由用户自行上传，版权归原作者所有。<br/>
-      上传者需确保拥有图片版权或已获得授权。
     </p>
     <p>
       如发现任何侵犯您权益的内容，或描述有误需要更正/删除，<br/>
@@ -585,8 +589,12 @@ const t = useTranslations(lang);
   }
 
   .page-subtitle {
+   page-subtitle p {
+    margin: 0.2rem 0;
+  }
+.page-subtitle {
     color: #666;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;

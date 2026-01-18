@@ -54,9 +54,6 @@ const trans = {
       <div class="warning-item text-gray">
         ℹ️ {t('imgupload.auditNotice')}
       </div>
-      <div class="warning-item text-gray" style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.9; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 0.5rem;">
-        {t('imgupload.disclaimer')}
-      </div>
     </div>
 
     <input
@@ -66,6 +63,10 @@ const trans = {
       multiple
       style="display: none;"
     />
+  </div>
+
+  <div class="disclaimer-footer">
+    {t('imgupload.disclaimer')}
   </div>
 
   <!-- 上传遮罩层 (进度条) -->
@@ -106,6 +107,16 @@ const trans = {
     max-width: 800px;
     margin: 0 auto 2rem;
     padding: 0 1rem;
+  }
+
+  .disclaimer-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #868e96;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    padding: 0 1rem;
+    opacity: 0.8;
   }
 
   /* Drop Zone Style */
