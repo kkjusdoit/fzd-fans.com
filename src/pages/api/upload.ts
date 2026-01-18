@@ -22,25 +22,42 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Cloudflare Workers/Pages specific handling:
-    // Duck typing check for File-like object to support various runtime implementations
-    const isFileLike = file && typeof file === 'object' && 'name' in file && 'size' in file && 'type' in file;
-
-    if (!isFileLike) {
-      console.error('无效的文件: File does not look like a File object');
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'No valid file provided',
-        debug: {
-            keys: Array.from(formData.keys()),
-            fileType: file ? typeof file : 'undefined',
-            constructor: file && file.constructor ? file.constructor.name : 'null',
-            contentType: request.headers.get('content-type')
-        }
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    // When a file is uploaded, sometimes it comes as a string path or just the filename if not parsed correctly.
+    // However, if it's a string, it means we failed to get the binary data.
+    
+    // IMPORTANT: In some Cloudflare environments or configurations, request.formData() might behave differently.
+    // If 'file' is a string, it's NOT the file content.
+    
+    // Attempt to handle the case where 'file' is just a string (filename) and we need to handle it differently.
+    // But realistically, if FormData returns a string, the upload failed to parse as a file.
+    
+    // Let's check if there are other entries that might contain the file, or if we need to parse differently.
+    
+    if (typeof file === 'string') {
+        console.error('File is a string:', file);
+        // This confirms the issue: Cloudflare is seeing the file field as a simple text field.
+        // This can happen if the browser sends it incorrectly or if the server parses it incorrectly.
+        // Since the browser is standard (Chrome/Safari), and local works, it's likely a Cloudflare specific behavior or misconfig.
+        
+        // Debugging: let's try to see if we can get it from the body directly if needed, but that's complex for multipart.
+        // Instead, let's verify if the client is sending it as a Blob.
+        
+        return new Response(JSON.stringify({ 
+            success: false, 
+            error: 'Server received a string instead of a file object. This usually means the file payload was lost or mis-parsed.',
+            debug: {
+                message: "File field is a string, expected File/Blob",
+                value: file.substring(0, 100), // Show start of string to see if it's content or filename
+                keys: Array.from(formData.keys()),
+                contentType: request.headers.get('content-type')
+            }
+        }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
+
+    // Duck typing check for File-like object to support various runtime implementations
 
     const fileObj = file as File;
     const fileNameToUse = originalName || fileObj.name;
