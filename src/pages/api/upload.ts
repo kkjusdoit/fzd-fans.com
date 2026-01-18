@@ -6,16 +6,33 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     console.log('收到上传请求');
+    console.log('Content-Type:', request.headers.get('content-type'));
 
     const formData = await request.formData();
+    console.log('FormData keys:', Array.from(formData.keys()));
+
     const file = formData.get('file');
     const originalName = formData.get('originalName') as string | null;
 
-    console.log('文件信息:', file);
+    console.log('File raw:', file);
+    if (file) {
+        console.log('Type of file:', typeof file);
+        // @ts-ignore
+        console.log('Constructor:', file.constructor ? file.constructor.name : 'unknown');
+    }
 
     if (!file || typeof file === 'string') {
       console.error('无效的文件: File is missing or is a string');
-      return new Response(JSON.stringify({ success: false, error: 'No valid file provided' }), {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'No valid file provided',
+        debug: {
+            keys: Array.from(formData.keys()),
+            fileType: file ? typeof file : 'undefined',
+            fileValue: file ? String(file) : 'null',
+            contentType: request.headers.get('content-type')
+        }
+      }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
