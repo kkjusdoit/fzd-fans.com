@@ -8,66 +8,87 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('收到上传请求');
     console.log('Content-Type:', request.headers.get('content-type'));
 
-    const formData = await request.formData();
-    console.log('FormData keys:', Array.from(formData.keys()));
+    const contentType = request.headers.get('content-type') || '';
+    let fileObj: File | null = null;
+    let fileNameToUse: string | null = null;
 
-    const file = formData.get('file');
-    const originalName = formData.get('originalName') as string | null;
-
-    // console.log('File raw:', file); // Log too large
-    if (file) {
-        console.log('Type of file:', typeof file);
-        // @ts-ignore
-        console.log('Constructor:', file.constructor ? file.constructor.name : 'unknown');
+    if (contentType.includes('application/json')) {
+      try {
+        const body = await request.json();
+        if (body.file && typeof body.file === 'string') {
+          console.log('Processing Base64 upload...');
+          // Data URL format: "data:image/jpeg;base64,....."
+          const base64Data = body.file.split(',')[1] || body.file;
+          
+          const binaryString = atob(base64Data);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          
+          const finalName = body.originalName || body.name || 'upload.bin';
+          fileNameToUse = finalName;
+          fileObj = new File([bytes], finalName, { type: body.type || 'application/octet-stream' });
+          console.log('Base64 file converted:', fileNameToUse, 'Size:', fileObj.size);
+        }
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: 'Invalid JSON payload for upload'
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    } else {
+      // Fallback for standard multipart/form-data
+      const formData = await request.formData();
+      console.log('FormData keys:', Array.from(formData.keys()));
+  
+      const file = formData.get('file');
+      const originalName = formData.get('originalName') as string | null;
+  
+      if (file && typeof file === 'object') {
+          // It's likely a File object (Node.js/modern browsers)
+          // But check if it's not null and has arrayBuffer
+          fileObj = file as File;
+          fileNameToUse = originalName || fileObj.name;
+      } else if (typeof file === 'string') {
+          console.error('File is a string:', file);
+          return new Response(JSON.stringify({ 
+              success: false, 
+              error: 'Server received a string instead of a file object via FormData. Please try the Base64 upload method (automatic).',
+              debug: {
+                  message: "File field is a string, expected File/Blob",
+                  value: file.substring(0, 100),
+                  keys: Array.from(formData.keys()),
+                  contentType: request.headers.get('content-type')
+              }
+          }), {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+          });
+      }
     }
 
-    // Cloudflare Workers/Pages specific handling:
-    // When a file is uploaded, sometimes it comes as a string path or just the filename if not parsed correctly.
-    // However, if it's a string, it means we failed to get the binary data.
-    
-    // IMPORTANT: In some Cloudflare environments or configurations, request.formData() might behave differently.
-    // If 'file' is a string, it's NOT the file content.
-    
-    // Attempt to handle the case where 'file' is just a string (filename) and we need to handle it differently.
-    // But realistically, if FormData returns a string, the upload failed to parse as a file.
-    
-    // Let's check if there are other entries that might contain the file, or if we need to parse differently.
-    
-    if (typeof file === 'string') {
-        console.error('File is a string:', file);
-        // This confirms the issue: Cloudflare is seeing the file field as a simple text field.
-        // This can happen if the browser sends it incorrectly or if the server parses it incorrectly.
-        // Since the browser is standard (Chrome/Safari), and local works, it's likely a Cloudflare specific behavior or misconfig.
-        
-        // Debugging: let's try to see if we can get it from the body directly if needed, but that's complex for multipart.
-        // Instead, let's verify if the client is sending it as a Blob.
-        
-        return new Response(JSON.stringify({ 
+    if (!fileObj) {
+         return new Response(JSON.stringify({ 
             success: false, 
-            error: 'Server received a string instead of a file object. This usually means the file payload was lost or mis-parsed.',
-            debug: {
-                message: "File field is a string, expected File/Blob",
-                value: file.substring(0, 100), // Show start of string to see if it's content or filename
-                keys: Array.from(formData.keys()),
-                contentType: request.headers.get('content-type')
-            }
+            error: 'No valid file provided' 
         }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 
-    // Duck typing check for File-like object to support various runtime implementations
-
-    const fileObj = file as File;
-    const fileNameToUse = originalName || fileObj.name;
     console.log('Internal filename:', fileObj.name, 'Original filename:', fileNameToUse, 'Size:', fileObj.size);
 
     // 在服务器端，直接使用 File 对象创建 FormData
     // Astro 使用 undici 的 FormData 实现，支持 File 对象
     const uploadFormData = new FormData();
     // Use the sanitized file.name for the upstream transfer to avoid encoding issues
-    uploadFormData.append('file', fileObj, fileObj.name);
+    uploadFormData.append('file', fileObj, fileNameToUse || fileObj.name);
 
     console.log('准备发送到图床服务器...');
 
