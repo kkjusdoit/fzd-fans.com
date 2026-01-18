@@ -15,8 +15,12 @@ try {
   const DB = runtime?.env?.DB;
   
   if (DB) {
-    const { results } = await DB.prepare('SELECT * FROM photos WHERE reviewed = 1 ORDER BY created_at DESC').all();
-    photos = results;
+    const result = await DB.prepare('SELECT * FROM photos WHERE reviewed = 1 ORDER BY created_at DESC').all();
+    if (result && Array.isArray(result.results)) {
+      photos = result.results;
+    } else {
+      console.warn('D1 query returned unexpected format:', JSON.stringify(result));
+    }
     console.log(`Page image-upload: fetched ${photos.length} reviewed photos from D1`);
   } else {
     // 开发环境回退或无绑定情况
@@ -24,12 +28,20 @@ try {
   }
 } catch (error) {
   console.error('Failed to load photos from D1:', error);
+  // Keep photos as empty array so page renders
 }
 
 // 过滤仅支持的图片格式
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
+// 防御性编程：确保 photos 是数组
+if (!Array.isArray(photos)) {
+  console.error('Photos is not an array, resetting to empty');
+  photos = [];
+}
+
 photos = photos.filter((photo: any) => {
+  if (!photo || !photo.url) return false;
   const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
   
   if (!ALLOWED_EXTS.includes(ext)) {
