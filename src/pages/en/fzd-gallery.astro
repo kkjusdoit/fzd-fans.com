@@ -196,6 +196,7 @@ const t = useTranslations(lang);
             </div>
           </div>
           <div class="card-footer">
+             <span class="photo-id">#${photo.id}</span>
              <div class="actions">
                 <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name || 'image')}" 
                    class="action-btn" 
@@ -694,11 +695,18 @@ const t = useTranslations(lang);
   /* Card Footer & Actions */
   .card-footer {
     display: flex;
-    align-items: center;
+    align-items: centspac;btwee
     justify-content: flex-end;
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1pxf;
+  }
+
+  .photo-id {
+     ont-size: 0.85rem;
+    color: #999;
+    font-family: monospace;
+    font-weight: 500solid #f0f0f0;
     background: #fff;
   }
 
