@@ -125,6 +125,15 @@ const ugcSchema = z.object({
 - 多语言 hreflang 标签
 - 语义化 HTML
 
+## 环境配置
+
+为了确保后台管理和同步功能的安全性，请务必在 Cloudflare Pages 的设置中（或本地 `.env` 文件中）添加以下环境变量：
+
+- `BASIC_USER`: 管理员用户名
+- `BASIC_PASS`: 管理员密码
+
+> **警告**：如果不设置这些环境变量，管理后台和同步 API 将无法使用。
+
 ## 开发
 
 ```bash

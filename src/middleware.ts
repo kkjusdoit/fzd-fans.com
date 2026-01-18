@@ -4,8 +4,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { url, request, locals } = context;
   const path = new URL(url).pathname;
 
-  // Protect /admin routes (excluding sync which is now public per request)
-  // path.startsWith('/api/sync') is also excluded now
+  // Protect /admin routes (excluding sync which is explicitly public per request)
   if (path.startsWith('/admin') && !path.includes('/sync')) {
     const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
 
@@ -58,13 +57,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const [user, ...passParts] = decoded.split(':');
       const pass = passParts.join(':'); // Handle passwords containing colons
 
-      // Get credentials from env or fallback (matching user provided screenshots)
+      // Get credentials from env
       const runtime = (locals as any).runtime;
       const env = runtime?.env || {};
       
-      // Fallback based on user conversations if environment variable is missing in dev
-      const validUser = env.BASIC_USER || import.meta.env.BASIC_USER || 'kkjusdoit';
-      const validPass = env.BASIC_PASS || import.meta.env.BASIC_PASS || 'fzd-fans.com';
+      const validUser = env.BASIC_USER || import.meta.env.BASIC_USER;
+      const validPass = env.BASIC_PASS || import.meta.env.BASIC_PASS;
+
+      if (!validUser || !validPass) {
+        console.error('[Auth] BASIC_USER or BASIC_PASS environment variables are not set.');
+        return new Response('Server Configuration Error: Auth credentials missing', { status: 500 });
+      }
 
       if (user === validUser && pass === validPass) {
         return next();

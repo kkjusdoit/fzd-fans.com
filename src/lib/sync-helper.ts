@@ -1,8 +1,12 @@
 export async function syncWithImageBed(DB: any, env: any) {
   try {
     // 1. Fetch image list from upstream
-    const user = env.BASIC_USER || 'kkjusdoit';
-    const pass = env.BASIC_PASS || 'fzd-fans.com';
+    const user = env.BASIC_USER;
+    const pass = env.BASIC_PASS;
+
+    if (!user || !pass) {
+      throw new Error('SyncHelper: BASIC_USER or BASIC_PASS environment variables are not set.');
+    }
     
     // Compatible encoding
     const authString = `${user}:${pass}`;
