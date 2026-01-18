@@ -23,12 +23,12 @@ let isUploading = false;
 let uploadStatus = '';
 
 const trans = {
-  valUnsupported: t('imgupload.val.unsupported'),
-  valInvalidName: t('imgupload.val.invalidName'),
-  valReqTitle: t('imgupload.val.reqTitle'),
-  valReqDetail: t('imgupload.val.reqDetail'),
-  successAudit: t('imgupload.successAudit'),
-};
+    valUnsupported: t('imgupload.val.unsupported'),
+    valInvalidName: t('imgupload.val.invalidName'),
+    valReqTitle: t('imgupload.val.reqTitle'),
+    valReqDetail: t('imgupload.val.reqDetail'),
+    successAudit: '上传成功！照片将在审核通过后展示。', // Hardcoded fallback if translation missing
+  };
 ---
 
 <div id="image-uploader" class="image-uploader">
