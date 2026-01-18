@@ -44,20 +44,8 @@ const trans = {
       <h3>{t('imgupload.dragTitle')}</h3>
       <p class="upload-hint">{t('imgupload.dragHint')}</p>
       <div class="naming-rules">
-        <p set:html={t('imgupload.rules.title')} />
-        <p set:html={t('imgupload.rules.format')} />
-        <p set:html={t('imgupload.rules.author')} />
-        <p set:html={t('imgupload.rules.desc')} />
-        <p set:html={t('imgupload.rules.date')} />
-        <p set:html={t('imgupload.rules.example')} />
-        <ul style="margin: 0; padding-left: 1.2rem; color: #388e3c;">
-          <li><code>@小刘-吃饭-20240102.jpg</code></li>
-          <li><code>@未知-握拳庆祝-20240804.jpg</code></li>
-          <li><code>@樊振东-夺冠-未知.jpg</code></li>
-          <li><code>@未知-背影-未知.jpg</code></li>
-        </ul>
-        <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">{t('imgupload.watermark')}</p>
-        <p style="margin-top: 0.5rem; color: #666; font-size: 0.85rem; border-top: 1px dashed #e0e0e0; padding-top: 0.5rem;">{t('imgupload.auditNotice')}</p>
+         <p style="margin-top: 0.8rem; color: #e65100; font-weight: bold;">{t('imgupload.watermark')}</p>
+         <p style="margin-top: 0.5rem; color: #666; font-size: 0.85rem; border-top: 1px dashed #e0e0e0; padding-top: 0.5rem;">{t('imgupload.auditNotice')}</p>
       </div>
       <input
         type="file"
@@ -441,29 +429,16 @@ const trans = {
       'image/webp'
     ];
 
-    // 文件名格式正则: @作者-描述-日期.扩展名
-    // 作者/描述: 不能包含连字符(-)
-    // 日期: 8位数字 或 "未知"
-    const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知)\.(jpg|jpeg|png|gif|webp)$/i;
-
     function validateFiles(files) {
       const validFiles = [];
       const invalidTypeFiles = [];
-      const invalidNameFiles = [];
 
       files.forEach(file => {
-        // 1. 检查类型
+        // 1. Check type
         if (!ALLOWED_TYPES.includes(file.type)) {
           invalidTypeFiles.push(file.name);
           return;
         }
-
-        // 2. 检查文件名格式
-        if (!FILENAME_REGEX.test(file.name)) {
-          invalidNameFiles.push(file.name);
-          return;
-        }
-
         validFiles.push(file);
       });
 
@@ -471,15 +446,9 @@ const trans = {
       if (invalidTypeFiles.length > 0) {
         errorMsg += `${trans.valUnsupported}${invalidTypeFiles.join('\n')}\n\n`;
       }
-      if (invalidNameFiles.length > 0) {
-        errorMsg += `${trans.valInvalidName}${invalidNameFiles.join('\n')}\n` +
-                    `${trans.valReqTitle}` +
-                    `${trans.valReqDetail}` +
-                    `✅ 正确示例:\n` + // Examples kept as is or can be translated too if strictly needed, but examples are file names mostly.
-                    `@小刘-吃饭-20240102.jpg\n` +
-                    `@未知-握拳庆祝-20240804.jpg\n` +
-                    `@樊振东-夺冠-未知.jpg\n` +
-                    `@未知-背影-未知.jpg`;
+
+      if (errorMsg) {
+        alert(errorMsg);
       }
 
       if (errorMsg) {
@@ -614,16 +583,17 @@ const trans = {
         }
 
         const result = await response.json();
-        console.log('上传成功:', result);
+        console.log('Upload success result:', result);
         
         // Use timeout to allow progress bar to finish visual update
         setTimeout(() => {
           alert(trans.successAudit);
+          console.log('Reloading page after successful upload');
           window.location.reload();
         }, 500);
         
       } catch (error) {
-        console.error('上传错误:', error);
+        console.error('Upload error in component:', error);
         throw error;
       }
     }

@@ -32,3 +32,6 @@ yarn-error.log*
 
 # Astro
 .astro/
+
+# Cloudflare Wrangler
+.wrangler/

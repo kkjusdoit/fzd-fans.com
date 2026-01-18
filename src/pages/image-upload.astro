@@ -16,6 +16,7 @@ try {
   if (DB) {
     const { results } = await DB.prepare('SELECT * FROM photos WHERE reviewed = 1 ORDER BY created_at DESC').all();
     photos = results;
+    console.log(`Page image-upload: fetched ${photos.length} reviewed photos from D1`);
   } else {
     // 开发环境回退或无绑定情况
     console.warn('D1 Database binding not found');
@@ -26,14 +27,15 @@ try {
 
 // 过滤仅支持的图片格式
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-// 过滤非法的命名格式 (@作者-描述-日期)
-// 允许 "Unknown" 但仍需符合结构，或严格符合格式
-const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知)\.(jpg|jpeg|png|gif|webp)$/i;
 
 photos = photos.filter((photo: any) => {
   const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
-  if (!ALLOWED_EXTS.includes(ext)) return false;
-  if (!FILENAME_REGEX.test(photo.name)) return false;
+  
+  if (!ALLOWED_EXTS.includes(ext)) {
+    console.log(`[Filter] Dropped ${photo.name}: Invalid extension (${ext})`);
+    return false;
+  }
+  
   return true;
 });
 
@@ -101,7 +103,7 @@ photos = photos.filter((photo: any) => {
     <h3>⚖️ 版权与免责声明</h3>
     <p>
       本站所有图片均由用户自行上传，版权归原作者所有。<br/>
-      上传者需确保拥有图片版权或已获得授权，并严格遵守命名规范 (<code>@作者-描述-日期</code>)。
+      上传者需确保拥有图片版权或已获得授权。
     </p>
     <p>
       如发现任何侵犯您权益的内容，或描述有误需要更正/删除，<br/>

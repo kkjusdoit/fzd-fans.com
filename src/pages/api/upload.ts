@@ -58,6 +58,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // 图床返回 [{src: "/file/xxx.png"}] 格式，转换为 {url: "完整URL"}
     const src = Array.isArray(result) && result[0]?.src ? result[0].src : null;
+    console.log(`Image storage src extracted: ${src}`);
     if (src) {
       const fullUrl = `https://cloudflare-imgbed-cvs.pages.dev${src}`;
       const fileName = file.name;
@@ -88,11 +89,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             });
           }
 
-          // Insert with ip and reviewed = 0 (pending)
+          // Insert with ip and reviewed = 1 (auto-approved since upstream handles moderation)
           await DB.prepare(
-            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 0)'
+            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
           ).bind(fileName, fullUrl, Date.now(), clientIP).run();
-          console.log('元数据已写入 D1 数据库 (Pending Review)');
+          console.log('元数据已写入 D1 数据库 (Auto Reviewed)');
 
         } catch (dbError) {
           console.error('D1 操作失败:', dbError);
@@ -108,6 +109,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
         name: fileName
       };
       
+      console.log('Upload success response:', JSON.stringify(finalResult));
+
+      // --- AUTO SYNC TRIGGER ---
+      // Background execution to ensure DB consistency
+      // Note: In Cloudflare Workers/pages, background tasks might need ctx.waitUntil
+      // But for simplicity and immediate consistency we can await it or fire-and-forget
+      // Given the user request, we'll try to execute it.
+      try {
+        const { syncWithImageBed } = await import('../../lib/sync-helper');
+        console.log('Triggering auto-sync after upload...');
+        await syncWithImageBed(DB);
+      } catch (syncErr) {
+        console.error('Post-upload sync failed:', syncErr);
+        // Do not fail the upload request itself
+      }
+      // -------------------------
+
       return new Response(JSON.stringify(finalResult), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }

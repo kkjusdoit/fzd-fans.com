@@ -85,7 +85,7 @@ export const ui = {
     // 图片上传
     'nav.imgupload': '照片墙',
     'imgupload.title': '照片墙',
-    'imgupload.subtitle': '上传樊振东相关图片，自动生成 Markdown 链接',
+    'imgupload.subtitle': '世界上 照片 最多的 男人',
     'imgupload.dragTitle': '拖拽图片到这里上传',
     'imgupload.dragHint': '或者点击选择文件 · 支持粘贴图片',
     'imgupload.rules.title': '⚠️ 命名规范要求：',
@@ -109,8 +109,8 @@ export const ui = {
     'imgupload.val.invalidName': '文件名格式不规范:\n',
     'imgupload.val.reqTitle': '------------------------\n要求格式: @作者-描述-日期.扩展名\n',
     'imgupload.val.reqDetail': '注意: 必须以 @ 开头，使用横杠 - 分隔\n日期: 8位数字或"未知"\n\n',
-    'imgupload.auditNotice': '🔒 为了确保内容合规，所有上传的照片都需要经过人工审核后才会显示。审核通过后刷新页面即可看到。',
-    'imgupload.successAudit': '上传成功！照片将在审核通过后显示，请耐心等待。',
+    'imgupload.auditNotice': '🔒 图片请确保内容合规，上传后暂不可见，审核后会进行展示。违规图片将被图床自动清理。',
+    'imgupload.successAudit': '上传成功！刷新页面即可在下方看到您的照片。',
   },
   en: {
     'site.title': 'Fan Zhendong Archive',

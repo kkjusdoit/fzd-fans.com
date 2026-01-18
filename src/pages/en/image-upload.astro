@@ -24,19 +24,16 @@ try {
 }
 
 // Filter supported image formats
+// Filter supported image formats
 const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-// Filter illegal naming format (@Author-Desc-Date)
-// Allow "Unknown" but must match structure
-const FILENAME_REGEX = /^@[^-]+-[^-]+-(\d{8}|未知|Unknown)\.(jpg|jpeg|png|gif|webp)$/i;
 
 photos = photos.filter((photo: any) => {
   const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
-  if (!ALLOWED_EXTS.includes(ext)) return false;
-  // Use a slightly more lenient regex or the same one if we enforce Chinese format even on English site?
-  // The implementing plan said "Format must be...", implying we keep the structure.
-  // The regex in ImageUploader is strictly checking. I should keep it consistent.
-  // However, for display, we just show what's there.
-  if (!FILENAME_REGEX.test(photo.name)) return false;
+  
+  if (!ALLOWED_EXTS.includes(ext)) {
+     return false;
+  }
+  
   return true;
 });
 
@@ -83,8 +80,7 @@ photos = photos.filter((photo: any) => {
       
       {photos.length === 0 && (
         <div class="empty-state">
-          <p>No photos yet, or photos do not meet naming conventions.</p>
-          <p class="small-hint">Check format: <code>@Author-Desc-Date.jpg</code></p>
+          <p>No photos yet.</p>
         </div>
       )}
     </div>
@@ -104,7 +100,7 @@ photos = photos.filter((photo: any) => {
     <h3>⚖️ Copyright & Disclaimer</h3>
     <p>
       All images are uploaded by users. Copyright belongs to original authors.<br/>
-      Uploaders must ensure they own the copyright or have authorization, and strictly follow naming rules (<code>@Author-Desc-Date</code>).
+      Uploaders must ensure they own the copyright or have authorization.
     </p>
     <p>
       If you find any content that infringes on your rights, or errors needing correction/deletion,<br/>
