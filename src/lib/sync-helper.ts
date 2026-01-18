@@ -1,8 +1,18 @@
-export async function syncWithImageBed(DB: any) {
+export async function syncWithImageBed(DB: any, env: any) {
   try {
     // 1. Fetch image list from upstream
-    const authHeader = 'Basic ' + btoa('kkjusdoit:fzd-fans.com');
-    console.log('SyncHelper: Fetching image list from upstream...');
+    const user = env.BASIC_USER || 'kkjusdoit';
+    const pass = env.BASIC_PASS || 'fzd-fans.com';
+    
+    // Compatible encoding
+    const authString = `${user}:${pass}`;
+    const authBase64 = typeof btoa === 'function' 
+      ? btoa(authString) 
+      : Buffer.from(authString).toString('base64');
+      
+    const authHeader = 'Basic ' + authBase64;
+    
+    console.log(`SyncHelper: Fetching image list from upstream (User: ${user})...`);
     
     const response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/api/manage/list', {
       method: 'POST',

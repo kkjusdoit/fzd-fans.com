@@ -9,6 +9,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
 
     if (!authHeader) {
+      console.log(`[Auth] Missing Authorization header for ${path}`);
       return new Response('Unauthorized', {
         status: 401,
         headers: {
@@ -17,27 +18,40 @@ export const onRequest = defineMiddleware(async (context, next) => {
       });
     }
 
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const user = auth[0];
-    const pass = auth[1];
+    try {
+      const authValue = authHeader.split(' ')[1];
+      if (!authValue) throw new Error('Invalid Auth Header');
 
-    // Get credentials from env or fallback (matching user provided screenshots)
-    const runtime = locals.runtime as any;
-    const env = runtime?.env || {};
-    
-    // Fallback based on user conversations if environment variable is missing in dev
-    const validUser = env.BASIC_USER || 'kkjusdoit';
-    const validPass = env.BASIC_PASS || 'fzd-fans.com';
+      // Compatible decoding for both Node (dev) and Workers (prod)
+      const decoded = typeof atob === 'function' 
+        ? atob(authValue) 
+        : Buffer.from(authValue, 'base64').toString();
+        
+      const [user, ...passParts] = decoded.split(':');
+      const pass = passParts.join(':'); // Handle passwords containing colons
 
-    if (user === validUser && pass === validPass) {
-      return next();
-    } else {
-      return new Response('Forbidden', {
-        status: 403,
-         headers: {
-          'WWW-Authenticate': 'Basic realm="Admin Access"'
-        }
-      });
+      // Get credentials from env or fallback (matching user provided screenshots)
+      const runtime = (locals as any).runtime;
+      const env = runtime?.env || {};
+      
+      // Fallback based on user conversations if environment variable is missing in dev
+      const validUser = env.BASIC_USER || 'kkjusdoit';
+      const validPass = env.BASIC_PASS || 'fzd-fans.com';
+
+      if (user === validUser && pass === validPass) {
+        return next();
+      } else {
+        console.warn(`[Auth] Failed login attempt. User: ${user}, Expected: ${validUser}`);
+        return new Response('Forbidden', {
+          status: 403,
+          headers: {
+            'WWW-Authenticate': 'Basic realm="Admin Access"'
+          }
+        });
+      }
+    } catch (e) {
+      console.error('[Auth] Error processing credentials:', e);
+      return new Response('Internal Server Error', { status: 500 });
     }
   }
 
