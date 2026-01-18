@@ -144,6 +144,7 @@ const t = useTranslations(lang);
         const meta = result.meta || {};
 
         if (newData.length > 0) {
+          console.log('API Data:', newData);
           renderBatch(newData);
           photosList = [...photosList, ...newData];
           
