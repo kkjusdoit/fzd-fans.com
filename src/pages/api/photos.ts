@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ locals }) => {
   }
 
   try {
-    const { results } = await DB.prepare('SELECT * FROM photos ORDER BY created_at DESC').all();
+    const { results } = await DB.prepare('SELECT * FROM photos WHERE reviewed = 1 ORDER BY created_at DESC').all();
     console.log(`API /api/photos: fetched ${results?.length || 0} photos`);
     return new Response(JSON.stringify(results), {
       status: 200,
