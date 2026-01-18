@@ -568,8 +568,16 @@ const trans = {
 
     async function uploadFile(file) {
       const formData = new FormData();
-      formData.append('file', file);
-      console.log('开始上传:', file.name);
+      
+      // Sanitized filename to avoid 400 errors with server-side multipart parsing
+      // especially for filenames with special characters (e.g. @, Chinese)
+      const ext = file.name.split('.').pop() || '';
+      const safeName = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+      
+      formData.append('file', file, safeName);
+      formData.append('originalName', file.name); // Pass original name separately
+      
+      console.log('开始上传:', file.name, 'as', safeName);
 
       try {
         // 通过本地 API 代理上传（避免 CORS 问题）

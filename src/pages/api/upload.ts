@@ -9,6 +9,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const formData = await request.formData();
     const file = formData.get('file');
+    const originalName = formData.get('originalName') as string | null;
 
     console.log('文件信息:', file);
 
@@ -20,12 +21,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    console.log('文件名:', file.name, '大小:', file.size);
+    const fileNameToUse = originalName || file.name;
+    console.log('Internal filename:', file.name, 'Original filename:', fileNameToUse, 'Size:', file.size);
 
     // 在服务器端，直接使用 File 对象创建 FormData
     // Astro 使用 undici 的 FormData 实现，支持 File 对象
     const uploadFormData = new FormData();
-    uploadFormData.append('file', file, file.name);
+    uploadFormData.append('file', file, fileNameToUse);
 
     console.log('准备发送到图床服务器...');
 
@@ -61,7 +63,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log(`Image storage src extracted: ${src}`);
     if (src) {
       const fullUrl = `https://cloudflare-imgbed-cvs.pages.dev${src}`;
-      const fileName = file.name;
+      const fileName = fileNameToUse;
 
       // 4. 将元数据存入 Cloudflare D1
       const runtime = locals.runtime as any;
