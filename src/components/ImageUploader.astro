@@ -567,54 +567,73 @@ const trans = {
     }
 
     async function uploadFile(file) {
-      const formData = new FormData();
-      
-      // Sanitized filename to avoid 400 errors with server-side multipart parsing
-      // especially for filenames with special characters (e.g. @, Chinese)
-      const ext = file.name.split('.').pop() || '';
-      const safeName = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
-      
-      formData.append('file', file, safeName);
-      formData.append('originalName', file.name); // Pass original name separately
-      
-      console.log('开始上传:', file.name, 'as', safeName);
+      console.log('开始处理文件 (Base64):', file.name);
 
-      try {
-        // 通过本地 API 代理上传（避免 CORS 问题）
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) {
-          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = async (e) => {
           try {
-             const errorData = await response.json();
-             if (errorData.error) {
-               errorMessage += `\nDetails: ${errorData.error}`;
-               if (errorData.details) errorMessage += `\n${errorData.details}`;
-               if (errorData.debug) errorMessage += `\nDebug: ${JSON.stringify(errorData.debug, null, 2)}`;
-             }
-          } catch (e) {
-            // Ignore JSON parse error
-          }
-          throw new Error(errorMessage);
-        }
+            const base64Data = e.target.result;
+            const ext = file.name.split('.').pop() || '';
+            const safeName = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+            
+            console.log('准备发送上传请求:', safeName);
 
-        const result = await response.json();
-        console.log('Upload success result:', result);
-        
-        // Use timeout to allow progress bar to finish visual update
-        setTimeout(() => {
-          alert(trans.successAudit);
-          console.log('Reloading page after successful upload');
-          window.location.reload();
-        }, 500);
-        
-      } catch (error) {
-        console.error('Upload error in component:', error);
-        throw error;
-      }
+            const payload = {
+              file: base64Data, // Data URL
+              name: safeName,
+              originalName: file.name,
+              type: file.type
+            };
+
+            const response = await fetch('/api/upload', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+              let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+              try {
+                 const errorData = await response.json();
+                 if (errorData.error) {
+                   errorMessage += `\nDetails: ${errorData.error}`;
+                   if (errorData.details) errorMessage += `\n${errorData.details}`;
+                   if (errorData.debug) errorMessage += `\nDebug: ${JSON.stringify(errorData.debug, null, 2)}`;
+                 }
+              } catch (e) {
+                // Ignore JSON parse error
+              }
+              throw new Error(errorMessage);
+            }
+
+            const result = await response.json();
+            console.log('Upload success result:', result);
+            
+            // Use timeout to allow progress bar to finish visual update
+            setTimeout(() => {
+              alert(trans.successAudit);
+              console.log('Reloading page after successful upload');
+              window.location.reload();
+            }, 500);
+            
+            resolve(result);
+          } catch (error) {
+            console.error('Upload error in component:', error);
+            reject(error);
+          }
+        };
+
+        reader.onerror = (error) => {
+          console.error('File reading error:', error);
+          reject(new Error('Failed to read file'));
+        };
+
+        reader.readAsDataURL(file);
+      });
     }
   });
 </script>
