@@ -183,29 +183,51 @@ const t = useTranslations(lang);
         const globalIndex = photosList.length + index; 
         
         div.innerHTML = `
-        div.innerHTML = `
           <div class="photo-wrapper" data-index="${globalIndex}">
             <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
-            <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}"
-               class="action-btn download-btn"
-               title="下载原图"
-               target="_blank"
-               onclick="event.stopPropagation()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-            </a>
+            <div class="photo-overlay">
+               <!-- Zoom icon can remain or be removed if purely minimalist. Keeping it subtle. -->
+            </div>
+          </div>
+          <div class="card-footer">
+             <div class="file-name" title="${photo.name || ''}">${photo.name || 'Untitled'}</div>
+             <div class="actions">
+                <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name || 'image')}" 
+                   class="action-btn" 
+                   title="下载原图" 
+                   target="_blank" 
+                   onclick="event.stopPropagation()">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </a>
+                <button class="action-btn copy-btn" title="复制链接">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+             </div>
           </div>
         `;
         
         // Add click event for lightbox
         const wrapper = div.querySelector('.photo-wrapper');
         wrapper.addEventListener('click', (e) => {
-            // Safety check: don't open if clicking the download button
-            if (e.target.closest('.download-btn')) return;
             openLightbox(globalIndex);
+        });
+
+        // Copy button handler
+        const copyBtn = div.querySelector('.copy-btn');
+        copyBtn?.addEventListener('click', async (e) => {
+             e.stopPropagation();
+             try {
+                 const fullUrl = new URL(photo.url, window.location.origin).href;
+                 await navigator.clipboard.writeText(fullUrl);
+                 
+                 // Feedback
+                 const originalHtml = copyBtn.innerHTML;
+                 copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                 setTimeout(() => copyBtn.innerHTML = originalHtml, 2000);
+             } catch (err) {
+                 console.error('Copy failed', err);
+                 alert('复制失败');
+             }
         });
         
         galleryGrid.appendChild(div);
@@ -284,8 +306,6 @@ const t = useTranslations(lang);
         }
       }
     });
-
-
   });
 </script>
 
@@ -326,83 +346,12 @@ const t = useTranslations(lang);
   }
 
   .gallery-grid {
-    column-count: 5;
-    column-gap: 15px;
-  }
-
-  .photo-item {
-    break-inside: avoid;
-    margin-bottom: 15px;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: inline-block;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
     width: 100%;
   }
 
-  .photo-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-  }
-
-  .photo-wrapper {
-    position: relative;
-    cursor: zoom-in;
-    background-color: #f0f0f0;
-    /* Removed fixed height to allow responsive adaptability */
-  }
-
-  .photo-wrapper img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: filter 0.3s ease;
-  }
-
-  /* Card Styles */
-  .download-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #333;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 2;
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  .download-btn:hover {
-    background: #1e88e5;
-    color: white;
-    transform: translateY(0) scale(1.1);
-  }
-
-  .photo-item:hover .download-btn {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Show on touch devices always or handle via active state - keeping hover for simplicity */
-  @media (hover: none) {
-    .download-btn {
-        opacity: 0.8;
-        transform: translateY(0);
-        background: rgba(255, 255, 255, 0.9);
-    }
-  }
-  
   /* Lightbox Styles */
   .lightbox {
     position: fixed;
@@ -483,27 +432,24 @@ const t = useTranslations(lang);
   .lightbox-prev { left: 20px; }
   .lightbox-next { right: 20px; }
 
-  @media (max-width: 1600px) {
-    .gallery-grid { column-count: 4; }
-  }
-  
-  @media (max-width: 1200px) {
-    .gallery-grid { column-count: 3; }
-  }
-  
   @media (max-width: 768px) {
-    .gallery-grid { column-count: 2; column-gap: 10px; }
     .lightbox-prev, .lightbox-next {
       width: 40px; 
       height: 40px; 
       font-size: 1.5rem;
     }
+    
+    .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    
+    .photo-item {
+      max-width: 100%; /* Allow full width on mobile if needed */
+    }
   }
   
-  @media (max-width: 480px) {
-    .gallery-grid { column-count: 1; }
-  }
-
+  /* Page Header */
   .page-header {
     text-align: center;
     padding: 3rem 1rem 2rem;
@@ -571,28 +517,6 @@ const t = useTranslations(lang);
     line-height: 1.6;
   }
 
-  @media (max-width: 1200px) {
-    .gallery-grid {
-      column-count: 3;
-    }
-  }
-
-  @media (max-width: 900px) {
-    .gallery-grid {
-      column-count: 2;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .gallery-grid {
-      column-count: 1;
-    }
-    
-    .page-header h1 {
-      font-size: 1.8rem;
-    }
-  }
-
   .disclaimer-footer {
     max-width: 800px;
     margin: 4rem auto 2rem;
@@ -626,12 +550,169 @@ const t = useTranslations(lang);
     font-family: monospace;
     color: #c62828;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 2rem;
     color: #999;
   }
-
-  
 </style>
+
+<style is:global>
+  /* Dynamic content styles for gallery items generated via JS */
+  .photo-item {
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 8px;
+  }
+
+  .photo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  .photo-wrapper {
+    position: relative;
+    cursor: zoom-in;
+    background-color: #f0f0f0;
+    width: 100%;
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: filter 0.3s ease;
+    max-height: 600px;
+    object-fit: cover; 
+  }
+
+  .photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .photo-item:hover .photo-overlay {
+    opacity: 1;
+  }
+
+  .zoom-icon {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  /* Card Footer & Actions */
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+  }
+
+  .file-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.92rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .action-btn {
+    appearance: none;
+    border: none;
+    background: #fff;
+    color: #333;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 1px #eee inset;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    background: #f6f6f6;
+  }
+
+  .action-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Download/Hover Button Styles */
+  .download-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .download-btn:hover {
+    background: #1e88e5;
+    color: white;
+    transform: translateY(0) scale(1.1);
+  }
+
+  .photo-item:hover .download-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (hover: none) {
+    .download-btn {
+        opacity: 0.8;
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .photo-item {
+      max-width: 100%;
+    }
+  }
+

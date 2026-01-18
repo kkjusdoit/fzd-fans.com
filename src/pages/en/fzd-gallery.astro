@@ -115,13 +115,16 @@ const t = useTranslations(lang);
         const div = document.createElement('div');
         div.className = 'photo-item';
         div.innerHTML = `
-          <div class="photo-wrapper">
-            <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
-          </div>
-          <div class="card-footer">
-            <span class="file-name" title="${photo.name || ''}">${photo.name || ''}</span>
-            <div class="actions">
-              <a href="${photo.url}" download="${photo.name}" class="action-btn" title="Download Original" target="_blank">⬇️</a>
+          <a href="${photo.url}" target="_blank" rel="noopener noreferrer" class="photo-link">
+            <div class="photo-wrapper" data-url="${photo.url}">
+              <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
+            </div>
+          </a>
+          <div class="photo-info">
+            <div class="button-group">
+              <a href="${photo.url}" download="${photo.name}" class="action-btn download-btn" title="Download Original" target="_blank">
+                ⬇️
+              </a>
               <button class="action-btn copy-btn" data-url="${photo.url}" title="Copy Link">📋</button>
             </div>
           </div>
@@ -202,28 +205,10 @@ const t = useTranslations(lang);
     100% { transform: rotate(360deg); }
   }
 
-  .gallery-grid { column-count: 5; column-gap: 15px; }
-
-  .photo-item {
-    break-inside: avoid;
-    margin-bottom: 1.5rem;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Fix for column layout overlap */
-    display: inline-block;
-    width: 100%;
+  .gallery-grid {
+    column-count: 4;
+    column-gap: 1.5rem;
   }
-
-  .photo-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  }
-
-  .photo-wrapper { position: relative; cursor: zoom-in; background-color: #f0f0f0; }
-  .photo-wrapper img { width: 100%; height: auto; display: block; transition: filter 0.3s ease; }
 
   .page-header {
     text-align: center;
@@ -292,13 +277,6 @@ const t = useTranslations(lang);
     line-height: 1.6;
   }
 
-  .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 0.9rem; border-top: 1px solid #f0f0f0; background: #fff; }
-  .file-name { flex: 1; min-width: 0; font-size: 0.92rem; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .actions { display: flex; gap: 0.25rem; }
-  .action-btn { appearance: none; border: none; background: #fff; color: #333; width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px #eee inset; cursor: pointer; transition: background 0.2s ease, transform 0.1s ease; text-decoration: none; }
-  .action-btn:hover { background: #f6f6f6; }
-  .action-btn:active { transform: scale(0.98); }
-
   .disclaimer-footer {
     max-width: 800px;
     margin: 4rem auto 2rem;
@@ -339,8 +317,108 @@ const t = useTranslations(lang);
     color: #999;
   }
 
-  @media (max-width: 1600px) { .gallery-grid { column-count: 4; } }
-  @media (max-width: 1200px) { .gallery-grid { column-count: 3; } }
-  @media (max-width: 768px) { .gallery-grid { column-count: 2; } }
-  @media (max-width: 480px) { .gallery-grid { column-count: 1; } }
+  @media (max-width: 1200px) {
+    .gallery-grid {
+      column-count: 3;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .gallery-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .gallery-grid {
+      column-count: 1;
+    }
+    
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Dynamic content styles for gallery items generated via JS */
+  .photo-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Fix for column layout overlap */
+    display: inline-block;
+    width: 100%;
+  }
+
+  .photo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+
+  .photo-wrapper {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+    /* Limit height for tall images, show top part */
+    height: 300px;
+    background-color: #f5f5f5;
+  }
+
+  .photo-wrapper img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: transform 0.5s ease;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .photo-item:hover .photo-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .photo-info {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .photo-name {
+    font-size: 0.9rem;
+    color: #444;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-btn:hover {
+    background: #f0f0f0;
+  }
 </style>
