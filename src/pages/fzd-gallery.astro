@@ -13,6 +13,9 @@ const t = useTranslations(lang);
     <div class="warning-banner">
       ⚠️ 温馨提示：图库包含多张高清大图，建议在 Wi-Fi 环境下浏览
     </div>
+    <div class="view-options">
+      <!-- Future: Add view switching controls if needed -->
+    </div>
     <h1>📸 {t('imgupload.title')}</h1>
     <p class="page-subtitle">
       {t('imgupload.subtitle')}
@@ -58,9 +61,22 @@ const t = useTranslations(lang);
       请及时联系我们进行处理，我们将会在第一时间配合删除或更正。
     </p>
   </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" style="display: none;">
+    <button class="lightbox-close">&times;</button>
+    <button class="lightbox-prev">&lt;</button>
+    <button class="lightbox-next">&gt;</button>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="Full view" />
+      <div class="lightbox-caption"></div>
+    </div>
+    <div class="lightbox-loader"></div>
+  </div>
 </BaseLayout>
 
 <script>
+  // @ts-nocheck
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', async () => {
     const galleryGrid = document.getElementById('gallery-grid');
@@ -69,85 +85,199 @@ const t = useTranslations(lang);
     const photoCountSpan = document.getElementById('photo-count');
     const loadMoreBtn = document.getElementById('load-more-btn');
     const loadMoreContainer = loadMoreBtn?.parentElement;
-
-    let allPhotos = [];
-    let currentLimit = 20;
-    const PAGE_SIZE = 20;
     
-    const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    // Lightbox elements
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.querySelector('.lightbox-caption');
+    const closeBtn = document.querySelector('.lightbox-close');
+    const prevBtn = document.querySelector('.lightbox-prev');
+    const nextBtn = document.querySelector('.lightbox-next');
 
-    try {
-      const response = await fetch('/api/photos');
-      if (!response.ok) throw new Error('Failed to fetch photos');
-      
-      const data = await response.json();
-      
-      // Client-side filtering
-      allPhotos = data.filter(photo => {
-        if (!photo || !photo.url) return false;
-        const ext = photo.url.substring(photo.url.lastIndexOf('.')).toLowerCase();
-        return ALLOWED_EXTS.includes(ext);
-      });
-
-      photoCountSpan.textContent = allPhotos.length;
-      loadingIndicator.style.display = 'none';
-
-      if (allPhotos.length === 0) {
-        emptyState.style.display = 'block';
-      } else {
-        renderBatch(allPhotos.slice(0, currentLimit));
-        
-        if (allPhotos.length > currentLimit) {
-          loadMoreContainer.style.display = 'block';
-          loadMoreBtn.textContent = `加载更多 (${allPhotos.length - currentLimit})`;
-        }
-      }
-
-    } catch (error) {
-      console.error('Error loading photos:', error);
-      loadingIndicator.innerHTML = '<p style="color: red;">加载失败，请刷新重试</p>';
-    }
-
-    // Render helper
-    function renderBatch(photos) {
-      photos.forEach(photo => {
-        const div = document.createElement('div');
-        div.className = 'photo-item';
-        div.innerHTML = `
-          <a href="${photo.url}" target="_blank" rel="noopener noreferrer" class="photo-link">
-            <div class="photo-wrapper" data-url="${photo.url}">
-              <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
-            </div>
-          </a>
-          <div class="photo-info">
-            <div class="button-group">
-              <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}" class="action-btn download-btn" title="下载原图" target="_blank">
-                ⬇️
-              </a>
-            </div>
-          </div>
-        `;
-        galleryGrid.appendChild(div);
-      });
-    }
+    // State
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+    let isLoading = false;
+    let hasMore = true;
+    let totalPhotos = 0;
+    let photosList = []; // Store current visible photos for lightbox navigation
+    
+    // Initial Load
+    await loadPhotos(1);
 
     // Load More Handler
     if (loadMoreBtn) {
       loadMoreBtn.addEventListener('click', () => {
-        const nextLimit = currentLimit + PAGE_SIZE;
-        const nextBatch = allPhotos.slice(currentLimit, nextLimit);
-        
-        renderBatch(nextBatch);
-        currentLimit = nextLimit;
-        
-        const remaining = allPhotos.length - currentLimit;
-        if (remaining <= 0) {
-          loadMoreContainer.style.display = 'none';
-        } else {
-          loadMoreBtn.textContent = `加载更多 (${remaining})`;
+        if (!isLoading && hasMore) {
+          loadPhotos(currentPage + 1);
         }
       });
     }
+
+    async function loadPhotos(page) {
+      if (isLoading) return;
+      isLoading = true;
+      
+      if (page === 1) {
+        galleryGrid.innerHTML = ''; // Clear only on refresh, not append
+        loadingIndicator.style.display = 'block';
+        loadMoreContainer.style.display = 'none';
+      } else {
+        loadMoreBtn.textContent = '加载中...';
+        loadMoreBtn.disabled = true;
+      }
+
+      try {
+        const response = await fetch(`/api/photos?page=${page}&limit=${PAGE_SIZE}`);
+        if (!response.ok) throw new Error('Failed to fetch photos');
+        
+        const result = await response.json();
+        // Handle API v2 structure { data: [], meta: {} } or fallback
+        const newData = result.data || result; 
+        const meta = result.meta || {};
+
+        if (newData.length > 0) {
+          renderBatch(newData);
+          photosList = [...photosList, ...newData];
+          
+          currentPage = page;
+          totalPhotos = meta.total || (photosList.length + (newData.length < PAGE_SIZE ? 0 : 1)); // fallback
+          hasMore = meta.hasMore !== undefined ? meta.hasMore : (newData.length === PAGE_SIZE);
+          
+          photoCountSpan.textContent = totalPhotos;
+          emptyState.style.display = 'none';
+        } else if (page === 1) {
+          emptyState.style.display = 'block';
+          photoCountSpan.textContent = 0;
+        }
+
+        loadingIndicator.style.display = 'none';
+
+        if (hasMore) {
+          loadMoreContainer.style.display = 'block';
+          loadMoreBtn.textContent = '加载更多';
+          loadMoreBtn.disabled = false;
+        } else {
+          loadMoreContainer.style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error('Error loading photos:', error);
+        if (page === 1) {
+          loadingIndicator.innerHTML = '<p style="color: red;">加载失败，请刷新重试</p>';
+        } else {
+          loadMoreBtn.textContent = '加载失败，点击重试';
+          loadMoreBtn.disabled = false;
+        }
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // Render helper
+    function renderBatch(photos) {
+      photos.forEach((photo, index) => {
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        // Global index for lightbox
+        const globalIndex = photosList.length + index; 
+        
+        div.innerHTML = `
+          <div class="photo-wrapper" data-index="${globalIndex}">
+            <img src="${photo.url}" alt="${photo.name}" loading="lazy" />
+            <div class="photo-overlay">
+               <span class="zoom-icon">🔍</span>
+            </div>
+          </div>
+          <div class="photo-info">
+            <div class="button-group">
+              <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name)}" class="action-btn download-btn" title="下载原图" target="_blank" onclick="event.stopPropagation()">
+                ⬇️ 下载
+              </a>
+            </div>
+          </div>
+        `;
+        
+        // Add click event for lightbox
+        const wrapper = div.querySelector('.photo-wrapper');
+        wrapper.addEventListener('click', () => openLightbox(globalIndex));
+        
+        galleryGrid.appendChild(div);
+      });
+    }
+
+    // --- Lightbox Logic ---
+    let currentLightboxIndex = -1;
+
+    function openLightbox(index) {
+      if (index < 0 || index >= photosList.length) return;
+      currentLightboxIndex = index;
+      updateLightboxContent();
+      lightbox.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    function closeLightbox() {
+      lightbox.style.display = 'none';
+      document.body.style.overflow = '';
+      lightboxImg.src = ''; // Clear to stop loading
+    }
+
+    function updateLightboxContent() {
+      const photo = photosList[currentLightboxIndex];
+      lightboxImg.style.opacity = '0';
+      lightboxImg.src = photo.url;
+      lightboxCaption.textContent = photo.name || `Photo ${currentLightboxIndex + 1}`;
+      
+      // Update nav buttons
+      prevBtn.style.visibility = currentLightboxIndex > 0 ? 'visible' : 'hidden';
+      nextBtn.style.visibility = currentLightboxIndex < photosList.length - 1 ? 'visible' : 'hidden';
+
+      lightboxImg.onload = () => {
+        lightboxImg.style.opacity = '1';
+      };
+    }
+
+    // Lightbox Controls
+    closeBtn.addEventListener('click', closeLightbox);
+    
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentLightboxIndex > 0) {
+        currentLightboxIndex--;
+        updateLightboxContent();
+      }
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentLightboxIndex < photosList.length - 1) {
+        currentLightboxIndex++;
+        updateLightboxContent();
+      }
+    });
+
+    // Close on background click
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (lightbox.style.display === 'flex') {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft' && currentLightboxIndex > 0) {
+          currentLightboxIndex--;
+          updateLightboxContent();
+        }
+        if (e.key === 'ArrowRight' && currentLightboxIndex < photosList.length - 1) {
+          currentLightboxIndex++;
+          updateLightboxContent();
+        }
+      }
+    });
   });
 </script>
 
@@ -188,48 +318,164 @@ const t = useTranslations(lang);
   }
 
   .gallery-grid {
-    column-count: 4;
-    column-gap: 1.5rem;
+    column-count: 5;
+    column-gap: 15px;
   }
 
   .photo-item {
     break-inside: avoid;
-    margin-bottom: 1.5rem;
+    margin-bottom: 15px;
     background: #fff;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Fix for column layout overlap */
     display: inline-block;
     width: 100%;
   }
 
   .photo-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
   }
 
   .photo-wrapper {
     position: relative;
-    overflow: hidden;
     cursor: zoom-in;
-    /* Limit height for tall images, show top part */
-    height: 300px;
-    background-color: #f5f5f5;
+    background-color: #f0f0f0;
+    /* Removed fixed height to allow responsive adaptability */
   }
 
   .photo-wrapper img {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    transition: transform 0.5s ease;
-    object-fit: cover;
-    object-position: top;
+    transition: filter 0.3s ease;
   }
 
-  .photo-item:hover .photo-wrapper img {
-    transform: scale(1.05);
+  .photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .photo-item:hover .photo-overlay {
+    opacity: 1;
+  }
+
+  .zoom-icon {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  /* Lightbox Styles */
+  .lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+  
+  .lightbox-content {
+    max-width: 90%;
+    max-height: 90vh;
+    position: relative;
+    text-align: center;
+  }
+  
+  .lightbox-content img {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    transition: opacity 0.3s ease;
+    object-fit: contain;
+  }
+  
+  .lightbox-caption {
+    color: #ccc;
+    margin-top: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 3rem;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 1001;
+    padding: 0;
+  }
+  
+  .lightbox-prev,
+  .lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .lightbox-prev:hover,
+  .lightbox-next:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  
+  .lightbox-prev { left: 20px; }
+  .lightbox-next { right: 20px; }
+
+  @media (max-width: 1600px) {
+    .gallery-grid { column-count: 4; }
+  }
+  
+  @media (max-width: 1200px) {
+    .gallery-grid { column-count: 3; }
+  }
+  
+  @media (max-width: 768px) {
+    .gallery-grid { column-count: 2; column-gap: 10px; }
+    .lightbox-prev, .lightbox-next {
+      width: 40px; 
+      height: 40px; 
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .gallery-grid { column-count: 1; }
   }
 
   .page-header {
@@ -328,6 +574,13 @@ const t = useTranslations(lang);
 
   .action-btn:hover {
     background: #f0f0f0;
+    color: #1e88e5;
+  }
+  
+  .download-btn {
+     font-size: 0.9rem;
+     color: #666;
+     gap: 0.3rem;
   }
 
   .disclaimer-footer {
