@@ -8,16 +8,17 @@ const slogan = lang === 'en'
   ? 'Heavy snow bends the pine, yet the pine stands tall. To know its noble spirit, wait until the snow melts.'
   : '大雪压青松，青松挺且直。要知松高洁，待到雪化时。';
 
-const copyright = lang === 'en'
-  ? '© 2026 Fan Zhendong Archive'
-  : '© 2026 樊振东的互联网档案馆';
+const copyrightYear = '2026';
+const copyrightOwner = lang === 'en' ? 'Fan Zhendong Archive' : '樊振东的互联网档案馆';
 ---
 
 <footer class="footer">
   <div class="container footer-inner">
     <p class="disclaimer">{t('footer.disclaimer')}</p>
     <p class="slogan">{slogan}</p>
-    <p class="copyright">{copyright}</p>
+    <p class="copyright">
+      <a href="/admin/sync" style="text-decoration: none; color: inherit; cursor: default;">©</a> {copyrightYear} {copyrightOwner}
+    </p>
   </div>
 </footer>
 
