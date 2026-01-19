@@ -107,9 +107,111 @@ const t = useTranslations(lang);
     let hasMore = true;
     let totalPhotos = 0;
     let photosList = []; // Store current visible photos for lightbox navigation
+
+    // Cache Config
+    const CACHE_KEY = 'fzd_gallery_state_en';
+    const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+    // --- Cache Functions ---
+    function saveState() {
+      const state = {
+        photos: photosList,
+        page: currentPage,
+        total: totalPhotos,
+        hasMore: hasMore,
+        scrollTop: window.scrollY,
+        timestamp: Date.now()
+      };
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Cache save failed', e);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const state = JSON.parse(raw);
+        
+        // Expiry check
+        if (Date.now() - state.timestamp > CACHE_DURATION) {
+            console.log('Cache expired');
+            localStorage.removeItem(CACHE_KEY);
+            return null;
+        }
+        return state;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Scroll Saver
+    let scrollTimer;
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        if (photosList.length > 0) saveState();
+      }, 200);
+    });
     
-    // Initial Load
-    await loadPhotos(1);
+    // --- Initialization ---
+    async function init() {
+        // Check for manual refresh
+        const perf = performance.getEntriesByType("navigation")[0];
+        const isReload = perf && (perf.type === 'reload');
+        
+        if (isReload) {
+             console.log('Manual refresh detected, clearing cache');
+             localStorage.removeItem(CACHE_KEY);
+             await loadPhotos(1);
+             return;
+        }
+
+        const cached = loadState();
+        if (cached && cached.photos && cached.photos.length > 0) {
+            console.log('Restoring from cache', cached);
+            // Restore data
+            photosList = cached.photos;
+            currentPage = cached.page;
+            totalPhotos = cached.total;
+            hasMore = cached.hasMore;
+            
+            // Render
+            galleryGrid.innerHTML = '';
+            renderBatch(photosList);
+            
+            // Update UI
+            photoCountSpan.textContent = totalPhotos;
+            loadingIndicator.style.display = 'none';
+            emptyState.style.display = 'none';
+            
+            if (hasMore) {
+                loadMoreContainer.style.display = 'block';
+                loadMoreBtn.textContent = 'Load More';
+                loadMoreBtn.disabled = false;
+            } else {
+                loadMoreContainer.style.display = 'none';
+            }
+
+            // Restore Scroll Position
+            if (cached.scrollTop) {
+                setTimeout(() => {
+                    window.scrollTo({
+                        top: cached.scrollTop,
+                        behavior: 'instant' 
+                    });
+                }, 0);
+            }
+        } else {
+            // No cache, fresh load
+            await loadPhotos(1);
+        }
+    }
+
+    // Start
+    await init();
 
     // Load More Handler
     if (loadMoreBtn) {
@@ -153,6 +255,10 @@ const t = useTranslations(lang);
           
           photoCountSpan.textContent = totalPhotos;
           emptyState.style.display = 'none';
+
+          // Save State
+          saveState();
+
         } else if (page === 1) {
           emptyState.style.display = 'block';
           photoCountSpan.textContent = 0;
