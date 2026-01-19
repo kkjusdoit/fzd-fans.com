@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS photos (
   url TEXT NOT NULL,
   created_at INTEGER NOT NULL,
   ip TEXT,
-  reviewed INTEGER DEFAULT 0
+  reviewed INTEGER DEFAULT 0,
+  desc TEXT
 );

@@ -110,7 +110,7 @@ export const ui = {
     'imgupload.val.reqTitle': '------------------------\n要求格式: @作者-描述-日期.扩展名\n',
     'imgupload.val.reqDetail': '注意: 必须以 @ 开头，使用横杠 - 分隔\n日期: 8位数字或"未知"\n\n',
     'imgupload.auditNotice': '🔒 图片请确保内容合规，上传后暂不可见，审核后会进行展示。违规图片将被图床自动清理。',
-    'imgupload.successAudit': '上传成功！请耐心等待审核，审核通过后即可在下方看到您的照片。',
+    'imgupload.successAudit': '上传成功！请耐心等待审核，审核通过后即可在照片墙看到。',
     'imgupload.cta.text': '你也有照片想分享？',
     'imgupload.cta.btn': '📷 上传照片',
     'imgupload.disclaimer': '本站由个人在本职工作之余出于热爱持续维护，精力有限，将尽力及时进行审核同步，但暂无法做到所有内容的实时更新，敬请理解❤️',

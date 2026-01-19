@@ -303,7 +303,7 @@ const t = useTranslations(lang);
             </div>
           </div>
           <div class="card-footer">
-             <span class="photo-id">#${photo.id}</span>
+             <span class="photo-id">#${photo.id}${photo.desc ? ' ' + photo.desc : ''}</span>
              <div class="actions">
                 <a href="/api/download?url=${encodeURIComponent(photo.url)}&filename=${encodeURIComponent(photo.name || 'image')}" 
                    class="action-btn" 

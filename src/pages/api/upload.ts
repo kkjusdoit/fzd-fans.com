@@ -11,10 +11,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const contentType = request.headers.get('content-type') || '';
     let fileObj: File | null = null;
     let fileNameToUse: string | null = null;
+    let desc = '';
 
     if (contentType.includes('application/json')) {
       try {
         const body = await request.json();
+        desc = body.desc || '';
         if (body.file && typeof body.file === 'string') {
           console.log('Processing Base64 upload...');
           // Data URL format: "data:image/jpeg;base64,....."
@@ -44,6 +46,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     } else {
       // Fallback for standard multipart/form-data
       const formData = await request.formData();
+      desc = formData.get('desc') as string || '';
       console.log('FormData keys:', Array.from(formData.keys()));
   
       const file = formData.get('file');
@@ -180,8 +183,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
           // Insert with ip and reviewed = 0 (pending review)
           await DB.prepare(
-            'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 0)'
-          ).bind(fileName, fullUrl, Date.now(), clientIP).run();
+            'INSERT INTO photos (name, url, created_at, ip, reviewed, desc) VALUES (?, ?, ?, ?, 0, ?)'
+          ).bind(fileName, fullUrl, Date.now(), clientIP, desc).run();
           console.log('元数据已写入 D1 数据库 (Pending Review)');
 
         } catch (dbError) {

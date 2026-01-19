@@ -140,7 +140,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const result = await response.json();
 
       if (response.ok) {
-        setStatus('success', `⚡️ 自动同步成功！\n\n远程文件总数: ${result.totalFound}\n新增入库: ${result.added}\n已存在: ${result.skipped}`);
+        setStatus('success', `⚡️ 自动同步成功！\n\n远程文件总数: ${result.totalFound}\n新增入库: ${result.added}\n激活可见: ${result.activated}\n已存在: ${result.skipped}`);
       } else {
         throw new Error(result.error || 'Server Error');
       }

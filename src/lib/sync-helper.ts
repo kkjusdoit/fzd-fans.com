@@ -37,6 +37,7 @@ export async function syncWithImageBed(DB: any, env: any) {
     let added = 0;
     let skipped = 0;
     let deleted = 0;
+    let activated = 0;
     const details = [];
 
     // 2. Process Remote Files (Add missing)
@@ -87,10 +88,13 @@ export async function syncWithImageBed(DB: any, env: any) {
         // If exists but not reviewed, approve it (since it exists on the image bed which is the source of truth)
         if (existing.reviewed !== 1) {
            await DB.prepare('UPDATE photos SET reviewed = 1 WHERE id = ?').bind(existing.id).run();
-           console.log(`SyncHelper: Auto-approved existing photo: ${displayName}`);
-           details.push({ name: displayName, status: 'approved' });
+           console.log(`SyncHelper: Activating pending upload (reviewed=0 -> 1): ${displayName}`);
+           activated++;
+           details.push({ name: displayName, status: 'activated' });
+        } else {
+           // Already reviewed and exists, just skip
+           skipped++;
         }
-        skipped++;
       } else {
         await DB.prepare(
           'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
@@ -117,12 +121,13 @@ export async function syncWithImageBed(DB: any, env: any) {
       }
     }
 
-    console.log(`SyncHelper: Sync complete. Added: ${added}, Skipped: ${skipped}, Deleted: ${deleted}`);
+    console.log(`SyncHelper: Sync complete. Added: ${added}, Activated: ${activated}, Skipped: ${skipped}, Deleted: ${deleted}`);
 
     return {
       success: true,
       totalFound: remoteFiles.length,
       added,
+      activated,
       skipped,
       deleted,
       details

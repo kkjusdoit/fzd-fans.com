@@ -33,6 +33,18 @@ const trans = {
 ---
 
 <div id="image-uploader" class="image-uploader">
+  <div class="input-group">
+    <label for="photo-desc" class="desc-label">
+      {lang === 'zh' ? '照片说明 (可选)' : 'Description (Optional)'}
+    </label>
+    <input 
+      type="text" 
+      id="photo-desc" 
+      class="desc-input"
+      placeholder={lang === 'zh' ? '例如：2024年巴黎奥运会男单决赛...' : 'e.g. Paris 2024 Men\'s Singles Final...'} 
+    />
+  </div>
+
   <!-- 紧凑型上传区域 -->
   <div
     id="drop-zone"
@@ -108,6 +120,33 @@ const trans = {
     max-width: 800px;
     margin: 0 auto 2rem;
     padding: 0 1rem;
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .desc-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.95rem;
+  }
+
+  .desc-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .desc-input:focus {
+    border-color: #1e88e5;
   }
 
   .disclaimer-footer {
@@ -479,13 +518,15 @@ const trans = {
             const ext = file.name.split('.').pop() || '';
             const safeName = `upload_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
             
-            console.log('准备发送上传请求:', safeName);
+            const descInput = document.getElementById('photo-desc');
+            const desc = descInput ? descInput.value.trim() : '';
 
             const payload = {
               file: base64Data, // Data URL
               name: safeName,
               originalName: file.name,
-              type: file.type
+              type: file.type,
+              desc: desc
             };
 
             // 设置60秒超时
