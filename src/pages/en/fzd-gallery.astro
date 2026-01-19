@@ -301,6 +301,9 @@ const t = useTranslations(lang);
             <div class="photo-overlay">
                <!-- Zoom icon can remain or be removed if purely minimalist. Keeping it subtle. -->
             </div>
+            <div class="long-image-hint">
+                <span>Long Image</span>
+            </div>
           </div>
           <div class="card-footer">
              <span class="photo-id">#${photo.id}${photo.desc ? ' ' + photo.desc : ''}</span>
@@ -318,6 +321,22 @@ const t = useTranslations(lang);
              </div>
           </div>
         `;
+        
+        // Long image detection
+        const img = div.querySelector('img');
+        const hint = div.querySelector('.long-image-hint');
+        
+        const checkLongImage = () => {
+            if (img.naturalHeight && img.naturalWidth && (img.naturalHeight / img.naturalWidth > 1.8)) {
+                 hint.style.opacity = '1';
+            }
+        };
+
+        if (img.complete) {
+            checkLongImage();
+        } else {
+            img.onload = checkLongImage;
+        }
         
         // Add click event for lightbox
         const wrapper = div.querySelector('.photo-wrapper');
@@ -764,15 +783,45 @@ const t = useTranslations(lang);
     cursor: zoom-in;
     background-color: #f0f0f0;
     width: 100%;
+    height: 300px; /* Fixed unified height */
+    overflow: hidden;
   }
 
   .photo-wrapper img {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     transition: filter 0.3s ease;
-    max-height: 600px;
     object-fit: cover; 
+    object-position: top;
+  }
+
+  .long-image-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    color: white;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  
+  .long-image-hint span {
+    background: rgba(0,0,0,0.6);
+    padding: 2px 8px;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .photo-overlay {
@@ -802,19 +851,30 @@ const t = useTranslations(lang);
   /* Card Footer & Actions */
   .card-footer {
     display: flex;
-    align-items: centspac;btwee
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
     padding: 0.75rem 0.9rem;
-    border-top: 1pxf;
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
   }
 
   .photo-id {
-     ont-size: 0.85rem;
+    font-size: 0.85rem;
     color: #999;
     font-family: monospace;
-    font-weight: 500solid #f0f0f0;
-    background: #fff;
+    font-weight: 500;
+  }
+
+  .file-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .actions {

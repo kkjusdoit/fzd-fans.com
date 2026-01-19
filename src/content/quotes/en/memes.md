@@ -61,4 +61,12 @@ Fan Zhendong's daily weight loss struggles - always on the path to losing weight
 
 ![Weight Loss Meme](/img/减肥梗.jpg)
 
+## The Viewership Rating Technique
+
+The classic progression of Fan Zhendong's matches - the more behind he falls, the more likely he is to make a comeback. Truly the "God of Comebacks."
+
+> Fan Zhendong playing average → Fan Zhendong off to a bad start → Fan Zhendong in a tough battle → Fan Zhendong falling behind → Fan Zhendong making mistakes → Fan Zhendong's defeat seems certain → Fan Zhendong giving his victory speech
+
+#BigHeart #GodOfComebacks
+
 ---
