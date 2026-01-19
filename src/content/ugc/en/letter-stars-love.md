@@ -14,7 +14,7 @@ tags: ["Ten Years", "Rio", "Paris", "National Games"]
 translated: true
 ---
 
-Pang, the stars in the sky are all people who love you. As a writer, I've never properly written about you. I fear my clumsy words cannot carry the glory and storms of your ten years of iron-blooded dominance.
+Pang, as a writer, I've never properly written about you. I fear my clumsy words cannot carry the glory and storms of your ten years of iron-blooded dominance.
 
 I'm a Rio veteran. The first time I saw you was at Zhang Jike's bedside. Back then, Little Pang was spirited and full of youthful brilliance. As merely a major tournament fan, I was already certain at that moment—the future would be yours.
 
