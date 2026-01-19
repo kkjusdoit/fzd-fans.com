@@ -5,6 +5,7 @@
 // Define simple interface for Cloudflare Env
 interface Env {
   DB: import("@cloudflare/workers-types").D1Database;
+  AUTH_CODE?: string;
 }
 
 declare namespace App {

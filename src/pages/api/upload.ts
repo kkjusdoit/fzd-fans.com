@@ -93,13 +93,38 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('准备发送到图床服务器...');
 
     // add serverCompress=false to force upload as file (original quality)
-    const response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/upload?serverCompress=false', {
-      method: 'POST',
-      headers: {
-        'authCode': 'kkjusdoit'
-      },
-      body: uploadFormData
-    });
+    // Add 50s timeout for upstream
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 50000);
+
+    // Get Auth Code from Environment Variables (Cloudflare Pages or .env)
+    const runtime = (locals as any).runtime;
+    const authCode = runtime?.env?.AUTH_CODE || import.meta.env.AUTH_CODE;
+
+    let response;
+    try {
+      response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/upload?serverCompress=false', {
+        method: 'POST',
+        headers: {
+          'authCode': authCode
+        },
+        body: uploadFormData,
+        signal: controller.signal as any // Astro types might not be fully up to date with fetch signal
+      });
+    } catch (err: any) {
+       if (err.name === 'AbortError') {
+         return new Response(JSON.stringify({
+            success: false,
+            error: 'Upstream upload timed out (50s)'
+         }), {
+            status: 504,
+            headers: { 'Content-Type': 'application/json' }
+         });
+       }
+       throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     console.log('图床服务器响应状态:', response.status);
 

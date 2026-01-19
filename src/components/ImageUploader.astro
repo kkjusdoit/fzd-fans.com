@@ -28,6 +28,7 @@ const trans = {
     valReqTitle: t('imgupload.val.reqTitle'),
     valReqDetail: t('imgupload.val.reqDetail'),
     successAudit: t('imgupload.successAudit'),
+    stay: t('imgupload.overlay.stay'),
   };
 ---
 
@@ -431,6 +432,12 @@ const trans = {
           progress += 0.5;
         }
         updateProgress(Math.min(95, Math.round(progress)));
+        
+        // 如果卡在95%超过一定时间，提示用户
+        if (progress >= 95) {
+             const hint = document.querySelector('#uploading-state p');
+             if (hint) hint.textContent = '服务器正在处理大图，请耐心等待...';
+        }
       }, 100);
 
       try {
@@ -452,7 +459,11 @@ const trans = {
         clearInterval(progressInterval);
         if (overlay) overlay.style.display = 'none';
         updateProgress(0);
-        alert(error.message || '上传失败');
+        // Reset hint text
+        const hint = document.querySelector('#uploading-state p');
+        if (hint) hint.textContent = trans?.stay || '请勿关闭页面';
+        
+        alert(error.message || '上传失败，请重试');
       }
     }
 
@@ -477,33 +488,47 @@ const trans = {
               type: file.type
             };
 
-            const response = await fetch('/api/upload', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(payload)
-            });
+            // 设置60秒超时
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-            if (!response.ok) {
-              let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-              try {
-                 const errorData = await response.json();
-                 if (errorData.error) {
-                   errorMessage += `\nDetails: ${errorData.error}`;
-                   if (errorData.details) errorMessage += `\n${errorData.details}`;
-                   if (errorData.debug) errorMessage += `\nDebug: ${JSON.stringify(errorData.debug, null, 2)}`;
-                 }
-              } catch (e) {
-                // Ignore JSON parse error
-              }
-              throw new Error(errorMessage);
+            try {
+                const response = await fetch('/api/upload', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(payload),
+                  signal: controller.signal
+                });
+    
+                clearTimeout(timeoutId);
+    
+                if (!response.ok) {
+                  let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                  try {
+                     const errorData = await response.json();
+                     if (errorData.error) {
+                       errorMessage += `\nDetails: ${errorData.error}`;
+                       if (errorData.details) errorMessage += `\n${errorData.details}`;
+                       if (errorData.debug) errorMessage += `\nDebug: ${JSON.stringify(errorData.debug, null, 2)}`;
+                     }
+                  } catch (e) {
+                    // Ignore JSON parse error
+                  }
+                  throw new Error(errorMessage);
+                }
+    
+                const result = await response.json();
+                console.log('Upload success result:', result);
+                resolve(result);
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                if (fetchError.name === 'AbortError') {
+                    throw new Error('上传超时，请检查网络或图片大小');
+                }
+                throw fetchError;
             }
-
-            const result = await response.json();
-            console.log('Upload success result:', result);
-            
-            resolve(result);
           } catch (error) {
             console.error('Upload error in component:', error);
             reject(error);
