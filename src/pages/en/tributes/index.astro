@@ -7,7 +7,9 @@ import { useTranslations, getLocalizedPath, removeLanguagePrefix } from '../../.
 const lang = 'en';
 const t = useTranslations(lang);
 const allTributes = await getCollection('tributes');
-const tributes = allTributes.filter(item => item.slug.startsWith('en/'));
+const tributes = allTributes
+  .filter(item => item.slug.startsWith('en/'))
+  .sort((a, b) => (b.data.date?.valueOf() || 0) - (a.data.date?.valueOf() || 0));
 
 // Tag translations
 const tagMap: Record<string, string> = {
@@ -29,6 +31,8 @@ const tagMap: Record<string, string> = {
   '亿万期待': 'Expectations',
   '球迷期盼': 'Fan Wishes',
   '男单夺冠': 'Singles Champion',
+  '品牌祝福': 'Brand Blessing',
+  '凯迪拉克': 'Cadillac',
 };
 ---
 

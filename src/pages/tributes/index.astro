@@ -4,7 +4,9 @@ import Card from '../../components/Card.astro';
 import { getCollection } from 'astro:content';
 
 const allTributes = await getCollection('tributes');
-const tributes = allTributes.filter(item => item.slug.startsWith('zh/'));
+const tributes = allTributes
+  .filter(item => item.slug.startsWith('zh/'))
+  .sort((a, b) => (b.data.date?.valueOf() || 0) - (a.data.date?.valueOf() || 0));
 ---
 
 <BaseLayout title="评价与祝福">
