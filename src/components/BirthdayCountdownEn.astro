@@ -171,10 +171,10 @@
       // Check if it's birthday
       if (chinaTime >= birthdayDate && chinaTime < birthdayEnd) {
         container.classList.add('is-birthday');
-        daysEl.textContent = '🎉';
-        hoursEl.textContent = 'H';
-        minutesEl.textContent = 'B';
-        secondsEl.textContent = 'D';
+        daysEl.textContent = 'H';
+        hoursEl.textContent = 'B';
+        minutesEl.textContent = 'D';
+        secondsEl.textContent = '!';
         document.querySelector('.countdown-date').textContent = 'Happy Birthday Xiao Pang! 🎂';
         return;
       }
