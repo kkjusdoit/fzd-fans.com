@@ -5,10 +5,6 @@
 
 <section class="birthday-countdown" id="birthdayCountdown">
   <div class="countdown-container">
-    <div class="countdown-header">
-      <span class="countdown-icon">🎂</span>
-      <span class="countdown-title">小胖生日倒计时</span>
-    </div>
     <div class="countdown-timer" id="countdownTimer">
       <div class="time-block">
         <span class="time-value" id="days">--</span>
@@ -58,30 +54,6 @@
 
   .countdown-container {
     text-align: center;
-  }
-
-  .countdown-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .countdown-icon {
-    font-size: 1.5rem;
-    animation: bounce 1s ease infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
-
-  .countdown-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #e91e63;
   }
 
   .countdown-timer {
@@ -194,10 +166,6 @@
     box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
   }
 
-  .birthday-countdown.is-birthday .countdown-title {
-    color: #f57c00;
-  }
-
   .birthday-countdown.is-birthday .time-value {
     color: #f57c00;
   }
@@ -210,9 +178,6 @@
     }
     .time-value {
       font-size: 1.4rem;
-    }
-    .countdown-title {
-      font-size: 1rem;
     }
   }
 </style>
@@ -245,6 +210,12 @@
         minutesEl.textContent = '快';
         secondsEl.textContent = '乐';
         document.querySelector('.countdown-date').textContent = '祝樊振东生日快乐！🎂';
+        
+        // 隐藏标签和分隔符
+        document.querySelectorAll('.time-label, .time-separator').forEach(el => {
+          el.style.display = 'none';
+        });
+        
         return;
       }
       

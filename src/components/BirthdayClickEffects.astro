@@ -1,0 +1,141 @@
+---
+// BirthdayClickEffects.astro
+---
+
+<div id="birthday-effects-container"></div>
+
+<script>
+  (function() {
+    // Time check: Only active until 2026-01-23 00:00:00 (UTC+8)
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const chinaTime = new Date(utc + (8 * 3600000));
+    const deadline = new Date('2026-01-23T00:00:00+08:00');
+
+    if (chinaTime >= deadline) {
+      return; // Do nothing if past deadline
+    }
+
+    const container = document.getElementById('birthday-effects-container');
+    if (!container) return;
+
+    const emojis = ['🎂', '🎉', '🌸', '🎁', '🎈', '❤️', '🕯️', '👑', '🏓', '✨'];
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+
+    document.addEventListener('click', (e) => {
+      spawnEmojis(e.clientX, e.clientY);
+      spawnSparkle(e.clientX, e.clientY);
+    });
+
+    function spawnEmojis(x, y) {
+      const count = 3; // Number of emojis per click
+      for (let i = 0; i < count; i++) {
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        const el = document.createElement('span');
+        el.textContent = emoji;
+        el.className = 'birthday-emoji';
+        
+        // Randomize initial position slightly
+        const offsetX = (Math.random() - 0.5) * 40;
+        const offsetY = (Math.random() - 0.5) * 40;
+        
+        el.style.left = `${x + offsetX}px`;
+        el.style.top = `${y + offsetY}px`;
+        
+        // Randomize size and rotation
+        const size = 20 + Math.random() * 20;
+        const rotation = (Math.random() - 0.5) * 60;
+        el.style.fontSize = `${size}px`;
+        el.style.transform = `rotate(${rotation}deg)`;
+        
+        // Randomize animation duration and horizontal drift
+        const duration = 1 + Math.random() * 1.5;
+        const drift = (Math.random() - 0.5) * 100;
+        el.style.setProperty('--drift', `${drift}px`);
+        el.style.animation = `emoji-fall ${duration}s ease-out forwards`;
+
+        container.appendChild(el);
+
+        // Cleanup
+        setTimeout(() => {
+          el.remove();
+        }, duration * 1000);
+      }
+    }
+
+    function spawnSparkle(x, y) {
+      const el = document.createElement('div');
+      el.className = 'click-sparkle';
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.borderColor = color;
+
+      container.appendChild(el);
+
+      setTimeout(() => {
+        el.remove();
+      }, 600);
+    }
+  })();
+</script>
+
+<style is:global>
+  #birthday-effects-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .birthday-emoji {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    opacity: 1;
+    will-change: transform, opacity;
+  }
+
+  @keyframes emoji-fall {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100px) translateX(var(--drift)) rotate(180deg) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  .click-sparkle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid;
+    transform: translate(-50%, -50%) scale(0);
+    animation: sparkle-burst 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes sparkle-burst {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+      border-width: 10px;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2.5);
+      opacity: 0;
+      border-width: 0px;
+    }
+  }
+</style>

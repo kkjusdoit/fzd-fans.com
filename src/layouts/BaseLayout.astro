@@ -3,6 +3,8 @@ import { getLangFromUrl, useTranslations } from '../i18n/utils';
 import { languages } from '../i18n/ui';
 import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
+import BirthdayAudio from '../components/BirthdayAudio.astro';
+import BirthdayClickEffects from '../components/BirthdayClickEffects.astro';
 
 interface Props {
   title?: string;
@@ -75,6 +77,8 @@ const pageDesc = description || t('site.subtitle');
   <main class="container">
     <slot />
   </main>
-  <Footer />
+  <BirthdayAudio />
+    <BirthdayClickEffects />
+    <Footer />
 </body>
 </html>
