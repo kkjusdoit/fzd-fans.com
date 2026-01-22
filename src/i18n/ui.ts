@@ -87,7 +87,7 @@ export const ui = {
     'imgupload.title': '照片墙',
     'imgupload.subtitle': '世界上 照片 最多的 男人',
     'imgupload.dragTitle': '点击选择图片上传',
-    'imgupload.dragHint': '或者拖拽图片到这里上传 · 支持粘贴图片',
+    'imgupload.dragHint': '支持粘贴图片',
     'imgupload.rules.title': '⚠️ 命名规范要求：',
     'imgupload.rules.format': '格式必须为：<code>@作者-描述-日期.jpg</code> (注意⚠️以@开头)',
     'imgupload.rules.author': '1. <strong>作者</strong>：名字 或 "未知"',

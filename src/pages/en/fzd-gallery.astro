@@ -34,14 +34,19 @@ const t = useTranslations(lang);
       <p>No photos yet.</p>
     </div>
 
-    <div class="load-more-container" style="display: none;">
-      <button id="load-more-btn" class="load-more-btn">
-        Load More
-      </button>
+    <!-- Pagination Controls -->
+    <div class="pagination-wrapper" id="pagination-wrapper" style="display: none;">
+       <div class="pagination" id="pagination"></div>
+       <div class="pagination-jump">
+         Total <span id="total-pages-count">--</span> pages
+         Go to <input type="number" id="jump-input" min="1" /> 
+         <button id="jump-btn">GO</button>
+       </div>
     </div>
 
     <div class="gallery-stats">
       Total <span id="photo-count">--</span> photos
+      <span id="current-page-info" style="display: none; margin-left: 8px; font-size: 0.9em; color: #666;">(Current page <span id="current-page-count">--</span> photos)</span>
     </div>
 
     <!-- Upload CTA -->
@@ -89,8 +94,15 @@ const t = useTranslations(lang);
     const loadingIndicator = document.getElementById('loading-indicator');
     const emptyState = document.getElementById('empty-state');
     const photoCountSpan = document.getElementById('photo-count');
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    const loadMoreContainer = loadMoreBtn?.parentElement;
+    const currentPageInfo = document.getElementById('current-page-info');
+    const currentPageCountSpan = document.getElementById('current-page-count');
+    
+    // Pagination elements
+    const paginationWrapper = document.getElementById('pagination-wrapper');
+    const paginationContainer = document.getElementById('pagination');
+    const totalPagesSpan = document.getElementById('total-pages-count');
+    const jumpInput = document.getElementById('jump-input');
+    const jumpBtn = document.getElementById('jump-btn');
     
     // Lightbox elements
     const lightbox = document.getElementById('lightbox');
@@ -104,13 +116,12 @@ const t = useTranslations(lang);
     let currentPage = 1;
     const PAGE_SIZE = 20;
     let isLoading = false;
-    let hasMore = true;
     let totalPhotos = 0;
     let photosList = []; // Store current visible photos for lightbox navigation
 
     // Cache Config
-    const CACHE_KEY = 'fzd_gallery_state_en';
-    const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+    const CACHE_KEY = 'fzd_gallery_state_en_v2';
+    const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
 
     // --- Cache Functions ---
     function saveState() {
@@ -118,7 +129,6 @@ const t = useTranslations(lang);
         photos: photosList,
         page: currentPage,
         total: totalPhotos,
-        hasMore: hasMore,
         scrollTop: window.scrollY,
         timestamp: Date.now()
       };
@@ -176,7 +186,6 @@ const t = useTranslations(lang);
             photosList = cached.photos;
             currentPage = cached.page;
             totalPhotos = cached.total;
-            hasMore = cached.hasMore;
             
             // Render
             galleryGrid.innerHTML = '';
@@ -187,13 +196,8 @@ const t = useTranslations(lang);
             loadingIndicator.style.display = 'none';
             emptyState.style.display = 'none';
             
-            if (hasMore) {
-                loadMoreContainer.style.display = 'block';
-                loadMoreBtn.textContent = 'Load More';
-                loadMoreBtn.disabled = false;
-            } else {
-                loadMoreContainer.style.display = 'none';
-            }
+            renderPagination(Math.ceil(totalPhotos / PAGE_SIZE), currentPage);
+            paginationWrapper.style.display = 'flex';
 
             // Restore Scroll Position
             if (cached.scrollTop) {
@@ -213,27 +217,31 @@ const t = useTranslations(lang);
     // Start
     await init();
 
-    // Load More Handler
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', () => {
-        if (!isLoading && hasMore) {
-          loadPhotos(currentPage + 1);
-        }
-      });
+    // Pagination Jump Handler
+    if (jumpBtn) {
+        jumpBtn.addEventListener('click', () => {
+            const page = parseInt(jumpInput.value);
+            const totalPages = Math.ceil(totalPhotos / PAGE_SIZE);
+            if (page >= 1 && page <= totalPages && page !== currentPage) {
+                loadPhotos(page);
+            } else {
+                alert(`Please enter a page number between 1 and ${totalPages}`);
+            }
+        });
     }
 
     async function loadPhotos(page) {
       if (isLoading) return;
       isLoading = true;
       
-      if (page === 1) {
-        galleryGrid.innerHTML = ''; // Clear only on refresh, not append
-        loadingIndicator.style.display = 'block';
-        loadMoreContainer.style.display = 'none';
-      } else {
-        loadMoreBtn.textContent = 'Loading...';
-        loadMoreBtn.disabled = true;
-      }
+      // Clear grid and show loading
+      galleryGrid.innerHTML = '';
+      loadingIndicator.style.display = 'block';
+      paginationWrapper.style.display = 'none';
+      emptyState.style.display = 'none';
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       try {
         const response = await fetch(`/api/photos?page=${page}&limit=${PAGE_SIZE}`);
@@ -247,44 +255,68 @@ const t = useTranslations(lang);
         if (newData.length > 0) {
           console.log('API Data:', newData);
           renderBatch(newData);
-          photosList = [...photosList, ...newData];
+          photosList = newData; // Replace list for current page
           
           currentPage = page;
           totalPhotos = meta.total || (photosList.length + (newData.length < PAGE_SIZE ? 0 : 1)); // fallback
-          hasMore = meta.hasMore !== undefined ? meta.hasMore : (newData.length === PAGE_SIZE);
           
           photoCountSpan.textContent = totalPhotos;
           emptyState.style.display = 'none';
 
+          // Render Pagination
+          renderPagination(Math.ceil(totalPhotos / PAGE_SIZE), currentPage);
+          paginationWrapper.style.display = 'flex';
+
           // Save State
           saveState();
 
-        } else if (page === 1) {
+        } else {
           emptyState.style.display = 'block';
           photoCountSpan.textContent = 0;
+          paginationWrapper.style.display = 'none';
         }
 
         loadingIndicator.style.display = 'none';
 
-        if (hasMore) {
-          loadMoreContainer.style.display = 'block';
-          loadMoreBtn.textContent = 'Load More';
-          loadMoreBtn.disabled = false;
-        } else {
-          loadMoreContainer.style.display = 'none';
-        }
-
       } catch (error) {
         console.error('Error loading photos:', error);
-        if (page === 1) {
-          loadingIndicator.innerHTML = '<p style="color: red;">Failed to load, please refresh</p>';
-        } else {
-          loadMoreBtn.textContent = 'Load failed, tap to retry';
-          loadMoreBtn.disabled = false;
-        }
+        loadingIndicator.innerHTML = '<p style="color: red;">Failed to load, please refresh</p>';
       } finally {
         isLoading = false;
       }
+    }
+
+    function renderPagination(total, current) {
+        paginationContainer.innerHTML = '';
+        totalPagesSpan.textContent = total;
+        
+        // Algorithm to show limited page numbers (e.g. 1 2 ... 5 6 7 ... 10)
+        // Simple version: Show current +/- 2
+        
+        const start = Math.max(1, current - 2);
+        const end = Math.min(total, start + 4);
+        const adjustedStart = Math.max(1, end - 4);
+        const finalStart = Math.max(1, adjustedStart);
+
+        for (let i = finalStart; i <= end; i++) {
+            const btn = document.createElement('button');
+            btn.className = `page-btn ${i === current ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => {
+                if (i !== current) loadPhotos(i);
+            };
+            paginationContainer.appendChild(btn);
+        }
+        
+        // Refresh button
+        const refreshBtn = document.createElement('button');
+        refreshBtn.className = 'refresh-btn';
+        refreshBtn.title = 'Refresh';
+        refreshBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
+        refreshBtn.onclick = () => {
+            loadPhotos(current);
+        };
+        paginationContainer.appendChild(refreshBtn);
     }
 
     // Render helper
@@ -292,8 +324,8 @@ const t = useTranslations(lang);
       photos.forEach((photo, index) => {
         const div = document.createElement('div');
         div.className = 'photo-item';
-        // Global index for lightbox
-        const globalIndex = photosList.length + index; 
+        // Global index for lightbox (just local index for page-based)
+        const globalIndex = index; 
         
         div.innerHTML = `
           <div class="photo-wrapper" data-index="${globalIndex}">
@@ -628,29 +660,7 @@ const t = useTranslations(lang);
     animation: fadeInDown 0.5s ease;
   }
 
-  .load-more-container {
-    text-align: center;
-    margin: 3rem 0;
-  }
 
-  .load-more-btn {
-    background: #fff;
-    border: 2px solid #1e88e5;
-    color: #1e88e5;
-    padding: 0.8rem 2.5rem;
-    border-radius: 2rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 500;
-  }
-
-  .load-more-btn:hover {
-    background: #1e88e5;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
-  }
 
   .gallery-stats {
     text-align: center;
@@ -755,9 +765,146 @@ const t = useTranslations(lang);
     padding: 2rem;
     color: #999;
   }
+
+
 </style>
 
 <style is:global>
+  /* Pagination - Global Styles */
+  .pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+  .pagination {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .page-btn:hover {
+    border-color: #1e88e5;
+    color: #1e88e5;
+    background: #f0f7ff;
+  }
+
+  .page-btn.active {
+    background: #1e88e5 !important;
+    color: #fff !important;
+    border-color: #1e88e5 !important;
+    box-shadow: 0 4px 10px rgba(30, 136, 229, 0.3);
+  }
+
+  .refresh-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  
+  .refresh-btn:hover {
+    background: #f5f5f5;
+    color: #1e88e5;
+    border-color: #1e88e5;
+  }
+  
+  .refresh-btn:active {
+    transform: rotate(180deg);
+  }
+
+  .pagination-jump {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+
+  .pagination-jump input {
+    width: 48px;
+    height: 36px;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    text-align: center;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.2s;
+  }
+  
+  .pagination-jump input:focus {
+    border-color: #1e88e5;
+  }
+
+  .pagination-jump button {
+    height: 36px;
+    padding: 0 14px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  
+  .pagination-jump button:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 600px) {
+    .pagination-wrapper {
+      gap: 10px;
+      margin: 30px 0;
+    }
+    .page-btn, .refresh-btn, .pagination-jump input, .pagination-jump button {
+      height: 32px;
+      font-size: 13px;
+    }
+    .page-btn {
+      min-width: 32px;
+    }
+    .pagination-jump {
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+      margin-left: 0;
+    }
+  }
+
   /* Dynamic content styles for gallery items generated via JS */
   .photo-item {
     background: #fff;
