@@ -8,133 +8,109 @@
 
 ---
 
+## 🏗️ 架构概览 (Architecture)
+
+本项目采用现代化的 **Astro 岛屿架构 (Islands Architecture)**，结合了服务端渲染 (SSR) 的高性能与 React 客户端交互的灵活性，部署于 Cloudflare Edge Network。
+
+### 架构图解
+
+```mermaid
+graph TD
+    User[用户浏览器]
+    Cloudflare[Cloudflare Workers (Edge)]
+    KV[Cloudflare KV (数据存储)]
+    R2[Cloudflare R2 / 图床 (图片存储)]
+
+    subgraph "Astro Server (SSR)"
+        Page[Astro Page (.astro)]
+        API[API Routes (.ts)]
+        Middleware[Middleware (Auth/Protection)]
+    end
+
+    subgraph "Client Side (Hydration)"
+        React[React Components]
+    end
+
+    User -->|请求页面| Cloudflare
+    Cloudflare -->|执行| Page
+    Page -->|HTML + JSON| User
+    
+    User -->|交互 (React)| React
+    React -->|Fetch API| API
+    
+    API -->|读写| KV
+    API -->|上传| R2
+```
+
+### 1. 渲染层：Astro + React (混合模式)
+
+*   **主体框架 (Astro)**: 负责路由、SEO、静态内容（如文章、Markdown）的生成。采用 SSR 模式，首屏直出 HTML，速度极快。
+*   **交互岛屿 (React)**: 负责复杂的客户端交互，通过 `client:load` 指令按需加载。
+    *   **ImageUploader**: 图片拖拽上传、进度反馈、文件校验。
+    *   **Gallery**: 照片墙瀑布流、分页加载、Lightbox 大图查看、状态缓存 (LocalStorage)。
+
+### 2. 服务端层：Cloudflare Workers
+
+*   **Edge Runtime**: 项目构建为 Cloudflare Workers 脚本 (`output: 'server'`)，运行在全球边缘节点。
+*   **API Routes**: 位于 `src/pages/api/`，处理动态请求。
+    *   `/api/photos`: 获取照片列表 (分页)。
+    *   `/api/upload`: 处理图片上传，中转至图床 API。
+    *   `/api/sync-auto`: 自动同步图床元数据。
+
+---
+
 ## 技术栈
 
 | 技术 | 用途 |
 |------|------|
-| [Astro 5](https://astro.build/) | 静态站点生成框架 |
+| [Astro 5](https://astro.build/) | 核心框架 (SSR) |
+| [React 19](https://react.dev/) | 客户端交互组件 |
 | TypeScript | 类型安全 |
-| Astro Content Collections | 内容管理 |
-| Cloudflare Pages | 部署托管 |
+| Cloudflare Pages | 部署托管 & Edge Runtime |
+| Cloudflare KV | 轻量级数据存储 |
+| CSS Modules | 组件样式隔离 |
 
 ## 项目结构
 
 ```
 fzd-archive/
 ├── src/
-│   ├── components/       # 可复用组件
-│   │   ├── Card.astro
-│   │   ├── Footer.astro
-│   │   ├── LanguagePicker.astro
-│   │   ├── Navigation.astro
-│   │   └── Timeline.astro
+│   ├── components/       
+│   │   ├── react/        # React 交互组件 (ImageUploader, Gallery)
+│   │   └── ...           # Astro 静态组件 (Footer, Navigation)
 │   ├── content/          # 内容集合 (Markdown)
 │   │   ├── arena/        # 职业生涯
-│   │   ├── friends/      # 贵人与朋友
-│   │   ├── fzd101/       # FZD 101 入门指南
-│   │   ├── links/        # 媒体链接
 │   │   ├── quotes/       # 语录与梗
-│   │   ├── stars/        # 天际樊星
-│   │   ├── tributes/     # 评价与祝福
-│   │   ├── ugc/          # 用户投稿
-│   │   ├── warrior/      # 孤勇者
-│   │   └── config.ts     # 内容 Schema 定义
-│   ├── i18n/             # 国际化
-│   │   ├── ui.ts         # 翻译字符串
-│   │   └── utils.ts      # i18n 工具函数
-│   ├── layouts/
-│   │   └── BaseLayout.astro
-│   ├── pages/            # 页面路由
-│   └── config/
-│       └── site.ts       # 站点配置
+│   │   └── ...
+│   ├── i18n/             # 国际化 (ui.ts, utils.ts)
+│   ├── pages/            # 路由定义
+│   │   ├── api/          # 后端 API (photos.ts, upload.ts)
+│   │   └── ...           # 前端页面
+│   └── env.d.ts          # 环境变量类型定义
 ├── public/               # 静态资源
-│   ├── audio/
-│   ├── img/
-│   ├── stars/
-│   └── videos/
-├── astro.config.mjs      # Astro 配置
-├── wrangler.toml         # Cloudflare 配置
-└── package.json
+├── astro.config.mjs      # Astro 配置 (Cloudflare + React)
+└── wrangler.toml         # Cloudflare 部署配置
 ```
 
 ## 核心特性
 
 ### 1. 内容集合 (Content Collections)
 
-使用 Astro 的 Content Collections 管理 Markdown 内容，通过 Zod Schema 进行类型校验：
-
-```typescript
-// src/content/config.ts
-const archiveSchema = z.object({
-  title: z.string(),
-  titleEn: z.string().optional(),
-  description: z.string().optional(),
-  date: z.date().optional(),
-  tags: z.array(z.string()).optional(),
-  category: z.enum(['stories', 'arena', 'quotes', ...]),
-  translated: z.boolean().default(false),
-});
-```
+使用 Astro 的 Content Collections 管理 Markdown 内容，通过 Zod Schema 进行类型校验。
 
 ### 2. 国际化 (i18n)
 
-- 默认语言：中文 (`zh`)
-- 支持语言：英文 (`en`)
-- 路由策略：中文无前缀，英文使用 `/en/` 前缀
-- 自动语言检测与跳转
+*   **UI 文本**: 统一字典管理 (`ui.ts`)。
+*   **内容**: 物理隔离 (`src/content/quotes/zh/`, `src/content/quotes/en/`)。
+*   **路由**: 中文默认无前缀，英文 `/en/`。
 
-```typescript
-// astro.config.mjs
-i18n: {
-  defaultLocale: 'zh',
-  locales: ['zh', 'en'],
-  routing: { prefixDefaultLocale: false }
-}
-```
+### 3. 照片墙 (Gallery System)
 
-内容按语言组织：
-```
-content/quotes/
-├── zh/
-│   ├── personal-quotes.md
-│   └── memes.md
-└── en/
-    └── personal-quotes.md
-```
+*   **高性能**: 列表数据分页加载，图片懒加载。
+*   **用户体验**: 自动缓存浏览状态（页码、滚动位置），刷新或返回时无缝衔接。
+*   **UGC**: 支持用户直接上传图片，前端进行文件校验和 Base64 转换，后端中转上传。
 
-### 3. UGC 投稿系统
-
-支持两种投稿类型：
-- **东风·论剑** (`tactical`): 技战术分析
-- **樊星·寄语** (`letter`): 球迷来信
-
-```typescript
-const ugcSchema = z.object({
-  ugcType: z.enum(['tactical', 'letter']),
-  ugcTag: z.string().optional(),
-  author: z.string(),
-  featured: z.boolean().default(false),
-  // ...
-});
-```
-
-### 4. SEO 优化
-
-- Canonical URL
-- Open Graph 标签
-- 多语言 hreflang 标签
-- 语义化 HTML
-
-## 环境配置
-
-为了确保后台管理和同步功能的安全性，请务必在 Cloudflare Pages 的设置中（或本地 `.env` 文件中）添加以下环境变量：
-
-- `BASIC_USER`: 管理员用户名
-- `BASIC_PASS`: 管理员密码
-
-> **警告**：如果不设置这些环境变量，管理后台和同步 API 将无法使用。
-
-## 开发
+## 开发指南
 
 ```bash
 # 安装依赖
@@ -146,39 +122,17 @@ npm run dev
 # 构建生产版本
 npm run build
 
-# 本地预览构建结果
-npm run preview
+# 类型检查
+npx astro check
 ```
 
-## 部署
+## 部署配置
 
-项目部署在 Cloudflare Pages：
+项目依赖以下环境变量 (Cloudflare Dashboard 或 `.env`):
 
-```toml
-# wrangler.toml
-name = "fzd-fans-com"
-pages_build_output_dir = "dist"
-```
-
-## 添加新内容
-
-1. 在对应的 `src/content/{category}/{lang}/` 目录下创建 `.md` 文件
-2. 添加 frontmatter 元数据
-3. 编写 Markdown 内容
-
-示例：
-```markdown
----
-title: "文章标题"
-description: "简短描述"
-date: 2025-01-01
-category: "quotes"
-tags: ["语录", "经典"]
-translated: false
----
-
-正文内容...
-```
+*   `BASIC_USER` / `BASIC_PASS`: 管理后台认证。
+*   `KV_BINDING`: Cloudflare KV 绑定名称。
+*   图床相关配置 (API Key, Endpoints 等)。
 
 ## License
 
