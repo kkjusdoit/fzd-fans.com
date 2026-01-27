@@ -353,9 +353,37 @@ class Tile {
 // Simple Audio Manager
 const AudioMgr = {
     ctx: null,
+    buffers: {},
     init: function() {
         if (!this.ctx) {
             this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.loadSounds();
+        }
+    },
+    loadSounds: function() {
+        const sounds = {
+            'match': '/audio/itemmatch.ogg',
+            'win': '/audio/level_win.ogg'
+        };
+        for (let [key, url] of Object.entries(sounds)) {
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => this.ctx.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    this.buffers[key] = audioBuffer;
+                })
+                .catch(e => console.error("Error loading sound:", url, e));
+        }
+    },
+    playSound: function(name) {
+        if (!this.ctx) this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        
+        if (this.buffers[name]) {
+            const source = this.ctx.createBufferSource();
+            source.buffer = this.buffers[name];
+            source.connect(this.ctx.destination);
+            source.start(0);
         }
     },
     playTone: function(freq, type, duration) {
@@ -381,13 +409,21 @@ const AudioMgr = {
         this.playTone(800, 'sine', 0.1);
     },
     playMatch: function() {
-        this.playTone(1200, 'sine', 0.1);
-        setTimeout(() => this.playTone(1800, 'sine', 0.2), 100);
+        if (this.buffers['match']) {
+            this.playSound('match');
+        } else {
+            this.playTone(1200, 'sine', 0.1);
+            setTimeout(() => this.playTone(1800, 'sine', 0.2), 100);
+        }
     },
     playWin: function() {
-        [440, 554, 659, 880].forEach((f, i) => {
-            setTimeout(() => this.playTone(f, 'square', 0.2), i * 100);
-        });
+        if (this.buffers['win']) {
+            this.playSound('win');
+        } else {
+            [440, 554, 659, 880].forEach((f, i) => {
+                setTimeout(() => this.playTone(f, 'square', 0.2), i * 100);
+            });
+        }
     },
     playLose: function() {
         this.playTone(150, 'sawtooth', 0.5);
