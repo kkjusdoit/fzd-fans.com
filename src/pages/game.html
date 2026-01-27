@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>东了个东 (Dong Le Ge Dong) - 樊振东粉丝公益版</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #8860a9; /* Paris Purple */
+            background: linear-gradient(135deg, #8860a9 0%, #4b2c68 100%);
+            font-family: 'Arial', sans-serif;
+            touch-action: none; /* Prevent zoom/scroll on mobile */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            background-color: rgba(240, 248, 255, 0.9); /* AliceBlue */
+            border-radius: 10px;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .header {
+            padding: 15px;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .controls {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            pointer-events: auto;
+            margin-bottom: 20px;
+            /* Ensure controls are above canvas visually if overlap occurs, though UI layer is on top */
+            z-index: 20;
+        }
+        button {
+            background: linear-gradient(to bottom, #ffeb3b, #fbc02d);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #5d4037;
+            cursor: pointer;
+            box-shadow: 0 4px #c49000;
+            transition: transform 0.1s;
+            font-size: 16px;
+            min-width: 80px;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 #c49000;
+        }
+        #loading-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #8860a9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: white;
+            transition: opacity 0.5s;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: #ffeb3b;
+            transition: width 0.3s;
+        }
+        #game-over-modal, #victory-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            z-index: 100;
+            width: 80%;
+            max-width: 320px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        h2 { color: #8860a9; margin-top: 0; }
+        p { color: #555; line-height: 1.5; }
+        .modal-btn {
+            background: linear-gradient(to bottom, #8860a9, #6a4c93);
+            color: white;
+            box-shadow: 0 4px #4a3c63;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .modal-btn:active {
+            box-shadow: 0 0 #4a3c63;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="loading-screen">
+        <h1>🏓 正在加载资源...</h1>
+        <div class="loader-bar"><div class="loader-progress" id="loader-progress"></div></div>
+    </div>
+
+    <div id="ui-layer">
+        <div class="header">
+            <h1>🏓 东了个东</h1>
+            <p id="level-display">第一关：热身赛</p>
+        </div>
+        <div class="controls">
+            <button id="btn-restart">🔄 重开</button>
+            <button id="btn-undo">↩️ 撤销</button>
+            <button id="btn-shuffle">🔀 洗牌</button>
+        </div>
+    </div>
+
+    <div id="game-over-modal">
+        <h2>遗憾离场 😢</h2>
+        <p>甚至没能甚至...<br>不要灰心，再来一局！</p>
+        <button class="modal-btn" onclick="game.restart()">再试一次</button>
+    </div>
+
+    <div id="victory-modal">
+        <h2>🎉 超级全满贯！</h2>
+        <p>你超越了 99.9% 的东粉，加入了国家队！</p>
+        <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
+    </div>
+</div>
+
+<script>
+/**
+ * Game Configuration & Assets
+ */
+const CONFIG = {
+    cardWidth: 50,
+    cardHeight: 56, 
+    slotCapacity: 7,
+    gridSize: 25, 
+};
+
+// Real Photos from FZD Fans Gallery (Local Assets)
+const PHOTO_URLS = [
+    "/game/assets/image- 000.webp",
+    "/game/assets/image- 001.webp",
+    "/game/assets/image- 002.webp",
+    "/game/assets/image- 003.webp",
+    "/game/assets/image- 004.webp",
+    "/game/assets/image- 005.webp",
+    "/game/assets/image- 006.webp",
+    "/game/assets/image- 007.webp",
+    "/game/assets/image- 008.webp",
+    "/game/assets/image- 009.webp",
+    "/game/assets/image- 010.webp",
+    "/game/assets/image- 011.webp",
+    "/game/assets/image- 012.webp",
+    "/game/assets/image- 013.webp",
+    "/game/assets/image- 014.webp"
+];
+
+const ASSETS = {};
+const IMG_CACHE = {};
+
+// Initialize Assets from Photo URLs
+PHOTO_URLS.forEach((url, index) => {
+    ASSETS['p' + index] = { type: 'image', src: url, color: '#fff' };
+});
+
+const LEVELS = {
+    1: {
+        name: "第一关：热身赛 (简单)",
+        types: ['p0', 'p1', 'p2'],
+        count: 21, 
+        layers: 2
+    },
+    2: {
+        name: "第二关：巴黎巅峰 (困难)",
+        types: Object.keys(ASSETS),
+        count: 102, 
+        layers: 8
+    }
+};
+
+class Tile {
+    constructor(id, type, x, y, layer) {
+        this.id = id;
+        this.type = type;
+        this.x = x; 
+        this.y = y;
+        this.layer = layer;
+        this.inSlot = false;
+        this.isRemoved = false;
+        // Visual state
+        this.currentX = 0;
+        this.currentY = 0;
+        this.targetX = null;
+        this.targetY = null;
+    }
+
+    isBlocked(otherTiles) {
+        if (this.inSlot || this.isRemoved) return false;
+        
+        // Strict Block Logic:
+        // A tile is blocked if ANY tile is directly ABOVE it (layer > this.layer)
+        // AND overlaps with it significantly.
+        
+        const overlapThreshold = 0.1; // Minimal overlap needed to count as blocking
+        const myLeft = this.x + overlapThreshold;
+        const myRight = this.x + 2 - overlapThreshold; // Assume size is ~2 grid units
+        const myTop = this.y + overlapThreshold;
+        const myBottom = this.y + 2 - overlapThreshold;
+
+        for (let other of otherTiles) {
+            if (other.id === this.id) continue;
+            if (other.inSlot || other.isRemoved) continue;
+            
+            // Only tiles on HIGHER layers can block
+            if (other.layer <= this.layer) continue; 
+
+            // Check bounding box intersection
+            // Note: Visual size is cardWidth/Height, but logic uses x,y grid units.
+            // In generation: x is center? No, look at toScreen:
+            // x * gridSize - cardWidth/2. So x is Grid Center.
+            // Card width ~ 50px, Grid size 25px. So Card is 2x Grid.
+            // So if tile is at x=0, it spans [-1, 1].
+            
+            // Let's normalize logic to Center Coordinates.
+            // Width/Height in grid units approx 1.8 (allowing gaps)
+            const r = 0.85; // Radius (half-width) in grid units
+            
+            const oLeft = other.x - r;
+            const oRight = other.x + r;
+            const oTop = other.y - r;
+            const oBottom = other.y + r;
+            
+            const mLeft = this.x - r;
+            const mRight = this.x + r;
+            const mTop = this.y - r;
+            const mBottom = this.y + r;
+
+            if (mLeft < oRight && mRight > oLeft &&
+                mTop < oBottom && mBottom > oTop) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+// Simple Audio Manager
+const AudioMgr = {
+    ctx: null,
+    init: function() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    },
+    playTone: function(freq, type, duration) {
+        if (!this.ctx) this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    playClick: function() {
+        this.playTone(800, 'sine', 0.1);
+    },
+    playMatch: function() {
+        this.playTone(1200, 'sine', 0.1);
+        setTimeout(() => this.playTone(1800, 'sine', 0.2), 100);
+    },
+    playWin: function() {
+        [440, 554, 659, 880].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, 'square', 0.2), i * 100);
+        });
+    },
+    playLose: function() {
+        this.playTone(150, 'sawtooth', 0.5);
+    }
+};
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.tiles = [];
+        this.slot = [];
+        this.level = 1;
+        this.scale = 1;
+        
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        this.canvas.addEventListener('click', (e) => this.handleClick(e));
+        // Simple touch handling via click event simulation is enough for most cases
+        // but we add touchstart to ensure responsiveness
+        this.canvas.addEventListener('touchstart', (e) => {
+             // e.preventDefault(); // Optional: prevent scrolling
+        });
+
+        document.getElementById('btn-restart').onclick = () => this.startLevel(this.level);
+        document.getElementById('btn-undo').onclick = () => this.undo();
+        document.getElementById('btn-shuffle').onclick = () => this.shuffle();
+        
+        // Start loading images first
+        this.preloadImages().then(() => {
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+            }, 500);
+            this.startLevel(1);
+            this.loop();
+        });
+    }
+
+    preloadImages() {
+        return new Promise((resolve) => {
+            let loaded = 0;
+            const keys = Object.keys(ASSETS);
+            const total = keys.length;
+            
+            if (total === 0) resolve();
+
+            keys.forEach(key => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // Handle CORS if needed
+                img.src = ASSETS[key].src;
+                img.onload = () => {
+                    loaded++;
+                    document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
+                    IMG_CACHE[key] = img;
+                    if (loaded >= total) resolve();
+                };
+                img.onerror = () => {
+                    console.error("Failed to load image:", ASSETS[key].src);
+                    // Fallback or just count it
+                    loaded++;
+                     document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
+                    if (loaded >= total) resolve();
+                };
+            });
+        });
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        
+        // Calculate scale to fit 7 cards width + margins
+        const requiredWidth = CONFIG.slotCapacity * (CONFIG.cardWidth + 4) + 60;
+        this.scale = Math.min(1.2, this.canvas.width / requiredWidth); // Max scale 1.2
+        
+        this.centerX = (this.canvas.width / 2) / this.scale;
+        this.centerY = (this.canvas.height / 2) / this.scale;
+        
+        this.ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
+    }
+
+    startLevel(lvl) {
+        this.level = lvl;
+        document.getElementById('level-display').innerText = LEVELS[lvl].name;
+        document.getElementById('game-over-modal').style.display = 'none';
+        document.getElementById('victory-modal').style.display = 'none';
+        
+        this.slot = [];
+        this.tiles = [];
+        this.generateTiles(LEVELS[lvl]);
+    }
+
+    generateTiles(levelConfig) {
+        let types = levelConfig.types;
+        let total = levelConfig.count;
+        while (total % 3 !== 0) total++;
+
+        // Create deck
+        let deck = [];
+        for (let i = 0; i < total / 3; i++) {
+            let type = types[i % types.length];
+            // Randomize types distribution better for Level 2
+            if (this.level > 1) {
+                 type = types[Math.floor(Math.random() * types.length)];
+            }
+            deck.push(type, type, type);
+        }
+        deck.sort(() => Math.random() - 0.5);
+
+        // Predefined layout for Level 1 (Simple Cross Shape / 3x3 subset)
+        // Layer 0: 3x3 grid (9 tiles)
+        // Layer 1: Center Cross (5 tiles)
+        // Layer 2: Center 1 (1 tile)
+        // Total: 15 tiles. If count is 21, we add some randoms or adjust.
+        
+        this.tiles = deck.map((type, index) => {
+            let layer, x, y;
+            
+            if (this.level === 1) {
+                // Fixed Layout for Level 1 (Teaching)
+                if (index < 12) {
+                    // Layer 0: 3x4 grid roughly
+                    layer = 0;
+                    x = (index % 3) * 2.2 - 2.2; 
+                    y = Math.floor(index / 3) * 2.2 - 2.2;
+                } else if (index < 20) {
+                     // Layer 1: Center area
+                     layer = 1;
+                     let i2 = index - 12;
+                     x = (i2 % 2) * 2.2 - 1.1;
+                     y = Math.floor(i2 / 2) * 2.2 - 1.1;
+                } else {
+                    // Top Layer
+                    layer = 2;
+                    x = 0; y = 0;
+                }
+                
+                // Slight offset jitter for organic look not needed for Level 1
+                // We want strict grid for tutorial feel
+            } else {
+                // Pyramid-like pile
+                // Higher index -> higher layer (roughly)
+                // We want a dense center
+                layer = Math.floor(index / 12); 
+                
+                // Spread reduces as layer goes up
+                let spread = Math.max(2, 6 - layer * 0.5);
+                x = Math.floor((Math.random() * spread * 2 - spread) * 2) / 2;
+                y = Math.floor((Math.random() * spread * 2 - spread) * 2) / 2;
+            }
+
+            return new Tile(index, type, x, y, layer);
+        });
+        
+        this.tiles.sort((a, b) => a.layer - b.layer || a.id - b.id);
+    }
+
+    // Convert Grid to Screen (Unscaled)
+    toScreen(x, y) {
+        return {
+            x: this.centerX + x * CONFIG.gridSize - CONFIG.cardWidth / 2,
+            y: this.centerY + y * CONFIG.gridSize - CONFIG.cardHeight / 2 - 80
+        };
+    }
+
+    render() {
+        // Clear logic needs to account for scale
+        this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
+
+        // 1. Draw Field Tiles
+        // We iterate and update animation positions here if we had them
+        // For now, static rendering
+        
+        // Draw Shadow for the whole pile to give depth? Optional.
+
+        for (let tile of this.tiles) {
+            if (tile.inSlot || tile.isRemoved) continue;
+            
+            let isBlocked = tile.isBlocked(this.tiles);
+            let pos = this.toScreen(tile.x, tile.y);
+            
+            this.drawTile(tile, pos.x, pos.y, isBlocked);
+        }
+
+        // 2. Draw Slot Area
+        let slotW = CONFIG.slotCapacity * (CONFIG.cardWidth + 4) + 20;
+        let slotX = this.centerX - slotW / 2;
+        
+        // LAYOUT FIX: Move slot higher up to avoid overlapping with bottom controls
+        // Original: (this.canvas.height / this.scale) - CONFIG.cardHeight - 40;
+        // New: -120 to leave space for buttons
+        let slotY = (this.canvas.height / this.scale) - CONFIG.cardHeight - 120;
+
+        this.ctx.fillStyle = '#512da8';
+        this.ctx.beginPath();
+        this.ctx.roundRect(slotX, slotY, slotW, CONFIG.cardHeight + 20, 15);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#d1c4e9';
+        this.ctx.lineWidth = 4;
+        this.ctx.stroke();
+
+        // 3. Draw Tiles in Slot
+        this.slot.forEach((tile, index) => {
+            let tx = slotX + 10 + index * (CONFIG.cardWidth + 4);
+            let ty = slotY + 10;
+            this.drawTile(tile, tx, ty, false);
+        });
+    }
+
+    drawTile(tile, x, y, isBlocked) {
+        let asset = ASSETS[tile.type];
+        
+        // Shadow (3D effect)
+        this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        this.ctx.beginPath();
+        this.ctx.roundRect(x + 2, y + 4, CONFIG.cardWidth, CONFIG.cardHeight, 6);
+        this.ctx.fill();
+
+        // Card Body
+        this.ctx.fillStyle = 'white'; // Always white bg for photos
+        this.ctx.beginPath();
+        this.ctx.roundRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight, 6);
+        this.ctx.fill();
+        
+        // Content (Image or Text)
+        if (asset.type === 'image' && IMG_CACHE[tile.type]) {
+            const img = IMG_CACHE[tile.type];
+            // Center Crop / Cover Logic
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight, 6);
+            this.ctx.clip();
+
+            const imgRatio = img.width / img.height;
+            const cardRatio = CONFIG.cardWidth / CONFIG.cardHeight;
+            
+            let drawW, drawH, drawX, drawY;
+            
+            if (imgRatio > cardRatio) {
+                // Image is wider
+                drawH = CONFIG.cardHeight;
+                drawW = drawH * imgRatio;
+                drawX = x - (drawW - CONFIG.cardWidth) / 2;
+                drawY = y;
+            } else {
+                // Image is taller
+                drawW = CONFIG.cardWidth;
+                drawH = drawW / imgRatio;
+                drawX = x;
+                drawY = y - (drawH - CONFIG.cardHeight) / 2;
+            }
+            
+            this.ctx.drawImage(img, drawX, drawY, drawW, drawH);
+            this.ctx.restore();
+        } else {
+            // Fallback Text
+            this.ctx.font = '24px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillText(asset.value || '?', x + CONFIG.cardWidth/2, y + CONFIG.cardHeight/2 + 2);
+        }
+
+        // Border (draw on top of image)
+        this.ctx.strokeStyle = '#5d4037';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight); // Simple rect is faster
+
+        // Highlight/Shine
+        this.ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x + CONFIG.cardWidth/2, y + 10, CONFIG.cardWidth/2 - 5, 5, 0, 0, Math.PI*2);
+        this.ctx.fill();
+        
+        // Blocked Overlay
+        if (isBlocked) {
+            this.ctx.fillStyle = 'rgba(0,0,0,0.6)'; // Darker for better visibility over photos
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight, 6);
+            this.ctx.fill();
+        }
+    }
+
+    handleClick(e) {
+        // Init audio context on first interaction
+        if (!this.audioInitialized) {
+            AudioMgr.init();
+            this.audioInitialized = true;
+        }
+
+        // Need to account for Scale
+        const rect = this.canvas.getBoundingClientRect();
+        const rawX = e.clientX - rect.left;
+        const rawY = e.clientY - rect.top;
+        
+        const clickX = rawX / this.scale;
+        const clickY = rawY / this.scale;
+
+        // Check tiles Top to Bottom
+        for (let i = this.tiles.length - 1; i >= 0; i--) {
+            let tile = this.tiles[i];
+            if (tile.inSlot || tile.isRemoved) continue;
+
+            let pos = this.toScreen(tile.x, tile.y);
+            
+            if (clickX >= pos.x && clickX <= pos.x + CONFIG.cardWidth &&
+                clickY >= pos.y && clickY <= pos.y + CONFIG.cardHeight) {
+                
+                if (!tile.isBlocked(this.tiles)) {
+                    AudioMgr.playClick();
+                    this.moveToSlot(tile);
+                    return; 
+                }
+            }
+        }
+    }
+
+    moveToSlot(tile) {
+        if (this.slot.length >= CONFIG.slotCapacity) {
+             this.checkGameOver();
+             return;
+        }
+
+        tile.inSlot = true;
+        this.slot.push(tile);
+        this.render();
+        
+        // Delay match check slightly for visual feel? No, instant is snappier for this version.
+        this.checkMatch();
+        this.checkGameOver();
+    }
+
+    checkMatch() {
+        let counts = {};
+        this.slot.forEach(t => counts[t.type] = (counts[t.type] || 0) + 1);
+
+        let matchedType = null;
+        for (let type in counts) {
+            if (counts[type] >= 3) {
+                matchedType = type;
+                break;
+            }
+        }
+
+        if (matchedType) {
+            // Delay removal slightly to show 3 together
+            setTimeout(() => {
+                AudioMgr.playMatch();
+                let removed = 0;
+                this.slot = this.slot.filter(t => {
+                    if (t.type === matchedType && removed < 3) {
+                        t.isRemoved = true;
+                        removed++;
+                        return false;
+                    }
+                    return true;
+                });
+                this.render();
+                
+                // Check Win
+                if (this.tiles.every(t => t.isRemoved)) {
+                    setTimeout(() => {
+                        AudioMgr.playWin();
+                        if (this.level === 1) {
+                            this.startLevel(2);
+                        } else {
+                            document.getElementById('victory-modal').style.display = 'block';
+                        }
+                    }, 300);
+                }
+            }, 100);
+        }
+    }
+
+    checkGameOver() {
+        if (this.slot.length >= CONFIG.slotCapacity) {
+            // Check if there is a pending match that hasn't cleared yet
+            // The checkMatch logic runs immediately, but the removal is in setTimeout.
+            // So we need to be careful. 
+            // Simplified: If full AND no 3-matches possible (checked by logic), fail.
+            
+            let counts = {};
+            this.slot.forEach(t => counts[t.type] = (counts[t.type] || 0) + 1);
+            let hasMatch = Object.values(counts).some(c => c >= 3);
+            
+            if (!hasMatch) {
+                setTimeout(() => {
+                    if (this.slot.length >= CONFIG.slotCapacity) {
+                        AudioMgr.playLose();
+                        document.getElementById('game-over-modal').style.display = 'block';
+                    }
+                }, 500);
+            }
+        }
+    }
+    
+    undo() {
+        if (this.slot.length > 0) {
+            let tile = this.slot.pop();
+            tile.inSlot = false;
+            // When undoing, we need to ensure it's not "under" existing tiles
+            // But logic uses `layer` which is fixed. 
+            // So it just goes back to original place.
+            this.render();
+        }
+    }
+    
+    shuffle() {
+        let activeTiles = this.tiles.filter(t => !t.inSlot && !t.isRemoved);
+        let types = activeTiles.map(t => t.type);
+        types.sort(() => Math.random() - 0.5);
+        activeTiles.forEach((t, i) => t.type = types[i]);
+        this.render();
+        // Visual feedback
+        this.ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
+        setTimeout(() => this.render(), 50);
+    }
+    
+    nextLevel() {
+        this.level++;
+        if (LEVELS[this.level]) {
+            this.startLevel(this.level);
+        } else {
+             // Loop back to 1 or stay?
+             alert("恭喜通关！回到第一关");
+             this.startLevel(1);
+        }
+    }
+
+    restart() {
+        this.startLevel(this.level);
+    }
+
+    loop() {
+        requestAnimationFrame(() => this.loop());
+    }
+}
+
+const game = new Game();
+
+</script>
+</body>
+</html>
