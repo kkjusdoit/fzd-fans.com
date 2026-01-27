@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>东了个东 (Dong Le Ge Dong) - 樊振东粉丝公益版</title>
+    <title>咚了个咚</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <style>
         body {
@@ -16,6 +16,27 @@
             touch-action: none; /* Prevent zoom/scroll on mobile */
             user-select: none;
             -webkit-user-select: none;
+        }
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(to bottom, #1e88e5, #1565c0);
+            color: white;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 1000;
+            pointer-events: auto;
+            box-shadow: 0 3px #0d47a1;
+            transition: transform 0.1s;
+            border: none;
+        }
+        #back-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 #0d47a1;
         }
         #game-container {
             position: relative;
@@ -144,11 +165,36 @@
         .modal-btn:active {
             box-shadow: 0 0 #4a3c63;
         }
+        #difficulty-banner {
+            display: none;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(90deg, transparent, #d32f2f, transparent);
+            color: white;
+            padding: 10px 40px;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px black;
+            width: 100%;
+            text-align: center;
+            z-index: 150;
+            pointer-events: none;
+            animation: slideAcross 1.5s ease-in-out;
+        }
+        @keyframes slideAcross {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
 <div id="game-container">
+    <a href="/games" id="back-btn">返回</a>
     <canvas id="gameCanvas"></canvas>
     
     <div id="loading-screen">
@@ -158,7 +204,7 @@
 
     <div id="ui-layer">
         <div class="header">
-            <h1>🏓 东了个东</h1>
+            <h1>🏓 咚了个咚</h1>
             <p id="level-display">第一关：热身赛</p>
         </div>
         <div class="controls">
@@ -176,8 +222,12 @@
 
     <div id="victory-modal">
         <h2>🎉 超级全满贯！</h2>
-        <p>你超越了 99.9% 的东粉，加入了国家队！</p>
+        <p>你超越了 99.9% 的樊星！</p>
         <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
+    </div>
+    
+    <div id="difficulty-banner">
+        ⚠️ 难度飙升 ⚠️
     </div>
 </div>
 
@@ -194,21 +244,21 @@ const CONFIG = {
 
 // Real Photos from FZD Fans Gallery (Local Assets)
 const PHOTO_URLS = [
-    "/game/assets/image- 000.webp",
-    "/game/assets/image- 001.webp",
     "/game/assets/image- 002.webp",
+    "/game/assets/image- 013.webp",
+    "/game/assets/image- 007.webp",
+    "/game/assets/image- 023.webp",
+    "/game/assets/image- 001.webp",
     "/game/assets/image- 003.webp",
     "/game/assets/image- 004.webp",
     "/game/assets/image- 005.webp",
     "/game/assets/image- 006.webp",
-    "/game/assets/image- 007.webp",
-    "/game/assets/image- 008.webp",
+    "/game/assets/image- 021.webp",
     "/game/assets/image- 009.webp",
-    "/game/assets/image- 010.webp",
-    "/game/assets/image- 011.webp",
+    "/game/assets/image- 020.webp",
+    "/game/assets/image- 019.webp",
     "/game/assets/image- 012.webp",
-    "/game/assets/image- 013.webp",
-    "/game/assets/image- 014.webp"
+    "/game/assets/image- 018.webp"
 ];
 
 const ASSETS = {};
@@ -352,6 +402,10 @@ class Game {
         this.slot = [];
         this.level = 1;
         this.scale = 1;
+        this.particles = []; // Particle System
+        
+        // GM Mode
+        this.godMode = false;
         
         this.resize();
         window.addEventListener('resize', () => this.resize());
@@ -363,10 +417,32 @@ class Game {
              // e.preventDefault(); // Optional: prevent scrolling
         });
 
-        document.getElementById('btn-restart').onclick = () => this.startLevel(this.level);
-        document.getElementById('btn-undo').onclick = () => this.undo();
-        document.getElementById('btn-shuffle').onclick = () => this.shuffle();
+        // Use addEventListener for buttons to ensure robust binding
+        const bindBtn = (id, handler) => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.onclick = null; // Clear inline or property handlers
+                btn.addEventListener('click', handler);
+                btn.addEventListener('touchend', (e) => {
+                    e.preventDefault(); // Prevent double-fire on mobile
+                    handler();
+                });
+            }
+        };
+
+        bindBtn('btn-restart', () => this.restart());
+        bindBtn('btn-undo', () => this.undo());
+        bindBtn('btn-shuffle', () => this.shuffle());
         
+        // Modal Buttons
+        // We need to expose game instance methods or bind them here.
+        // Since 'game' variable is defined after class, we can use a small delay or bind in DOM directly if game is global.
+        // But better to bind dynamically here.
+        
+        // Note: The HTML onclick="game.restart()" might fail if 'game' isn't on window.
+        // Let's attach to window to be safe for HTML attributes
+        window.game = this;
+
         // Start loading images first
         this.preloadImages().then(() => {
             document.getElementById('loading-screen').style.opacity = '0';
@@ -374,6 +450,8 @@ class Game {
                 document.getElementById('loading-screen').style.display = 'none';
             }, 500);
             this.startLevel(1);
+            // Force an initial render explicitly after loading
+            setTimeout(() => this.render(), 100); 
             this.loop();
         });
     }
@@ -390,19 +468,26 @@ class Game {
                 const img = new Image();
                 img.crossOrigin = "Anonymous"; // Handle CORS if needed
                 img.src = ASSETS[key].src;
-                img.onload = () => {
-                    loaded++;
-                    document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
-                    IMG_CACHE[key] = img;
-                    if (loaded >= total) resolve();
-                };
-                img.onerror = () => {
-                    console.error("Failed to load image:", ASSETS[key].src);
-                    // Fallback or just count it
-                    loaded++;
-                     document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
-                    if (loaded >= total) resolve();
-                };
+                // Important: Ensure we catch cached loads too
+                if (img.complete) {
+                     loaded++;
+                     IMG_CACHE[key] = img;
+                     if (loaded >= total) resolve();
+                } else {
+                    img.onload = () => {
+                        loaded++;
+                        document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
+                        IMG_CACHE[key] = img;
+                        if (loaded >= total) resolve();
+                    };
+                    img.onerror = () => {
+                        console.error("Failed to load image:", ASSETS[key].src);
+                        // Fallback or just count it
+                        loaded++;
+                         document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
+                        if (loaded >= total) resolve();
+                    };
+                }
             });
         });
     }
@@ -423,13 +508,39 @@ class Game {
 
     startLevel(lvl) {
         this.level = lvl;
+        this.isGameOver = false;
         document.getElementById('level-display').innerText = LEVELS[lvl].name;
         document.getElementById('game-over-modal').style.display = 'none';
         document.getElementById('victory-modal').style.display = 'none';
         
+        // Reset controls state
+        const controls = document.querySelector('.controls');
+        if (controls) {
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
+        }
+        
+        // Show difficulty banner for Level 2
+        const banner = document.getElementById('difficulty-banner');
+        if (lvl === 2) {
+            banner.style.display = 'block';
+            banner.style.animation = 'none';
+            banner.offsetHeight; /* trigger reflow */
+            banner.style.animation = 'slideAcross 1.5s ease-in-out';
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 1500);
+        } else {
+            banner.style.display = 'none';
+        }
+
         this.slot = [];
         this.tiles = [];
         this.generateTiles(LEVELS[lvl]);
+        
+        // Fix: Force render after level switch to ensure tiles are drawn immediately
+        // The loop() will pick it up, but sometimes a clear followed by a wait causes flicker or blank
+        this.render();
     }
 
     generateTiles(levelConfig) {
@@ -459,18 +570,19 @@ class Game {
             let layer, x, y;
             
             if (this.level === 1) {
-                // Fixed Layout for Level 1 (Teaching)
+                // Fixed Layout for Level 1 (Teaching) - Increased Spacing
+                const spacing = 2.4; // Slightly increased from 2.2
                 if (index < 12) {
                     // Layer 0: 3x4 grid roughly
                     layer = 0;
-                    x = (index % 3) * 2.2 - 2.2; 
-                    y = Math.floor(index / 3) * 2.2 - 2.2;
+                    x = (index % 3) * spacing - spacing; 
+                    y = Math.floor(index / 3) * spacing - spacing;
                 } else if (index < 20) {
                      // Layer 1: Center area
                      layer = 1;
                      let i2 = index - 12;
-                     x = (i2 % 2) * 2.2 - 1.1;
-                     y = Math.floor(i2 / 2) * 2.2 - 1.1;
+                     x = (i2 % 2) * spacing - (spacing / 2);
+                     y = Math.floor(i2 / 2) * spacing - (spacing / 2);
                 } else {
                     // Top Layer
                     layer = 2;
@@ -513,11 +625,6 @@ class Game {
         this.ctx.restore();
 
         // 1. Draw Field Tiles
-        // We iterate and update animation positions here if we had them
-        // For now, static rendering
-        
-        // Draw Shadow for the whole pile to give depth? Optional.
-
         for (let tile of this.tiles) {
             if (tile.inSlot || tile.isRemoved) continue;
             
@@ -530,17 +637,14 @@ class Game {
         // 2. Draw Slot Area
         let slotW = CONFIG.slotCapacity * (CONFIG.cardWidth + 4) + 20;
         let slotX = this.centerX - slotW / 2;
-        
-        // LAYOUT FIX: Move slot higher up to avoid overlapping with bottom controls
-        // Original: (this.canvas.height / this.scale) - CONFIG.cardHeight - 40;
-        // New: -120 to leave space for buttons
         let slotY = (this.canvas.height / this.scale) - CONFIG.cardHeight - 120;
 
-        this.ctx.fillStyle = '#512da8';
+        // Change slot color to blue (Deep Purple -> Blue)
+        this.ctx.fillStyle = '#1e88e5'; // Material Blue 600
         this.ctx.beginPath();
         this.ctx.roundRect(slotX, slotY, slotW, CONFIG.cardHeight + 20, 15);
         this.ctx.fill();
-        this.ctx.strokeStyle = '#d1c4e9';
+        this.ctx.strokeStyle = '#90caf9'; // Blue 200 Border
         this.ctx.lineWidth = 4;
         this.ctx.stroke();
 
@@ -550,6 +654,58 @@ class Game {
             let ty = slotY + 10;
             this.drawTile(tile, tx, ty, false);
         });
+
+        // 4. Draw Particles
+        this.drawParticles();
+    }
+
+    createParticles(x, y, type) {
+        const emojis = type === 'win' ? ['🎉', '✨', '🏆', '🥇', '🏓'] : ['🏓', '✨', '🌟'];
+        const count = type === 'win' ? 150 : 30;
+        
+        for (let i = 0; i < count; i++) {
+            this.particles.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 15, // Faster horizontal spread
+                vy: (Math.random() - 0.5) * 15 - (type === 'win' ? 8 : 4), // Higher jump
+                life: 1.0,
+                color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                gravity: 0.25, // Slightly heavier
+                size: 20 + Math.random() * 20 // Variable size
+            });
+        }
+    }
+
+    updateParticles() {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            let p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.gravity;
+            p.life -= 0.01; // Slower fade out (was 0.02)
+            
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+            }
+        }
+    }
+
+    drawParticles() {
+        for (let p of this.particles) {
+            this.ctx.save();
+            this.ctx.globalAlpha = p.life;
+            this.ctx.font = `${p.size}px Arial`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillStyle = p.color;
+            // Add a slight shadow for better visibility
+            this.ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            this.ctx.shadowBlur = 2;
+            this.ctx.fillText(p.emoji, p.x, p.y);
+            this.ctx.restore();
+        }
     }
 
     drawTile(tile, x, y, isBlocked) {
@@ -611,15 +767,9 @@ class Game {
         this.ctx.lineWidth = 1;
         this.ctx.strokeRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight); // Simple rect is faster
 
-        // Highlight/Shine
-        this.ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        this.ctx.beginPath();
-        this.ctx.ellipse(x + CONFIG.cardWidth/2, y + 10, CONFIG.cardWidth/2 - 5, 5, 0, 0, Math.PI*2);
-        this.ctx.fill();
-        
         // Blocked Overlay
         if (isBlocked) {
-            this.ctx.fillStyle = 'rgba(0,0,0,0.6)'; // Darker for better visibility over photos
+            this.ctx.fillStyle = 'rgba(0,0,0,0.3)'; // Reduced darkness from 0.6 to 0.4
             this.ctx.beginPath();
             this.ctx.roundRect(x, y, CONFIG.cardWidth, CONFIG.cardHeight, 6);
             this.ctx.fill();
@@ -627,6 +777,8 @@ class Game {
     }
 
     handleClick(e) {
+        if (this.isGameOver) return;
+        
         // Init audio context on first interaction
         if (!this.audioInitialized) {
             AudioMgr.init();
@@ -640,6 +792,25 @@ class Game {
         
         const clickX = rawX / this.scale;
         const clickY = rawY / this.scale;
+
+        // GM Mode Logic
+        if (this.godMode) {
+            for (let i = this.tiles.length - 1; i >= 0; i--) {
+                let tile = this.tiles[i];
+                if (tile.inSlot || tile.isRemoved) continue;
+
+                let pos = this.toScreen(tile.x, tile.y);
+                if (clickX >= pos.x && clickX <= pos.x + CONFIG.cardWidth &&
+                    clickY >= pos.y && clickY <= pos.y + CONFIG.cardHeight) {
+                    
+                    tile.isRemoved = true;
+                    console.log(`🔨 GM消除: [Layer ${tile.layer}] ID:${tile.id} (${tile.type})`);
+                    this.render();
+                    return; 
+                }
+            }
+            return; // Skip normal logic
+        }
 
         // Check tiles Top to Bottom
         for (let i = this.tiles.length - 1; i >= 0; i--) {
@@ -668,6 +839,15 @@ class Game {
 
         tile.inSlot = true;
         this.slot.push(tile);
+        
+        // Auto-sort logic: Group tiles of same type together
+        this.slot.sort((a, b) => {
+            // Sort by type first
+            if (a.type !== b.type) return a.type.localeCompare(b.type);
+            // Then by original ID to keep stable order
+            return a.id - b.id;
+        });
+
         this.render();
         
         // Delay match check slightly for visual feel? No, instant is snappier for this version.
@@ -688,6 +868,9 @@ class Game {
         }
 
         if (matchedType) {
+            // Spawn particles at screen center instead of slot to avoid "exploding person" effect
+            this.createParticles(this.centerX, this.centerY, 'match');
+
             // Delay removal slightly to show 3 together
             setTimeout(() => {
                 AudioMgr.playMatch();
@@ -704,10 +887,14 @@ class Game {
                 
                 // Check Win
                 if (this.tiles.every(t => t.isRemoved)) {
+                    this.createParticles(this.centerX, this.centerY, 'win');
                     setTimeout(() => {
                         AudioMgr.playWin();
                         if (this.level === 1) {
-                            this.startLevel(2);
+                            // Delay next level start to let win particles play out
+                            setTimeout(() => {
+                                this.startLevel(2);
+                            }, 1500);
                         } else {
                             document.getElementById('victory-modal').style.display = 'block';
                         }
@@ -731,8 +918,12 @@ class Game {
             if (!hasMatch) {
                 setTimeout(() => {
                     if (this.slot.length >= CONFIG.slotCapacity) {
+                        this.isGameOver = true;
                         AudioMgr.playLose();
                         document.getElementById('game-over-modal').style.display = 'block';
+                        // Disable controls visually
+                        document.querySelector('.controls').style.opacity = '0.5';
+                        document.querySelector('.controls').style.pointerEvents = 'none';
                     }
                 }, 500);
             }
@@ -740,6 +931,7 @@ class Game {
     }
     
     undo() {
+        if (this.isGameOver) return;
         if (this.slot.length > 0) {
             let tile = this.slot.pop();
             tile.inSlot = false;
@@ -751,6 +943,7 @@ class Game {
     }
     
     shuffle() {
+        if (this.isGameOver) return;
         let activeTiles = this.tiles.filter(t => !t.inSlot && !t.isRemoved);
         let types = activeTiles.map(t => t.type);
         types.sort(() => Math.random() - 0.5);
@@ -773,11 +966,53 @@ class Game {
         }
     }
 
+    toggleGodMode() {
+        this.godMode = !this.godMode;
+        const status = this.godMode ? "开启" : "关闭";
+        alert(`GM 上帝模式已${status}！\n点击卡牌直接消除，无视遮挡。`);
+        
+        if (this.godMode) {
+            this.canvas.style.border = "4px solid red";
+            this.audit();
+        } else {
+            this.canvas.style.border = "none";
+        }
+    }
+
+    audit() {
+        const counts = {};
+        let total = 0;
+        this.tiles.forEach(t => {
+            if (!t.isRemoved) {
+                counts[t.type] = (counts[t.type] || 0) + 1;
+                total++;
+            }
+        });
+        
+        console.group("📊 牌堆数据审计");
+        console.log(`当前剩余总数: ${total}`);
+        console.table(counts);
+        
+        const errors = Object.entries(counts).filter(([type, num]) => num % 3 !== 0);
+        if (errors.length === 0) {
+            console.log("%c✅ 验证通过：所有卡牌数量均为 3 的倍数", "color: green; font-weight: bold;");
+            if (this.godMode) alert(`✅ 数据审计通过：剩余 ${total} 张牌，均为 3 的倍数。`);
+        } else {
+            console.log("%c❌ 验证失败：存在非3倍数卡牌", "color: red; font-weight: bold;", errors);
+            if (this.godMode) alert(`❌ 数据异常！\n以下卡牌数量不对：\n${errors.map(e => e[0]+': '+e[1]).join('\n')}`);
+        }
+        console.groupEnd();
+    }
+
     restart() {
         this.startLevel(this.level);
     }
 
     loop() {
+        this.updateParticles();
+        if (this.particles.length > 0) {
+            this.render();
+        }
         requestAnimationFrame(() => this.loop());
     }
 }
