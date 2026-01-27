@@ -18,20 +18,37 @@ export async function syncWithImageBed(DB: any, env: any) {
     
     console.log(`SyncHelper: Fetching image list from upstream (User: ${user})...`);
     
-    const response = await fetch('https://cloudflare-imgbed-cvs.pages.dev/api/manage/list', {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      }
-    });
+    let remoteFiles: any[] = [];
+    let start = 0;
+    const pageSize = 500;
+    let hasMore = true;
 
-    if (!response.ok) {
-      throw new Error(`Upstream API failed: ${response.status}`);
+    while (hasMore) {
+      console.log(`SyncHelper: Fetching page start=${start}, count=${pageSize}...`);
+      const response = await fetch(`https://cloudflare-imgbed-cvs.pages.dev/api/manage/list?start=${start}&count=${pageSize}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upstream API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const files = data.files || [];
+      remoteFiles = remoteFiles.concat(files);
+
+      if (files.length < pageSize || (data.totalCount && remoteFiles.length >= data.totalCount)) {
+        hasMore = false;
+      } else {
+        start += files.length;
+      }
     }
 
-    const data = await response.json();
-    const remoteFiles = data.files || [];
+    console.log(`SyncHelper: Total remote files fetched: ${remoteFiles.length}`);
     const validRemoteUrls = new Set<string>();
 
     let added = 0;
