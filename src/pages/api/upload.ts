@@ -171,7 +171,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
           console.log(`IP ${clientIP} uploaded ${count} images in last 10 mins`);
 
-          if (count >= 10) {
+          if (count >= 50) {
             return new Response(JSON.stringify({
               success: false,
               error: 'Rate limit exceeded. Please try again later.'
