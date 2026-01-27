@@ -45,6 +45,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
         canvas {
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
@@ -61,6 +62,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            align-items: center; /* Center UI elements horizontally */
         }
         .header {
             padding: 15px;
@@ -69,6 +71,8 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             pointer-events: auto;
             z-index: 10;
+            max-width: 600px;
+            width: 100%;
         }
         .header h1 {
             font-size: 24px;
@@ -88,6 +92,8 @@
             margin-bottom: 20px;
             /* Ensure controls are above canvas visually if overlap occurs, though UI layer is on top */
             z-index: 20;
+            max-width: 600px;
+            width: 100%;
         }
         button {
             background: linear-gradient(to bottom, #ffeb3b, #fbc02d);
@@ -532,9 +538,20 @@ class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         
-        // Calculate scale to fit 7 cards width + margins
-        const requiredWidth = CONFIG.slotCapacity * (CONFIG.cardWidth + 4) + 60;
-        this.scale = Math.min(1.2, this.canvas.width / requiredWidth); // Max scale 1.2
+        // Base dimensions (Reference Mobile Resolution)
+        // We want to ensure at least this area is visible
+        const safeWidth = CONFIG.slotCapacity * (CONFIG.cardWidth + 4) + 60; // ~440px
+        const safeHeight = 750; // Include space for Header, Pile, Slot, Controls
+        
+        // Calculate scale to fit BOTH width and height
+        const scaleX = this.canvas.width / safeWidth;
+        const scaleY = this.canvas.height / safeHeight;
+        
+        // Use the smaller scale to ensure everything fits
+        this.scale = Math.min(scaleX, scaleY);
+        
+        // Limit max scale on large desktop screens to avoid absurdly huge UI
+        this.scale = Math.min(this.scale, 2.0); 
         
         this.centerX = (this.canvas.width / 2) / this.scale;
         this.centerY = (this.canvas.height / 2) / this.scale;
