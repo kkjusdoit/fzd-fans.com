@@ -139,7 +139,7 @@
             background: #ffeb3b;
             transition: width 0.3s;
         }
-        #game-over-modal, #victory-modal {
+        #game-over-modal, #victory-modal, #confirm-modal {
             display: none;
             position: absolute;
             top: 50%;
@@ -233,6 +233,15 @@
         <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
     </div>
     
+    <div id="confirm-modal">
+        <h2>⚠️ 危险操作</h2>
+        <p>卡槽即将满员且无法消除！<br>这一步可能导致失败。</p>
+        <div style="display:flex; gap:10px; justify-content: space-between;">
+            <button class="modal-btn" id="btn-confirm-no" style="background: linear-gradient(to bottom, #1e88e5, #1565c0); width: 48%;">我再想想</button>
+            <button class="modal-btn" id="btn-confirm-yes" style="background: linear-gradient(to bottom, #d32f2f, #c62828); width: 48%;">头铁继续</button>
+        </div>
+    </div>
+    
     <div id="difficulty-banner">
         ⚠️ 难度飙升 ⚠️
     </div>
@@ -285,9 +294,9 @@ const LEVELS = {
     },
     2: {
         name: "第二关：巴黎巅峰 (困难)",
-        types: Object.keys(ASSETS),
-        count: 102, 
-        layers: 8
+        types: Object.keys(ASSETS).slice(0, 10), // Reduced from all 15 types
+        count: 60, // Reduced from 102
+        layers: 5 // Reduced from 8
     }
 };
 
@@ -446,6 +455,7 @@ class Game {
         this.level = 1;
         this.scale = 1;
         this.particles = []; // Particle System
+        this.pendingTile = null;
         
         // GM Mode
         this.godMode = false;
@@ -476,6 +486,9 @@ class Game {
         bindBtn('btn-restart', () => this.restart());
         bindBtn('btn-undo', () => this.undo());
         bindBtn('btn-shuffle', () => this.shuffle());
+        
+        bindBtn('btn-confirm-yes', () => this.confirmMove(true));
+        bindBtn('btn-confirm-no', () => this.confirmMove(false));
         
         // Modal Buttons
         // We need to expose game instance methods or bind them here.
@@ -581,9 +594,11 @@ class Game {
     startLevel(lvl) {
         this.level = lvl;
         this.isGameOver = false;
+        this.pendingTile = null;
         document.getElementById('level-display').innerText = LEVELS[lvl].name;
         document.getElementById('game-over-modal').style.display = 'none';
         document.getElementById('victory-modal').style.display = 'none';
+        document.getElementById('confirm-modal').style.display = 'none';
         
         // Reset controls state
         const controls = document.querySelector('.controls');
@@ -850,6 +865,7 @@ class Game {
 
     handleClick(e) {
         if (this.isGameOver) return;
+        if (this.pendingTile) return; // Prevent clicks when modal is open
         
         // Init audio context on first interaction
         if (!this.audioInitialized) {
@@ -895,12 +911,48 @@ class Game {
                 clickY >= pos.y && clickY <= pos.y + CONFIG.cardHeight) {
                 
                 if (!tile.isBlocked(this.tiles)) {
-                    AudioMgr.playClick();
-                    this.moveToSlot(tile);
+                    // AudioMgr.playClick(); // Moved to tryMoveToSlot/confirmMove
+                    this.tryMoveToSlot(tile);
                     return; 
                 }
             }
         }
+    }
+
+    tryMoveToSlot(tile) {
+        // Check if slot is about to be full (currently size 6, capacity 7)
+        if (this.slot.length === CONFIG.slotCapacity - 1) {
+            // Check if adding this tile will cause a match (and thus clear space)
+            let count = 0;
+            for(let t of this.slot) {
+                if(t.type === tile.type) count++;
+            }
+            
+            // If count < 2, adding this tile makes it 1 or 2, not 3. No match.
+            // Slot becomes full (7/7) and no match -> Game Over likely.
+            if (count < 2) {
+                this.showFullSlotWarning(tile);
+                return;
+            }
+        }
+        
+        // Safe to move
+        AudioMgr.playClick();
+        this.moveToSlot(tile);
+    }
+
+    showFullSlotWarning(tile) {
+        this.pendingTile = tile;
+        document.getElementById('confirm-modal').style.display = 'block';
+    }
+
+    confirmMove(yes) {
+        document.getElementById('confirm-modal').style.display = 'none';
+        if (yes && this.pendingTile) {
+            AudioMgr.playClick();
+            this.moveToSlot(this.pendingTile);
+        }
+        this.pendingTile = null;
     }
 
     moveToSlot(tile) {
