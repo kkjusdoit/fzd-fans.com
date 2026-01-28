@@ -529,9 +529,9 @@ const trans = {
               desc: desc
             };
 
-            // 设置60秒超时
+            // 设置180秒超时
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000);
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
 
             try {
                 const response = await fetch('/api/upload', {
@@ -566,7 +566,7 @@ const trans = {
             } catch (fetchError) {
                 clearTimeout(timeoutId);
                 if (fetchError.name === 'AbortError') {
-                    throw new Error('上传超时，请检查网络或图片大小');
+                    throw new Error('上传超时（3分钟），请检查网络或尝试压缩图片后重试');
                 }
                 throw fetchError;
             }

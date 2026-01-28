@@ -96,9 +96,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('准备发送到图床服务器...');
 
     // add serverCompress=false to force upload as file (original quality)
-    // Add 50s timeout for upstream
+    // Add 120s timeout for upstream
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 50000);
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
 
     // Get Auth Code from Environment Variables (Cloudflare Pages or .env)
     const runtime = (locals as any).runtime;
@@ -118,7 +118,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
        if (err.name === 'AbortError') {
          return new Response(JSON.stringify({
             success: false,
-            error: 'Upstream upload timed out (50s)'
+            error: 'Upstream upload timed out (120s)'
          }), {
             status: 504,
             headers: { 'Content-Type': 'application/json' }
