@@ -41,7 +41,8 @@
         #game-container {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Modern mobile browsers */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -504,39 +505,57 @@ class Game {
             const keys = Object.keys(ASSETS);
             const total = keys.length;
             
-            if (total === 0) resolve();
+            if (total === 0) {
+                resolve();
+                return;
+            }
+
+            const checkDone = () => {
+                loaded++;
+                const progress = document.getElementById('loader-progress');
+                if (progress) progress.style.width = (loaded / total * 100) + '%';
+                
+                if (loaded >= total) resolve();
+            };
 
             keys.forEach(key => {
                 const img = new Image();
-                img.crossOrigin = "Anonymous"; // Handle CORS if needed
+                img.crossOrigin = "Anonymous";
+                
+                // Define handlers BEFORE setting src to ensure no race conditions
+                img.onload = () => {
+                    IMG_CACHE[key] = img;
+                    checkDone();
+                };
+                
+                img.onerror = () => {
+                    console.error("Failed to load image:", ASSETS[key].src);
+                    // Fallback to text or placeholder
+                    checkDone();
+                };
+
                 img.src = ASSETS[key].src;
-                // Important: Ensure we catch cached loads too
-                if (img.complete) {
-                     loaded++;
-                     IMG_CACHE[key] = img;
-                     if (loaded >= total) resolve();
-                } else {
-                    img.onload = () => {
-                        loaded++;
-                        document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
-                        IMG_CACHE[key] = img;
-                        if (loaded >= total) resolve();
-                    };
-                    img.onerror = () => {
-                        console.error("Failed to load image:", ASSETS[key].src);
-                        // Fallback or just count it
-                        loaded++;
-                         document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
-                        if (loaded >= total) resolve();
-                    };
+                
+                // Try to use decode() if available for smoother rendering readiness
+                if (img.decode) {
+                    img.decode().catch(err => {
+                        // Decode error (e.g. format not supported), but onload might still have fired or will fire?
+                        // Usually if decode fails, the image is bad.
+                        console.warn("Image decode failed:", ASSETS[key].src, err);
+                    });
                 }
             });
         });
     }
 
     resize() {
+        // Fix: Sync container height to visible window height to handle mobile toolbars
+        const vh = window.innerHeight;
+        const container = document.getElementById('game-container');
+        if (container) container.style.height = `${vh}px`;
+
         this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        this.canvas.height = vh;
         
         // Base dimensions (Reference Mobile Resolution)
         // We want to ensure at least this area is visible
