@@ -8,17 +8,34 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h1>🏓 球迷等级考试</h1>
       <p>测测你对樊振东了解多少？</p>
       <p class="hint">共10道题，包含选择题和判断题</p>
+      <div class="copyright" style="margin-bottom: 2rem; font-size: 0.9rem; color: #888;">
+        Caesar Fan 问答游戏 by <a href="https://weibo.com/baiduFZDbar" target="_blank" rel="noopener noreferrer" style="color: #1e88e5; text-decoration: none;">球迷会-天际樊星</a>
+      </div>
       <button id="start-btn">开始答题</button>
     </div>
     
     <div id="quiz-area" style="display: none;">
-      <div id="progress">
-        <span id="current-q">1</span> / <span id="total-q">10</span>
+      <div class="quiz-status-bar">
+        <div id="progress">
+          <span id="current-q">1</span> / <span id="total-q">29</span>
+        </div>
+        <button id="peek-btn">
+          👀 偷瞄一下 (<span id="peek-count">1</span>)
+        </button>
       </div>
       <div id="question-card">
         <div id="question-type"></div>
         <h2 id="question-text"></h2>
         <div id="options"></div>
+        
+        <div id="explanation-box" style="display: none; margin-top: 1.5rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1e88e5;">
+          <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem; color: #1e88e5;">💡 答案解析</h3>
+          <p id="explanation-text" style="margin: 0; color: #555; font-size: 0.95rem; line-height: 1.5;"></p>
+        </div>
+
+        <button id="next-btn" style="display: none; margin-top: 1.5rem; width: 100%; padding: 1rem; background: #1e88e5; color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer;">
+          下一题 →
+        </button>
       </div>
     </div>
     
@@ -26,6 +43,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="result-card">
         <div id="score-display"></div>
         <div id="rank-display"></div>
+        <div id="surpassed-display" style="color: #666; margin-bottom: 1rem; font-size: 1.1rem;"></div>
         <div id="rank-desc"></div>
         <div id="wrong-answers"></div>
         <button id="retry-btn">再考一次</button>
@@ -34,7 +52,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
 </BaseLayout>
 
-<style>
+<style is:global>
   #quiz-container {
     max-width: 700px;
     margin: 0 auto;
@@ -73,12 +91,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
   }
   
+  .quiz-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+  
   #progress {
-    text-align: center;
     font-size: 1.1rem;
     color: #888;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
   }
+  
+  #peek-btn {
+    background: #ff9f43;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  #peek-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
+  }
+  
+  #peek-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   #question-card {
     background: #fff;
     border-radius: 16px;
@@ -130,6 +181,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .option-btn.wrong {
     border-color: #ff4757;
     background: #fff0f0;
+  }
+  
+  .option-btn.peek-highlight {
+    border-color: #ff9f43;
+    background: #fff8e1;
+    position: relative;
+  }
+  
+  .option-btn.peek-highlight::after {
+    content: '👈 偷偷告诉你';
+    position: absolute;
+    right: 1rem;
+    color: #ff9f43;
+    font-size: 0.8rem;
   }
   
   #quiz-result {
@@ -194,73 +259,206 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <script>
   interface Question {
-    type: 'choice' | 'truefalse';
+    type: 'choice' | 'truefalse' | 'multi' | 'fill';
     question: string;
-    options: string[];
-    answer: number;
+    options?: string[];
+    answer: number | number[] | string;
     explanation?: string;
   }
 
   const questions: Question[] = [
     {
       type: 'choice',
-      question: '樊振东的出生日期是？',
-      options: ['1995年1月22日', '1997年1月22日', '1996年1月22日', '1998年1月22日'],
-      answer: 1
+      question: '1、(单选)樊振东最支持的足球队是：(2分)',
+      options: ['A、皇马', 'B、利物浦', 'C、巴萨', 'D、马竞'],
+      answer: 0,
+      explanation: '【解析】送命题。'
     },
     {
       type: 'choice',
-      question: '樊振东的外号"小胖"是谁起的？',
-      options: ['刘国梁', '王皓', '吴敬平', '马龙'],
-      answer: 2
-    },
-    {
-      type: 'truefalse',
-      question: '樊振东是历史上最年轻的世乒赛男单冠军。',
-      options: ['正确', '错误'],
-      answer: 0
+      question: '2、(单选)樊振东踢足球时会挑选几号球衣？(3分)',
+      options: ['A、97', 'B、99', 'C、1', 'D、122'],
+      answer: 1,
+      explanation: '【解析】乒乓世界2022年12月明星大调查。'
     },
     {
       type: 'choice',
-      question: '"地表最强12人"赛事，樊振东获得了几次冠军？',
-      options: ['1次', '2次', '3次', '4次'],
-      answer: 2
+      question: '3、(单选)樊振东春暖花开时最想去哪里玩？(3分)',
+      options: ['A、上海', 'B、巴黎', 'C、萨尔布吕肯', 'D、广州'],
+      answer: 0,
+      explanation: '【解析】乒乓世界2022年5月明星大调查。'
     },
     {
       type: 'choice',
-      question: '2023年亚运会男单决赛"粤圆之夜"，樊振东的对手是？',
-      options: ['王楚钦', '马龙', '张本智和', '林高远'],
-      answer: 1
-    },
-    {
-      type: 'truefalse',
-      question: '樊振东是右手横板两面反胶打法。',
-      options: ['正确', '错误'],
-      answer: 0
+      question: '4、(单选)樊振东觉得哪个《训练》项目练起来最累？(3分)',
+      options: ['A、长跑', 'B、多球', 'C、跑位'],
+      answer: 1,
+      explanation: '【解析】乒乓世界2022年12月明星大调查。'
     },
     {
       type: 'choice',
-      question: '樊振东首次获得世界排名第一是在哪一年？',
-      options: ['2020年', '2021年', '2022年', '2023年'],
-      answer: 2
+      question: '5、(单选)樊振东最爱吃什么馅的月饼？(3分)',
+      options: ['A、流沙', 'B、蛋黄', 'C、五仁', 'D、莲蓉'],
+      answer: 0,
+      explanation: '【解析】乒乓世界2020年10月明星大调查。'
     },
     {
       type: 'choice',
-      question: '樊振东在2024年巴黎奥运会获得了什么成绩？',
-      options: ['男单金牌', '男单银牌', '男单铜牌', '男团金牌+男单银牌'],
+      question: '6、(单选)粤语"乜都劲"表示"什么都很厉害"，那么"乜说话"的意思是(3分)',
+      options: ['A、谁说话', 'B、什么都说话', 'C、不在话下', 'D、你客气啦'],
       answer: 3
     },
     {
+      type: 'choice',
+      question: '7、(单选)2025全运会吉祥物原型是一只：(3分)',
+      options: ['A、白海豚', 'B、白切鸡', 'C、豉油鸡', 'D、熊猫'],
+      answer: 0
+    },
+    {
+      type: 'multi',
+      question: '8、(多选)樊振东在如下大赛中曾经单枪匹马独守全区：(4分)',
+      options: ['A、2024巴黎奥运会', 'B、2021休斯顿世乒赛', 'C、2019男乒世界杯', 'D、2019武汉军运会', 'E、2018男乒世界杯', 'F、2017亚锦赛'],
+      answer: [0, 1, 2, 3, 4]
+    },
+    {
+      type: 'multi',
+      question: '9、(多选)巴黎奥运会前樊振东曾表达过的小期待，目前为止实现了的有：(5分)',
+      options: ['A、专注于获得冠军的过程', 'B、在奥运村认识同为皇马球迷的纳达尔', 'C、在乒乓球比赛中跟魔笛一起对抗姆巴佩和贝林厄姆', 'D、见到另一位美凌格阿尔卡拉斯', 'E、冲击金牌'],
+      answer: [0, 1, 3, 4]
+    },
+    {
+      type: 'multi',
+      question: '10、(多选)樊振东曾在如下城市获得过2次或以上冠军：(5分)',
+      options: ['A、巴黎', 'B、威海', 'C、成都', 'D、新乡', 'E、新加坡'],
+      answer: [0, 1, 2, 4],
+      explanation: '【解析】\n巴黎：2018世界杯、2024奥运会；\n威海：2020世界杯、2020全锦赛；\n成都：2016中国公开赛、2019世界杯、2022世乒赛；\n新乡：2023WTT冠军赛；\n新加坡：2021WTT世界杯、2022WTT大满贯、2023WTT大满贯。'
+    },
+    {
+      type: 'multi',
+      question: '11、(多选)樊振东喜欢的动物有：(5分)',
+      options: ['A、熊', 'B、大象', 'C、猫', 'D、狗', 'E、兔'],
+      answer: [0, 1],
+      explanation: '【解析】乒乓世界2017年10月明星大调查。'
+    },
+    {
+      type: 'multi',
+      question: '12、(多选)欧冠联赛在如下情况中视作胜利的有：(5分)',
+      options: ['A、决胜局比分6-5', 'B、在淘汰赛中主场比赛输，客场比赛赢，第三场比赛在最后一盘单打中获胜', 'C、决胜局比分11-9', 'D、在淘汰赛中主场比赛赢，客场比赛输，第三场比赛在最后一盘双打中获胜'],
+      answer: [0, 1],
+      explanation: '【解析】欧冠没有双打；决胜局抢6达到6分即获胜。'
+    },
+    {
+      type: 'multi',
+      question: '13、(多选)关于棒球，正确的说法是：(5分)',
+      options: ['A、"三振出局"是指击球员累计三击不中而被判出局', 'B、击球员击球时，球棒可以击打球的任何部位', 'C、棒球比赛标准局数为7局', 'D、当棒球员击出界外球时算作一个好球', 'E、棒球中的"二刀流"指的是既能担任投手又能担任击球员的球员'],
+      answer: [0, 3, 4],
+      explanation: '【解析】棒球比赛为9局制。'
+    },
+    {
       type: 'truefalse',
-      question: '樊振东曾在世界杯上实现三连冠。',
-      options: ['正确', '错误'],
+      question: '14、(判断)樊振东是第一位参加德甲联赛的中国运动员 (2分)',
+      options: ['A、对', 'B、错'],
+      answer: 1
+    },
+    {
+      type: 'fill',
+      question: '15、(填空)2025全运会期间，樊振东表达过：永恒不变的是____(1分)',
+      answer: '变化',
+      explanation: '【解析】变化。'
+    },
+    {
+      type: 'choice',
+      question: '16、(单选)樊振东在比赛中，其极具威胁且运用频繁的反手技术是以下哪种？(3分)',
+      options: ['A、反手拧拉', 'B、正手弧圈球', 'C、侧身暴冲', 'D、削球'],
+      answer: 0,
+      explanation: '【解析】樊振东反手技术特点鲜明，他的反手拧拉速度快、力量大、线路灵活，在比赛中常常能为他争取到有主动进攻的机会。'
+    },
+    {
+      type: 'choice',
+      question: '17、(单选)樊振东投资的美国乒乓球职业联赛简称：(3分)',
+      options: ['A、MLTT', 'B、WTT', 'C、TBLL', 'D、ITTF'],
       answer: 0
     },
     {
       type: 'choice',
-      question: '樊振东的籍贯是？',
-      options: ['广东广州', '广东深圳', '湖北武汉', '北京'],
-      answer: 0
+      question: '18、(单选)西语中"1、2、3"发音正确的是：(5分)',
+      options: ['A、cero 塞洛、dos 多丝、uno 务诺', 'B、uno 务诺、dos 多丝、tres 得来丝', 'C、tres 得来丝、dos 多丝、uno 务诺', 'D、uno 务诺、dos 多丝、seis 塞伊丝'],
+      answer: 1
+    },
+    {
+      type: 'multi',
+      question: '19、(单/多选)樊振东对自己最满意的部位是：(5分)',
+      options: ['A、手', 'B、脸', 'C、皮肤', 'D、腿', 'E、头发', 'F、眼睛', 'G、牙齿'],
+      answer: [0, 1],
+      explanation: '【解析】乒乓世界2013年9月明星大调查：脸；六年后：手。'
+    },
+    {
+      type: 'choice',
+      question: '20、(单选)樊振东创造全运会最年青冠军纪录是在哪一年？(3分)',
+      options: ['A、2014年', 'B、2013年', 'C、2015年', 'D、2016年'],
+      answer: 1,
+      explanation: '【解析】樊振东2012年进入国家队，2013年就获得了第12届全运会男团、男双冠军，创造了全运会最年青冠军纪录。'
+    },
+    {
+      type: 'choice',
+      question: '21、(单选)樊振东曾四度获得的ITTF世界杯冠军是击败了几位不同对手实现的：(3分)',
+      options: ['A、1', 'B、2', 'C、3', 'D、4'],
+      answer: 3,
+      explanation: '【解析】\n2016：许昕；2018：波尔；2019：张本智和；2020：马龙。'
+    },
+    {
+      type: 'multi',
+      question: '22、(多选)以下属于樊振东主要技术特点的有哪些？(5分)',
+      options: ['A、反手拧拉', 'B、正手攻球', 'C、削球', 'D、中远台相持'],
+      answer: [0, 1, 3],
+      explanation: '【解析】樊振东的技术特点鲜明且全面。反手拧拉是他的拿手技术之一，能在台内快速上手并占据主动；正手攻球力量大、速度快，是他进攻的重要手段；中远台相持能力出色，能在多板回合中保持稳定并寻找得分机会。而削球并非他的主要技术风格，他主要是以进攻为主。'
+    },
+    {
+      type: 'choice',
+      question: '23、(单选)樊振东在足球场上最喜欢踢的位置是(3分)',
+      options: ['A、前锋', 'B、中场', 'C、后卫', 'D、守门'],
+      answer: 1,
+      explanation: '【解析】乒乓世界2022年12月明星大调查。'
+    },
+    {
+      type: 'choice',
+      question: '24、(单选)樊振东旅游时会买的纪念品是：(3分)',
+      options: ['A、当地特色娃娃', 'B、当地特色美食', 'C、化妆品', 'D、徽章或冰箱贴'],
+      answer: 3,
+      explanation: '【解析】乒乓世界2021年5月明星大调查。'
+    },
+    {
+      type: 'choice',
+      question: '25、(单选)2016年乒超联赛八一队获得冠军，樊振东表示："赛场外的嘘寒问暖、赛场上的呐喊助威，在这里还是要再次说一声感谢。我们团队越来越给力了，我只能在底下吃（）"(3分)',
+      options: ['A、巧克力', 'B、薯片', 'C、饼干', 'D、小香肠'],
+      answer: 1,
+      explanation: '【解析】乒乓世界杂志2016年12月刊。'
+    },
+    {
+      type: 'fill',
+      question: '26、(填空)2025全运会后，樊振东成为历史上第一位奖牌数量最多的____金王(1分)',
+      answer: '6',
+      explanation: '【解析】6或六。'
+    },
+    {
+      type: 'choice',
+      question: '27、(单选)"梦想没有大小没有版图没有边界"是樊振东在哪次大赛夺冠后的采访：(3分)',
+      options: ['A、2016世界杯', 'B、2018世界杯', 'C、2019世界杯', 'D、2020世界杯', 'E、2021世乒赛', 'F、2024奥运会', 'G、2023世乒赛'],
+      answer: 6
+    },
+    {
+      type: 'choice',
+      question: '28、(单选)"我希望能够成长得快一点，希望大家按主力队员对我提要求"是樊振东几岁时对自己的期许(5分)',
+      options: ['A、18', 'B、19', 'C、20', 'D、21', 'E、22', 'F、23'],
+      answer: 0,
+      explanation: '【解析】该采访来自2015年5月CCTV5风云会。'
+    },
+    {
+      type: 'multi',
+      question: '29、(多选)樊振东曾与以下哪些选手组队参加过比赛：(4分)',
+      options: ['A、朱世赫', 'B、莫雷高德', 'C、奥恰洛夫', 'D、林昀儒', 'E、黄镇廷', 'F、贾哈', 'G、阿鲁纳', 'H、张之臻'],
+      answer: [0, 1, 4, 7],
+      explanation: '【解析】\n朱世赫、黄镇廷：2016亚欧对抗赛亚洲队；\n莫雷高德：欧冠联赛萨尔布吕肯俱乐部；\n张之臻：上海劳力士大师赛双打。'
     }
   ];
 
@@ -268,17 +466,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     { min: 0, max: 2, title: '🌱 路人粉', desc: '刚开始了解小胖，继续加油！' },
     { min: 3, max: 5, title: '⭐ 普通球迷', desc: '有一定了解，但还需要多看比赛哦~' },
     { min: 6, max: 7, title: '🌟 资深球迷', desc: '不错不错，对小胖很熟悉了！' },
-    { min: 8, max: 9, title: '💫 铁杆粉丝', desc: '厉害！你是真正的东粉！' },
-    { min: 10, max: 10, title: '🏆 终极迷弟/迷妹', desc: '满分！你比小胖还了解小胖！' }
+    { min: 8, max: 9, title: '💫 大满贯球迷', desc: '厉害！你是真正的樊星！' },
+    { min: 10, max: 10, title: '🏆 超级金满贯球迷', desc: '满分！你比小胖还了解小胖！' }
   ];
 
   let currentIndex = 0;
   let score = 0;
+  let peekCount = 1;
   let userAnswers: number[] = [];
   let shuffledQuestions: Question[] = [];
 
   const startBtn = document.getElementById('start-btn');
   const retryBtn = document.getElementById('retry-btn');
+  const peekBtn = document.getElementById('peek-btn');
+  const peekCountSpan = document.getElementById('peek-count');
   const quizIntro = document.getElementById('quiz-intro');
   const quizArea = document.getElementById('quiz-area');
   const quizResult = document.getElementById('quiz-result');
@@ -295,13 +496,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   function startQuiz() {
     currentIndex = 0;
     score = 0;
+    peekCount = 1;
     userAnswers = [];
-    shuffledQuestions = shuffle(questions);
+    // 随机抽选10道题
+    shuffledQuestions = shuffle(questions).slice(0, 10);
     
     if (quizIntro) quizIntro.style.display = 'none';
     if (quizResult) quizResult.style.display = 'none';
     if (quizArea) quizArea.style.display = 'block';
     
+    // 更新总题数显示
+    const totalQ = document.getElementById('total-q');
+    if (totalQ) totalQ.textContent = shuffledQuestions.length.toString();
+    
+    if (peekCountSpan) peekCountSpan.textContent = peekCount.toString();
+    if (peekBtn) (peekBtn as HTMLButtonElement).disabled = false;
+
     showQuestion();
   }
 
@@ -311,51 +521,276 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const questionType = document.getElementById('question-type');
     const questionText = document.getElementById('question-text');
     const optionsDiv = document.getElementById('options');
+    const explanationBox = document.getElementById('explanation-box');
+    const nextBtn = document.getElementById('next-btn');
     
+    // 重置状态
+    if (explanationBox) explanationBox.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
+
     if (currentQ) currentQ.textContent = (currentIndex + 1).toString();
-    if (questionType) questionType.textContent = q.type === 'choice' ? '选择题' : '判断题';
+    if (questionType) {
+        if (q.type === 'choice') questionType.textContent = '单选题';
+        else if (q.type === 'truefalse') questionType.textContent = '判断题';
+        else if (q.type === 'multi') questionType.textContent = '多选题';
+        else if (q.type === 'fill') questionType.textContent = '填空题';
+    }
     if (questionText) questionText.textContent = q.question;
     
     if (optionsDiv) {
       optionsDiv.innerHTML = '';
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = q.type === 'choice' ? `${String.fromCharCode(65 + i)}. ${opt}` : opt;
-        btn.addEventListener('click', () => selectAnswer(i));
-        optionsDiv.appendChild(btn);
-      });
+      if (q.type === 'fill') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = '请输入答案...';
+        input.className = 'fill-input';
+        input.style.width = '100%';
+        input.style.padding = '1rem';
+        input.style.marginBottom = '1rem';
+        input.style.border = '2px solid #eee';
+        input.style.borderRadius = '10px';
+        input.style.fontSize = '1rem';
+        
+        const submitBtn = document.createElement('button');
+        submitBtn.className = 'option-btn';
+        submitBtn.textContent = '提交答案';
+        submitBtn.style.textAlign = 'center';
+        submitBtn.style.background = '#1e88e5';
+        submitBtn.style.color = 'white';
+        submitBtn.onclick = () => {
+            const val = input.value.trim();
+            if (!val) return;
+            
+            // 简单的填空检查：包含关键词即算对
+            const correctKey = String(q.answer);
+            const isCorrect = val.includes(correctKey);
+            
+            if (isCorrect) {
+                input.style.borderColor = '#2ed573';
+                input.style.background = '#e8fff0';
+                score++;
+            } else {
+                input.style.borderColor = '#ff4757';
+                input.style.background = '#fff0f0';
+            }
+            
+            input.disabled = true;
+            submitBtn.disabled = true;
+            userAnswers.push(isCorrect ? 1 : 0); // 1 for correct, 0 for wrong (simplified for fill)
+            
+            showExplanation(q);
+            
+            if (nextBtn) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? '查看结果' : '下一题 →';
+                nextBtn.onclick = () => {
+                    currentIndex++;
+                    if (currentIndex < shuffledQuestions.length) {
+                        showQuestion();
+                    } else {
+                        showResult();
+                    }
+                };
+            }
+        };
+        
+        optionsDiv.appendChild(input);
+        optionsDiv.appendChild(submitBtn);
+      } else if (q.type === 'multi') {
+          // 多选题逻辑
+          const confirmBtn = document.createElement('button');
+          confirmBtn.className = 'option-btn';
+          confirmBtn.textContent = '确认选择';
+          confirmBtn.style.marginTop = '1rem';
+          confirmBtn.style.textAlign = 'center';
+          confirmBtn.style.background = '#1e88e5';
+          confirmBtn.style.color = 'white';
+          confirmBtn.style.display = 'none'; // 初始隐藏，选了才显示
+          
+          let selectedIndices: number[] = [];
+          
+          q.options?.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => {
+                if (btn.classList.contains('selected')) {
+                    btn.classList.remove('selected');
+                    selectedIndices = selectedIndices.filter(idx => idx !== i);
+                } else {
+                    btn.classList.add('selected');
+                    selectedIndices.push(i);
+                }
+                confirmBtn.style.display = selectedIndices.length > 0 ? 'block' : 'none';
+            };
+            optionsDiv.appendChild(btn);
+          });
+          
+          confirmBtn.onclick = () => {
+              const correctAnswers = q.answer as number[];
+              const buttons = optionsDiv ? optionsDiv.querySelectorAll('.option-btn') : document.querySelectorAll('.option-btn');
+              
+              // 排序比较
+              selectedIndices.sort();
+              const correctSorted = [...correctAnswers].sort();
+              const isCorrect = JSON.stringify(selectedIndices) === JSON.stringify(correctSorted);
+              
+              buttons.forEach((btn, i) => {
+                  // 跳过确认按钮
+                  if (btn === confirmBtn) return;
+                  
+                  (btn as HTMLButtonElement).disabled = true;
+                  if (correctAnswers.includes(i)) {
+                      btn.classList.add('correct');
+                  } else if (selectedIndices.includes(i)) {
+                      btn.classList.add('wrong');
+                  }
+              });
+              
+              confirmBtn.disabled = true;
+              confirmBtn.textContent = '已确认';
+              if (isCorrect) score++;
+              userAnswers.push(isCorrect ? 1 : 0); // 简化记录
+              
+              showExplanation(q);
+              
+              if (nextBtn) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? '查看结果' : '下一题 →';
+                nextBtn.onclick = () => {
+                    currentIndex++;
+                    if (currentIndex < shuffledQuestions.length) {
+                        showQuestion();
+                    } else {
+                        showResult();
+                    }
+                };
+            }
+          };
+          
+          optionsDiv.appendChild(confirmBtn);
+      } else {
+        // 单选和判断
+        q.options?.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.addEventListener('click', () => {
+                selectAnswer(i);
+                if (nextBtn) {
+                    nextBtn.style.display = 'block';
+                    nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? '查看结果' : '下一题 →';
+                    nextBtn.onclick = () => {
+                        currentIndex++;
+                        if (currentIndex < shuffledQuestions.length) {
+                            showQuestion();
+                        } else {
+                            showResult();
+                        }
+                    };
+                }
+            });
+            optionsDiv.appendChild(btn);
+        });
+      }
+    }
+
+    if (peekBtn) {
+      (peekBtn as HTMLButtonElement).disabled = peekCount <= 0;
+    }
+  }
+
+  function peekAnswer() {
+    if (peekCount <= 0) return;
+    
+    const q = shuffledQuestions[currentIndex];
+    const buttons = document.querySelectorAll('.option-btn');
+    
+    // 偷瞄逻辑适配
+    if (q.type === 'fill') {
+        const input = document.querySelector('.fill-input') as HTMLInputElement;
+        if (input) {
+            input.value = String(q.answer); // 直接填入部分答案
+            input.style.border = '2px solid #ff9f43';
+        }
+    } else if (q.type === 'multi') {
+        const correctAnswers = q.answer as number[];
+        buttons.forEach((btn, i) => {
+            if (correctAnswers.includes(i)) {
+                btn.classList.add('peek-highlight');
+            }
+        });
+    } else {
+        // 单选/判断
+        const ans = q.answer as number;
+        if (buttons[ans]) {
+            buttons[ans].classList.add('peek-highlight');
+        }
+    }
+    
+    // 偷瞄时显示解析
+    showExplanation(q);
+
+    peekCount--;
+    if (peekCountSpan) peekCountSpan.textContent = peekCount.toString();
+    if (peekBtn && peekCount <= 0) {
+      (peekBtn as HTMLButtonElement).disabled = true;
+    }
+  }
+
+  function showExplanation(q: Question) {
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationText = document.getElementById('explanation-text');
+    
+    if (explanationBox && explanationText) {
+      if (q.explanation) {
+        explanationBox.style.display = 'block';
+        explanationText.textContent = q.explanation;
+      } else {
+        explanationBox.style.display = 'none';
+      }
     }
   }
 
   function selectAnswer(index: number) {
     const q = shuffledQuestions[currentIndex];
     const buttons = document.querySelectorAll('.option-btn');
+    const nextBtn = document.getElementById('next-btn');
     
     // 禁用所有按钮
     buttons.forEach((btn, i) => {
       (btn as HTMLButtonElement).disabled = true;
       if (i === q.answer) {
         btn.classList.add('correct');
+        btn.classList.remove('peek-highlight'); // 移除偷瞄高亮，显示正式结果
       } else if (i === index && index !== q.answer) {
         btn.classList.add('wrong');
       }
     });
     
+    if (peekBtn) (peekBtn as HTMLButtonElement).disabled = true;
+
+    // 显示解析
+    showExplanation(q);
+
     userAnswers.push(index);
     if (index === q.answer) {
       score++;
     }
     
-    // 延迟后进入下一题
-    setTimeout(() => {
-      currentIndex++;
-      if (currentIndex < shuffledQuestions.length) {
-        showQuestion();
-      } else {
-        showResult();
-      }
-    }, 800);
+    // 显示下一题按钮，不再自动跳转
+    if (nextBtn) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = currentIndex === shuffledQuestions.length - 1 ? '查看结果' : '下一题 →';
+      nextBtn.onclick = () => {
+        currentIndex++;
+        if (currentIndex < shuffledQuestions.length) {
+          showQuestion();
+        } else {
+          showResult();
+        }
+      };
+    }
   }
 
   function showResult() {
@@ -364,6 +799,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     
     const scoreDisplay = document.getElementById('score-display');
     const rankDisplay = document.getElementById('rank-display');
+    const surpassedDisplay = document.getElementById('surpassed-display');
     const rankDesc = document.getElementById('rank-desc');
     const wrongAnswers = document.getElementById('wrong-answers');
     
@@ -372,6 +808,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const rank = ranks.find(r => score >= r.min && score <= r.max);
     if (rank && rankDisplay) rankDisplay.textContent = rank.title;
     if (rank && rankDesc) rankDesc.textContent = rank.desc;
+
+    if (surpassedDisplay) {
+      let surpassed = 0;
+      if (score === shuffledQuestions.length) {
+        surpassed = 99.9;
+      } else if (score >= shuffledQuestions.length * 0.9) {
+        surpassed = 95 + Math.random() * 4;
+      } else if (score >= shuffledQuestions.length * 0.6) {
+        surpassed = 60 + (score / shuffledQuestions.length) * 30 + Math.random() * 5;
+      } else {
+        surpassed = (score / shuffledQuestions.length) * 50 + Math.random() * 10;
+      }
+      surpassedDisplay.textContent = `击败了全国 ${surpassed.toFixed(1)}% 的樊振东粉丝！`;
+    }
     
     // 显示错题
     if (wrongAnswers) {
@@ -398,4 +848,5 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   startBtn?.addEventListener('click', startQuiz);
   retryBtn?.addEventListener('click', startQuiz);
+  peekBtn?.addEventListener('click', peekAnswer);
 </script>
