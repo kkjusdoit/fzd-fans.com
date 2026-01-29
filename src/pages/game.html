@@ -196,6 +196,30 @@
             80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
+
+        .badge-container {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .badge-img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px gold);
+            animation: badgeShine 2s infinite alternate;
+        }
+        .badge-label {
+            color: #d81b60;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0;
+        }
+        @keyframes badgeShine {
+            from { filter: drop-shadow(0 0 5px gold); transform: scale(1); }
+            to { filter: drop-shadow(0 0 15px #ffd700); transform: scale(1.05); }
+        }
     </style>
 </head>
 <body>
@@ -229,6 +253,10 @@
 
     <div id="victory-modal">
         <h2>🎉 超级金满贯！</h2>
+        <div class="badge-container">
+            <img src="/img/badge.png" alt="金满贯徽章" class="badge-img">
+            <p class="badge-label">获得【金满贯徽章】</p>
+        </div>
         <p>你超越了 99.9% 的樊星！</p>
         <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
     </div>
@@ -459,6 +487,9 @@ class Game {
         
         // GM Mode
         this.godMode = false;
+        
+        // Warning State
+        this.hasWarnedFullSlot = false;
         
         this.resize();
         window.addEventListener('resize', () => this.resize());
@@ -931,7 +962,13 @@ class Game {
             // If count < 2, adding this tile makes it 1 or 2, not 3. No match.
             // Slot becomes full (7/7) and no match -> Game Over likely.
             if (count < 2) {
-                this.showFullSlotWarning(tile);
+                // If we already warned the user once (globally), just let them proceed
+                if (this.hasWarnedFullSlot) {
+                    AudioMgr.playClick();
+                    this.moveToSlot(tile);
+                } else {
+                    this.showFullSlotWarning(tile);
+                }
                 return;
             }
         }
@@ -948,9 +985,14 @@ class Game {
 
     confirmMove(yes) {
         document.getElementById('confirm-modal').style.display = 'none';
-        if (yes && this.pendingTile) {
-            AudioMgr.playClick();
-            this.moveToSlot(this.pendingTile);
+        if (yes) {
+            // User confirmed risk, mark as warned globally
+            this.hasWarnedFullSlot = true;
+            
+            if (this.pendingTile) {
+                AudioMgr.playClick();
+                this.moveToSlot(this.pendingTile);
+            }
         }
         this.pendingTile = null;
     }
