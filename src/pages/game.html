@@ -258,7 +258,7 @@
             <p class="badge-label">获得【金满贯徽章】</p>
         </div>
         <p>你超越了 99.9% 的樊星！</p>
-        <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
+        <button class="modal-btn" onclick="game.nextLevel()">再玩一次</button>
     </div>
     
     <div id="confirm-modal">
@@ -1126,8 +1126,7 @@ class Game {
         if (LEVELS[this.level]) {
             this.startLevel(this.level);
         } else {
-             // Loop back to 1 or stay?
-             alert("恭喜通关！回到第一关");
+             // Loop back to 1
              this.startLevel(1);
         }
     }
