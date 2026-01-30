@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>咚咚消消乐</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #e3f2fd; /* Light Blue */
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            font-family: 'Arial', sans-serif;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(to bottom, #1e88e5, #1565c0);
+            color: white;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 1000;
+            pointer-events: auto;
+            box-shadow: 0 3px #0d47a1;
+            transition: transform 0.1s;
+            border: none;
+        }
+        #back-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 #0d47a1;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        canvas {
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header {
+            padding: 15px;
+            text-align: center;
+            color: #1565c0; /* Dark Blue Text */
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            pointer-events: auto;
+            z-index: 10;
+            width: 100%;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .score-box {
+            background: rgba(255,255,255,0.6);
+            color: #0d47a1;
+            padding: 5px 15px;
+            border-radius: 15px;
+            margin-top: 5px;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #loading-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #8860a9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: white;
+            transition: opacity 0.5s;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: #ffeb3b;
+            transition: width 0.3s;
+        }
+        #game-over-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            z-index: 100;
+            width: 80%;
+            max-width: 320px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .modal-btn {
+            background: linear-gradient(to bottom, #8860a9, #6a4c93);
+            color: white;
+            box-shadow: 0 4px #4a3c63;
+            width: 100%;
+            margin-top: 10px;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .modal-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #4a3c63;
+        }
+        #victory-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            z-index: 100;
+            width: 80%;
+            max-width: 320px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #bonus-banner {
+            display: none;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 150;
+            pointer-events: none;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+        }
+        #bonus-banner > img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9));
+            position: relative;
+            z-index: 2;
+        }
+        .champion-img {
+            position: absolute;
+            bottom: 40%; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            z-index: 1;
+        }
+        .champion-img img {
+            width: 100%;
+            height: auto;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+        }
+        .pop-in {
+            animation: popInBanner 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popInBanner {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <a href="/games" id="back-btn">返回</a>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="loading-screen">
+        <h1>✨ 正在加载资源...</h1>
+        <div class="loader-bar"><div class="loader-progress" id="loader-progress"></div></div>
+    </div>
+
+    <div id="ui-layer">
+        <div class="header">
+            <h1 style="margin-top: 40px; margin-bottom: 10px;">✨ 咚咚消消乐</h1>
+            <div class="score-box">分数: <span id="score">0</span></div>
+            <div class="score-box" style="margin-left: 10px;">目标: <span id="target">1000</span></div>
+            <div class="score-box" style="margin-left: 10px;">步数: <span id="moves">20</span></div>
+        </div>
+    </div>
+
+    <div id="game-over-modal">
+        <h2 id="modal-title">游戏结束</h2>
+        <p id="modal-msg">分数: 0</p>
+        <button class="modal-btn" onclick="game.restart()">再玩一次</button>
+    </div>
+
+    <div id="victory-modal">
+        <h2>🎉 恭喜过关！</h2>
+        <p>分数达标！准备好迎接下一关了吗？</p>
+        <button class="modal-btn" onclick="game.nextLevel()">下一关</button>
+    </div>
+
+    <div id="bonus-banner">
+        <img src="/img/bonus.png" alt="Bonus Time">
+    </div>
+</div>
+
+<script>
+/**
+ * Game Configuration
+ */
+const CONFIG = {
+    gridRows: 8,
+    gridCols: 7, // 7 cols fits mobile better
+    tileSize: 50,
+    gap: 2,
+    animSpeed: 0.2 // seconds
+};
+
+// Real Photos from FZD Fans Gallery (Same as Dong Le Ge Dong)
+const PHOTO_URLS = [
+    "/game/assets/image- 002.webp",
+    "/game/assets/image- 013.webp",
+    "/game/assets/image- 007.webp",
+    "/game/assets/image- 023.webp",
+    "/game/assets/image- 001.webp",
+    "/game/assets/image- 003.webp",
+    "/game/assets/image- 004.webp",
+    "/game/assets/image- 005.webp",
+    "/game/assets/image- 006.webp",
+    "/game/assets/image- 021.webp",
+    "/game/assets/image- 009.webp",
+    "/game/assets/image- 020.webp",
+    "/game/assets/image- 019.webp",
+    "/game/assets/image- 012.webp",
+    "/game/assets/image- 018.webp"
+];
+
+// Use subset for Match-3 to ensure matches are possible
+const GAME_PHOTOS = PHOTO_URLS.slice(0, 6); 
+const ASSETS = {};
+const IMG_CACHE = {};
+
+// Audio Manager (Reused)
+const AudioMgr = {
+    ctx: null,
+    buffers: {},
+    init: function() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.loadSounds();
+        }
+    },
+    loadSounds: function() {
+        const sounds = {
+            'match': '/audio/itemmatch.ogg', // Assuming these exist from other game
+            'win': '/audio/level_win.ogg'
+        };
+        // Just mocked for now if files don't exist, will fallback to tone
+    },
+    playTone: function(freq, type, duration) {
+        if (!this.ctx) this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    playClick: function() { this.playTone(800, 'sine', 0.1); },
+    playMatch: function() { 
+        this.playTone(1200, 'sine', 0.1); 
+        setTimeout(() => this.playTone(1800, 'sine', 0.1), 100);
+    },
+    playInvalid: function() { this.playTone(150, 'sawtooth', 0.3); }
+};
+
+class Tile {
+    constructor(r, c, type) {
+        this.r = r;
+        this.c = c;
+        this.type = type;
+        this.x = c * (CONFIG.tileSize + CONFIG.gap);
+        this.y = r * (CONFIG.tileSize + CONFIG.gap);
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.scale = 1;
+        this.alpha = 1;
+        this.isMatch = false;
+        this.isNew = false;
+    }
+
+    update() {
+        // Simple lerp for animation
+        this.x += (this.targetX - this.x) * 0.2;
+        this.y += (this.targetY - this.y) * 0.2;
+        
+        if (Math.abs(this.x - this.targetX) < 0.5) this.x = this.targetX;
+        if (Math.abs(this.y - this.targetY) < 0.5) this.y = this.targetY;
+
+        if (this.isMatch) {
+            this.scale -= 0.1;
+            this.alpha -= 0.1;
+        } else if (this.scale < 1) {
+            this.scale += 0.1;
+        }
+    }
+}
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.grid = [];
+        this.width = CONFIG.gridCols * (CONFIG.tileSize + CONFIG.gap) - CONFIG.gap;
+        this.height = CONFIG.gridRows * (CONFIG.tileSize + CONFIG.gap) - CONFIG.gap;
+        
+        this.selectedTile = null;
+        this.isProcessing = false;
+        this.score = 0;
+        this.level = 1;
+        this.targetScore = 1000;
+        this.moves = 20;
+        this.scale = 1;
+        this.particles = [];
+        
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        // Input
+        this.canvas.addEventListener('click', (e) => this.handleClick(e));
+        this.canvas.addEventListener('touchstart', (e) => {}); // Enable touch
+
+        window.game = this;
+
+        this.preloadImages().then(() => {
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+            }, 500);
+            this.start();
+            this.loop();
+        });
+    }
+
+    preloadImages() {
+        return new Promise((resolve) => {
+            let loaded = 0;
+            const total = GAME_PHOTOS.length;
+            if (total === 0) { resolve(); return; }
+
+            GAME_PHOTOS.forEach((url, index) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    IMG_CACHE[index] = img;
+                    loaded++;
+                    document.getElementById('loader-progress').style.width = (loaded / total * 100) + '%';
+                    if (loaded >= total) resolve();
+                };
+                img.onerror = () => {
+                    console.error("Failed to load:", url);
+                    loaded++;
+                    if (loaded >= total) resolve();
+                };
+                img.src = url;
+            });
+        });
+    }
+
+    resize() {
+        const vh = window.innerHeight;
+        document.getElementById('game-container').style.height = `${vh}px`;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = vh;
+        
+        // Fit grid + margins
+        const safeW = this.width + 40;
+        const safeH = this.height + 200; // Header space
+        
+        const scaleX = this.canvas.width / safeW;
+        const scaleY = this.canvas.height / safeH;
+        this.scale = Math.min(scaleX, scaleY, 1.5); // Max scale
+        
+        this.offsetX = (this.canvas.width - this.width * this.scale) / 2;
+        this.offsetY = (this.canvas.height - this.height * this.scale) / 2 + 40 * this.scale;
+    }
+
+    start() {
+        this.score = 0;
+        // Level progression
+        this.targetScore = 1000 + (this.level - 1) * 1500;
+        this.moves = Math.max(15, 20 - Math.floor((this.level - 1) / 2));
+        
+        this.updateUI();
+        document.getElementById('game-over-modal').style.display = 'none';
+        document.getElementById('victory-modal').style.display = 'none';
+        
+        // Init Grid
+        this.grid = [];
+        for (let r = 0; r < CONFIG.gridRows; r++) {
+            this.grid[r] = [];
+            for (let c = 0; c < CONFIG.gridCols; c++) {
+                this.grid[r][c] = this.createTile(r, c);
+            }
+        }
+        
+        // Ensure no initial matches
+        this.resolveMatches(true);
+        
+        // Ensure playable
+        if (!this.hasPossibleMoves()) {
+            this.shuffleBoard();
+        }
+    }
+
+    createTile(r, c) {
+        // Random type
+        let type = Math.floor(Math.random() * GAME_PHOTOS.length);
+        return new Tile(r, c, type);
+    }
+
+    toGrid(x, y) {
+        const gx = (x - this.offsetX) / this.scale;
+        const gy = (y - this.offsetY) / this.scale;
+        
+        const c = Math.floor(gx / (CONFIG.tileSize + CONFIG.gap));
+        const r = Math.floor(gy / (CONFIG.tileSize + CONFIG.gap));
+        
+        if (r >= 0 && r < CONFIG.gridRows && c >= 0 && c < CONFIG.gridCols) {
+            return { r, c };
+        }
+        return null;
+    }
+
+    handleClick(e) {
+        if (this.isProcessing || this.moves <= 0) return;
+        
+        AudioMgr.init();
+        const rect = this.canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        
+        const pos = this.toGrid(clickX, clickY);
+        if (!pos) {
+            this.selectedTile = null;
+            return;
+        }
+
+        const tile = this.grid[pos.r][pos.c];
+        
+        if (!this.selectedTile) {
+            this.selectedTile = tile;
+            AudioMgr.playClick();
+        } else {
+            // Check if adjacent
+            const dr = Math.abs(this.selectedTile.r - tile.r);
+            const dc = Math.abs(this.selectedTile.c - tile.c);
+            
+            if (this.selectedTile === tile) {
+                this.selectedTile = null; // Deselect
+            } else if (dr + dc === 1) {
+                // Swap
+                this.trySwap(this.selectedTile, tile);
+                this.selectedTile = null;
+            } else {
+                this.selectedTile = tile; // Switch selection
+                AudioMgr.playClick();
+            }
+        }
+    }
+
+    async trySwap(t1, t2) {
+        this.isProcessing = true;
+        
+        // Visual Swap
+        await this.swapTiles(t1, t2);
+        
+        // Check Match
+        const matches = this.findMatches();
+        if (matches.length > 0) {
+            this.moves--;
+            this.updateUI();
+            await this.processMatches(matches);
+        } else {
+            // Swap back
+            AudioMgr.playInvalid();
+            await this.swapTiles(t1, t2);
+        }
+        
+        this.isProcessing = false;
+        
+        if (this.moves <= 0) {
+            this.gameOver();
+        }
+    }
+
+    swapTiles(t1, t2) {
+        return new Promise(resolve => {
+            // Update Logic Grid
+            this.grid[t1.r][t1.c] = t2;
+            this.grid[t2.r][t2.c] = t1;
+            
+            // Swap R/C props
+            const tr = t1.r, tc = t1.c;
+            t1.r = t2.r; t1.c = t2.c;
+            t2.r = tr; t2.c = tc;
+            
+            // Set Targets
+            t1.targetX = t1.c * (CONFIG.tileSize + CONFIG.gap);
+            t1.targetY = t1.r * (CONFIG.tileSize + CONFIG.gap);
+            t2.targetX = t2.c * (CONFIG.tileSize + CONFIG.gap);
+            t2.targetY = t2.r * (CONFIG.tileSize + CONFIG.gap);
+            
+            setTimeout(resolve, 250); // Wait for animation
+        });
+    }
+
+    findMatches() {
+        const matches = new Set();
+        
+        // Horizontal
+        for (let r = 0; r < CONFIG.gridRows; r++) {
+            for (let c = 0; c < CONFIG.gridCols - 2; c++) {
+                const type = this.grid[r][c].type;
+                if (this.grid[r][c+1].type === type && this.grid[r][c+2].type === type) {
+                    matches.add(this.grid[r][c]);
+                    matches.add(this.grid[r][c+1]);
+                    matches.add(this.grid[r][c+2]);
+                }
+            }
+        }
+        
+        // Vertical
+        for (let r = 0; r < CONFIG.gridRows - 2; r++) {
+            for (let c = 0; c < CONFIG.gridCols; c++) {
+                const type = this.grid[r][c].type;
+                if (this.grid[r+1][c].type === type && this.grid[r+2][c].type === type) {
+                    matches.add(this.grid[r][c]);
+                    matches.add(this.grid[r+1][c]);
+                    matches.add(this.grid[r+2][c]);
+                }
+            }
+        }
+        
+        return Array.from(matches);
+    }
+
+    async processMatches(matches) {
+        let combo = 0;
+        
+        while (matches.length > 0) {
+            AudioMgr.playMatch();
+            
+            // New scoring: 3 -> 30, 4 -> 60, 5+ -> 120 (per set)
+            let points = 30;
+            if (matches.length > 3) {
+                 points = 30 * Math.pow(2, matches.length - 3);
+            }
+            
+            // Combo Bonus: +50 per extra step in chain reaction
+            if (combo > 0) {
+                points += 50 * combo;
+                // Visual feedback for combo? (Optional, maybe log or special particle color)
+            }
+            
+            this.score += points;
+            this.updateUI();
+            
+            // Particles
+            matches.forEach(t => {
+                const cx = this.offsetX + (t.x + CONFIG.tileSize/2) * this.scale;
+                const cy = this.offsetY + (t.y + CONFIG.tileSize/2) * this.scale;
+                this.createParticles(cx, cy, combo > 0 ? 'combo' : 'normal');
+            });
+
+            // Mark and Animate Removal
+            matches.forEach(t => t.isMatch = true);
+            await new Promise(r => setTimeout(r, 200));
+            
+            // Remove and Drop
+            this.applyGravity();
+            
+            // Wait for Drop
+            await new Promise(r => setTimeout(r, 300));
+            
+            // Check new matches
+            matches = this.findMatches();
+            if (matches.length > 0) combo++;
+        }
+
+        // Check Victory
+        if (this.score >= this.targetScore) {
+            this.triggerBonusTime();
+            return;
+        }
+
+        // Check Deadlock
+        if (!this.hasPossibleMoves()) {
+            this.shuffleBoard();
+        }
+    }
+
+    applyGravity() {
+        for (let c = 0; c < CONFIG.gridCols; c++) {
+            let emptySlots = 0;
+            for (let r = CONFIG.gridRows - 1; r >= 0; r--) {
+                if (this.grid[r][c].isMatch) {
+                    emptySlots++;
+                } else if (emptySlots > 0) {
+                    // Move down
+                    const tile = this.grid[r][c];
+                    const targetR = r + emptySlots;
+                    this.grid[targetR][c] = tile;
+                    tile.r = targetR;
+                    tile.targetY = targetR * (CONFIG.tileSize + CONFIG.gap);
+                    this.grid[r][c] = null; // Cleared
+                }
+            }
+            
+            // Fill top
+            for (let i = 0; i < emptySlots; i++) {
+                const r = emptySlots - 1 - i; // Fill from bottom of empty space up
+                // Actually we just fill the nulls from top (0 to emptySlots-1)
+                // Logic above moved existing tiles down, so indices 0..emptySlots-1 are null
+            }
+            
+            // Correct fill logic
+            for (let r = 0; r < CONFIG.gridRows; r++) {
+                if (this.grid[r][c] === null || this.grid[r][c].isMatch) {
+                    // Create new
+                    const tile = this.createTile(r, c);
+                    tile.y = -CONFIG.tileSize * (CONFIG.gridRows - r); // Start above
+                    tile.targetY = r * (CONFIG.tileSize + CONFIG.gap);
+                    this.grid[r][c] = tile;
+                }
+            }
+        }
+    }
+
+    resolveMatches(silent) {
+        // Initial setup helper to remove matches without animation
+        let matches = this.findMatches();
+        while (matches.length > 0) {
+            matches.forEach(t => {
+                t.type = Math.floor(Math.random() * GAME_PHOTOS.length);
+            });
+            matches = this.findMatches();
+        }
+    }
+
+    // Deadlock & Shuffle
+    hasPossibleMoves() {
+        for (let r = 0; r < CONFIG.gridRows; r++) {
+            for (let c = 0; c < CONFIG.gridCols; c++) {
+                if (c < CONFIG.gridCols - 1 && this.checkSwap(r, c, r, c + 1)) return true;
+                if (r < CONFIG.gridRows - 1 && this.checkSwap(r, c, r + 1, c)) return true;
+            }
+        }
+        return false;
+    }
+
+    checkSwap(r1, c1, r2, c2) {
+        const t1 = this.grid[r1][c1];
+        const t2 = this.grid[r2][c2];
+        const type1 = t1.type;
+        const type2 = t2.type;
+        
+        t1.type = type2;
+        t2.type = type1;
+
+        let hasMatch = false;
+        if (this.hasMatchAt(r1, c1) || this.hasMatchAt(r2, c2)) hasMatch = true;
+
+        t1.type = type1;
+        t2.type = type2;
+        return hasMatch;
+    }
+
+    hasMatchAt(r, c) {
+        const type = this.grid[r][c].type;
+        // Horiz
+        let h = 1;
+        if (c > 0 && this.grid[r][c-1].type === type) {
+            h++;
+            if (c > 1 && this.grid[r][c-2].type === type) return true;
+        }
+        if (c < CONFIG.gridCols - 1 && this.grid[r][c+1].type === type) {
+            h++;
+            if (h >= 3) return true;
+            if (c < CONFIG.gridCols - 2 && this.grid[r][c+2].type === type) return true;
+        }
+        // Vert
+        let v = 1;
+        if (r > 0 && this.grid[r-1][c].type === type) {
+            v++;
+            if (r > 1 && this.grid[r-2][c].type === type) return true;
+        }
+        if (r < CONFIG.gridRows - 1 && this.grid[r+1][c].type === type) {
+            v++;
+            if (v >= 3) return true;
+            if (r < CONFIG.gridRows - 2 && this.grid[r+2][c].type === type) return true;
+        }
+        return false;
+    }
+
+    async shuffleBoard() {
+        const msg = document.createElement('div');
+        msg.innerText = "无路可走，正在洗牌...";
+        Object.assign(msg.style, {
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            background: 'rgba(0,0,0,0.7)', color: 'white', padding: '10px 20px', 
+            borderRadius: '10px', zIndex: '1000', pointerEvents: 'none'
+        });
+        document.body.appendChild(msg);
+
+        let flat = [];
+        this.grid.forEach(row => row.forEach(t => flat.push(t)));
+        
+        do {
+            let types = flat.map(t => t.type);
+            types.sort(() => Math.random() - 0.5);
+            flat.forEach((t, i) => t.type = types[i]);
+            this.resolveMatches(true);
+        } while (!this.hasPossibleMoves());
+
+        await new Promise(r => setTimeout(r, 1000));
+        msg.remove();
+    }
+
+    // Bonus Time Logic
+    async triggerBonusTime() {
+        this.isProcessing = true; 
+        
+        const banner = document.getElementById('bonus-banner');
+        banner.style.display = 'block';
+        banner.classList.add('pop-in');
+        
+        AudioMgr.playTone(400, 'sine', 0.1);
+        setTimeout(() => AudioMgr.playTone(600, 'sine', 0.1), 150);
+        setTimeout(() => AudioMgr.playTone(800, 'sine', 0.2), 300);
+
+        await new Promise(r => setTimeout(r, 1500)); 
+
+        while (this.moves > 0) {
+            this.moves--;
+            this.score += 200;
+            this.updateUI();
+            
+            const r = Math.floor(Math.random() * CONFIG.gridRows);
+            const c = Math.floor(Math.random() * CONFIG.gridCols);
+            const tile = this.grid[r][c];
+            if (tile) {
+                const cx = this.offsetX + (tile.x + CONFIG.tileSize/2) * this.scale;
+                const cy = this.offsetY + (tile.y + CONFIG.tileSize/2) * this.scale;
+                this.createParticles(cx, cy, 'bonus');
+                AudioMgr.playTone(800 + Math.random()*400, 'square', 0.1);
+            }
+            await new Promise(r => setTimeout(r, 200));
+        }
+        
+        await new Promise(r => setTimeout(r, 500)); 
+        
+        banner.style.display = 'none';
+        banner.classList.remove('pop-in');
+        this.levelWin();
+    }
+
+    levelWin() {
+        AudioMgr.playTone(600, 'sine', 0.1);
+        setTimeout(() => AudioMgr.playTone(800, 'sine', 0.2), 100);
+        document.getElementById('victory-modal').style.display = 'block';
+    }
+
+    nextLevel() {
+        this.level++;
+        this.start();
+    }
+
+    createParticles(x, y, type) {
+        for (let i = 0; i < 10; i++) {
+            let color = `hsl(${Math.random()*360}, 80%, 60%)`;
+            let size = 4;
+            
+            if (type === 'bonus') {
+                color = `hsl(45, 100%, 60%)`; // Gold
+                size = 6;
+            } else if (type === 'combo') {
+                color = `hsl(${Math.random()*60 + 300}, 100%, 70%)`; // Pink/Purple for combos
+                size = 5;
+            }
+
+            this.particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                life: 1,
+                color: color,
+                size: size
+            });
+        }
+    }
+
+    updateUI() {
+        document.getElementById('score').innerText = this.score;
+        document.getElementById('moves').innerText = this.moves;
+        document.getElementById('target').innerText = this.targetScore;
+        document.querySelector('.header h1').innerText = `✨ 咚咚消消乐 (第${this.level}关)`;
+    }
+
+    gameOver() {
+        document.getElementById('modal-title').innerText = "挑战失败";
+        document.getElementById('modal-msg').innerHTML = `得分: ${this.score}<br>目标: ${this.targetScore}<br>只差一点点！`;
+        document.getElementById('game-over-modal').style.display = 'block';
+    }
+
+    restart() {
+        this.start();
+    }
+
+    render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.ctx.save();
+        this.ctx.translate(this.offsetX, this.offsetY);
+        this.ctx.scale(this.scale, this.scale);
+        
+        // Background
+        this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        this.ctx.beginPath();
+        this.ctx.roundRect(-10, -10, this.width + 20, this.height + 20, 15);
+        this.ctx.fill();
+
+        // Tiles
+        this.grid.forEach(row => {
+            row.forEach(tile => {
+                if (tile && tile.alpha > 0) {
+                    tile.update();
+                    this.drawTile(tile);
+                }
+            });
+        });
+
+        // Selection
+        if (this.selectedTile) {
+            this.ctx.strokeStyle = '#ffeb3b';
+            this.ctx.lineWidth = 4;
+            this.ctx.strokeRect(
+                this.selectedTile.x - 2, this.selectedTile.y - 2, 
+                CONFIG.tileSize + 4, CONFIG.tileSize + 4
+            );
+        }
+
+        this.ctx.restore();
+
+        // Particles
+        this.updateParticles();
+    }
+
+    drawTile(tile) {
+        const x = tile.x;
+        const y = tile.y;
+        const s = CONFIG.tileSize;
+        
+        this.ctx.save();
+        this.ctx.translate(x + s/2, y + s/2);
+        this.ctx.scale(tile.scale, tile.scale);
+        this.ctx.globalAlpha = tile.alpha;
+        this.ctx.translate(-s/2, -s/2);
+
+        // Card bg
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.roundRect(0, 0, s, s, 8);
+        this.ctx.fill();
+
+        // Image
+        if (IMG_CACHE[tile.type]) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.roundRect(0, 0, s, s, 8);
+            this.ctx.clip();
+            this.ctx.drawImage(IMG_CACHE[tile.type], 0, 0, s, s);
+            this.ctx.restore();
+        }
+
+        this.ctx.restore();
+    }
+
+    updateParticles() {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            let p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.05;
+            
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size || 4, 0, Math.PI*2);
+            this.ctx.fill();
+            
+            if (p.life <= 0) this.particles.splice(i, 1);
+        }
+        this.ctx.globalAlpha = 1;
+    }
+
+    loop() {
+        this.render();
+        requestAnimationFrame(() => this.loop());
+    }
+}
+
+new Game();
+</script>
+</body>
+</html>
