@@ -438,8 +438,11 @@ class Game {
     start() {
         this.score = 0;
         // Level progression
-        this.targetScore = 1000 + (this.level - 1) * 1500;
-        this.moves = Math.max(15, 20 - Math.floor((this.level - 1) / 2));
+        // 难度优化：平滑增长曲线
+        // 初始 800 分，每关加 400 分
+        this.targetScore = 1500 + (this.level - 1) * 500;
+        // 初始 25 步，每 3 关减少 1 步，最低 20 步
+        this.moves = Math.max(18, 25 - Math.floor((this.level - 1)));
         
         this.updateUI();
         document.getElementById('game-over-modal').style.display = 'none';

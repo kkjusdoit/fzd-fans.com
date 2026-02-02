@@ -36,3 +36,4 @@ yarn-error.log*
 # Cloudflare Wrangler
 .wrangler/
 .agent/tasks
+local_npm_cache
