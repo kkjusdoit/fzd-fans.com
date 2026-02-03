@@ -28,7 +28,11 @@ export const GET: APIRoute = async ({ locals, request }) => {
       .all();
     
     // Runtime Accessibility Check (Parallel)
-    // Filter out images that are no longer accessible (e.g. blocked in image bed but still in DB)
+    // [FIX] Disabled strict server-side check because it causes false negatives (e.g. 302 redirects, firewall blocks).
+    // We trust the DB records and let the client browser attempt to load the images.
+    const validResults = results; // Skip check: const checkedResults = await Promise.all(...)
+    
+    /* 
     const invalidIds: number[] = [];
     const checkedResults = await Promise.all(
       (results || []).map(async (photo: any) => {
@@ -48,25 +52,21 @@ export const GET: APIRoute = async ({ locals, request }) => {
         }
       })
     );
-
+    */
+    
     // Update invalid photos in DB so they don't count next time
     // We set reviewed = 2 (or 0) to hide them.
+    // [FIX] Commented out to prevent pagination holes (skipping valid photos) when offset shifts
+    /*
     if (invalidIds.length > 0) {
-       try {
-         const stmt = DB.prepare('UPDATE photos SET reviewed = 2 WHERE id = ?');
-         for (const id of invalidIds) {
-             console.log(`Marking photo ${id} as invalid/unreachable`);
-             await stmt.bind(id).run();
-         }
-       } catch (dbErr) {
-         console.error('Failed to update invalid photos status:', dbErr);
-       }
+       // ... existing commented code ...
     }
-
-    const validResults = checkedResults.filter((p: any) => p !== null);
+    */
+    
+    // const validResults = checkedResults.filter((p: any) => p !== null);
     
     // Adjust total to reflect the invalid items found on this page
-    const adjustedTotal = Math.max(0, total - invalidIds.length);
+    const adjustedTotal = total; // Math.max(0, total - invalidIds.length);
 
     console.log(`API /api/photos: fetched page ${page} with ${results?.length || 0} photos, returning ${validResults.length} accessible. Total adjusted from ${total} to ${adjustedTotal}`);
     

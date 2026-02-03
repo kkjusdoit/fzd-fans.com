@@ -392,6 +392,15 @@ const t = useTranslations(lang);
                  hint.style.opacity = '1';
             }
         };
+        
+        // Handle loading errors
+        img.onerror = () => {
+            div.style.opacity = '0.5';
+            img.src = '/placeholder-error.png'; // Or a generated SVG placeholder
+            img.alt = '图片加载失败';
+            // Optional: add a visual indicator or keep it subtle
+            // We could also remove the element: div.remove();
+        };
 
         if (img.complete) {
             checkLongImage();
