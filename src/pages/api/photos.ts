@@ -7,7 +7,7 @@ export const GET: APIRoute = async ({ locals, request }) => {
   const DB = runtime?.env?.DB;
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get('page') || '1');
-  const limit = parseInt(url.searchParams.get('limit') || '20');
+  const limit = parseInt(url.searchParams.get('limit') || '15');
   const offset = (page - 1) * limit;
 
   if (!DB) {

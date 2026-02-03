@@ -119,14 +119,14 @@ const t = useTranslations(lang);
 
     // State
     let currentPage = 1;
-    const PAGE_SIZE = 20;
+    const PAGE_SIZE = 15; // Set to 15 to match Sanyue ImgHub standard
     let isLoading = false;
     let totalPhotos = 0;
     let totalPages = 1;
     let photosList = []; // Store current visible photos for lightbox navigation
 
     // Cache Config
-    const CACHE_KEY = 'fzd_gallery_state_zh_v2'; // Changed key for new version
+    const CACHE_KEY = 'fzd_gallery_state_zh_v4'; // Bump version for page size change to 15
     const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
 
     // --- Cache Functions ---
@@ -549,8 +549,8 @@ const t = useTranslations(lang);
 
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
     width: 100%;
   }
 
@@ -666,8 +666,12 @@ const t = useTranslations(lang);
     }
     
     .gallery-grid {
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 10px;
+    }
+    
+    .photo-wrapper {
+      height: 140px; /* Square ratio for mobile */
     }
     
     .photo-item {
@@ -955,9 +959,7 @@ const t = useTranslations(lang);
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    /* max-width removed to fill grid */
     border-radius: 8px;
   }
 
@@ -971,7 +973,7 @@ const t = useTranslations(lang);
     cursor: zoom-in;
     background-color: #f0f0f0;
     width: 100%;
-    height: 300px; /* Fixed unified height */
+    height: 200px; /* More compact height for gallery view */
     overflow: hidden;
   }
 
