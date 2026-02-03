@@ -77,7 +77,17 @@ export async function syncWithImageBed(DB: any, env: any) {
       }
 
       // 2. Check metadata for explicit whitelist (always accessible) or fallback to HTTP check
-      let isAccessible = false;
+      let isAccessible = true; // [OPTIMIZATION] Default to true to avoid expensive HEAD checks
+      
+      if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
+          // Double check explicit block (already checked above but keeping logic clear)
+          isAccessible = false;
+      }
+
+      /* [OPTIMIZATION] 
+         Disabled per-file HTTP HEAD check to reduce KV operations on the Image Bed side.
+         We trust the list API. If the image is really gone, the frontend onerror will handle it.
+         
       if (file.metadata?.ListType === 'White') {
           isAccessible = true;
       } else {
@@ -94,6 +104,7 @@ export async function syncWithImageBed(DB: any, env: any) {
              console.warn(`SyncHelper: Error checking accessibility for ${displayName}, skipping. Error: ${(e as Error).message}`);
           }
       }
+      */
 
       if (!isAccessible) continue;
 
