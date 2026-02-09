@@ -77,21 +77,22 @@ export async function syncWithImageBed(DB: any, env: any) {
       }
 
       // 2. Check metadata for explicit whitelist (always accessible) or fallback to HTTP check
-      let isAccessible = true; // [OPTIMIZATION] Default to true to avoid expensive HEAD checks
+      let isAccessible = false; // Default to false unless proven accessible (White list) or verified (HEAD)
       
+      // Case A: Explicitly Blocked
       if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
-          // Double check explicit block (already checked above but keeping logic clear)
           isAccessible = false;
+          // console.log(`SyncHelper: Skipping explicitly blocked file: ${displayName}`);
       }
-
-      /* [OPTIMIZATION] 
-         Disabled per-file HTTP HEAD check to reduce KV operations on the Image Bed side.
-         We trust the list API. If the image is really gone, the frontend onerror will handle it.
-         
-      if (file.metadata?.ListType === 'White') {
+      // Case B: Explicitly Whitelisted (Trust immediately, no HEAD check needed)
+      else if (file.metadata?.ListType === 'White') {
           isAccessible = true;
-      } else {
-          // 3. Fallback to HTTP HEAD check (verifies if server allows access under current mode)
+      }
+      // Case C: Unknown Status (Must Verify)
+      else {
+          // [OPTIMIZATION] Only perform HEAD check if NOT in White list. 
+          // This significantly reduces KV ops for "trusted" images, while still filtering out broken ones for others.
+          // Note: If you want to save MORE quota and accept broken images, you can set this to 'true' directly.
           try {
              // redirect: 'manual' ensures we treat 302 redirects (e.g. to block page) as inaccessible
              const headRes = await fetch(publicUrl, { method: 'HEAD', redirect: 'manual' });
@@ -102,9 +103,10 @@ export async function syncWithImageBed(DB: any, env: any) {
              }
           } catch (e) {
              console.warn(`SyncHelper: Error checking accessibility for ${displayName}, skipping. Error: ${(e as Error).message}`);
+             // Network error -> assume inaccessible to be safe, or accessible if you prefer loose mode
+             isAccessible = false; 
           }
       }
-      */
 
       if (!isAccessible) continue;
 
