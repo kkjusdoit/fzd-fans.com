@@ -711,18 +711,6 @@ const slogans = [
 </style>
 
 <script is:inline>
-  // 语言检测与自动跳转
-  (function() {
-    const hasRedirected = sessionStorage.getItem('lang-redirected');
-    if (!hasRedirected && !location.pathname.startsWith('/en')) {
-      const lang = navigator.language || navigator.userLanguage;
-      if (lang && !lang.startsWith('zh')) {
-        sessionStorage.setItem('lang-redirected', '1');
-        location.href = '/en' + location.pathname;
-      }
-    }
-  })();
-
   document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.getElementById('quotesCarousel');
     const quotes = carousel?.querySelectorAll('.quote-card');

@@ -42,5 +42,17 @@ const { Content } = await entry.render();
   .content { line-height: 1.8; }
   .content :global(h2) { margin-top: 2rem; color: #1e88e5; }
   .content :global(h3) { margin-top: 1.5rem; }
+  .content :global(blockquote) {
+    background: #f8f9fa;
+    border-left: 4px solid #1e88e5;
+    padding: 0.8rem 1.2rem;
+    margin: 0.8rem 0 1.5rem;
+    border-radius: 0 4px 4px 0;
+    color: #555;
+    font-size: 0.95rem;
+  }
+  .content :global(li) {
+    margin-bottom: 0.5rem;
+  }
   footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #eee; }
 </style>
