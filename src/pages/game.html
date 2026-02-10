@@ -321,10 +321,28 @@ const LEVELS = {
         layers: 2
     },
     2: {
-        name: "第二关：巴黎巅峰 (困难)",
-        types: Object.keys(ASSETS).slice(0, 10), // Reduced from all 15 types
-        count: 60, // Reduced from 102
-        layers: 5 // Reduced from 8
+        name: "第二关：初试锋芒 (普通)",
+        types: Object.keys(ASSETS).slice(0, 6),
+        count: 36,
+        layers: 3
+    },
+    3: {
+        name: "第三关：渐入佳境 (进阶)",
+        types: Object.keys(ASSETS).slice(0, 9),
+        count: 54,
+        layers: 4
+    },
+    4: {
+        name: "第四关：巴黎巅峰 (困难)",
+        types: Object.keys(ASSETS).slice(0, 12),
+        count: 72,
+        layers: 5
+    },
+    5: {
+        name: "第五关：超级金满贯 (炼狱)",
+        types: Object.keys(ASSETS),
+        count: 99,
+        layers: 6
     }
 };
 
@@ -1056,10 +1074,11 @@ class Game {
                     this.createParticles(this.centerX, this.centerY, 'win');
                     setTimeout(() => {
                         AudioMgr.playWin();
-                        if (this.level === 1) {
+                        const maxLevel = Object.keys(LEVELS).length;
+                        if (this.level < maxLevel) {
                             // Delay next level start to let win particles play out
                             setTimeout(() => {
-                                this.startLevel(2);
+                                this.startLevel(this.level + 1);
                             }, 1500);
                         } else {
                             document.getElementById('victory-modal').style.display = 'block';
