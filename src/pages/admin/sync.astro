@@ -7,6 +7,11 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <h1>🔄同步图片</h1>
     <p class="subtitle">同步后默认状态为<b>已审核 (reviewed=1)</b>。</p>
 
+    <div class="diagnostic-section">
+      <button id="diagnosticBtn" class="sync-btn diagnostic">🔍 运行诊断</button>
+      <p class="hint">检查环境变量、数据库连接和图床 API 状态</p>
+    </div>
+
     <div class="auto-sync-section">
       <button id="autoSyncBtn" class="sync-btn auto">⚡️ 自动同步 (Fetched from Cloudflare)</button>
       <p class="hint">直接从图床 API 获取所有文件并同步</p>
@@ -92,6 +97,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     align-self: center;
   }
 
+  .sync-btn.diagnostic {
+    background: #ff9800;
+  }
+
+  .sync-btn.diagnostic:hover {
+    background: #f57c00;
+  }
+
   .sync-btn:hover {
     background: #1565c0;
     transform: translateY(-2px);
@@ -103,6 +116,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+  }
+
+  .diagnostic-section {
+    margin-bottom: 1.5rem;
   }
 
   .status-box {
@@ -121,6 +138,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <script>
   const autoSyncBtn = document.getElementById('autoSyncBtn') as HTMLButtonElement;
+  const diagnosticBtn = document.getElementById('diagnosticBtn') as HTMLButtonElement;
   const statusBox = document.getElementById('status') as HTMLDivElement;
 
   function setStatus(type, msg) {
@@ -128,6 +146,64 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     statusBox.className = `status-box ${type}`;
     statusBox.textContent = msg;
   }
+
+  // Diagnostic Check
+  diagnosticBtn?.addEventListener('click', async () => {
+    diagnosticBtn.disabled = true;
+    diagnosticBtn.textContent = '正在诊断...';
+    setStatus('loading', '正在检查系统状态...\n');
+
+    try {
+      const response = await fetch('/api/debug-sync', { method: 'GET' });
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const r = result.results;
+        let msg = '✅ 诊断完成\n\n';
+        
+        msg += '📋 环境变量检查:\n';
+        for (const [key, value] of Object.entries(r.envCheck as any)) {
+          msg += `  ${key}: ${value}\n`;
+        }
+        
+        msg += '\n💾 数据库检查:\n';
+        msg += `  状态：${r.dbCheck.status}\n`;
+        if (r.dbCheck.photoCount !== undefined) {
+          msg += `  照片数量：${r.dbCheck.photoCount}\n`;
+        }
+        if (r.dbCheck.error) {
+          msg += `  错误：${r.dbCheck.error}\n`;
+        }
+        
+        msg += '\n🌐 图床 API 检查:\n';
+        if (r.apiCheck.status) {
+          msg += `  状态：${r.apiCheck.status}\n`;
+        }
+        if (r.apiCheck.ok !== undefined) {
+          msg += `  响应：${r.apiCheck.ok ? '✅ 成功' : '❌ 失败'}\n`;
+        }
+        if (r.apiCheck.response) {
+          msg += `  文件数：${r.apiCheck.response.filesCount}\n`;
+          msg += `  总数：${r.apiCheck.response.totalCount}\n`;
+        }
+        if (r.apiCheck.error) {
+          msg += `  错误：${r.apiCheck.error}\n`;
+        }
+        if (r.apiCheck.errorBody) {
+          msg += `  响应体：${r.apiCheck.errorBody}\n`;
+        }
+        
+        setStatus('success', msg);
+      } else {
+        throw new Error(result.error || '诊断失败');
+      }
+    } catch (err) {
+      setStatus('error', `❌ 诊断失败：${(err as Error).message}`);
+    } finally {
+      diagnosticBtn.disabled = false;
+      diagnosticBtn.textContent = '🔍 运行诊断';
+    }
+  });
 
   // Auto Sync
   autoSyncBtn?.addEventListener('click', async () => {
@@ -140,12 +216,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const result = await response.json();
 
       if (response.ok) {
-        setStatus('success', `⚡️ 自动同步成功！\n\n远程文件总数: ${result.totalFound}\n新增入库: ${result.added}\n激活可见: ${result.activated}\n已存在: ${result.skipped}`);
+        setStatus('success', `⚡️ 自动同步成功！\n\n远程文件总数：${result.totalFound}\n新增入库：${result.added}\n激活可见：${result.activated}\n已存在：${result.skipped}`);
       } else {
         throw new Error(result.error || 'Server Error');
       }
     } catch (err) {
-      setStatus('error', `❌ 自动同步失败: ${(err as Error).message}`);
+      setStatus('error', `❌ 自动同步失败：${(err as Error).message}\n\n💡 提示：请先点击"运行诊断"按钮检查系统状态`);
     } finally {
       autoSyncBtn.disabled = false;
       autoSyncBtn.textContent = '⚡️ 自动同步 (Fetched from Cloudflare)';
