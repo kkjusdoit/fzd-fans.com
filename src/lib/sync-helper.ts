@@ -20,6 +20,30 @@ async function parseJsonResponse(response: Response, label: string) {
   }
 }
 
+async function isNewPhotoAccessible(publicUrl: string, file: any) {
+  if (file.metadata?.ListType === 'White') {
+    return true;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const headRes = await fetch(publicUrl, {
+      method: 'HEAD',
+      redirect: 'manual',
+      signal: controller.signal
+    });
+
+    return headRes.status === 200;
+  } catch (error) {
+    console.warn(`SyncHelper: Accessibility check failed for ${publicUrl}: ${(error as Error).message}`);
+    return false;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function syncWithImageBed(DB: any, env: any) {
   try {
     // 1. Fetch image list from upstream
@@ -97,18 +121,17 @@ export async function syncWithImageBed(DB: any, env: any) {
       const publicUrl = `https://cloudflare-imgbed-cvs.pages.dev/file/${file.name}`;
       const displayName = file.metadata?.FileName || file.name;
 
-      // Filter out explicitly blocked images. For admin sync we trust the
-      // upstream file list and avoid per-file HEAD requests, which can cause
-      // Cloudflare Pages requests to time out when syncing large batches.
+      // Filter out explicitly blocked images.
       if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
           console.log(`SyncHelper: Skipping explicitly blocked file: ${displayName}`);
           continue;
       }
 
-      validRemoteUrls.add(publicUrl);
       const existing = localPhotosByUrl.get(publicUrl);
 
       if (existing) {
+        validRemoteUrls.add(publicUrl);
+
         // If exists but not reviewed, approve it (since it exists on the image bed which is the source of truth)
         if (existing.reviewed !== 1) {
            await DB.prepare('UPDATE photos SET reviewed = 1 WHERE id = ?').bind(existing.id).run();
@@ -120,6 +143,13 @@ export async function syncWithImageBed(DB: any, env: any) {
            skipped++;
         }
       } else {
+        const isAccessible = await isNewPhotoAccessible(publicUrl, file);
+        if (!isAccessible) {
+          console.log(`SyncHelper: Skipping non-whitelisted/inaccessible new file: ${displayName}`);
+          continue;
+        }
+
+        validRemoteUrls.add(publicUrl);
         await DB.prepare(
           'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
         ).bind(displayName, publicUrl, Date.now(), 'auto-sync').run();
