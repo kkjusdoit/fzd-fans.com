@@ -70,6 +70,14 @@ export async function syncWithImageBed(DB: any, env: any) {
 
     console.log(`SyncHelper: Total remote files fetched: ${remoteFiles.length}`);
     const validRemoteUrls = new Set<string>();
+    const localPhotosResult = await DB.prepare('SELECT id, url, name, reviewed FROM photos').all();
+    const localPhotos = (localPhotosResult.results || []) as Array<{
+      id: number;
+      url: string;
+      name: string;
+      reviewed: number;
+    }>;
+    const localPhotosByUrl = new Map(localPhotos.map((photo) => [photo.url, photo]));
 
     let added = 0;
     let skipped = 0;
@@ -87,52 +95,18 @@ export async function syncWithImageBed(DB: any, env: any) {
       }
 
       const publicUrl = `https://cloudflare-imgbed-cvs.pages.dev/file/${file.name}`;
-      let displayName = file.metadata?.FileName || file.name;
+      const displayName = file.metadata?.FileName || file.name;
 
-      // Accessibility Check: Filter out blocked/inaccessible images
-      // 1. Check metadata for explicit blocks
+      // Filter out explicitly blocked images. For admin sync we trust the
+      // upstream file list and avoid per-file HEAD requests, which can cause
+      // Cloudflare Pages requests to time out when syncing large batches.
       if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
           console.log(`SyncHelper: Skipping explicitly blocked file: ${displayName}`);
           continue;
       }
 
-      // 2. Check metadata for explicit whitelist (always accessible) or fallback to HTTP check
-      let isAccessible = false; // Default to false unless proven accessible (White list) or verified (HEAD)
-      
-      // Case A: Explicitly Blocked
-      if (file.metadata?.ListType === 'Block' || file.metadata?.Label === 'adult') {
-          isAccessible = false;
-          // console.log(`SyncHelper: Skipping explicitly blocked file: ${displayName}`);
-      }
-      // Case B: Explicitly Whitelisted (Trust immediately, no HEAD check needed)
-      else if (file.metadata?.ListType === 'White') {
-          isAccessible = true;
-      }
-      // Case C: Unknown Status (Must Verify)
-      else {
-          // [OPTIMIZATION] Only perform HEAD check if NOT in White list. 
-          // This significantly reduces KV ops for "trusted" images, while still filtering out broken ones for others.
-          // Note: If you want to save MORE quota and accept broken images, you can set this to 'true' directly.
-          try {
-             // redirect: 'manual' ensures we treat 302 redirects (e.g. to block page) as inaccessible
-             const headRes = await fetch(publicUrl, { method: 'HEAD', redirect: 'manual' });
-             if (headRes.status === 200) {
-                 isAccessible = true;
-             } else {
-                 console.warn(`SyncHelper: Skipping inaccessible file (Status ${headRes.status}): ${displayName}`);
-             }
-          } catch (e) {
-             console.warn(`SyncHelper: Error checking accessibility for ${displayName}, skipping. Error: ${(e as Error).message}`);
-             // Network error -> assume inaccessible to be safe, or accessible if you prefer loose mode
-             isAccessible = false; 
-          }
-      }
-
-      if (!isAccessible) continue;
-
       validRemoteUrls.add(publicUrl);
-      
-      const existing = await DB.prepare('SELECT id, reviewed FROM photos WHERE url = ?').bind(publicUrl).first();
+      const existing = localPhotosByUrl.get(publicUrl);
 
       if (existing) {
         // If exists but not reviewed, approve it (since it exists on the image bed which is the source of truth)
@@ -156,18 +130,13 @@ export async function syncWithImageBed(DB: any, env: any) {
     }
 
     // 3. Process Local Files (Delete if not in remote)
-    // Fetch all current URLs from DB
-    const localPhotos = await DB.prepare('SELECT id, url, name FROM photos').all();
-    
-    if (localPhotos.results) {
-      for (const photo of localPhotos.results) {
-        // If local URL is NOT in the valid remote set, delete it
-        if (!validRemoteUrls.has(photo.url as string)) {
-          console.log(`SyncHelper: Deleting orphaned photo: ${photo.name} (${photo.url})`);
-          await DB.prepare('DELETE FROM photos WHERE id = ?').bind(photo.id).run();
-          deleted++;
-          details.push({ name: photo.name, status: 'deleted' });
-        }
+    for (const photo of localPhotos) {
+      // If local URL is NOT in the valid remote set, delete it
+      if (!validRemoteUrls.has(photo.url)) {
+        console.log(`SyncHelper: Deleting orphaned photo: ${photo.name} (${photo.url})`);
+        await DB.prepare('DELETE FROM photos WHERE id = ?').bind(photo.id).run();
+        deleted++;
+        details.push({ name: photo.name, status: 'deleted' });
       }
     }
 
