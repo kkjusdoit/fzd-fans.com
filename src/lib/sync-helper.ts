@@ -44,6 +44,26 @@ async function isNewPhotoAccessible(publicUrl: string, file: any) {
   }
 }
 
+async function runWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  worker: (item: T) => Promise<R>
+) {
+  const results: R[] = new Array(items.length);
+  let index = 0;
+
+  async function consume() {
+    while (index < items.length) {
+      const current = index++;
+      results[current] = await worker(items[current]);
+    }
+  }
+
+  const workerCount = Math.min(concurrency, items.length);
+  await Promise.all(Array.from({ length: workerCount }, () => consume()));
+  return results;
+}
+
 export async function syncWithImageBed(DB: any, env: any) {
   try {
     // 1. Fetch image list from upstream
@@ -108,6 +128,11 @@ export async function syncWithImageBed(DB: any, env: any) {
     let deleted = 0;
     let activated = 0;
     const details = [];
+    const newCandidates: Array<{
+      file: any;
+      publicUrl: string;
+      displayName: string;
+    }> = [];
 
     // 2. Process Remote Files (Add missing)
     for (const file of remoteFiles) {
@@ -143,20 +168,33 @@ export async function syncWithImageBed(DB: any, env: any) {
            skipped++;
         }
       } else {
-        const isAccessible = await isNewPhotoAccessible(publicUrl, file);
-        if (!isAccessible) {
-          console.log(`SyncHelper: Skipping non-whitelisted/inaccessible new file: ${displayName}`);
-          continue;
-        }
-
-        validRemoteUrls.add(publicUrl);
-        await DB.prepare(
-          'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
-        ).bind(displayName, publicUrl, Date.now(), 'auto-sync').run();
-        
-        added++;
-        details.push({ name: displayName, status: 'added' });
+        newCandidates.push({ file, publicUrl, displayName });
       }
+    }
+
+    const concurrentChecks = Number(env.SYNC_ACCESS_CHECK_CONCURRENCY || 8);
+    const checkedNewCandidates = await runWithConcurrency(
+      newCandidates,
+      concurrentChecks,
+      async (candidate) => ({
+        ...candidate,
+        isAccessible: await isNewPhotoAccessible(candidate.publicUrl, candidate.file)
+      })
+    );
+
+    for (const candidate of checkedNewCandidates) {
+      if (!candidate.isAccessible) {
+        console.log(`SyncHelper: Skipping non-whitelisted/inaccessible new file: ${candidate.displayName}`);
+        continue;
+      }
+
+      validRemoteUrls.add(candidate.publicUrl);
+      await DB.prepare(
+        'INSERT INTO photos (name, url, created_at, ip, reviewed) VALUES (?, ?, ?, ?, 1)'
+      ).bind(candidate.displayName, candidate.publicUrl, Date.now(), 'auto-sync').run();
+
+      added++;
+      details.push({ name: candidate.displayName, status: 'added' });
     }
 
     // 3. Process Local Files (Delete if not in remote)
