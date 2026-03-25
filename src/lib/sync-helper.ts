@@ -1,3 +1,25 @@
+async function parseJsonResponse(response: Response, label: string) {
+  const contentType = response.headers.get('content-type') || 'unknown';
+  const text = await response.text();
+
+  if (!response.ok) {
+    const snippet = text.slice(0, 200).replace(/\s+/g, ' ').trim();
+    throw new Error(`${label} failed (${response.status} ${response.statusText}, Content-Type: ${contentType})${snippet ? `\n响应片段: ${snippet}` : ''}`);
+  }
+
+  if (!contentType.includes('application/json')) {
+    const snippet = text.slice(0, 200).replace(/\s+/g, ' ').trim();
+    throw new Error(`${label} returned non-JSON content (Content-Type: ${contentType})${snippet ? `\n响应片段: ${snippet}` : ''}`);
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    const snippet = text.slice(0, 200).replace(/\s+/g, ' ').trim();
+    throw new Error(`${label} returned invalid JSON${snippet ? `\n响应片段: ${snippet}` : ''}`);
+  }
+}
+
 export async function syncWithImageBed(DB: any, env: any) {
   try {
     // 1. Fetch image list from upstream
@@ -29,15 +51,13 @@ export async function syncWithImageBed(DB: any, env: any) {
         method: 'POST',
         headers: {
           'Authorization': authHeader,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        redirect: 'manual'
       });
 
-      if (!response.ok) {
-        throw new Error(`Upstream API failed: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await parseJsonResponse(response, 'Upstream image list API');
       const files = data.files || [];
       remoteFiles = remoteFiles.concat(files);
 
