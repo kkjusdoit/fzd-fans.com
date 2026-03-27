@@ -42,7 +42,7 @@ Fans joked "Can you treat us more often?"
 
 ## Paris Olympics vs Zhang Tomokazu
 
-When down 0-2:
+Down 1-2 (changing jerseys):
 
 > "I can do this"
 
