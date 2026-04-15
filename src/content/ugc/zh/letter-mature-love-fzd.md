@@ -6,9 +6,9 @@ tags: ["伦敦世锦赛", "理性支持", "成熟的爱", "繁星物语"]
 category: "ugc"
 ugcType: "letter"
 ugcTag: "文字创作"
-author: "佚名"
-authorNote: "如系原作者，请联系站长补充署名。"
-editorNote: "本文据读者提供稿件整理发布，当前未能确认原作者信息；如系原作者本人，请联系站长补充署名。"
+author: "七蛋王者"
+authorNote: "微博 ID：七蛋王者"
+editorNote: "作者署名已补充为微博 ID“七蛋王者”，感谢作者认领。"
 featured: false
 ---
 
