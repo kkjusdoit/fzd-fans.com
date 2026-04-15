@@ -8,7 +8,6 @@ ugcType: "letter"
 ugcTag: "文字创作"
 author: "七蛋王者"
 authorNote: "微博 ID：七蛋王者"
-editorNote: "作者署名已补充为微博 ID“七蛋王者”，感谢作者认领。"
 featured: false
 ---
 
