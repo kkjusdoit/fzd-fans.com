@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>贪吃蛇</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      font-family: 'Arial', sans-serif;
+      color: #1f2a37;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: linear-gradient(to bottom, #1e88e5, #1565c0);
+      color: white;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 3px #0d47a1;
+      transition: transform 0.1s;
+    }
+    #back-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 0 #0d47a1;
+    }
+    #game-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 3.5rem 1rem 2rem;
+      box-sizing: border-box;
+    }
+    #hud {
+      width: min(90vw, 420px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      padding: 0.6rem 0.9rem;
+      box-shadow: 0 6px 20px rgba(30, 136, 229, 0.15);
+    }
+    #status-text {
+      font-size: 0.9rem;
+      color: #455a64;
+      flex: 1;
+      text-align: center;
+    }
+    .score {
+      font-weight: bold;
+      color: #1e88e5;
+      font-size: 0.95rem;
+    }
+    #restart-btn {
+      background: #1e88e5;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    canvas {
+      width: min(90vw, 420px);
+      height: min(90vw, 420px);
+      background: #f8fbff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(30, 136, 229, 0.2);
+    }
+    #controls {
+      display: none;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      width: min(80vw, 260px);
+      user-select: none;
+    }
+    #controls button {
+      background: white;
+      border: 1px solid #bbdefb;
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #1e88e5;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(30, 136, 229, 0.2);
+      width: 100%;
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      width: 100%;
+    }
+    .controls-grid .spacer {
+      visibility: hidden;
+    }
+    @media (max-width: 768px) {
+      #controls {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body
+  data-status-ready="按方向键开始"
+  data-status-running="进行中"
+  data-status-over="游戏结束"
+  data-label-start="开始"
+  data-label-restart="重开"
+>
+  <a id="back-btn" href="/games">← 返回</a>
+  <div id="game-container">
+    <div id="hud">
+      <div class="score">得分 <span id="score-value">0</span></div>
+      <div id="status-text">按方向键开始</div>
+      <button id="restart-btn">开始</button>
+    </div>
+
+    <canvas id="game-canvas" data-grid="20" data-cell="20" data-tick="130"></canvas>
+
+    <div id="controls" aria-label="移动方向">
+      <div class="controls-grid">
+        <span class="spacer">&nbsp;</span>
+        <button data-dir="up" aria-label="向上">▲</button>
+        <span class="spacer">&nbsp;</span>
+        <button data-dir="left" aria-label="向左">◀</button>
+        <button data-dir="down" aria-label="向下">▼</button>
+        <button data-dir="right" aria-label="向右">▶</button>
+      </div>
+    </div>
+  </div>
+  <script src="/js/snake.js" defer></script>
+</body>
+</html>

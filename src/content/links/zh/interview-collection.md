@@ -39,4 +39,4 @@ translated: true
 
 ---
 
-*(欢迎投稿推荐 <a href="mailto:inbox@fzd-fans.com">inbox@fzd-fans.com</a>）*
+*(欢迎投稿推荐 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）*

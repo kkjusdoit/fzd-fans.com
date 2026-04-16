@@ -39,4 +39,4 @@ Experience the linguistic charm of Fan Zhendong
 
 ---
 
-*(Welcome to submit recommendations <a href="mailto:inbox@fzd-fans.com">inbox@fzd-fans.com</a>)*
+*(Welcome to submit recommendations <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>)*
