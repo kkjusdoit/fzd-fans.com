@@ -4,6 +4,7 @@ description: "东方体育日报报道：萨尔布吕肯主场为樊振东等四
 date: 2026-04-17
 category: links
 tags: ["媒体", "报道", "萨尔布吕肯", "德甲"]
+image: "https://images.shobserver.com/dftyrb/files/20260417/i_A090417.jpg"
 source: "https://www.shobserver.com/journal/getMobileArticle.htm?id=504645"
 translated: false
 ---
@@ -11,6 +12,8 @@ translated: false
 **来源：东方体育日报**
   
 **作者：程超**
+
+![东方体育日报报道配图](https://images.shobserver.com/dftyrb/files/20260417/i_A090417.jpg)
 
 北京时间 4 月 16 日凌晨，2025-2026 赛季德甲乒乓球联赛第二十一轮，萨尔布吕肯迎来常规赛最后一个主场。面对云达不来梅，球队以 3 比 1 取胜，为常规赛主场征程画上圆满句号。但这一晚的意义并不只在比分，赛前和赛后，歌声、掌声与真诚的发言交织在一起，俱乐部也为即将离队的樊振东、达科·约奇克、迈斯纳、村松雄斗四位球员举办了一场没有伤感的欢送会。
 
