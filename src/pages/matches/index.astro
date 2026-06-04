@@ -1,0 +1,834 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import matchesData from '../../data/matches.json';
+import rankingsData from '../../data/rankings.json';
+import yearlyData from '../../data/yearly.json';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Pre-compute unique values for filters
+const events = [...new Set(matchesData.map(m => m.event))].filter(Boolean);
+const periods = [...new Set(matchesData.map(m => m.period))].filter(Boolean);
+const levels = [...new Set(matchesData.map(m => m.level))].filter(Boolean);
+const opponents = [...new Set(matchesData.map(m => m.opponent).filter(o => o && o !== '——'))].sort();
+const partners = [...new Set(matchesData.map(m => m.partner).filter(Boolean))].sort();
+
+// Association ordering by table tennis strength
+const assocOrder = ['日本', '韩国', '德国', '瑞典', '法国', '中国台北', '中国香港', '新加坡', '巴西', '葡萄牙', '英格兰', '印度', '斯洛文尼亚', '克罗地亚', '罗马尼亚', '尼日利亚', '埃及'];
+const rawAssocs = [...new Set(matchesData.map(m => m.assoc))].filter(a => a && a !== '——');
+const assocs = rawAssocs.sort((a, b) => {
+  const ia = assocOrder.indexOf(a);
+  const ib = assocOrder.indexOf(b);
+  if (ia !== -1 && ib !== -1) return ia - ib;
+  if (ia !== -1) return -1;
+  if (ib !== -1) return 1;
+  return a.localeCompare(b, 'zh');
+});
+
+// Association → Opponents mapping (for linked dropdowns)
+const assocOpponentMap = {};
+for (const m of matchesData) {
+  if (m.assoc && m.assoc !== '——' && m.opponent && m.opponent !== '——') {
+    if (!assocOpponentMap[m.assoc]) assocOpponentMap[m.assoc] = new Set();
+    assocOpponentMap[m.assoc].add(m.opponent);
+  }
+}
+// Convert Sets to sorted arrays
+for (const k of Object.keys(assocOpponentMap)) {
+  assocOpponentMap[k] = [...assocOpponentMap[k]].sort();
+}
+
+// Event → Partners mapping (for linked dropdowns)
+const eventPartnerMap = {};
+for (const m of matchesData) {
+  if (m.partner && m.event) {
+    if (!eventPartnerMap[m.event]) eventPartnerMap[m.event] = new Set();
+    eventPartnerMap[m.event].add(m.partner);
+  }
+}
+for (const k of Object.keys(eventPartnerMap)) {
+  eventPartnerMap[k] = [...eventPartnerMap[k]].sort();
+}
+
+// Stats (only 胜 and 负 count for win rate; W.O. and —— are excluded)
+const total = matchesData.length;
+const wins = matchesData.filter(m => m.result === '胜').length;
+const losses = matchesData.filter(m => m.result === '负').length;
+const winRate = ((wins / (wins + losses)) * 100).toFixed(1);
+
+// Unique years for yearly table
+const years = [...new Set(yearlyData.map(y => y.year))].sort();
+---
+
+<BaseLayout title="战绩查询系统" description="樊振东职业生涯战绩查询系统 - 按对手、搭档、赛事级别等多维度查询">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🏓 战绩数据库</div>
+      <h1>战绩查询系统</h1>
+      <p class="hero-sub">樊振东职业生涯全部正式比赛记录 · 数据截止 2026.6.2</p>
+    </div>
+  </section>
+
+  <!-- Intro -->
+  <section class="intro">
+    <p class="intro-text">
+      本系统收录樊振东职业生涯正式比赛 <strong>{total}</strong> 场，涵盖大小赛事 <strong>176</strong> 站，国家及以上级冠军 <strong>117</strong> 次。
+      可通过时间排序直观查看全部赛事数据，也可通过筛选功能快速查询与某一对手或搭档的交手、组队记录。
+    </p>
+    <p class="intro-slogan">时光淬炼王者，热爱永燃不熄。携手赴前路，步步皆传奇！</p>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{total}</span>
+      <span class="stat-label">总场次</span>
+    </div>
+    <div class="stat-card stat-win">
+      <span class="stat-value">{wins}</span>
+      <span class="stat-label">胜</span>
+    </div>
+    <div class="stat-card stat-loss">
+      <span class="stat-value">{losses}</span>
+      <span class="stat-label">负</span>
+    </div>
+    <div class="stat-card stat-rate">
+      <span class="stat-value">{winRate}<small>%</small></span>
+      <span class="stat-label">胜率</span>
+    </div>
+  </section>
+
+  <!-- Dimension Toggle -->
+  <section class="dim-toggle-wrap">
+    <div class="dim-toggle">
+      <button class="dim-btn active" data-dim="opponent">按对手查询</button>
+      <button class="dim-btn" data-dim="partner">按搭档查询</button>
+    </div>
+  </section>
+
+  <!-- Filters: Opponent dimension (matches Excel layout) -->
+  <section class="filters" id="filters-opponent">
+    <div class="filters-header">
+      <span class="filters-icon">🔍</span>
+      <span class="filters-title">按对手维度查询</span>
+    </div>
+    <div class="filter-grid">
+      <!-- Left column -->
+      <div class="filter-col">
+        <div class="filter-group">
+          <label for="o-event">比赛项目</label>
+          <select id="o-event">
+            <option value="">全部</option>
+            {events.map(e => <option value={e}>{e}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="o-assoc">对手协会</label>
+          <select id="o-assoc">
+            <option value="">全部</option>
+            {assocs.map(a => <option value={a}>{a}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="o-search">对手名称</label>
+          <select id="o-search">
+            <option value="">全部</option>
+            {opponents.map(o => <option value={o}>{o}</option>)}
+          </select>
+        </div>
+      </div>
+      <!-- Right column -->
+      <div class="filter-col">
+        <div class="filter-group">
+          <label for="o-period">周期选择</label>
+          <select id="o-period">
+            <option value="">全周期</option>
+            {periods.map(p => <option value={p}>{p}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="o-level">赛事级别选择</label>
+          <select id="o-level">
+            <option value="">全级别</option>
+            {levels.map(l => <option value={l}>{l}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="o-result">赛果</label>
+          <select id="o-result">
+            <option value="">全部</option>
+            <option value="胜">胜</option>
+            <option value="负">负</option>
+            <option value="W.O.">W.O.</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>胜率</label>
+          <div class="winrate-display" id="o-winrate">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-actions-row">
+      <div class="filter-stats">
+        筛选结果：<strong id="o-count">{total}</strong> 场 ·
+        胜 <strong id="o-wins">{wins}</strong> ·
+        负 <strong id="o-losses">{losses}</strong> ·
+        胜率 <strong id="o-rate">{winRate}</strong>%
+      </div>
+      <button class="btn-reset" id="o-reset">重置筛选</button>
+    </div>
+  </section>
+
+  <!-- Filters: Partner dimension -->
+  <section class="filters" id="filters-partner" style="display:none">
+    <div class="filters-header">
+      <span class="filters-icon">⚙</span>
+      <span class="filters-title">按搭档维度查询</span>
+    </div>
+    <div class="filter-grid">
+      <!-- Left column -->
+      <div class="filter-col">
+        <div class="filter-group">
+          <label for="p-event">比赛项目</label>
+          <select id="p-event">
+            <option value="">全部</option>
+            <option value="双打">双打</option>
+            <option value="混双">混双</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="p-search">搭档名称</label>
+          <select id="p-search">
+            <option value="">全部</option>
+            {partners.map(p => <option value={p}>{p}</option>)}
+          </select>
+        </div>
+      </div>
+      <!-- Right column -->
+      <div class="filter-col">
+        <div class="filter-group">
+          <label for="p-period">周期</label>
+          <select id="p-period">
+            <option value="">全部</option>
+            {periods.map(p => <option value={p}>{p}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="p-level">赛事级别</label>
+          <select id="p-level">
+            <option value="">全部</option>
+            {levels.map(l => <option value={l}>{l}</option>)}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="p-result">赛果</label>
+          <select id="p-result">
+            <option value="">全部</option>
+            <option value="胜">胜</option>
+            <option value="负">负</option>
+            <option value="W.O.">W.O.</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="filter-actions-row">
+      <div class="filter-stats">
+        筛选结果：<strong id="p-count">0</strong> 场 ·
+        胜 <strong id="p-wins">0</strong> ·
+        负 <strong id="p-losses">0</strong> ·
+        胜率 <strong id="p-rate">0</strong>%
+      </div>
+      <button class="btn-reset" id="p-reset">重置筛选</button>
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="table-section">
+    <div class="table-scroll">
+      <table id="matches-table">
+        <thead>
+          <tr>
+            <th>周期</th>
+            <th>比赛名称</th>
+            <th>赛事级别</th>
+            <th class="sortable" id="th-date">比赛时间 ▼</th>
+            <th>比赛场次</th>
+            <th>项目</th>
+            <th id="th-opponent">对手</th>
+            <th id="th-partner">搭档</th>
+            <th>赛果</th>
+            <th>大比分</th>
+            <th>小比分</th>
+          </tr>
+        </thead>
+        <tbody id="matches-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Ranking History Chart -->
+  <section class="chart-section">
+    <h2 class="section-title">世界排名走势</h2>
+    <p class="section-sub">ITTF 世界排名 · 积分与位次变化</p>
+    <div class="chart-container">
+      <canvas id="ranking-chart"></canvas>
+    </div>
+  </section>
+
+  <!-- Yearly Stats -->
+  <section class="yearly-section">
+    <h2 class="section-title">年度战绩统计</h2>
+    <p class="section-sub">按年份和项目分类的比赛数据与胜率</p>
+    <div class="table-scroll">
+      <table class="yearly-table">
+        <thead>
+          <tr>
+            <th rowspan="2">年份</th>
+            <th rowspan="2">项目</th>
+            <th colspan="3" class="group-header">整体</th>
+            <th colspan="3" class="group-header">外战</th>
+          </tr>
+          <tr>
+            <th>场数</th>
+            <th>胜场</th>
+            <th>胜率</th>
+            <th>场数</th>
+            <th>胜场</th>
+            <th>胜率</th>
+          </tr>
+        </thead>
+        <tbody>
+          {yearlyData.map(y => (
+            <tr>
+              <td class="year-cell">{y.year}</td>
+              <td>{y.event}</td>
+              <td>{y.total}</td>
+              <td>{y.wins}</td>
+              <td class="rate-cell">{y.rate !== null ? `${y.rate}%` : '—'}</td>
+              <td>{y.extTotal}</td>
+              <td>{y.extWins}</td>
+              <td class="rate-cell">{y.extRate !== null ? `${y.extRate}%` : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Credit -->
+  <section class="credit">
+    <p>数据来源：<a href="https://weibo.com/baiduFZDbar" target="_blank" rel="noopener noreferrer">@樊振东球迷会-天际樊星</a></p>
+    <p class="credit-sub">原始 Excel 文件下载：<a href="http://t.cn/AXXbEeoc" target="_blank" rel="noopener noreferrer">http://t.cn/AXXbEeoc</a>（请下载至电脑端使用 Excel 打开）</p>
+  </section>
+
+  <!-- Chart.js CDN -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script is:inline define:vars={{ matchesData, rankingsData, assocOpponentMap, eventPartnerMap }}>
+    const data = matchesData;
+    const rankings = rankingsData;
+
+    // ===== Dimension Toggle =====
+    const dimBtns = document.querySelectorAll('.dim-btn');
+    const filtersOpponent = document.getElementById('filters-opponent');
+    const filtersPartner = document.getElementById('filters-partner');
+    const thOpponent = document.getElementById('th-opponent');
+    const thPartner = document.getElementById('th-partner');
+    let currentDim = 'opponent';
+
+    dimBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dimBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDim = btn.dataset.dim;
+        if (currentDim === 'opponent') {
+          filtersOpponent.style.display = '';
+          filtersPartner.style.display = 'none';
+          thOpponent.textContent = '对手';
+          thPartner.textContent = '搭档';
+        } else {
+          filtersOpponent.style.display = 'none';
+          filtersPartner.style.display = '';
+          thOpponent.textContent = '搭档';
+          thPartner.textContent = '对手';
+        }
+        render();
+      });
+    });
+
+    // ===== Opponent filters =====
+    const oEvent = document.getElementById('o-event');
+    const oAssoc = document.getElementById('o-assoc');
+    const oPeriod = document.getElementById('o-period');
+    const oLevel = document.getElementById('o-level');
+    const oResult = document.getElementById('o-result');
+    const oSearch = document.getElementById('o-search');
+    const oReset = document.getElementById('o-reset');
+    const oCount = document.getElementById('o-count');
+    const oWinrate = document.getElementById('o-winrate');
+    const oWins = document.getElementById('o-wins');
+    const oLosses = document.getElementById('o-losses');
+    const oRate = document.getElementById('o-rate');
+
+    // ===== Partner filters =====
+    const pEvent = document.getElementById('p-event');
+    const pPeriod = document.getElementById('p-period');
+    const pLevel = document.getElementById('p-level');
+    const pResult = document.getElementById('p-result');
+    const pSearch = document.getElementById('p-search');
+    const pReset = document.getElementById('p-reset');
+    const pCount = document.getElementById('p-count');
+    const pWins = document.getElementById('p-wins');
+    const pLosses = document.getElementById('p-losses');
+    const pRate = document.getElementById('p-rate');
+
+    // ===== Common =====
+    const tbody = document.getElementById('matches-body');
+    const thDate = document.getElementById('th-date');
+    let sortAsc = false;
+
+    // Check if assoc matches (handles dual assocs like '德国\\瑞典')
+    function assocMatches(mAssoc, filterAssoc) {
+      if (!filterAssoc) return true;
+      if (!mAssoc) return false;
+      if (mAssoc === filterAssoc) return true;
+      // Dual assoc: check if either part matches
+      if (mAssoc.includes('\\')) {
+        return mAssoc.split('\\').some(s => s.trim() === filterAssoc);
+      }
+      return false;
+    }
+
+    function getFiltered() {
+      if (currentDim === 'opponent') {
+        const ev = oEvent.value;
+        const as = oAssoc.value;
+        const pe = oPeriod.value;
+        const lv = oLevel.value;
+        const rs = oResult.value;
+        const q = oSearch.value;
+        return data.filter(m => {
+          if (ev && m.event !== ev) return false;
+          if (as && !assocMatches(m.assoc, as)) return false;
+          if (pe && m.period !== pe) return false;
+          if (lv && m.level !== lv) return false;
+          if (rs && m.result !== rs) return false;
+          if (q && m.opponent !== q) return false;
+          return true;
+        });
+      } else {
+        const ev = pEvent.value;
+        const pe = pPeriod.value;
+        const lv = pLevel.value;
+        const rs = pResult.value;
+        const q = pSearch.value;
+        return data.filter(m => {
+          if (!m.partner) return false;
+          if (ev && m.event !== ev) return false;
+          if (pe && m.period !== pe) return false;
+          if (lv && m.level !== lv) return false;
+          if (rs && m.result !== rs) return false;
+          if (q && m.partner !== q) return false;
+          return true;
+        });
+      }
+    }
+
+    function render() {
+      const filtered = getFiltered();
+      const sorted = [...filtered].sort((a, b) => {
+        const da = a.dateSort || '0000.00.00';
+        const db = b.dateSort || '0000.00.00';
+        return sortAsc ? da.localeCompare(db) : db.localeCompare(da);
+      });
+
+      const w = sorted.filter(m => m.result === '胜').length;
+      const l = sorted.filter(m => m.result === '负').length;
+      const rate = (w + l) > 0 ? ((w / (w + l)) * 100).toFixed(1) : '0';
+
+      if (currentDim === 'opponent') {
+        oCount.textContent = sorted.length;
+        oWins.textContent = w;
+        oLosses.textContent = l;
+        oRate.textContent = rate;
+
+        // Per-opponent win rate: wins / (wins + losses) only
+        const opName = oSearch.value;
+        if (opName) {
+          const opMatches = data.filter(m => m.opponent === opName);
+          const opW = opMatches.filter(m => m.result === '胜').length;
+          const opL = opMatches.filter(m => m.result === '负').length;
+          oWinrate.textContent = (opW + opL) > 0 ? (opW / (opW + opL)).toFixed(4) : '—';
+        } else {
+          oWinrate.textContent = '—';
+        }
+      } else {
+        pCount.textContent = sorted.length;
+        pWins.textContent = w;
+        pLosses.textContent = l;
+        pRate.textContent = rate;
+      }
+
+      const rows = sorted.map(m => {
+        const cls = m.result === '胜' ? 'row-win' : m.result === '负' ? 'row-loss' : '';
+        const col1 = currentDim === 'opponent'
+          ? `${m.opponent}${m.assoc ? ' (' + m.assoc + ')' : ''}`
+          : (m.partner || '——');
+        const col2 = currentDim === 'opponent'
+          ? (m.partner || '——')
+          : `${m.opponent}${m.assoc ? ' (' + m.assoc + ')' : ''}`;
+        return `<tr class="${cls}">
+          <td>${m.period}</td>
+          <td>${m.tournament}</td>
+          <td>${m.level}</td>
+          <td>${m.date || '——'}</td>
+          <td>${m.round}</td>
+          <td>${m.event}</td>
+          <td>${col1}</td>
+          <td>${col2}</td>
+          <td class="result-cell">${m.result}</td>
+          <td>${m.score}</td>
+          <td class="games-cell">${m.games}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = rows.join('');
+    }
+
+    // Update opponent dropdown based on selected association
+    function updateOpponentOptions() {
+      const assoc = oAssoc.value;
+      const list = assoc ? (assocOpponentMap[assoc] || []) : null;
+      const prev = oSearch.value;
+      oSearch.innerHTML = '<option value="">全部</option>';
+      if (list) {
+        list.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          oSearch.appendChild(opt);
+        });
+      } else {
+        const all = [...new Set(matchesData.map(m => m.opponent).filter(o => o && o !== '——'))].sort();
+        all.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          oSearch.appendChild(opt);
+        });
+      }
+      if (prev && oSearch.querySelector('option[value="' + CSS.escape(prev) + '"]')) {
+        oSearch.value = prev;
+      } else {
+        oSearch.value = '';
+      }
+    }
+
+    // Update partner dropdown based on selected event
+    function updatePartnerOptions() {
+      const ev = pEvent.value;
+      const list = ev ? (eventPartnerMap[ev] || []) : null;
+      const prev = pSearch.value;
+      pSearch.innerHTML = '<option value="">全部</option>';
+      if (list) {
+        list.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          pSearch.appendChild(opt);
+        });
+      } else {
+        const all = [...new Set(matchesData.map(m => m.partner).filter(Boolean))].sort();
+        all.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          pSearch.appendChild(opt);
+        });
+      }
+      if (prev && pSearch.querySelector('option[value="' + CSS.escape(prev) + '"]')) {
+        pSearch.value = prev;
+      } else {
+        pSearch.value = '';
+      }
+    }
+
+    // Opponent events
+    [oEvent, oPeriod, oLevel, oResult, oSearch].forEach(el => el.addEventListener('change', render));
+    oAssoc.addEventListener('change', () => {
+      updateOpponentOptions();
+      render();
+    });
+    oReset.addEventListener('click', () => {
+      oEvent.value = ''; oAssoc.value = ''; oPeriod.value = '';
+      oLevel.value = ''; oResult.value = ''; oSearch.value = '';
+      updateOpponentOptions();
+      oWinrate.textContent = '—';
+      render();
+    });
+
+    // Partner events
+    [pPeriod, pLevel, pResult, pSearch].forEach(el => el.addEventListener('change', render));
+    pEvent.addEventListener('change', () => {
+      updatePartnerOptions();
+      render();
+    });
+    pReset.addEventListener('click', () => {
+      pEvent.value = ''; pPeriod.value = '';
+      pLevel.value = ''; pResult.value = ''; pSearch.value = '';
+      updatePartnerOptions();
+      render();
+    });
+
+    // Sort
+    thDate.addEventListener('click', () => {
+      sortAsc = !sortAsc;
+      thDate.textContent = sortAsc ? '比赛时间 ▲' : '比赛时间 ▼';
+      render();
+    });
+
+    // Initial render
+    render();
+
+    // ===== Ranking Chart =====
+    const ctx = document.getElementById('ranking-chart');
+    if (ctx && typeof Chart !== 'undefined') {
+      const labels = rankings.map(r => r.date.slice(0, 7));
+      const rankValues = rankings.map(r => r.rank);
+      const pointValues = rankings.map(r => r.points);
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: '世界排名',
+              data: rankValues,
+              borderColor: '#1e88e5',
+              backgroundColor: 'rgba(30,136,229,0.08)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              borderWidth: 2.5,
+              yAxisID: 'y',
+            },
+            {
+              label: '积分',
+              data: pointValues,
+              borderColor: '#ffa726',
+              backgroundColor: 'transparent',
+              tension: 0.3,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              borderWidth: 1.5,
+              borderDash: [4, 3],
+              yAxisID: 'y1',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { font: { size: 12 }, usePointStyle: true } },
+            tooltip: {
+              callbacks: {
+                title: (items) => items[0]?.label || '',
+                label: (item) => {
+                  const prefix = item.datasetIndex === 0 ? '排名' : '积分';
+                  return `${prefix}: ${item.formattedValue}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { maxTicksLimit: 12, font: { size: 11 } },
+              grid: { display: false }
+            },
+            y: {
+              reverse: true,
+              title: { display: true, text: '排名', font: { size: 12 } },
+              ticks: { font: { size: 11 } },
+              grid: { color: 'rgba(0,0,0,0.04)' }
+            },
+            y1: {
+              position: 'right',
+              title: { display: true, text: '积分', font: { size: 12 } },
+              ticks: { font: { size: 11 } },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    margin: -1rem -1rem 0;
+    padding: 3.5rem 2rem 2.5rem;
+    background: linear-gradient(135deg, #0d47a1 0%, #1565c0 30%, #1e88e5 60%, #42a5f5 100%);
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    padding: 0.35rem 1rem;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.03em;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .hero-sub { font-size: 1rem; color: rgba(255,255,255,0.8); }
+
+  /* ===== Intro ===== */
+  .intro { text-align: center; padding: 1.8rem 1rem 1.5rem; max-width: 720px; margin: 0 auto; }
+  .intro-text { font-size: 0.95rem; color: #555; line-height: 1.8; margin-bottom: 0.8rem; }
+  .intro-text strong { color: #1e88e5; font-weight: 700; font-size: 1.05em; }
+  .intro-slogan { font-size: 0.88rem; color: #999; font-style: italic; letter-spacing: 0.05em; }
+
+  /* ===== Stats ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 680px; margin: 0 auto 1.5rem; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 1.2rem 0.8rem; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border-bottom: 3px solid #e0e0e0; transition: transform 0.2s, box-shadow 0.2s; }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .stat-win { border-bottom-color: #43a047; }
+  .stat-loss { border-bottom-color: #e53935; }
+  .stat-rate { border-bottom-color: #1e88e5; }
+  .stat-value { display: block; font-size: 2rem; font-weight: 800; color: #222; line-height: 1.1; }
+  .stat-win .stat-value { color: #2e7d32; }
+  .stat-loss .stat-value { color: #c62828; }
+  .stat-rate .stat-value { color: #1e88e5; }
+  .stat-value small { font-size: 0.55em; font-weight: 600; }
+  .stat-label { display: block; margin-top: 0.3rem; font-size: 0.78rem; color: #999; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ===== Dimension Toggle ===== */
+  .dim-toggle-wrap { text-align: center; margin-bottom: 1.5rem; }
+  .dim-toggle { display: inline-flex; background: #f0f0f0; border-radius: 8px; padding: 4px; gap: 4px; }
+  .dim-btn { padding: 0.55rem 1.6rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #888; background: transparent; transition: all 0.2s; }
+  .dim-btn.active { background: #1e88e5; color: #fff; box-shadow: 0 2px 8px rgba(30,136,229,0.3); }
+  .dim-btn:hover:not(.active) { color: #333; background: rgba(0,0,0,0.04); }
+
+  /* ===== Filters ===== */
+  .filters { background: #fff; border-radius: 10px; padding: 1.4rem 1.6rem; margin-bottom: 1.8rem; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border: 1px solid #eee; }
+  .filters-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid #f0f0f0; }
+  .filters-icon { font-size: 1rem; opacity: 0.5; }
+  .filters-title { font-size: 0.85rem; font-weight: 600; color: #888; letter-spacing: 0.04em; }
+  .filter-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 0.8rem; }
+  .filter-row:last-of-type { margin-bottom: 0; }
+  .filter-group { display: flex; flex-direction: column; min-width: 130px; }
+  .filter-group label { font-size: 0.75rem; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.35rem; }
+  .filter-group select, .filter-group input { padding: 0.55rem 0.7rem; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 0.88rem; background: #fafafa; color: #333; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; appearance: auto; }
+  .filter-group select:hover, .filter-group input:hover { border-color: #bdbdbd; }
+  .filter-group select:focus, .filter-group input:focus { outline: none; border-color: #1e88e5; background: #fff; box-shadow: 0 0 0 3px rgba(30,136,229,0.12); }
+  .search-group { position: relative; flex: 1; min-width: 200px; }
+  .filter-actions { justify-content: flex-end; }
+  .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; margin-bottom: 0.8rem; }
+  .filter-col { display: flex; flex-direction: column; gap: 0.7rem; }
+  .winrate-display { padding: 0.55rem 0.7rem; border: 1.5px solid #e0e0e0; border-radius: 6px; font-size: 1.1rem; font-weight: 800; background: #fafafa; color: #1e88e5; min-height: 2.3rem; display: flex; align-items: center; }
+  .filter-actions-row { display: flex; justify-content: space-between; align-items: center; padding-top: 0.7rem; border-top: 1px solid #f5f5f5; }
+  .btn-reset { padding: 0.55rem 1.4rem; background: #fff; border: 1.5px solid #e0e0e0; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #888; white-space: nowrap; transition: all 0.2s; }
+  .btn-reset:hover { border-color: #1e88e5; color: #1e88e5; background: #e3f2fd; }
+  .filter-stats { font-size: 0.82rem; color: #999; margin-top: 0.8rem; padding-top: 0.7rem; border-top: 1px solid #f5f5f5; }
+  .filter-stats strong { color: #1e88e5; font-weight: 700; }
+
+  /* ===== Suggestions ===== */
+  .suggestions { display: none; position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; max-height: 220px; overflow-y: auto; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .suggestion-item { padding: 0.6rem 0.8rem; cursor: pointer; font-size: 0.88rem; color: #333; transition: background 0.15s; }
+  .suggestion-item:first-child { border-radius: 8px 8px 0 0; }
+  .suggestion-item:last-child { border-radius: 0 0 8px 8px; }
+  .suggestion-item:hover { background: #e3f2fd; color: #1565c0; }
+
+  /* ===== Table ===== */
+  .table-section { margin-bottom: 2.5rem; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border: 1px solid #eee; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: #fff; }
+  thead { background: linear-gradient(180deg, #1e88e5 0%, #1976d2 100%); color: #fff; position: sticky; top: 0; z-index: 10; }
+  th { padding: 0.75rem 0.7rem; text-align: left; font-weight: 600; font-size: 0.82rem; white-space: nowrap; letter-spacing: 0.02em; border-bottom: 2px solid #1565c0; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { background: rgba(255,255,255,0.1); }
+  td { padding: 0.5rem 0.7rem; border-bottom: 1px solid #f5f5f5; white-space: nowrap; transition: background 0.15s; }
+  .row-win { background: #f9fbe7; }
+  .row-win:hover { background: #f0f4c3; }
+  .row-loss { background: #fff8f8; }
+  .row-loss:hover { background: #ffebee; }
+  tr:not(.row-win):not(.row-loss):hover { background: #f5f5f5; }
+  .result-cell { font-weight: 800; font-size: 0.88rem; }
+  .row-win .result-cell { color: #2e7d32; }
+  .row-loss .result-cell { color: #c62828; }
+  .games-cell { max-width: 280px; white-space: normal; word-break: break-all; font-size: 0.78rem; color: #999; line-height: 1.5; }
+
+  /* ===== Chart ===== */
+  .chart-section { margin-bottom: 2.5rem; }
+  .section-title { font-size: 1.3rem; font-weight: 700; color: #333; text-align: center; margin-bottom: 0.3rem; }
+  .section-sub { font-size: 0.85rem; color: #999; text-align: center; margin-bottom: 1.2rem; }
+  .chart-container { background: #fff; border-radius: 10px; padding: 1.2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border: 1px solid #eee; height: 360px; position: relative; }
+
+  /* ===== Yearly Table ===== */
+  .yearly-section { margin-bottom: 2.5rem; }
+  .yearly-table { font-size: 0.85rem; }
+  .yearly-table th { background: #37474f; border-bottom-color: #263238; font-size: 0.8rem; }
+  .yearly-table th.group-header { background: #455a64; text-align: center; border-left: 1px solid rgba(255,255,255,0.15); }
+  .yearly-table td { text-align: center; }
+  .year-cell { font-weight: 700; color: #1e88e5; }
+  .rate-cell { font-weight: 600; color: #555; }
+  .yearly-table tr:hover { background: #e3f2fd; }
+
+  /* ===== Credit ===== */
+  .credit { text-align: center; padding: 1.5rem 0 2rem; font-size: 0.82rem; color: #bbb; }
+  .credit a { color: #90caf9; }
+  .credit a:hover { color: #1e88e5; }
+  .credit-sub { margin-top: 0.3rem; font-size: 0.78rem; }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .hero { padding: 2.5rem 1.2rem 1.8rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero-sub { font-size: 0.88rem; }
+    .intro { padding: 1.2rem 0.5rem 1rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; margin-bottom: 1.2rem; }
+    .stat-value { font-size: 1.5rem; }
+    .stat-card { padding: 0.9rem 0.6rem; }
+    .dim-btn { padding: 0.45rem 1rem; font-size: 0.82rem; }
+    .filters { padding: 1rem; }
+    .filter-row { flex-direction: column; gap: 0.6rem; }
+    .filter-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .filter-group { min-width: 100%; }
+    .filter-actions-row { flex-direction: column; gap: 0.6rem; align-items: flex-start; }
+    th, td { padding: 0.4rem 0.5rem; font-size: 0.78rem; }
+    .chart-container { height: 260px; padding: 0.8rem; }
+    .section-title { font-size: 1.1rem; }
+  }
+</style>
