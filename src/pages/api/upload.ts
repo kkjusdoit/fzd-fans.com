@@ -3,6 +3,17 @@ import type { APIRoute } from 'astro';
 // 禁用预渲染，让 API 在服务器端运行
 export const prerender = false;
 
+function isReviewRequired(locals: any) {
+  const runtime = locals?.runtime;
+  const rawValue = runtime?.env?.PHOTO_UPLOAD_REVIEW_REQUIRED ?? import.meta.env.PHOTO_UPLOAD_REVIEW_REQUIRED;
+
+  if (typeof rawValue !== 'string') {
+    return false;
+  }
+
+  return rawValue.toLowerCase() === 'true';
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     console.log('收到上传请求');
@@ -154,6 +165,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (src) {
       const fullUrl = `https://cloudflare-imgbed-cvs.pages.dev${src}`;
       const fileName = fileNameToUse;
+      const reviewRequired = isReviewRequired(locals);
+      const reviewedStatus = reviewRequired ? 0 : 1;
 
       // 4. 将元数据存入 Cloudflare D1
       const runtime = (locals as any).runtime;
@@ -181,11 +194,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             });
           }
 
-          // Insert with ip and reviewed = 0 (pending review)
+          // Keep the review gate behind an env flag so we can revert without code changes.
           await DB.prepare(
-            'INSERT INTO photos (name, url, created_at, ip, reviewed, desc) VALUES (?, ?, ?, ?, 0, ?)'
-          ).bind(fileName, fullUrl, Date.now(), clientIP, desc).run();
-          console.log('元数据已写入 D1 数据库 (Pending Review)');
+            'INSERT INTO photos (name, url, created_at, ip, reviewed, desc) VALUES (?, ?, ?, ?, ?, ?)'
+          ).bind(fileName, fullUrl, Date.now(), clientIP, reviewedStatus, desc).run();
+          console.log(`元数据已写入 D1 数据库 (reviewed=${reviewedStatus}, reviewRequired=${reviewRequired})`);
 
         } catch (dbError) {
           console.error('D1 操作失败:', dbError);
