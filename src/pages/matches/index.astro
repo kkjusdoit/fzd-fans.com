@@ -458,13 +458,26 @@ const years = [...new Set(yearlyData.map(y => y.year))].sort();
         oLosses.textContent = l;
         oRate.textContent = rate;
 
-        // Per-opponent win rate: wins / (wins + losses) only
+        // Match the Excel query sheet: keep the current opponent-side filters,
+        // but do not let the result filter force the rate to 100% or 0%.
         const opName = oSearch.value;
         if (opName) {
-          const opMatches = data.filter(m => m.opponent === opName);
+          const ev = oEvent.value;
+          const as = oAssoc.value;
+          const pe = oPeriod.value;
+          const lv = oLevel.value;
+          const opMatches = data.filter(m => {
+            if (ev && m.event !== ev) return false;
+            if (as && !assocMatches(m.assoc, as)) return false;
+            if (pe && m.period !== pe) return false;
+            if (lv && m.level !== lv) return false;
+            return m.opponent === opName;
+          });
           const opW = opMatches.filter(m => m.result === '胜').length;
           const opL = opMatches.filter(m => m.result === '负').length;
-          oWinrate.textContent = (opW + opL) > 0 ? (opW / (opW + opL)).toFixed(4) : '—';
+          oWinrate.textContent = (opW + opL) > 0
+            ? `${((opW / (opW + opL)) * 100).toFixed(2)}%`
+            : '—';
         } else {
           oWinrate.textContent = '—';
         }
