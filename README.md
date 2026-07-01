@@ -98,6 +98,10 @@ fzd-archive/
 
 使用 Astro 的 Content Collections 管理 Markdown 内容，通过 Zod Schema 进行类型校验。
 
+> [!NOTE]
+> `arena`（职业生涯）页面并没有使用 Markdown 的内容集合，它是一个集成了 Chart.js 和交互式 `timelineData` 数组的单页（SPA）展示系统。
+
+
 ### 2. 国际化 (i18n)
 
 *   **UI 文本**: 统一字典管理 (`ui.ts`)。
