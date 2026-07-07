@@ -1,0 +1,34 @@
+<view class="container">
+  <!-- Modern Header Banner -->
+  <view class="header">
+    <view class="lang-switch" bindtap="toggleLang">
+      <text class="{{currentLang === 'zh' ? 'active' : ''}}">中</text>
+      <text class="divider">/</text>
+      <text class="{{currentLang === 'en' ? 'active' : ''}}">En</text>
+    </view>
+    <view class="title-badge">🏓 Fan Zhendong Archive</view>
+    <text class="title">{{currentLang === 'zh' ? '樊振东的互联网档案馆' : 'Fan Zhendong Archive'}}</text>
+    <text class="subtitle">{{currentLang === 'zh' ? '民间互联网记忆工程' : 'A Community Internet Memory Project'}}</text>
+  </view>
+  
+  <!-- Categories Grid -->
+  <view class="category-grid">
+    <view class="category-card card-{{item.id}}" 
+          wx:for="{{categories}}" 
+          wx:key="id" 
+          bindtap="onCategoryTap" 
+          data-category="{{item.id}}">
+      <view class="card-top">
+        <text class="card-icon">{{item.icon}}</text>
+        <text class="card-count">{{item.count}}</text>
+      </view>
+      <view class="card-bottom">
+        <text class="card-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="disclaimer">
+    <text class="disclaimer-text">本站致力于弘扬樊振东顽强拼搏的体育精神</text>
+  </view>
+</view>

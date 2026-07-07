@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="hero-card">
+    <view class="hero-overlay"></view>
+    <view class="hero-content">
+      <text class="hero-title">探索与发现</text>
+      <text class="hero-desc">时光淬炼王者，热爱永燃不熄</text>
+    </view>
+  </view>
+
+  <view class="menu-grid">
+    <view class="menu-card card-matches" bindtap="navigateTo" data-url="/pages/matches/matches">
+      <view class="card-icon">🏓</view>
+      <view class="card-info">
+        <text class="card-title">战绩查询系统</text>
+        <text class="card-desc">生涯全部比赛记录，多维筛选</text>
+      </view>
+      <view class="card-badge">Data</view>
+    </view>
+
+    <view class="menu-card card-quiz" bindtap="navigateTo" data-url="/pages/quiz/quiz">
+      <view class="card-icon">📝</view>
+      <view class="card-info">
+        <text class="card-title">球迷等级考试</text>
+        <text class="card-desc">10道随机测试题，测测你的段位</text>
+      </view>
+      <view class="card-badge">Game</view>
+    </view>
+
+    <view class="menu-card card-timeline" bindtap="navigateTo" data-url="/pages/timeline/timeline">
+      <view class="card-icon">📅</view>
+      <view class="card-info">
+        <text class="card-title">赛场里程碑</text>
+        <text class="card-desc">2012-2026职业生涯重要时刻</text>
+      </view>
+    </view>
+
+    <view class="menu-card card-games" bindtap="navigateTo" data-url="/pages/webview/webview">
+      <view class="card-icon">🎮</view>
+      <view class="card-info">
+        <text class="card-title">樊主题小游戏</text>
+        <text class="card-desc">咚了个咚、打爆一切等H5游戏</text>
+      </view>
+      <view class="card-badge hot">Hot</view>
+    </view>
+
+    <view class="menu-card card-about" bindtap="navigateTo" data-url="/pages/about/about">
+      <view class="card-icon">ℹ️</view>
+      <view class="card-info">
+        <text class="card-title">关于本站</text>
+        <text class="card-desc">关于初衷、版权和技术栈说明</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="footer">
+    <text class="footer-text">樊振东的互联网档案馆 · 民间互联网记忆工程</text>
+  </view>
+</view>

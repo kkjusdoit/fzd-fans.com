@@ -1,0 +1,21 @@
+<view class="container" wx:if="{{article}}">
+  <view class="article-header">
+    <text class="title">{{article.title}}</text>
+    <view class="meta" wx:if="{{article.tags && article.tags.length > 0}}">
+      <text class="tag" wx:for="{{article.tags}}" wx:key="*this">#{{item}}</text>
+    </view>
+    <view class="description" wx:if="{{article.description}}">
+      {{article.description}}
+    </view>
+  </view>
+
+  <view class="divider"></view>
+
+  <view class="article-content">
+    <mp-html content="{{article.body}}" />
+  </view>
+</view>
+
+<view class="error" wx:else>
+  <text>文章未找到</text>
+</view>

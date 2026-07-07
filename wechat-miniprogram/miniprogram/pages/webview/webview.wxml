@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="header">
+    <text class="title">樊主题小游戏</text>
+    <text class="desc">在轻松的游戏中击退烦恼、重温快乐</text>
+  </view>
+
+  <view class="games-list">
+    <view class="game-card" wx:for="{{games}}" wx:key="url">
+      <view class="game-top">
+        <view class="game-icon">{{item.icon}}</view>
+        <view class="game-info">
+          <text class="game-title">{{item.title}}</text>
+          <text class="game-desc">{{item.desc}}</text>
+        </view>
+      </view>
+      
+      <view class="game-actions">
+        <button class="action-btn copy" bindtap="copyLink" data-url="{{item.url}}">复制链接到浏览器游玩</button>
+      </view>
+    </view>
+  </view>
+</view>

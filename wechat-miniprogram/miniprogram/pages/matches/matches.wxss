@@ -1,0 +1,296 @@
+.container {
+  padding: 12px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+
+/* Stats Panel */
+.stats-panel {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(241, 245, 249, 0.8);
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 2px;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.stat-card.win .stat-num {
+  color: #1e88e5;
+}
+
+.stat-card.loss .stat-num {
+  color: #ef4444;
+}
+
+.stat-card.rate .stat-num {
+  color: #059669;
+}
+
+/* Filters Row */
+.filters-container {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(241, 245, 249, 0.8);
+  box-sizing: border-box;
+}
+
+.filters-scroll {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 32px;
+}
+
+.filter-item {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin-right: 8px;
+  font-size: 12px;
+  color: #64748b;
+  box-sizing: border-box;
+}
+
+.filter-item.active {
+  background-color: #e0f2fe;
+  color: #0284c7;
+  font-weight: 500;
+}
+
+.picker-val {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arrow {
+  font-size: 8px;
+  opacity: 0.5;
+}
+
+.reset-btn {
+  font-size: 12px;
+  color: #ef4444;
+  padding: 4px 8px;
+  margin-left: 8px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* Match List */
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.match-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(241, 245, 249, 0.8);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 6px;
+}
+
+.badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.badge.period {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.badge.level {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.match-date {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.tournament-info {
+  margin-bottom: 8px;
+}
+
+.tournament-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-right: 8px;
+}
+
+.round-name {
+  font-size: 11px;
+  color: #64748b;
+  background-color: #f8fafc;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.match-vs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #334155;
+  gap: 4px;
+}
+
+.player-me {
+  font-weight: bold;
+}
+
+.player-partner {
+  color: #64748b;
+}
+
+.vs-text {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0 2px;
+}
+
+.player-opponent {
+  font-weight: 500;
+}
+
+.assoc-name {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 60px;
+}
+
+.result-text {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+.score-display.win .result-text {
+  background-color: #dbeafe;
+  color: #1e88e5;
+}
+
+.score-display.loss .result-text {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.score-num {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.games-detail {
+  font-size: 11px;
+  color: #64748b;
+  display: flex;
+  background-color: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.games-label {
+  color: #94a3b8;
+}
+
+.loading-more, .no-more-matches {
+  text-align: center;
+  padding: 16px 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: #94a3b8;
+}

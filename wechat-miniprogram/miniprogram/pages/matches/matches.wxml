@@ -1,0 +1,117 @@
+<view class="container">
+  <!-- Stats Header -->
+  <view class="stats-panel">
+    <view class="stat-card">
+      <text class="stat-num">{{filteredTotal}}</text>
+      <text class="stat-lbl">总场次</text>
+    </view>
+    <view class="stat-card win">
+      <text class="stat-num">{{filteredWins}}</text>
+      <text class="stat-lbl">胜</text>
+    </view>
+    <view class="stat-card loss">
+      <text class="stat-num">{{filteredLosses}}</text>
+      <text class="stat-lbl">负</text>
+    </view>
+    <view class="stat-card rate">
+      <text class="stat-num">{{filteredWinRate}}%</text>
+      <text class="stat-lbl">胜率</text>
+    </view>
+  </view>
+
+  <!-- Filters Row -->
+  <view class="filters-container">
+    <scroll-view class="filters-scroll" scroll-x="true" enable-flex>
+      <picker class="filter-item {{opponentIndex > 0 ? 'active' : ''}}" mode="selector" range="{{opponents}}" bindchange="onOpponentChange">
+        <view class="picker-val">
+          {{opponentIndex > 0 ? opponents[opponentIndex] : '对手'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+
+      <picker class="filter-item {{periodIndex > 0 ? 'active' : ''}}" mode="selector" range="{{periods}}" bindchange="onPeriodChange">
+        <view class="picker-val">
+          {{periodIndex > 0 ? periods[periodIndex] : '时期'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+
+      <picker class="filter-item {{levelIndex > 0 ? 'active' : ''}}" mode="selector" range="{{levels}}" bindchange="onLevelChange">
+        <view class="picker-val">
+          {{levelIndex > 0 ? levels[levelIndex] : '赛事级别'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+
+      <picker class="filter-item {{partnerIndex > 0 ? 'active' : ''}}" mode="selector" range="{{partners}}" bindchange="onPartnerChange">
+        <view class="picker-val">
+          {{partnerIndex > 0 ? partners[partnerIndex] : '双打搭档'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+
+      <picker class="filter-item {{resultIndex > 0 ? 'active' : ''}}" mode="selector" range="{{results}}" bindchange="onResultChange">
+        <view class="picker-val">
+          {{resultIndex > 0 ? results[resultIndex] : '胜负'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+    </scroll-view>
+
+    <view class="reset-btn" bindtap="resetFilters" wx:if="{{hasActiveFilters}}">
+      <text>重置</text>
+    </view>
+  </view>
+
+  <!-- Match List -->
+  <view class="match-list" wx:if="{{visibleMatches.length > 0}}">
+    <view class="match-card" wx:for="{{visibleMatches}}" wx:key="index">
+      <view class="card-header">
+        <view class="badge-row">
+          <text class="badge period">{{item.period}}</text>
+          <text class="badge level">{{item.level}}</text>
+        </view>
+        <text class="match-date">{{item.date || '——'}}</text>
+      </view>
+
+      <view class="card-body">
+        <view class="tournament-info">
+          <text class="tournament-name">{{item.tournament}}</text>
+          <text class="round-name">{{item.round}}</text>
+        </view>
+
+        <view class="score-row">
+          <view class="match-vs">
+            <text class="player-me">樊振东</text>
+            <text class="player-partner" wx:if="{{item.partner}}"> / {{item.partner}}</text>
+            <text class="vs-text">VS</text>
+            <text class="player-opponent">{{item.opponent || '——'}}</text>
+            <text class="assoc-name" wx:if="{{item.assoc && item.assoc !== '——'}}">({{item.assoc}})</text>
+          </view>
+          
+          <view class="score-display {{item.result === '胜' ? 'win' : (item.result === '负' ? 'loss' : '')}}">
+            <text class="result-text">{{item.result}}</text>
+            <text class="score-num">{{item.score}}</text>
+          </view>
+        </view>
+
+        <view class="games-detail" wx:if="{{item.games && item.games !== '——'}}">
+          <text class="games-label">局分：</text>
+          <text class="games-val">{{item.games}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-more" wx:if="{{hasMore}}">
+      <text>正在加载更多...</text>
+    </view>
+    <view class="no-more-matches" wx:else>
+      <text>—— 已显示全部筛选记录 ——</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">🏓</text>
+    <text class="empty-text">没有找到符合筛选条件的战绩</text>
+  </view>
+</view>

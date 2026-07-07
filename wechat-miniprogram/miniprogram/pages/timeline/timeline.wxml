@@ -1,0 +1,36 @@
+<view class="container">
+  <view class="timeline-header">
+    <text class="title">赛场时刻</text>
+    <text class="desc">记录樊振东职业生涯中的决定性瞬间及最新动向</text>
+  </view>
+
+  <view class="timeline-list">
+    <view class="timeline-line"></view>
+    
+    <view class="timeline-item {{item.expanded ? 'expanded' : ''}}" 
+          wx:for="{{timelineData}}" 
+          wx:key="index" 
+          bindtap="toggleItem" 
+          data-index="{{index}}">
+      
+      <!-- Dot -->
+      <view class="timeline-dot dot-{{item.type}}"></view>
+
+      <!-- Content Card -->
+      <view class="timeline-card">
+        <view class="card-header">
+          <text class="year">{{item.year}}</text>
+          <text class="tag {{item.type}}">{{item.typeLabel}}</text>
+        </view>
+        <text class="card-title">{{item.title}}</text>
+        <text class="card-desc">{{item.desc}}</text>
+        <view class="expand-indicator" wx:if="{{!item.expanded}}">点击查看详情</view>
+        
+        <view class="card-detail" wx:if="{{item.expanded}}">
+          <text class="detail-text">{{item.detail}}</text>
+        </view>
+      </view>
+
+    </view>
+  </view>
+</view>

@@ -1,0 +1,104 @@
+<view class="container">
+  <!-- 1. Intro View -->
+  <view class="intro-view" wx:if="{{state === 'intro'}}">
+    <view class="logo-emoji">📝</view>
+    <text class="title">球迷等级考试</text>
+    <text class="subtitle">测测你对樊振东了解多少？</text>
+    <view class="rules-box">
+      <text class="rule-title">考试规则：</text>
+      <text class="rule-item">1. 共从题库中随机抽取 10 道题</text>
+      <text class="rule-item">2. 包含单选、多选、判断和填空题</text>
+      <text class="rule-item">3. 每次测试有且仅有一次“偷瞄”答案的机会</text>
+    </view>
+    <button class="start-btn" bindtap="startQuiz">开始答题</button>
+    <text class="copyright">原创问答游戏由 @球迷会-天际樊星 授权提供</text>
+  </view>
+
+  <!-- 2. Quiz Play View -->
+  <view class="quiz-view" wx:if="{{state === 'quiz'}}">
+    <view class="quiz-header">
+      <view class="progress">
+        <text class="progress-curr">{{currentIndex + 1}}</text>
+        <text class="progress-total"> / 10</text>
+      </view>
+      <button class="peek-btn {{peekCount === 0 ? 'disabled' : ''}}" bindtap="onPeek" disabled="{{peekCount === 0 || hasAnswered}}">
+        👀 偷瞄一下 ({{peekCount}})
+      </button>
+    </view>
+
+    <!-- Question Card -->
+    <view class="question-card">
+      <view class="q-type-badge">{{currentQuestion.typeText}}</view>
+      <text class="q-text">{{currentQuestion.question}}</text>
+
+      <!-- Choice / TrueFalse options -->
+      <view class="options-list" wx:if="{{currentQuestion.type === 'choice' || currentQuestion.type === 'truefalse'}}">
+        <view class="option-item {{item.styleClass}}" 
+              wx:for="{{optionsWithStyles}}" 
+              wx:key="index"
+              bindtap="onOptionSelect" 
+              data-index="{{index}}">
+          <text class="option-letter">{{item.letter}}</text>
+          <text class="option-text">{{item.text}}</text>
+        </view>
+      </view>
+
+      <!-- Multi choice checkboxes -->
+      <view class="options-list" wx:if="{{currentQuestion.type === 'multi'}}">
+        <view class="option-item {{item.styleClass}} {{item.selected ? 'checked' : ''}}" 
+              wx:for="{{optionsWithStyles}}" 
+              wx:key="index"
+              bindtap="onMultiOptionSelect" 
+              data-index="{{index}}">
+          <checkbox class="checkbox-box" checked="{{item.selected}}" disabled="{{hasAnswered}}"></checkbox>
+          <text class="option-text">{{item.text}}</text>
+        </view>
+        <button class="submit-btn" bindtap="onSubmitMulti" wx:if="{{!hasAnswered}}">确认提交</button>
+      </view>
+
+      <!-- Fill in the blank -->
+      <view class="fill-box" wx:if="{{currentQuestion.type === 'fill'}}">
+        <input class="fill-input" 
+               placeholder="请输入你的答案" 
+               bindinput="onFillInput" 
+               value="{{fillValue}}" 
+               disabled="{{hasAnswered}}" />
+        <button class="submit-btn" bindtap="onSubmitFill" wx:if="{{!hasAnswered}}">确认提交</button>
+      </view>
+
+      <!-- Explanation Area -->
+      <view class="explanation-box" wx:if="{{hasAnswered}}">
+        <text class="exp-title">💡 答案解析</text>
+        <text class="exp-text">{{currentQuestion.explanation || '本题答案简单直接，暂无深度解析哦。'}}</text>
+      </view>
+
+      <!-- Next Button -->
+      <button class="next-btn" bindtap="onNext" wx:if="{{hasAnswered}}">
+        {{currentIndex === 9 ? '查看考试结果' : '下一题 →'}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 3. Result View -->
+  <view class="result-view" wx:if="{{state === 'result'}}">
+    <view class="result-card">
+      <view class="score-display">
+        <text class="score-num">{{score * 10}}</text>
+        <text class="score-unit">分</text>
+      </view>
+      <text class="rank-title">{{rankInfo.title}}</text>
+      <text class="rank-desc">{{rankInfo.desc}}</text>
+
+      <view class="wrong-list" wx:if="{{wrongQuestions.length > 0}}">
+        <text class="wrong-header">错题回顾：</text>
+        <view class="wrong-item" wx:for="{{wrongQuestions}}" wx:key="index">
+          <text class="wrong-q">{{item.q}}</text>
+          <text class="wrong-ans incorrect">你的答案：{{item.userAns}}</text>
+          <text class="wrong-ans correct">正确答案：{{item.correctAns}}</text>
+        </view>
+      </view>
+
+      <button class="retry-btn" bindtap="startQuiz">再考一次</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,149 @@
+.container {
+  padding: 16px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+
+.timeline-header {
+  margin-bottom: 24px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.timeline-header .title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1e88e5;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.timeline-header .desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  display: block;
+}
+
+.timeline-list {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 25px;
+  width: 2px;
+  background-color: #cbd5e1;
+  z-index: 1;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+  z-index: 2;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -2px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  background-color: #cbd5e1;
+}
+
+/* Dot Types */
+.timeline-dot.dot-start { background-color: #8b5cf6; }
+.timeline-dot.dot-win { background-color: #10b981; }
+.timeline-dot.dot-gold { background-color: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.5); }
+.timeline-dot.dot-loss { background-color: #ef4444; }
+.timeline-dot.dot-move { background-color: #3b82f6; }
+.timeline-dot.dot-rank { background-color: #06b6d4; }
+
+.timeline-card {
+  margin-left: 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(241, 245, 249, 0.8);
+  transition: all 0.2s ease;
+}
+
+.timeline-item:active .timeline-card {
+  background-color: #f8fafc;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.year {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.tag {
+  font-size: 9px;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.tag.start { background-color: #f5f3ff; color: #7c3aed; }
+.tag.win { background-color: #ecfdf5; color: #059669; }
+.tag.gold { background-color: #fef9c3; color: #ca8a04; }
+.tag.loss { background-color: #fef2f2; color: #dc2626; }
+.tag.move { background-color: #eff6ff; color: #2563eb; }
+.tag.rank { background-color: #ecfeff; color: #0891b2; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1e88e5;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+  display: block;
+}
+
+.expand-indicator {
+  font-size: 10px;
+  color: #94a3b8;
+  text-align: right;
+  margin-top: 8px;
+}
+
+.card-detail {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.6;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

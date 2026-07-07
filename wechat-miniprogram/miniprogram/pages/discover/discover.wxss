@@ -1,0 +1,151 @@
+.container {
+  padding: 16px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+
+.hero-card {
+  position: relative;
+  height: 140px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e88e5, #0d47a1);
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(30, 136, 229, 0.15);
+  box-sizing: border-box;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15), transparent 60%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.hero-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-card {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(241, 245, 249, 0.8);
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.menu-card:active {
+  transform: scale(0.98);
+  background-color: #f1f5f9;
+}
+
+.card-icon {
+  font-size: 32px;
+  margin-right: 16px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.card-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.card-badge.hot {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.card-matches .card-icon {
+  background-color: #e0f2fe;
+}
+.card-quiz .card-icon {
+  background-color: #fef3c7;
+}
+.card-timeline .card-icon {
+  background-color: #e2f0d9;
+}
+.card-games .card-icon {
+  background-color: #f3e8ff;
+}
+.card-about .card-icon {
+  background-color: #f1f5f9;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 11px;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}

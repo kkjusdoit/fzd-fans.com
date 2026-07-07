@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="warning-banner">
+    <text class="banner-icon">💡</text>
+    <text class="banner-text">图库由球迷共同维护。建议在 Wi-Fi 环境下浏览，点击可查看原图。</text>
+  </view>
+
+  <view class="gallery-grid" wx:if="{{photos.length > 0}}">
+    <view class="gallery-column">
+      <view class="photo-card" wx:for="{{leftColumn}}" wx:key="id" bindtap="onPhotoTap" data-url="{{item.url}}">
+        <image class="photo-img" src="{{item.url}}" mode="widthFix" lazy-load></image>
+        <view class="photo-info">
+          <text class="photo-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="gallery-column">
+      <view class="photo-card" wx:for="{{rightColumn}}" wx:key="id" bindtap="onPhotoTap" data-url="{{item.url}}">
+        <image class="photo-img" src="{{item.url}}" mode="widthFix" lazy-load></image>
+        <view class="photo-info">
+          <text class="photo-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <view class="spinner"></view>
+    <text class="loading-text">正在加载照片...</text>
+  </view>
+
+  <view class="no-more" wx:if="{{!hasMore && photos.length > 0}}">
+    <text class="no-more-text">—— 已经到底啦 ——</text>
+  </view>
+
+  <view class="empty-state" wx:if="{{!isLoading && photos.length === 0}}">
+    <text class="empty-text">图库暂空或加载失败</text>
+  </view>
+</view>
