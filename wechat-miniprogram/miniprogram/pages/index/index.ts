@@ -71,6 +71,10 @@ Component({
           if (lang === 'zh' && c === 'fzd101') {
             return false;
           }
+          // Hide 'friends' in both modes (to match website)
+          if (c === 'friends') {
+            return false;
+          }
           return true;
         })
         .map(c => {
