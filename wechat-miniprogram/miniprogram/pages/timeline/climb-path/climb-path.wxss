@@ -1,0 +1,11 @@
+.climb-scroll {
+  width: 100vw;
+  height: 100vh;
+  background-color: #0b0c10;
+  box-sizing: border-box;
+}
+
+.climb-img {
+  width: 100%;
+  display: block;
+}

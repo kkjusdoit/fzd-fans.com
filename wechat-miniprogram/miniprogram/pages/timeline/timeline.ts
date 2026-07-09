@@ -125,9 +125,8 @@ Component({
     },
 
     onPreviewClimbPath() {
-      wx.previewImage({
-        current: 'https://fzd-fans.com/img/timeline/climb-path.jpg',
-        urls: ['https://fzd-fans.com/img/timeline/climb-path.jpg']
+      wx.navigateTo({
+        url: '/pages/timeline/climb-path/climb-path'
       });
     }
   }

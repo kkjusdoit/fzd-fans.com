@@ -1,0 +1,3 @@
+<scroll-view class="climb-scroll" scroll-y="true">
+  <image class="climb-img" src="https://fzd-fans.com/img/timeline/climb-path.jpg" mode="widthFix" show-menu-by-longpress></image>
+</scroll-view>

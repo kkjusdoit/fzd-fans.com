@@ -1,0 +1,10 @@
+Component({
+  methods: {
+    onShareAppMessage() {
+      return {
+        title: '樊振东 · 登峰之路荣誉长图',
+        path: '/pages/timeline/climb-path/climb-path'
+      };
+    }
+  }
+});
