@@ -1,3 +1,8 @@
-<scroll-view class="climb-scroll" scroll-y="true">
-  <image class="climb-img" src="https://fzd-fans.com/img/timeline/climb-path.jpg" mode="widthFix" show-menu-by-longpress></image>
+<view class="loading-overlay" wx:if="{{!imageLoaded}}">
+  <view class="spinner"></view>
+  <text class="loading-text">正在加载荣誉长图...</text>
+</view>
+
+<scroll-view class="climb-scroll {{imageLoaded ? 'loaded' : ''}}" scroll-y="true">
+  <image class="climb-img" src="https://fzd-fans.com/img/timeline/climb-path.jpg" mode="widthFix" show-menu-by-longpress bindload="onImageLoad"></image>
 </scroll-view>
