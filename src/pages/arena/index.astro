@@ -83,7 +83,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <div id="view-timeline" class="view-section hidden fade-in">
       <div class="timeline-layout">
         <div class="timeline-nav custom-scroll">
-          <h3>关键里程碑</h3>
+          <div class="timeline-nav-header">
+            <h3>关键里程碑</h3>
+            <a href="/img/timeline/climb-path.jpg" target="_blank" class="climb-poster-btn" title="查看登峰之路荣誉长图">
+              🏆 荣誉长图
+            </a>
+          </div>
           <div class="timeline-list" id="timeline-list"></div>
         </div>
         <div class="timeline-detail" id="timeline-detail">
@@ -237,8 +242,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   .timeline-nav { width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1rem; max-height: 350px; overflow-y: auto; }
   @media (min-width: 640px) { .timeline-nav { padding: 1.5rem; max-height: 450px; } }
   @media (min-width: 1024px) { .timeline-nav { width: 33%; max-height: 600px; } }
-  .timeline-nav h3 { font-size: 1rem; font-weight: bold; color: #111; margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 1; }
-  @media (min-width: 640px) { .timeline-nav h3 { font-size: 1.125rem; margin: 0 0 1rem; } }
+  .timeline-nav-header { display: flex; justify-content: space-between; align-items: center; margin: 0 0 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 1; }
+  .timeline-nav-header h3 { font-size: 1rem; font-weight: bold; color: #111; margin: 0; }
+  @media (min-width: 640px) { .timeline-nav-header h3 { font-size: 1.125rem; } }
+  .climb-poster-btn { display: inline-flex; align-items: center; gap: 0.25rem; background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%); color: white; font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 4px; text-decoration: none; transition: all 0.2s; box-shadow: 0 2px 4px rgba(202, 138, 4, 0.2); }
+  .climb-poster-btn:hover { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(202, 138, 4, 0.3); }
+  .climb-poster-btn:active { transform: translateY(0); }
   .timeline-list { padding-left: 1rem; border-left: 2px solid #f3f4f6; }
   
   .timeline-detail { width: 100%; background: white; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 1.5rem 1rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; min-height: 280px; }
