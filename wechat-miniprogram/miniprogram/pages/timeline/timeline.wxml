@@ -4,6 +4,20 @@
     <text class="desc">记录樊振东职业生涯中的决定性瞬间及最新动向</text>
   </view>
 
+  <view class="honor-banner" bindtap="onPreviewClimbPath">
+    <image class="banner-bg" src="https://fzd-fans.com/img/timeline/climb-path.jpg" mode="aspectFill"></image>
+    <view class="banner-mask">
+      <view class="banner-content">
+        <text class="banner-emoji">🏆</text>
+        <view class="banner-text-group">
+          <text class="banner-title">樊振东 · 登峰之路</text>
+          <text class="banner-subtitle">进入国家队获 117 冠、20 个世界冠军荣誉长图</text>
+        </view>
+        <text class="banner-arrow">➔</text>
+      </view>
+    </view>
+  </view>
+
   <view class="timeline-list">
     <view class="timeline-line"></view>
     

@@ -122,6 +122,13 @@ Component({
       this.setData({
         timelineData: data
       });
+    },
+
+    onPreviewClimbPath() {
+      wx.previewImage({
+        current: 'https://fzd-fans.com/img/timeline/climb-path.jpg',
+        urls: ['https://fzd-fans.com/img/timeline/climb-path.jpg']
+      });
     }
   }
 });
