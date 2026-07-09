@@ -59,7 +59,10 @@ async function sync() {
       const { data: frontmatter, content: markdownBody } = matter(rawContent);
 
       // Convert Markdown to HTML
-      const htmlBody = await marked.parse(markdownBody);
+      let htmlBody = await marked.parse(markdownBody);
+      
+      // Rewrite root-relative URLs (like /videos/... or /img/...) to absolute URLs pointing to the main website
+      htmlBody = htmlBody.replace(/(src|href)=["']\/([^"']+)["']/g, '$1="https://fzd-fans.com/$2"');
 
       contentArray.push({
         id: fileId,
