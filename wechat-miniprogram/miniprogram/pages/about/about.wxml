@@ -38,5 +38,12 @@
       </text>
     </view>
 
+    <view class="section">
+      <text class="h2">相关链接</text>
+      <view class="link-item" bindtap="openArticle" data-url="https://mp.weixin.qq.com/s/YpElhONaPWjn1nIx9uMULg">
+        <text class="link-text">樊振东的互联网档案馆｜fzd-fans.com 网站建成纪实</text>
+        <text class="arrow">➔</text>
+      </view>
+    </view>
   </view>
 </view>

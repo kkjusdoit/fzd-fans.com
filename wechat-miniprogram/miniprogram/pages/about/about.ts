@@ -21,6 +21,12 @@ Component({
       wx.navigateTo({
         url: '../cases/cases',
       })
+    },
+    openArticle(e: any) {
+      const url = e.currentTarget.dataset.url;
+      wx.navigateTo({
+        url: `/pages/article-webview/article-webview?url=${encodeURIComponent(url)}`
+      });
     }
   },
 })

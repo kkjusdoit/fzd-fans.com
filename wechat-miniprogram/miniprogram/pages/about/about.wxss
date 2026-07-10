@@ -61,3 +61,27 @@
 .p:last-child {
   margin-bottom: 0;
 }
+
+.link-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 10px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.link-text {
+  font-size: 13px;
+  color: #1e88e5;
+  font-weight: 500;
+  flex: 1;
+  padding-right: 10px;
+}
+
+.arrow {
+  font-size: 14px;
+  color: #1e88e5;
+}
