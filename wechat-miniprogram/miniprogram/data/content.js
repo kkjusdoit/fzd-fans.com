@@ -558,7 +558,7 @@ module.exports = {
       "Rational Fandom"
     ],
     "translated": true,
-    "body": "<p>Click to view the Porsche Family Letters details and gallery.</p>\n"
+    "body": "<h2>I. Origin of the Letters</h2>\n<p>Fan Zhendong previously did not have any personal social media accounts. Since 2021, he communicated with fans through the fan club&#39;s Weibo (which was posted using a Huawei Mate40 Porsche Design phone). Because the posting device contained the word &quot;Porsche&quot;, the four long letters were affectionately called <strong>&quot;Porsche Family Letters&quot;</strong> by fans.</p>\n<h2>II. Core Advocacies</h2>\n<ul>\n<li><strong>🚫 Reject Fandom Culture</strong>: Opposes airport pick-ups, fan club fundraising, voting campaigns, and following his personal life. Stresses that the athlete-fan relationship belongs exclusively to the sports arena.</li>\n<li><strong>🏠 Protect Personal Space</strong>: Except for official team schedules, personal schedules should not be intruded. He only accepts handwritten letters and refuses gifts to avoid fan economy monetization.</li>\n<li><strong>💡 Call for Rational Support</strong>: Urges fans to focus on their own lives, support him through match performances, and resist privacy invasion or online toxicity.</li>\n</ul>\n<h2>📜 The Letters (Click &amp; Long-press to Save)</h2>\n<img src=\"https://fzd-fans.com/stars/letters/1.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/2.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/3.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/4.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/5.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/6.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n"
   },
   {
     "id": "stars-en-slogans",
@@ -668,7 +668,7 @@ module.exports = {
       "理性追星"
     ],
     "translated": false,
-    "body": "<p>点击查看保时捷家书详情与图集。</p>\n"
+    "body": "<h2>一、家书的由来</h2>\n<p>樊振东早先有段时间未注册个人社交账号，自2021年起通过球迷会微博（发布设备为华为Mate40保时捷设计手机）与球迷沟通。因发布设备含“保时捷”字样，四封长信被球迷亲切地称为**“保时捷家书”**。</p>\n<h2>二、核心主张</h2>\n<ul>\n<li><strong>🚫 拒绝饭圈化</strong>：明确反对集资应援、投票打榜、接送机、追拍私生活等行为，强调运动员与球迷的关系仅限于赛场。</li>\n<li><strong>🏠 维护个人空间</strong>：除队伍公开行程外，个人行程谢绝接触；仅收取手写信件，拒收礼物以避免粉丝经济消耗。</li>\n<li><strong>💡 呼吁理性支持</strong>：主张球迷专注自身生活，仅通过赛场表现见证运动员成长，抵制对私生活的窥探或网络骂战。</li>\n</ul>\n<h2>📜 家书原文（点击图片长按可保存）</h2>\n<img src=\"https://fzd-fans.com/stars/letters/1.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/2.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/3.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/4.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/5.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n<img src=\"https://fzd-fans.com/stars/letters/6.jpg\" mode=\"widthFix\" style=\"width:100%;margin-bottom:12px;display:block;\" />\n"
   },
   {
     "id": "stars-zh-slogans",

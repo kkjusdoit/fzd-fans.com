@@ -12,7 +12,7 @@
   <view class="divider"></view>
 
   <view class="article-content">
-    <mp-html content="{{article.body}}" />
+    <mp-html content="{{article.body}}" bindlinktap="onLinkTap" />
   </view>
 </view>
 
