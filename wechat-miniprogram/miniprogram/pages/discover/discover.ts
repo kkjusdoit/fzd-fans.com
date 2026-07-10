@@ -5,7 +5,7 @@ Component({
   pageLifetimes: {
     show() {
       const now = new Date();
-      const targetDate = new Date('2026-07-16T00:00:00');
+      const targetDate = new Date('2026-07-11T00:00:00');
       this.setData({
         showGames: now > targetDate
       });
