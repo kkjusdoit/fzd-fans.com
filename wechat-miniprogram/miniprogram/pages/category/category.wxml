@@ -1,5 +1,15 @@
 <view class="container">
   <block wx:if="{{categoryId === 'ugc'}}">
+    <view class="ugc-guide-card">
+      <view class="guide-top">
+        <text class="guide-title">✍️ 欢迎投稿贡献</text>
+        <text class="guide-desc">如果你有独到的技战术分析或真挚的来信，欢迎投稿加入我们！收到邮件后会在24小时内处理回复。</text>
+      </view>
+      <view class="guide-btn" bindtap="copySubmissionEmail">
+        <text class="guide-btn-text">点击复制投稿邮箱：kkjusdoit@gmail.com</text>
+      </view>
+    </view>
+
     <view class="section-title">💌 繁星寄语</view>
     <view class="article-list">
       <view class="article-item" wx:for="{{letters}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">

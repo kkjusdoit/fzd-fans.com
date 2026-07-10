@@ -77,6 +77,18 @@ Component({
         url: `../article/article?id=${id}`
       });
     },
+    copySubmissionEmail() {
+      wx.setClipboardData({
+        data: 'kkjusdoit@gmail.com',
+        success: () => {
+          wx.showToast({
+            title: '投稿邮箱已复制',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      });
+    },
     onShareAppMessage() {
       return {
         title: `${this.data.categoryName} · 樊振东的互联网档案馆`,

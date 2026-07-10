@@ -75,3 +75,48 @@
   margin-top: 6px;
   font-weight: 500;
 }
+
+.ugc-guide-card {
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+  border-radius: 12px;
+  padding: 16px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+}
+
+.guide-top {
+  margin-bottom: 12px;
+  display: block;
+}
+
+.guide-title {
+  font-size: 16px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.guide-desc {
+  font-size: 12px;
+  opacity: 0.9;
+  line-height: 1.5;
+  display: block;
+}
+
+.guide-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+
+.guide-btn-text {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.guide-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+}
