@@ -73,6 +73,7 @@ async function sync() {
         titleEn: frontmatter.titleEn || '',
         description: frontmatter.description || frontmatter.descriptionEn || '',
         tags: frontmatter.tags || [],
+        author: frontmatter.author || '',
         translated: frontmatter.translated || false,
         body: htmlBody
       });
