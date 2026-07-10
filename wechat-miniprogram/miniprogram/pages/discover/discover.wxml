@@ -34,6 +34,15 @@
       </view>
     </view>
 
+    <view class="menu-card card-games" bindtap="navigateTo" data-url="/pages/webview/webview" wx:if="{{showGames}}">
+      <view class="card-icon">🎮</view>
+      <view class="card-info">
+        <text class="card-title">樊主题小游戏</text>
+        <text class="card-desc">咚了个咚、打爆一切等H5游戏</text>
+      </view>
+      <view class="card-badge hot">Hot</view>
+    </view>
+
     <view class="menu-card card-about" bindtap="navigateTo" data-url="/pages/about/about">
       <view class="card-icon">ℹ️</view>
       <view class="card-info">

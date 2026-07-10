@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container" wx:if="{{showGames}}">
   <view class="header">
     <text class="title">樊主题小游戏</text>
     <text class="desc">在轻松的游戏中击退烦恼、重温快乐</text>
@@ -19,4 +19,8 @@
       </view>
     </view>
   </view>
+</view>
+
+<view class="empty-state" wx:else>
+  <text class="empty-text">加载中...</text>
 </view>

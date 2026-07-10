@@ -7,6 +7,7 @@ interface GameItem {
 
 Component({
   data: {
+    showGames: false,
     games: [
       {
         icon: '💥',
@@ -27,6 +28,15 @@ Component({
         url: 'https://fzd-fans.com/match3.html'
       }
     ] as GameItem[]
+  },
+  pageLifetimes: {
+    show() {
+      const now = new Date();
+      const targetDate = new Date('2026-07-16T00:00:00');
+      this.setData({
+        showGames: now > targetDate
+      });
+    }
   },
   methods: {
     onLoad() {

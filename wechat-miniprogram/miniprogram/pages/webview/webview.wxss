@@ -111,3 +111,16 @@
 .action-btn.copy:active {
   background-color: #1565c0;
 }
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: #94a3b8;
+}
