@@ -86,23 +86,42 @@
   color: #1e88e5;
 }
 
-.copy-btn-wrapper {
+.action-buttons-grid {
   margin-top: 12px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
 
-.copy-btn {
+.action-btn-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1e88e5;
+  padding: 10px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.15);
+  cursor: pointer;
+}
+
+.action-btn-item.email {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+}
+
+.action-btn-text {
   font-size: 13px;
   color: #ffffff;
-  background-color: #1e88e5;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.2);
+  font-weight: 600;
 }
 
-.copy-btn-wrapper:active {
+.action-btn-item.email .action-btn-text {
+  color: #334155;
+}
+
+.action-btn-item:active {
   opacity: 0.85;
 }
 

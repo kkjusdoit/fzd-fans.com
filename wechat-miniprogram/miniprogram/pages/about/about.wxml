@@ -27,10 +27,15 @@
     <view class="section">
       <text class="h2">参与贡献</text>
       <text class="p">
-        这是一个开放的项目，欢迎所有樊振东的球迷参与贡献内容。如果你有好的素材、故事、链接，欢迎关注公众号并后台发消息留言投稿。
+        这是一个开放的项目，欢迎所有樊振东的球迷参与贡献内容。如果你有好的素材、故事、链接，可以通过以下方式进行投稿投递：
       </text>
-      <view class="copy-btn-wrapper" bindtap="copyOfficialAccount" data-id="kkjusdoit">
-        <text class="copy-btn">点击复制公众号【kkjusdoit】</text>
+      <view class="action-buttons-grid">
+        <view class="action-btn-item" bindtap="copyOfficialAccount" data-id="kkjusdoit">
+          <text class="action-btn-text">复制公众号【kkjusdoit】</text>
+        </view>
+        <view class="action-btn-item email" bindtap="copyEmail" data-email="kkjusdoit@gmail.com">
+          <text class="action-btn-text">复制邮箱【kkjusdoit@gmail.com】</text>
+        </view>
       </view>
     </view>
 

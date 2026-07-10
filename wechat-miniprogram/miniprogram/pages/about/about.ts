@@ -42,6 +42,19 @@ Component({
         }
       });
     },
+    copyEmail(e: any) {
+      const email = e.currentTarget.dataset.email || 'kkjusdoit@gmail.com';
+      wx.setClipboardData({
+        data: email,
+        success: () => {
+          wx.showToast({
+            title: '邮箱已复制，欢迎投稿',
+            icon: 'none',
+            duration: 2500
+          });
+        }
+      });
+    },
     onShareAppMessage() {
       return {
         title: '关于 · 樊振东的互联网档案馆',
