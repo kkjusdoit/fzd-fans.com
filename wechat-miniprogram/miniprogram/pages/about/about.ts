@@ -28,6 +28,20 @@ Component({
         url: `/pages/article-webview/article-webview?url=${encodeURIComponent(url)}`
       });
     },
+    copyOfficialAccount(e: any) {
+      const id = e.currentTarget.dataset.id || 'kkjusdoit';
+      wx.setClipboardData({
+        data: id,
+        success: () => {
+          wx.showModal({
+            title: '公众号已复制',
+            content: `已成功复制公众号ID：${id}\n请在微信中搜索并关注该公众号发消息留言！`,
+            showCancel: false,
+            confirmText: '我知道了'
+          });
+        }
+      });
+    },
     onShareAppMessage() {
       return {
         title: '关于 · 樊振东的互联网档案馆',

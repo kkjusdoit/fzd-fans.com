@@ -85,3 +85,28 @@
   font-size: 14px;
   color: #1e88e5;
 }
+
+.copy-btn-wrapper {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.copy-btn {
+  font-size: 13px;
+  color: #ffffff;
+  background-color: #1e88e5;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(30, 136, 229, 0.2);
+}
+
+.copy-btn-wrapper:active {
+  opacity: 0.85;
+}
+
+.official-account-wrapper {
+  margin-top: 10px;
+  width: 100%;
+}

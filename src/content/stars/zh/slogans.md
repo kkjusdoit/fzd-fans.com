@@ -27,6 +27,6 @@ translated: false
 
 > 樊振东，闪耀洛杉矶
 
-*未完待续...(欢迎投稿推荐 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a>）* 
+*未完待续...(欢迎投稿推荐 <a href="copy-official://kkjusdoit">关注公众号【kkjusdoit】后台留言（点击复制）</a>)* 
 ---
 
