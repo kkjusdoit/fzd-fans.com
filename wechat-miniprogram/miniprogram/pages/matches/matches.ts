@@ -179,6 +179,17 @@ Component({
         page: nextPage,
         hasMore
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: '战绩查询 · 樊振东的互联网档案馆',
+        path: '/pages/matches/matches'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '战绩查询 · 樊振东的互联网档案馆'
+      };
     }
   }
 });

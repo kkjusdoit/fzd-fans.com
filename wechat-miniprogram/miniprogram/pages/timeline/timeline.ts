@@ -128,6 +128,17 @@ Component({
       wx.navigateTo({
         url: '/pages/timeline/climb-path/climb-path'
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: '生涯里程碑 · 樊振东的互联网档案馆',
+        path: '/pages/timeline/timeline'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '生涯里程碑 · 樊振东的互联网档案馆'
+      };
     }
   }
 });

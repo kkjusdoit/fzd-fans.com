@@ -121,6 +121,17 @@ Component({
         title: newLang === 'zh' ? '已切换至中文' : 'Switched to English',
         icon: 'none'
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: '樊振东的互联网档案馆 · fzd-fans.com',
+        path: '/pages/index/index'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '樊振东的互联网档案馆 · fzd-fans.com'
+      };
     }
   }
 });

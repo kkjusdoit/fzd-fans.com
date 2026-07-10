@@ -475,6 +475,17 @@ Component({
           rankInfo
         });
       }
+    },
+    onShareAppMessage() {
+      return {
+        title: '球迷等级考试 · 樊振东的互联网档案馆',
+        path: '/pages/quiz/quiz'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '球迷等级考试 · 樊振东的互联网档案馆'
+      };
     }
   }
 });

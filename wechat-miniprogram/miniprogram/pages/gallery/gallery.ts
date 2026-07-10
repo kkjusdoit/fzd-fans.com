@@ -112,6 +112,17 @@ Component({
         current: currentUrl,
         urls: urls
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: '照片墙 · 樊振东的互联网档案馆',
+        path: '/pages/gallery/gallery'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '照片墙 · 樊振东的互联网档案馆'
+      };
     }
   }
 });

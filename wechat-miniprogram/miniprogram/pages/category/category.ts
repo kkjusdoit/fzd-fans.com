@@ -61,6 +61,18 @@ Component({
       wx.navigateTo({
         url: `../article/article?id=${id}`
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: `${this.data.categoryName} · 樊振东的互联网档案馆`,
+        path: `/pages/category/category?id=${this.data.categoryId}`
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: `${this.data.categoryName} · 樊振东的互联网档案馆`,
+        query: `id=${this.data.categoryId}`
+      };
     }
   }
 })

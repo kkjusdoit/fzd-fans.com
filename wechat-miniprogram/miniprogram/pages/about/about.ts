@@ -27,6 +27,17 @@ Component({
       wx.navigateTo({
         url: `/pages/article-webview/article-webview?url=${encodeURIComponent(url)}`
       });
+    },
+    onShareAppMessage() {
+      return {
+        title: '关于 · 樊振东的互联网档案馆',
+        path: '/pages/about/about'
+      };
+    },
+    onShareTimeline() {
+      return {
+        title: '关于 · 樊振东的互联网档案馆'
+      };
     }
   },
 })
