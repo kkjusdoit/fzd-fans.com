@@ -1,13 +1,40 @@
 <view class="container">
-  <view class="article-list">
-    <view class="article-item" wx:for="{{articles}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
-      <view class="article-info">
-        <view class="article-title">{{item.title}}</view>
-        <view class="article-desc" wx:if="{{item.description}}">{{item.description}}</view>
+  <block wx:if="{{categoryId === 'ugc'}}">
+    <view class="section-title">💌 繁星寄语</view>
+    <view class="article-list">
+      <view class="article-item" wx:for="{{letters}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
+        <view class="article-info">
+          <view class="article-title">{{item.title}}</view>
+          <view class="article-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="article-author" wx:if="{{item.author}}">作者：{{item.author}}</view>
+        </view>
       </view>
     </view>
-  </view>
-  <view wx:if="{{articles.length === 0}}" class="empty-state">
+
+    <view class="section-title" style="margin-top: 24px;">⚔️ 东风论剑</view>
+    <view class="article-list">
+      <view class="article-item" wx:for="{{tactics}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
+        <view class="article-info">
+          <view class="article-title">{{item.title}}</view>
+          <view class="article-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="article-author" wx:if="{{item.author}}">作者：{{item.author}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="article-list">
+      <view class="article-item" wx:for="{{articles}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
+        <view class="article-info">
+          <view class="article-title">{{item.title}}</view>
+          <view class="article-desc" wx:if="{{item.description}}">{{item.description}}</view>
+          <view class="article-author" wx:if="{{item.author}}">作者：{{item.author}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+  
+  <view wx:if="{{articles.length === 0 && letters.length === 0 && tactics.length === 0}}" class="empty-state">
     <text>暂无内容</text>
   </view>
 </view>

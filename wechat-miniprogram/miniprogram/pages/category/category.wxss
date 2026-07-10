@@ -58,3 +58,20 @@
   color: #94a3b8;
   font-size: 13px;
 }
+
+.section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+  display: block;
+  border-left: 3.5px solid #1e88e5;
+  padding-left: 8px;
+}
+
+.article-author {
+  font-size: 11px;
+  color: #1e88e5;
+  margin-top: 6px;
+  font-weight: 500;
+}

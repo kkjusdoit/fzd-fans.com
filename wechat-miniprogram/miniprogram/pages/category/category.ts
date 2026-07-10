@@ -15,6 +15,8 @@ const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
 Component({
   data: {
     articles: [] as any[],
+    letters: [] as any[],
+    tactics: [] as any[],
     categoryName: '',
     categoryId: ''
   },
@@ -46,10 +48,23 @@ Component({
         item.category === categoryId && item.lang === lang
       );
 
-      this.setData({
-        articles: filtered,
-        categoryName: name
-      });
+      if (categoryId === 'ugc') {
+        const letters = filtered.filter((item: any) => item.id.includes('letter-'));
+        const tactics = filtered.filter((item: any) => !item.id.includes('letter-'));
+        this.setData({
+          articles: filtered,
+          letters,
+          tactics,
+          categoryName: name
+        });
+      } else {
+        this.setData({
+          articles: filtered,
+          letters: [],
+          tactics: [],
+          categoryName: name
+        });
+      }
 
       wx.setNavigationBarTitle({
         title: name
@@ -75,4 +90,4 @@ Component({
       };
     }
   }
-})
+});

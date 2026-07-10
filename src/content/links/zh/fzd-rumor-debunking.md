@@ -18,4 +18,4 @@ translated: false
 
 — 
 
-如需将此类内容按专题归档为“辟谣与核查”，后续可在网站中建立专门聚合页统一呈现。欢迎补充线索与材料：<a href="copy-official://kkjusdoit">关注公众号【kkjusdoit】后台留言（点击复制）</a>
+如需将此类内容按专题归档为“辟谣与核查”，后续可在网站中建立专门聚合页统一呈现。欢迎补充线索与材料，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>

@@ -39,4 +39,4 @@ Experience the linguistic charm of Fan Zhendong
 
 ---
 
-*(Welcome to submit recommendations: <a href="copy-official://kkjusdoit">Follow Official Account 【kkjusdoit】 to send message (Click to Copy)</a>)*
+*(Welcome to submit/recommend, please email to <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com (Click to Copy)</a>)*
