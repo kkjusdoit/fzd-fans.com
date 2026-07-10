@@ -11,7 +11,7 @@
       <text class="rule-item">3. 每次测试有且仅有一次“偷瞄”答案的机会</text>
     </view>
     <button class="start-btn" bindtap="startQuiz">开始答题</button>
-    <text class="copyright">原创问答游戏由 @球迷会-天际樊星 授权提供</text>
+    <text class="copyright">原创问答测试由 @球迷会-天际樊星 授权提供</text>
   </view>
 
   <!-- 2. Quiz Play View -->
