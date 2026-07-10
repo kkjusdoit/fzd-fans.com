@@ -14,7 +14,8 @@ translated: false
 
 在一众应援物中，这款黄毛巾凭借其鲜艳的配色，在看台上格外打眼，让赛场上的樊振东一眼就能看到支持他的力量。
 <div class="image-grid">
-  <img src="https://youke.xn--y7xa690gmna.cn/s1/2026/02/11/698bde41c241f.webp" alt="赛场上的黄色海洋" />
+  <img src="https://fzd-fans.com/img/towel/stadium.jpg" alt="赛场上的黄色海洋" />
+  <img src="https://fzd-fans.com/img/towel/design.jpg" alt="功勋应援毛巾设计" />
 </div>
 
 ## 设计背后的故事
@@ -25,8 +26,8 @@ translated: false
 *   **"Oneward & Upward"**：取自樊振东退伍后，注册新微博账号时发布的新年祝福语，寓意“一往无前，蒸蒸日上”。
 *   **"You'll Never Walk Alone"**：源自他第一次跟随波尔去现场观看皇马比赛的 Vlog。这不仅是利物浦的队歌，也是他对体育精神的共鸣，更是粉丝对他的承诺——你永远不会独行。
 <div class="image-grid">
-  <img src="https://youke.xn--y7xa690gmna.cn/s1/2026/02/11/698bde41836c8.webp" alt="皇马新闻" />
-  <img src="https://youke.xn--y7xa690gmna.cn/s1/2026/02/11/698bde418e7bc.webp" alt="退伍后发的微博" />
+  <img src="https://fzd-fans.com/img/towel/realmadrid.jpg" alt="皇马新闻" />
+  <img src="https://fzd-fans.com/img/towel/weibo.jpg" alt="退伍后发的微博" />
 </div>
 
 ## 繁星共创与公益初心

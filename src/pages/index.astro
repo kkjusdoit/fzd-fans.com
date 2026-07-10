@@ -284,6 +284,28 @@ const slogans = [
     </div>
   </section>
 
+  <!-- 小程序推广 -->
+  <section class="miniprogram-promo">
+    <div class="promo-container">
+      <div class="promo-info">
+        <span class="promo-badge">📱 微信小程序</span>
+        <h2>微信体验「樊星宇宙」小程序</h2>
+        <p class="promo-desc">
+          「樊振东的互联网档案馆」已上线微信小程序！手机端浏览更流畅，随时随地查询生涯里程碑、大考战绩、经典语录与球迷答题特训，支持一键分享分享给微信好友。
+        </p>
+        <div class="promo-features">
+          <span class="feature-tag">✨ 生涯里程碑</span>
+          <span class="feature-tag">📝 球迷等级考试</span>
+          <span class="feature-tag">⚔️ 历年战绩查询</span>
+        </div>
+      </div>
+      <div class="promo-qrcode">
+        <img src="/img/miniprogram-qrcode.jpg" alt="樊星宇宙小程序码" />
+        <span class="qrcode-label">微信扫码或长按识别体验</span>
+      </div>
+    </div>
+  </section>
+
   <!-- 底部口号 -->
   <section class="footer-slogan">
     <div class="slogan-main">樊振东 每个赛场见</div>
@@ -708,6 +730,84 @@ const slogans = [
     opacity: 0.9;
   }
 
+  /* 小程序推广 */
+  .miniprogram-promo {
+    max-width: 900px;
+    margin: 4rem auto 2rem;
+    padding: 0 1.5rem;
+  }
+  .promo-container {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+    box-shadow: 0 10px 30px rgba(30, 136, 229, 0.15);
+  }
+  .promo-info {
+    flex: 1;
+    text-align: left;
+  }
+  .promo-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .promo-info h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #fff !important;
+  }
+  .promo-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+  }
+  .promo-features {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .feature-tag {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+  }
+  .promo-qrcode {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .promo-qrcode img {
+    width: 140px;
+    height: 140px;
+    display: block;
+    border-radius: 8px;
+  }
+  .qrcode-label {
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
   /* 响应式 */
   @media (max-width: 768px) {
     .hero h1 { font-size: 1.8rem; }
@@ -716,6 +816,29 @@ const slogans = [
     .stat-num { font-size: 1.5rem; }
     .category-grid { grid-template-columns: repeat(2, 1fr); }
     .slogan-main { font-size: 1.5rem; }
+    
+    .miniprogram-promo {
+      margin: 2rem auto;
+    }
+    .promo-container {
+      flex-direction: column;
+      padding: 1.8rem;
+      text-align: center;
+      gap: 1.5rem;
+    }
+    .promo-info {
+      text-align: center;
+    }
+    .promo-info h2 {
+      font-size: 1.5rem;
+    }
+    .promo-features {
+      justify-content: center;
+    }
+    .promo-qrcode img {
+      width: 120px;
+      height: 120px;
+    }
   }
 </style>
 
