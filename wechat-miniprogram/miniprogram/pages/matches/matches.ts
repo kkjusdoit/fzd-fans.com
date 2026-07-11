@@ -19,13 +19,12 @@ interface Match {
 
 Component({
   data: {
-    opponents: [] as string[],
     periods: [] as string[],
     levels: [] as string[],
     partners: [] as string[],
     results: ['全部胜负', '胜', '负'],
 
-    opponentIndex: 0,
+    opponentSearch: '',
     periodIndex: 0,
     levelIndex: 0,
     partnerIndex: 0,
@@ -61,9 +60,6 @@ Component({
     initFilters() {
       const data = matchesData as Match[];
 
-      const rawOpponents = [...new Set(data.map(m => m.opponent).filter(o => o && o !== '——'))].sort();
-      const opponents = ['全部对手', ...rawOpponents];
-
       const rawPeriods = [...new Set(data.map(m => m.period))].filter(Boolean);
       const periods = ['全部时期', ...rawPeriods];
 
@@ -74,15 +70,20 @@ Component({
       const partners = ['全部搭档', ...rawPartners];
 
       this.setData({
-        opponents,
         periods,
         levels,
         partners
       });
     },
 
-    onOpponentChange(e: any) {
-      this.setData({ opponentIndex: parseInt(e.detail.value), page: 1 }, () => {
+    onOpponentSearchInput(e: any) {
+      this.setData({ opponentSearch: e.detail.value, page: 1 }, () => {
+        this.applyFilters();
+      });
+    },
+
+    clearOpponentSearch() {
+      this.setData({ opponentSearch: '', page: 1 }, () => {
         this.applyFilters();
       });
     },
@@ -113,7 +114,7 @@ Component({
 
     resetFilters() {
       this.setData({
-        opponentIndex: 0,
+        opponentSearch: '',
         periodIndex: 0,
         levelIndex: 0,
         partnerIndex: 0,
@@ -127,16 +128,16 @@ Component({
     applyFilters() {
       const data = matchesData as Match[];
 
-      const opponentFilter = this.data.opponentIndex > 0 ? this.data.opponents[this.data.opponentIndex] : null;
+      const opponentSearch = this.data.opponentSearch.trim().toLowerCase();
       const periodFilter = this.data.periodIndex > 0 ? this.data.periods[this.data.periodIndex] : null;
       const levelFilter = this.data.levelIndex > 0 ? this.data.levels[this.data.levelIndex] : null;
       const partnerFilter = this.data.partnerIndex > 0 ? this.data.partners[this.data.partnerIndex] : null;
       const resultFilter = this.data.resultIndex > 0 ? this.data.results[this.data.resultIndex] : null;
 
-      const hasActiveFilters = !!(opponentFilter || periodFilter || levelFilter || partnerFilter || resultFilter);
+      const hasActiveFilters = !!(opponentSearch || periodFilter || levelFilter || partnerFilter || resultFilter);
 
       const filtered = data.filter(m => {
-        if (opponentFilter && m.opponent !== opponentFilter) return false;
+        if (opponentSearch && !m.opponent.toLowerCase().includes(opponentSearch)) return false;
         if (periodFilter && m.period !== periodFilter) return false;
         if (levelFilter && m.level !== levelFilter) return false;
         if (partnerFilter && m.partner !== partnerFilter) return false;

@@ -19,16 +19,26 @@
     </view>
   </view>
 
+  <!-- Search Bar -->
+  <view class="search-bar-container">
+    <view class="search-input-wrapper">
+      <icon class="search-icon" type="search" size="14" color="#94a3b8"></icon>
+      <input 
+        class="search-input" 
+        type="text" 
+        placeholder="输入对手名字模糊搜索 (如: 马龙, 莫雷加德...)" 
+        value="{{opponentSearch}}" 
+        bindinput="onOpponentSearchInput"
+      />
+      <view class="clear-btn" wx:if="{{opponentSearch}}" bindtap="clearOpponentSearch">
+        <icon type="clear" size="14" color="#cbd5e1"></icon>
+      </view>
+    </view>
+  </view>
+
   <!-- Filters Row -->
   <view class="filters-container">
     <scroll-view class="filters-scroll" scroll-x="true" enable-flex>
-      <picker class="filter-item {{opponentIndex > 0 ? 'active' : ''}}" mode="selector" range="{{opponents}}" bindchange="onOpponentChange">
-        <view class="picker-val">
-          {{opponentIndex > 0 ? opponents[opponentIndex] : '对手'}}
-          <text class="arrow">▼</text>
-        </view>
-      </picker>
-
       <picker class="filter-item {{periodIndex > 0 ? 'active' : ''}}" mode="selector" range="{{periods}}" bindchange="onPeriodChange">
         <view class="picker-val">
           {{periodIndex > 0 ? periods[periodIndex] : '时期'}}
