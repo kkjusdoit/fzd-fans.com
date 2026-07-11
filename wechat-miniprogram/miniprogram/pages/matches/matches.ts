@@ -19,12 +19,14 @@ interface Match {
 
 Component({
   data: {
+    events: ['全部项目', '单打', '双打', '混双', '其他'],
     periods: [] as string[],
     levels: [] as string[],
     partners: [] as string[],
     results: ['全部胜负', '胜', '负'],
 
     opponentSearch: '',
+    eventIndex: 0,
     periodIndex: 0,
     levelIndex: 0,
     partnerIndex: 0,
@@ -88,6 +90,12 @@ Component({
       });
     },
 
+    onEventChange(e: any) {
+      this.setData({ eventIndex: parseInt(e.detail.value), page: 1 }, () => {
+        this.applyFilters();
+      });
+    },
+
     onPeriodChange(e: any) {
       this.setData({ periodIndex: parseInt(e.detail.value), page: 1 }, () => {
         this.applyFilters();
@@ -115,6 +123,7 @@ Component({
     resetFilters() {
       this.setData({
         opponentSearch: '',
+        eventIndex: 0,
         periodIndex: 0,
         levelIndex: 0,
         partnerIndex: 0,
@@ -129,15 +138,17 @@ Component({
       const data = matchesData as Match[];
 
       const opponentSearch = this.data.opponentSearch.trim().toLowerCase();
+      const eventFilter = this.data.eventIndex > 0 ? this.data.events[this.data.eventIndex] : null;
       const periodFilter = this.data.periodIndex > 0 ? this.data.periods[this.data.periodIndex] : null;
       const levelFilter = this.data.levelIndex > 0 ? this.data.levels[this.data.levelIndex] : null;
       const partnerFilter = this.data.partnerIndex > 0 ? this.data.partners[this.data.partnerIndex] : null;
       const resultFilter = this.data.resultIndex > 0 ? this.data.results[this.data.resultIndex] : null;
 
-      const hasActiveFilters = !!(opponentSearch || periodFilter || levelFilter || partnerFilter || resultFilter);
+      const hasActiveFilters = !!(opponentSearch || eventFilter || periodFilter || levelFilter || partnerFilter || resultFilter);
 
       const filtered = data.filter(m => {
         if (opponentSearch && !m.opponent.toLowerCase().includes(opponentSearch)) return false;
+        if (eventFilter && m.event !== eventFilter) return false;
         if (periodFilter && m.period !== periodFilter) return false;
         if (levelFilter && m.level !== levelFilter) return false;
         if (partnerFilter && m.partner !== partnerFilter) return false;

@@ -39,6 +39,13 @@
   <!-- Filters Row -->
   <view class="filters-container">
     <scroll-view class="filters-scroll" scroll-x="true" enable-flex>
+      <picker class="filter-item {{eventIndex > 0 ? 'active' : ''}}" mode="selector" range="{{events}}" bindchange="onEventChange">
+        <view class="picker-val">
+          {{eventIndex > 0 ? events[eventIndex] : '项目'}}
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+
       <picker class="filter-item {{periodIndex > 0 ? 'active' : ''}}" mode="selector" range="{{periods}}" bindchange="onPeriodChange">
         <view class="picker-val">
           {{periodIndex > 0 ? periods[periodIndex] : '时期'}}
