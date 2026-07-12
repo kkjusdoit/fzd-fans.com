@@ -88,6 +88,31 @@ const slogans = [
   <!-- 生日倒计时 -->
   <BirthdayCountdown />
 
+  <!-- 访问体验与小程序推荐 -->
+  <section class="access-notice-section">
+    <div class="notice-card">
+      <div class="notice-content">
+        <span class="notice-badge">💡 访问体验提示</span>
+        <h3>网页加载缓慢或图片打不开？</h3>
+        <p>
+          由于本站部署于海外节点，受部分地区网络环境影响，国内访问可能会出现<strong>缓慢、加载失败或图片打不开</strong>等问题，手机端体验较不稳定。
+        </p>
+        <p class="recommend-text">
+          为了获得更稳定流畅的阅读与互动体验，我们强烈推荐使用微信扫描下方二维码，体验官方<strong>「樊星宇宙」小程序</strong>。
+        </p>
+        <div class="notice-tags">
+          <span>⚡ 国内加速 · 毫秒级加载</span>
+          <span>📖 生涯数据与战绩本地丝滑筛选</span>
+          <span>🎮 互动答题与小游戏直接体验</span>
+        </div>
+      </div>
+      <div class="notice-qrcode">
+        <img src="/img/miniprogram-qrcode.jpg" alt="樊星宇宙微信小程序" />
+        <span class="qrcode-tip">微信扫码或长按识别</span>
+      </div>
+    </div>
+  </section>
+
   <!-- 滚动应援 -->
   <section class="slogan-marquee">
     <div class="marquee-content">
@@ -291,12 +316,12 @@ const slogans = [
         <span class="promo-badge">📱 微信小程序</span>
         <h2>微信体验「樊星宇宙」小程序</h2>
         <p class="promo-desc">
-          「樊振东的互联网档案馆」已上线微信小程序！手机端浏览更流畅，随时随地查询生涯里程碑、大考战绩、经典语录与球迷答题特训，支持一键分享分享给微信好友。
+          觉得网页加载卡顿或排版不方便？试试微信扫描二维码，进入「樊星宇宙」微信小程序。国内节点秒级加载，完全对齐网站内容，支持一键分享给微信同好。
         </p>
         <div class="promo-features">
-          <span class="feature-tag">✨ 生涯里程碑</span>
-          <span class="feature-tag">📝 球迷等级考试</span>
-          <span class="feature-tag">⚔️ 历年战绩查询</span>
+          <span class="feature-tag">⚡ 国内高速加载</span>
+          <span class="feature-tag">📖 战绩丝滑筛选</span>
+          <span class="feature-tag">📝 球迷等级大考</span>
         </div>
       </div>
       <div class="promo-qrcode">
@@ -730,6 +755,91 @@ const slogans = [
     opacity: 0.9;
   }
 
+  /* 访问体验提示 */
+  .access-notice-section {
+    max-width: 900px;
+    margin: 3rem auto 1rem;
+    padding: 0 1.5rem;
+  }
+  .notice-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+    border: 1px solid #bbdefb;
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    box-shadow: 0 4px 20px rgba(30, 136, 229, 0.05);
+  }
+  .notice-content {
+    flex: 1;
+    text-align: left;
+  }
+  .notice-badge {
+    background: #1e88e5;
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 0.8rem;
+  }
+  .notice-content h3 {
+    font-size: 1.4rem;
+    color: #1565c0;
+    margin-bottom: 0.6rem;
+    font-weight: bold;
+    margin-top: 0;
+  }
+  .notice-content p {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 0.6rem;
+  }
+  .recommend-text {
+    font-weight: 600;
+    color: #1e88e5 !important;
+  }
+  .notice-tags {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .notice-tags span {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+  .notice-qrcode {
+    background: #fff;
+    padding: 0.8rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    border: 1px solid #e2e8f0;
+  }
+  .notice-qrcode img {
+    width: 120px;
+    height: 120px;
+    display: block;
+    border-radius: 6px;
+  }
+  .qrcode-tip {
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
   /* 小程序推广 */
   .miniprogram-promo {
     max-width: 900px;
@@ -838,6 +948,22 @@ const slogans = [
     .promo-qrcode img {
       width: 120px;
       height: 120px;
+    }
+
+    .notice-card {
+      flex-direction: column;
+      padding: 1.5rem;
+      text-align: center;
+      gap: 1.2rem;
+    }
+    .notice-content {
+      text-align: center;
+    }
+    .notice-content h3 {
+      font-size: 1.2rem;
+    }
+    .notice-tags {
+      justify-content: center;
     }
   }
 </style>
