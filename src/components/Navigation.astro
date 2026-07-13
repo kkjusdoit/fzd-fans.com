@@ -11,6 +11,8 @@ const navItems = [
   { href: '/', label: t('nav.home') },
   { href: '/arena', label: t('nav.arena') },
   { href: '/matches', label: t('nav.matches') },
+  { href: '/news', label: t('nav.news') },
+  { href: '/endorsements', label: t('nav.empire') },
   { href: '/quotes', label: t('nav.quotes') },
   // { href: '/friends', label: t('nav.friends') }, // 暂时隐藏
   { href: '/tributes', label: t('nav.tributes') },
@@ -43,7 +45,7 @@ function isActive(href: string) {
 <header class="header">
   <div class="container header-inner">
     <a href={getLocalizedPath('/', lang)} class="logo">
-      <span class="logo-icon">🏓</span>
+      <img src="/favicon_io/favicon-32x32.png" alt="樊振东档案馆" class="logo-icon" width="28" height="28" />
       <span class="logo-text">{t('site.title')}</span>
     </a>
     <nav class="nav">
@@ -84,7 +86,7 @@ function isActive(href: string) {
     color: #1e88e5;
   }
   .logo:hover { text-decoration: none; }
-  .logo-icon { font-size: 1.5rem; }
+  .logo-icon { font-size: 1.5rem; display: block; border-radius: 6px; }
   .nav {
     display: flex;
     gap: 1.5rem;

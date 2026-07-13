@@ -7,6 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "debug:remote": "astro build && wrangler pages dev dist --d1 DB=5337ea22-a722-424f-9479-cc08613108ca --compatibility-flags nodejs_compat",
+    "news:add": "node --env-file=.env scripts/add_news.mjs",
+    "news:sync": "node scripts/sync_news.mjs",
+    "endorsements:sync": "node scripts/sync_endorsements.mjs",
     "astro": "astro"
   },
   "dependencies": {

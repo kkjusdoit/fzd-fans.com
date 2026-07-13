@@ -33,6 +33,9 @@ yarn-error.log*
 # Astro
 .astro/
 
+# 快讯起草待处理截图（原图不入库，起草后归档在 _inbox/_done）
+_inbox/
+
 # Cloudflare Wrangler
 .wrangler/
 .agent/tasks

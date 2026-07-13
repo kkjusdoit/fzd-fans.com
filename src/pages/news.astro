@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import newsData from '../data/news.json';
+import { NEWS_CATEGORIES, NEWS_CATEGORY_KEYS } from '../data/newsCategories.mjs';
+
+const items = (newsData as any[])
+  .filter((n) => !n.draft)
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const usedCats = NEWS_CATEGORY_KEYS.filter((k) => items.some((n) => n.category === k));
+
+// 按年份分组（粘性年份标）
+const byYear: { year: number; list: any[] }[] = [];
+for (const n of items) {
+  const y = new Date(n.date).getFullYear();
+  let g = byYear.find((x) => x.year === y);
+  if (!g) { g = { year: y, list: [] }; byYear.push(g); }
+  g.list.push(n);
+}
+
+const imgSrc = (img: string) => (img?.startsWith('http') ? img : `/${img}`);
+---
+
+<BaseLayout title="樊振东快讯">
+  <div class="news-page">
+    <header class="news-head">
+      <h1>📰 樊振东快讯</h1>
+      <p class="news-sub">商务 · 宣传 · 赛事 · 出席，一路走来的最新动向</p>
+    </header>
+
+    <!-- 分类筛选 -->
+    <div class="filter-bar">
+      <button class="chip active" data-cat="all">全部</button>
+      {usedCats.map((k) => (
+        <button class="chip" data-cat={k} style={`--chip:${NEWS_CATEGORIES[k].color}`}>
+          {NEWS_CATEGORIES[k].icon} {NEWS_CATEGORIES[k].label}
+        </button>
+      ))}
+    </div>
+
+    {items.length === 0 ? (
+      <p class="empty">暂无快讯</p>
+    ) : (
+      <div class="timeline">
+        {byYear.map((group) => (
+          <section class="year-group">
+            <div class="year-label"><span>{group.year}</span></div>
+            {group.list.map((n) => {
+              const meta = NEWS_CATEGORIES[n.category] || NEWS_CATEGORIES.other;
+              return (
+                <article class="tl-item" data-cat={n.category}>
+                  <div class="tl-dot" style={`background:${meta.color}`}>{meta.icon}</div>
+                  <div class="tl-card">
+                    <div class="tl-meta">
+                      <span class="tl-date">{n.date}</span>
+                      <span class="tl-tag" style={`background:${meta.color}`}>{meta.label}</span>
+                    </div>
+                    <h3 class="tl-title">{n.title}</h3>
+                    {n.summary && <p class="tl-summary">{n.summary}</p>}
+                    {n.image && <img class="tl-img" src={imgSrc(n.image)} alt={n.title} loading="lazy" />}
+                    {n.source && (
+                      <a class="tl-source" href={n.source} target="_blank" rel="noopener noreferrer">查看来源 ↗</a>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  // 进入视口淡入
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.tl-item').forEach((el) => io.observe(el));
+
+  // 分类筛选
+  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-bar .chip');
+  const groups = document.querySelectorAll<HTMLElement>('.year-group');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      const cat = chip.dataset.cat;
+      groups.forEach((g) => {
+        const cards = g.querySelectorAll<HTMLElement>('.tl-item');
+        let anyVisible = false;
+        cards.forEach((it) => {
+          const show = cat === 'all' || it.dataset.cat === cat;
+          it.style.display = show ? '' : 'none';
+          if (show) anyVisible = true;
+        });
+        g.style.display = anyVisible ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .news-page { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .news-head { text-align: center; margin-bottom: 1.75rem; }
+  .news-head h1 { margin: 0 0 0.5rem; font-size: 1.8rem; }
+  .news-sub { color: #666; font-size: 0.95rem; margin: 0; }
+
+  /* 筛选 */
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; }
+  .chip { --chip: #1e88e5; padding: 0.35rem 0.9rem; border: 1px solid #d8e2ec; border-radius: 999px; background: #fff; color: #44586c; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
+  .chip:hover { border-color: var(--chip); color: var(--chip); }
+  .chip.active { background: var(--chip); color: #fff; border-color: var(--chip); }
+  .chip[data-cat="all"] { --chip: #1e88e5; }
+
+  /* 单轴时间线 */
+  .timeline { position: relative; padding-left: 52px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 19px; top: 6px; bottom: 6px; width: 2px;
+    background: linear-gradient(to bottom, #1e88e5, #90caf9);
+  }
+
+  /* 年份分组标（粘性） */
+  .year-group { position: relative; }
+  .year-label { position: sticky; top: 64px; z-index: 3; margin: 0 0 1rem -52px; padding-left: 52px; }
+  .year-label span {
+    display: inline-block; background: #1e88e5; color: #fff; font-weight: 700;
+    font-size: 0.95rem; padding: 0.2rem 0.9rem; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(30,136,229,0.25);
+  }
+
+  .tl-item {
+    position: relative; margin-bottom: 1.5rem;
+    opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .tl-item.in { opacity: 1; transform: translateY(0); }
+  .tl-dot {
+    position: absolute; left: -42px; top: 4px; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #fff;
+    border: 3px solid #fff; box-shadow: 0 3px 10px rgba(30,136,229,0.22); z-index: 2;
+  }
+  .tl-card {
+    background: #fff; border: 1px solid #eef2f6; border-radius: 12px; padding: 1rem 1.15rem;
+    box-shadow: 0 2px 10px rgba(30,136,229,0.05); transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+  }
+  .tl-card:hover { box-shadow: 0 10px 22px rgba(30,136,229,0.13); transform: translateY(-2px); border-color: #bbdefb; }
+  .tl-meta { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.4rem; }
+  .tl-date { font-size: 0.8rem; color: #8797a8; font-variant-numeric: tabular-nums; }
+  .tl-tag { font-size: 0.7rem; color: #fff; padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 600; }
+  .tl-title { margin: 0.2rem 0 0.4rem; font-size: 1.1rem; color: #1a2b40; line-height: 1.4; }
+  .tl-summary { margin: 0 0 0.6rem; font-size: 0.9rem; color: #5a6b7d; line-height: 1.65; }
+  .tl-img { width: 100%; border-radius: 8px; display: block; margin: 0.5rem 0; }
+  .tl-source { font-size: 0.82rem; color: #1e88e5; }
+  .tl-source:hover { text-decoration: underline; }
+  .empty { text-align: center; color: #999; padding: 3rem 0; }
+
+  @media (max-width: 640px) {
+    .timeline { padding-left: 44px; }
+    .timeline::before { left: 15px; }
+    .tl-dot { left: -37px; width: 30px; height: 30px; }
+    .year-label { top: 56px; margin-left: -44px; padding-left: 44px; }
+  }
+</style>

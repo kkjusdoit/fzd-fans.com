@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import data from '../data/endorsements.json';
+import { ENDORSEMENT_TYPES, ENDORSEMENT_STATUS, ENDORSEMENT_TYPE_KEYS } from '../data/endorsementsConfig.mjs';
+
+const items = data as any[];
+
+// —— 统计（破圈广度的量化） ——
+const total = items.length;
+const activeCount = items.filter((i) => i.status === 'active').length;
+const categories = [...new Set(items.map((i) => i.category))];
+const categoryCount = categories.length;
+
+const byType = ENDORSEMENT_TYPE_KEYS.map((k) => ({
+  key: k, ...ENDORSEMENT_TYPES[k], count: items.filter((i) => i.type === k).length
+})).filter((t) => t.count > 0);
+
+// —— 时间解析：signDate 是文本，抽取年月做排序与分组 ——
+function parseTime(s: string) {
+  const m = String(s).match(/(\d{4})[-年]?(\d{1,2})?/);
+  if (!m) return { t: 0, year: 0 };
+  const year = Number(m[1]);
+  return { t: new Date(year, m[2] ? Number(m[2]) - 1 : 0).getTime(), year };
+}
+const enriched = items.map((i) => ({ ...i, ...parseTime(i.signDate) }));
+const sorted = [...enriched].sort((a, b) => b.t - a.t);
+
+// 按年分组（叙事：逐年扩张的商业版图）
+const years = [...new Set(sorted.map((i) => i.year))].filter(Boolean).sort((a, b) => b - a);
+const byYear = years.map((y) => ({ year: y, list: sorted.filter((i) => i.year === y) }));
+
+function initial(brand: string) {
+  const zh = brand.match(/[一-龥]/);
+  return zh ? zh[0] : brand.trim()[0]?.toUpperCase() || '?';
+}
+---
+
+<BaseLayout title="商业版图">
+  <div class="empire-page">
+    <!-- 叙事英雄区 -->
+    <header class="empire-hero">
+      <span class="hero-badge">💼 商业版图</span>
+      <h1>从器材到高奢，横跨 {categoryCount} 个行业的商业认可</h1>
+      <p class="hero-lead">
+        运动器材、消费电子、高端汽车、奢侈时装、美妆护肤、快消餐饮……
+        樊振东以赛场实力赢得的品牌信任，早已越过乒乓球台的边界。
+        这里客观记录他每一次商业合作，看一位运动员的影响力如何破圈生长。
+      </p>
+      <div class="hero-stats">
+        <div class="hs"><span class="n">{total}</span><span class="l">合作品牌</span></div>
+        <div class="hs"><span class="n">{categoryCount}</span><span class="l">覆盖行业</span></div>
+        <div class="hs"><span class="n">{activeCount}</span><span class="l">进行中</span></div>
+        <div class="hs"><span class="n">{byType.find((t) => t.key === 'commercial')?.count ?? 0}</span><span class="l">商业代言</span></div>
+      </div>
+    </header>
+
+    <!-- 破圈广度：行业标签云 -->
+    <section class="breadth">
+      <h2 class="sec-title">🌐 破圈广度</h2>
+      <p class="sec-sub">合作品牌横跨的行业领域</p>
+      <div class="cat-cloud">
+        {categories.map((c) => {
+          const n = items.filter((i) => i.category === c).length;
+          return <span class="cat-pill">{c}<em>{n}</em></span>;
+        })}
+      </div>
+    </section>
+
+    <!-- 类型筛选 -->
+    <div class="filter-bar">
+      <button class="chip active" data-type="all">全部 {total}</button>
+      {byType.map((t) => (
+        <button class="chip" data-type={t.key}>{t.icon} {t.label} {t.count}</button>
+      ))}
+    </div>
+
+    <!-- 逐年扩张的版图 -->
+    <section class="empire-timeline">
+      {byYear.map((group) => (
+        <div class="year-block">
+          <div class="year-marker"><span>{group.year}</span></div>
+          <div class="brand-grid">
+            {group.list.map((i) => {
+              const tm = ENDORSEMENT_TYPES[i.type] || ENDORSEMENT_TYPES.commercial;
+              const sm = ENDORSEMENT_STATUS[i.status] || ENDORSEMENT_STATUS.active;
+              return (
+                <article class="brand-card" data-type={i.type}>
+                  <div class="bc-top">
+                    <div class="bc-logo">
+                      {i.logo ? <img src={`/${i.logo}`} alt={i.brand} loading="lazy" /> : <span>{initial(i.brand)}</span>}
+                    </div>
+                    <span class={`bc-status ${i.status}`}>{sm.label}</span>
+                  </div>
+                  <h3 class="bc-brand">
+                    {i.officialUrl ? <a href={i.officialUrl} target="_blank" rel="noopener noreferrer">{i.brand}</a> : i.brand}
+                  </h3>
+                  <div class="bc-tags">
+                    <span class="bc-cat">{i.category}</span>
+                    <span class="bc-role">{i.role}</span>
+                  </div>
+                  {i.slogan && <p class="bc-slogan">「{i.slogan}」</p>}
+                  <div class="bc-foot">
+                    <span class="bc-date">{i.signDate}</span>
+                    <span class="bc-type">{tm.icon} {tm.label}</span>
+                  </div>
+                  {i.editorNote && <p class="bc-note">编者按 · {i.editorNote}</p>}
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <!-- 可信度页脚（取 f-zd 之长：来源/更新/勘误） -->
+    <footer class="empire-foot">
+      <p>📊 数据整理自公开报道与品牌官方发布，力求客观准确，<strong>仅供参考</strong>。</p>
+      <p>如发现错漏或有新的合作信息，欢迎发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com</a> 指正共建。</p>
+    </footer>
+  </div>
+</BaseLayout>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-bar .chip');
+  const cards = document.querySelectorAll<HTMLElement>('.brand-card');
+  const blocks = document.querySelectorAll<HTMLElement>('.year-block');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      const t = chip.dataset.type;
+      cards.forEach((c) => {
+        c.style.display = t === 'all' || c.dataset.type === t ? '' : 'none';
+      });
+      // 整年被筛空则隐藏年份标记
+      blocks.forEach((b) => {
+        const visible = b.querySelectorAll<HTMLElement>('.brand-card').length &&
+          [...b.querySelectorAll<HTMLElement>('.brand-card')].some((c) => c.style.display !== 'none');
+        b.style.display = visible ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .empire-page { max-width: 1000px; margin: 0 auto; padding: 1rem 0 3rem; }
+
+  /* 英雄区 —— 蓝白渐变，呼应主站 #1e88e5 */
+  .empire-hero {
+    text-align: center;
+    padding: 2.5rem 1.5rem 2rem;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f8fbff 100%);
+    border-radius: 20px;
+    margin-bottom: 2rem;
+  }
+  .hero-badge {
+    display: inline-block; background: #1e88e5; color: #fff;
+    padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;
+  }
+  .empire-hero h1 { font-size: 1.7rem; color: #1a2b40; margin: 0 0 1rem; line-height: 1.4; }
+  .hero-lead { max-width: 640px; margin: 0 auto 1.75rem; color: #5a6b7d; font-size: 0.98rem; line-height: 1.8; }
+  .hero-stats { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
+  .hs { display: flex; flex-direction: column; }
+  .hs .n { font-size: 2rem; font-weight: 800; color: #1e88e5; line-height: 1; }
+  .hs .l { font-size: 0.8rem; color: #8797a8; margin-top: 0.35rem; }
+
+  /* 破圈广度 */
+  .breadth { margin-bottom: 2rem; padding: 0 1rem; }
+  .sec-title { font-size: 1.2rem; color: #1a2b40; margin: 0 0 0.25rem; }
+  .sec-sub { color: #8797a8; font-size: 0.85rem; margin: 0 0 1rem; }
+  .cat-cloud { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .cat-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #fff; border: 1px solid #e3eaf2; border-radius: 999px;
+    padding: 0.4rem 0.9rem; font-size: 0.85rem; color: #44586c;
+  }
+  .cat-pill em { font-style: normal; background: #e3f2fd; color: #1e88e5; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 999px; }
+
+  /* 筛选 */
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 0 1rem 2rem; }
+  .chip {
+    padding: 0.35rem 0.9rem; border: 1px solid #d8e2ec; border-radius: 999px;
+    background: #fff; color: #44586c; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;
+  }
+  .chip:hover { border-color: #1e88e5; color: #1e88e5; }
+  .chip.active { background: #1e88e5; color: #fff; border-color: #1e88e5; }
+
+  /* 逐年时间轴 */
+  .empire-timeline { padding: 0 1rem; }
+  .year-block { margin-bottom: 1.5rem; }
+  .year-marker {
+    display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+  }
+  .year-marker span {
+    font-size: 1.4rem; font-weight: 800; color: #1e88e5;
+    background: #e3f2fd; padding: 0.15rem 0.9rem; border-radius: 10px;
+  }
+  .year-marker::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, #d8e2ec, transparent); }
+
+  .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+  .brand-card {
+    background: #fff; border: 1px solid #eef2f6; border-radius: 14px; padding: 1.1rem;
+    box-shadow: 0 2px 10px rgba(30, 136, 229, 0.05);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+    display: flex; flex-direction: column;
+  }
+  .brand-card:hover {
+    box-shadow: 0 10px 24px rgba(30, 136, 229, 0.14);
+    transform: translateY(-3px); border-color: #bbdefb;
+  }
+  .bc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.7rem; }
+  .bc-logo {
+    width: 48px; height: 48px; border-radius: 12px; background: #f4f8fc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; font-weight: 700; color: #1e88e5; overflow: hidden;
+  }
+  .bc-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .bc-status { font-size: 0.68rem; padding: 0.12rem 0.55rem; border-radius: 999px; font-weight: 600; }
+  .bc-status.active { background: #e3f2fd; color: #1565c0; }
+  .bc-status.completed { background: #f1f3f5; color: #868e96; }
+  .bc-brand { margin: 0 0 0.5rem; font-size: 1.05rem; color: #1a2b40; }
+  .bc-brand a { color: #1e88e5; }
+  .bc-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+  .bc-cat, .bc-role { font-size: 0.72rem; padding: 0.12rem 0.5rem; border-radius: 5px; }
+  .bc-cat { background: #eef2f6; color: #5a6b7d; }
+  .bc-role { background: #e3f2fd; color: #1565c0; }
+  .bc-slogan { font-size: 0.85rem; color: #5a6b7d; font-style: italic; margin: 0.2rem 0 0.6rem; }
+  .bc-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; }
+  .bc-date { font-size: 0.78rem; color: #8797a8; }
+  .bc-type { font-size: 0.75rem; font-weight: 600; color: #5c6bc0; }
+  .bc-note { font-size: 0.75rem; color: #8797a8; margin: 0.5rem 0 0; padding-top: 0.5rem; border-top: 1px dashed #eef2f6; line-height: 1.5; }
+
+  /* 页脚可信度 */
+  .empire-foot {
+    margin: 2.5rem 1rem 0; padding: 1.25rem 1.5rem; background: #f8fbff;
+    border: 1px solid #e3eaf2; border-radius: 12px; text-align: center;
+  }
+  .empire-foot p { margin: 0.25rem 0; font-size: 0.82rem; color: #8797a8; line-height: 1.6; }
+
+  @media (max-width: 520px) {
+    .empire-hero h1 { font-size: 1.35rem; }
+    .hero-stats { gap: 1.5rem; }
+    .hs .n { font-size: 1.6rem; }
+    .brand-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  }
+</style>
