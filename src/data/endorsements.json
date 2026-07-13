@@ -9,7 +9,7 @@
     "status": "active",
     "type": "sports_club",
     "notes": "2026 年 7 月转会加盟德甲传统豪门，与老将波尔并肩作战",
-    "logo": "",
+    "logo": "img/endorsements/logos/dusseldorf.png",
     "officialUrl": "",
     "productImage": ""
   },
@@ -23,7 +23,7 @@
     "status": "completed",
     "type": "sports_club",
     "notes": "2025 年加盟，效力一个赛季助队夺德甲三冠，2026 年 7 月合同期满转会杜塞尔多夫",
-    "logo": "",
+    "logo": "img/endorsements/logos/saarbrucken.png",
     "officialUrl": "",
     "productImage": ""
   },
@@ -219,7 +219,7 @@
     "status": "active",
     "type": "commercial",
     "notes": "",
-    "logo": "",
+    "logo": "img/endorsements/logos/dryu.png",
     "officialUrl": "",
     "productImage": ""
   },
@@ -261,7 +261,7 @@
     "status": "active",
     "type": "commercial",
     "notes": "",
-    "logo": "",
+    "logo": "img/endorsements/logos/omo.png",
     "officialUrl": "",
     "productImage": ""
   },
@@ -289,7 +289,7 @@
     "status": "active",
     "type": "commercial",
     "notes": "",
-    "logo": "",
+    "logo": "img/endorsements/logos/xinxiangyin.png",
     "officialUrl": "",
     "productImage": ""
   },
@@ -303,7 +303,7 @@
     "status": "active",
     "type": "commercial",
     "notes": "伊利旗下高端乳业品牌",
-    "logo": "",
+    "logo": "img/endorsements/logos/satine.png",
     "officialUrl": "",
     "productImage": ""
   }

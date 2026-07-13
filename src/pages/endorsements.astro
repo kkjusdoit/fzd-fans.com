@@ -1,19 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import data from '../data/endorsements.json';
-import { ENDORSEMENT_TYPES, ENDORSEMENT_STATUS, ENDORSEMENT_TYPE_KEYS } from '../data/endorsementsConfig.mjs';
+import { ENDORSEMENT_TYPES, ENDORSEMENT_STATUS, ENDORSEMENT_GROUPS } from '../data/endorsementsConfig.mjs';
 
 const items = data as any[];
 
-// —— 统计（破圈广度的量化） ——
-const total = items.length;
-const activeCount = items.filter((i) => i.status === 'active').length;
-const categories = [...new Set(items.map((i) => i.category))];
-const categoryCount = categories.length;
+// —— 分组：球队(效力) / 品牌(代言·公益) ——
+const clubs = items.filter((i) => ENDORSEMENT_GROUPS.club.types.includes(i.type));
+const brands = items.filter((i) => ENDORSEMENT_GROUPS.brand.types.includes(i.type));
 
-const byType = ENDORSEMENT_TYPE_KEYS.map((k) => ({
-  key: k, ...ENDORSEMENT_TYPES[k], count: items.filter((i) => i.type === k).length
-})).filter((t) => t.count > 0);
+// —— 统计 ——
+const brandCount = brands.length;
+const clubCount = clubs.length;
+const activeBrand = brands.filter((i) => i.status === 'active').length;
+const categories = [...new Set(brands.map((i) => i.category))];
+const categoryCount = categories.length;
 
 // —— 时间解析：signDate 是文本，抽取年月做排序与分组 ——
 function parseTime(s: string) {
@@ -22,12 +23,12 @@ function parseTime(s: string) {
   const year = Number(m[1]);
   return { t: new Date(year, m[2] ? Number(m[2]) - 1 : 0).getTime(), year };
 }
-const enriched = items.map((i) => ({ ...i, ...parseTime(i.signDate) }));
-const sorted = [...enriched].sort((a, b) => b.t - a.t);
-
-// 按年分组（叙事：逐年扩张的商业版图）
-const years = [...new Set(sorted.map((i) => i.year))].filter(Boolean).sort((a, b) => b - a);
-const byYear = years.map((y) => ({ year: y, list: sorted.filter((i) => i.year === y) }));
+// 球队按时间倒序（现役在前）
+const clubList = clubs.map((i) => ({ ...i, ...parseTime(i.signDate) })).sort((a, b) => b.t - a.t);
+// 品牌按年分组（叙事：逐年有更多品牌选择与他同行）
+const brandSorted = brands.map((i) => ({ ...i, ...parseTime(i.signDate) })).sort((a, b) => b.t - a.t);
+const years = [...new Set(brandSorted.map((i) => i.year))].filter(Boolean).sort((a, b) => b - a);
+const byYear = years.map((y) => ({ year: y, list: brandSorted.filter((i) => i.year === y) }));
 
 function initial(brand: string) {
   const zh = brand.match(/[一-龥]/);
@@ -35,81 +36,113 @@ function initial(brand: string) {
 }
 ---
 
-<BaseLayout title="商业版图">
+<BaseLayout title="同行者">
   <div class="empire-page">
     <!-- 叙事英雄区 -->
     <header class="empire-hero">
-      <span class="hero-badge">💼 商业版图</span>
-      <h1>从器材到高奢，横跨 {categoryCount} 个行业的商业认可</h1>
+      <span class="hero-badge">🤝 同行者</span>
+      <h1>与他并肩的球队，选择他的品牌</h1>
       <p class="hero-lead">
-        运动器材、消费电子、高端汽车、奢侈时装、美妆护肤、快消餐饮……
-        樊振东以赛场实力赢得的品牌信任，早已越过乒乓球台的边界。
-        这里客观记录他每一次商业合作，看一位运动员的影响力如何破圈生长。
+        从并肩作战的职业俱乐部，到横跨 {categoryCount} 个行业主动选择他的品牌——
+        这里记录的不是「他征服了多少」，而是有多少球队与品牌，愿意与樊振东同行。
+        赛场上的实力与场下的人品，是这份信任最好的注脚。
       </p>
       <div class="hero-stats">
-        <div class="hs"><span class="n">{total}</span><span class="l">合作品牌</span></div>
+        <div class="hs"><span class="n">{clubCount}</span><span class="l">效力球队</span></div>
+        <div class="hs"><span class="n">{brandCount}</span><span class="l">同行品牌</span></div>
         <div class="hs"><span class="n">{categoryCount}</span><span class="l">覆盖行业</span></div>
-        <div class="hs"><span class="n">{activeCount}</span><span class="l">进行中</span></div>
-        <div class="hs"><span class="n">{byType.find((t) => t.key === 'commercial')?.count ?? 0}</span><span class="l">商业代言</span></div>
+        <div class="hs"><span class="n">{activeBrand}</span><span class="l">进行中</span></div>
       </div>
     </header>
 
-    <!-- 破圈广度：行业标签云 -->
-    <section class="breadth">
-      <h2 class="sec-title">🌐 破圈广度</h2>
-      <p class="sec-sub">合作品牌横跨的行业领域</p>
-      <div class="cat-cloud">
-        {categories.map((c) => {
-          const n = items.filter((i) => i.category === c).length;
-          return <span class="cat-pill">{c}<em>{n}</em></span>;
+    <!-- 并肩的球队 -->
+    <section class="group-block">
+      <div class="group-head">
+        <h2 class="group-title">🏓 {ENDORSEMENT_GROUPS.club.title}</h2>
+        <p class="group-sub">{ENDORSEMENT_GROUPS.club.sub}</p>
+      </div>
+      <div class="brand-grid">
+        {clubList.map((i) => {
+          const tm = ENDORSEMENT_TYPES[i.type] || ENDORSEMENT_TYPES.sports_club;
+          const sm = ENDORSEMENT_STATUS[i.status] || ENDORSEMENT_STATUS.active;
+          return (
+            <article class="brand-card club-card" data-type={i.type}>
+              <div class="bc-top">
+                <div class="bc-logo">
+                  {i.logo ? <img src={`/${i.logo}`} alt={i.brand} loading="lazy" /> : <span>{initial(i.brand)}</span>}
+                </div>
+                <span class={`bc-status ${i.status}`}>{i.status === 'active' ? '现役' : '曾效力'}</span>
+              </div>
+              <h3 class="bc-brand">
+                {i.officialUrl ? <a href={i.officialUrl} target="_blank" rel="noopener noreferrer">{i.brand}</a> : i.brand}
+              </h3>
+              <div class="bc-tags">
+                <span class="bc-cat">{i.category}</span>
+                <span class="bc-role">{i.role}</span>
+              </div>
+              {i.notes && <p class="bc-slogan">{i.notes}</p>}
+              <div class="bc-foot">
+                <span class="bc-date">{i.signDate}</span>
+                <span class="bc-type">{tm.icon} {tm.label}</span>
+              </div>
+            </article>
+          );
         })}
       </div>
     </section>
 
-    <!-- 类型筛选 -->
-    <div class="filter-bar">
-      <button class="chip active" data-type="all">全部 {total}</button>
-      {byType.map((t) => (
-        <button class="chip" data-type={t.key}>{t.icon} {t.label} {t.count}</button>
-      ))}
-    </div>
+    <!-- 选择他的品牌 -->
+    <section class="group-block">
+      <div class="group-head">
+        <h2 class="group-title">💼 {ENDORSEMENT_GROUPS.brand.title}</h2>
+        <p class="group-sub">{ENDORSEMENT_GROUPS.brand.sub} · 横跨 {categoryCount} 个行业</p>
+      </div>
 
-    <!-- 逐年扩张的版图 -->
-    <section class="empire-timeline">
-      {byYear.map((group) => (
-        <div class="year-block">
-          <div class="year-marker"><span>{group.year}</span></div>
-          <div class="brand-grid">
-            {group.list.map((i) => {
-              const tm = ENDORSEMENT_TYPES[i.type] || ENDORSEMENT_TYPES.commercial;
-              const sm = ENDORSEMENT_STATUS[i.status] || ENDORSEMENT_STATUS.active;
-              return (
-                <article class="brand-card" data-type={i.type}>
-                  <div class="bc-top">
-                    <div class="bc-logo">
-                      {i.logo ? <img src={`/${i.logo}`} alt={i.brand} loading="lazy" /> : <span>{initial(i.brand)}</span>}
+      <!-- 行业标签云 -->
+      <div class="cat-cloud">
+        {categories.map((c) => {
+          const n = brands.filter((i) => i.category === c).length;
+          return <span class="cat-pill">{c}<em>{n}</em></span>;
+        })}
+      </div>
+
+      <!-- 逐年：越来越多品牌选择同行 -->
+      <div class="empire-timeline">
+        {byYear.map((group) => (
+          <div class="year-block">
+            <div class="year-marker"><span>{group.year}</span></div>
+            <div class="brand-grid">
+              {group.list.map((i) => {
+                const tm = ENDORSEMENT_TYPES[i.type] || ENDORSEMENT_TYPES.commercial;
+                const sm = ENDORSEMENT_STATUS[i.status] || ENDORSEMENT_STATUS.active;
+                return (
+                  <article class="brand-card" data-type={i.type}>
+                    <div class="bc-top">
+                      <div class="bc-logo">
+                        {i.logo ? <img src={`/${i.logo}`} alt={i.brand} loading="lazy" /> : <span>{initial(i.brand)}</span>}
+                      </div>
+                      <span class={`bc-status ${i.status}`}>{sm.label}</span>
                     </div>
-                    <span class={`bc-status ${i.status}`}>{sm.label}</span>
-                  </div>
-                  <h3 class="bc-brand">
-                    {i.officialUrl ? <a href={i.officialUrl} target="_blank" rel="noopener noreferrer">{i.brand}</a> : i.brand}
-                  </h3>
-                  <div class="bc-tags">
-                    <span class="bc-cat">{i.category}</span>
-                    <span class="bc-role">{i.role}</span>
-                  </div>
-                  {i.slogan && <p class="bc-slogan">「{i.slogan}」</p>}
-                  <div class="bc-foot">
-                    <span class="bc-date">{i.signDate}</span>
-                    <span class="bc-type">{tm.icon} {tm.label}</span>
-                  </div>
-                  {i.editorNote && <p class="bc-note">编者按 · {i.editorNote}</p>}
-                </article>
-              );
-            })}
+                    <h3 class="bc-brand">
+                      {i.officialUrl ? <a href={i.officialUrl} target="_blank" rel="noopener noreferrer">{i.brand}</a> : i.brand}
+                    </h3>
+                    <div class="bc-tags">
+                      <span class="bc-cat">{i.category}</span>
+                      <span class="bc-role">{i.role}</span>
+                    </div>
+                    {i.slogan && <p class="bc-slogan">「{i.slogan}」</p>}
+                    <div class="bc-foot">
+                      <span class="bc-date">{i.signDate}</span>
+                      <span class="bc-type">{tm.icon} {tm.label}</span>
+                    </div>
+                    {i.editorNote && <p class="bc-note">编者按 · {i.editorNote}</p>}
+                  </article>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
 
     <!-- 可信度页脚（取 f-zd 之长：来源/更新/勘误） -->
@@ -121,25 +154,16 @@ function initial(brand: string) {
 </BaseLayout>
 
 <script>
-  const chips = document.querySelectorAll<HTMLButtonElement>('.filter-bar .chip');
-  const cards = document.querySelectorAll<HTMLElement>('.brand-card');
-  const blocks = document.querySelectorAll<HTMLElement>('.year-block');
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      chips.forEach((c) => c.classList.remove('active'));
-      chip.classList.add('active');
-      const t = chip.dataset.type;
-      cards.forEach((c) => {
-        c.style.display = t === 'all' || c.dataset.type === t ? '' : 'none';
-      });
-      // 整年被筛空则隐藏年份标记
-      blocks.forEach((b) => {
-        const visible = b.querySelectorAll<HTMLElement>('.brand-card').length &&
-          [...b.querySelectorAll<HTMLElement>('.brand-card')].some((c) => c.style.display !== 'none');
-        b.style.display = visible ? '' : 'none';
-      });
+  // 进入视口淡入上移
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        (e.target as HTMLElement).classList.add('in');
+        io.unobserve(e.target);
+      }
     });
-  });
+  }, { threshold: 0.08 });
+  document.querySelectorAll<HTMLElement>('.brand-card').forEach((c) => io.observe(c));
 </script>
 
 <style>
@@ -164,11 +188,17 @@ function initial(brand: string) {
   .hs .n { font-size: 2rem; font-weight: 800; color: #1e88e5; line-height: 1; }
   .hs .l { font-size: 0.8rem; color: #8797a8; margin-top: 0.35rem; }
 
-  /* 破圈广度 */
-  .breadth { margin-bottom: 2rem; padding: 0 1rem; }
-  .sec-title { font-size: 1.2rem; color: #1a2b40; margin: 0 0 0.25rem; }
-  .sec-sub { color: #8797a8; font-size: 0.85rem; margin: 0 0 1rem; }
-  .cat-cloud { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  /* 分组区块 */
+  .group-block { margin-bottom: 2.5rem; padding: 0 1rem; }
+  .group-head { margin-bottom: 1.25rem; }
+  .group-title { font-size: 1.3rem; color: #1a2b40; margin: 0 0 0.2rem; }
+  .group-sub { color: #8797a8; font-size: 0.86rem; margin: 0; }
+
+  /* 球队卡片 —— 与品牌卡区分：更沉稳的边框强调 */
+  .club-card { border-color: #dfe6f0; }
+  .club-card .bc-logo { background: #f7f9fc; }
+
+  .cat-cloud { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
   .cat-pill {
     display: inline-flex; align-items: center; gap: 0.4rem;
     background: #fff; border: 1px solid #e3eaf2; border-radius: 999px;
