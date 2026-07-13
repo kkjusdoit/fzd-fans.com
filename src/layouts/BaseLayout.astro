@@ -70,6 +70,168 @@ const pageDesc = description || t('site.subtitle');
     a { color: #1e88e5; text-decoration: none; }
     a:hover { text-decoration: underline; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+    /* 小程序推广弹窗 */
+    .promo-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+    .modal-card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 2.2rem 2rem 2rem;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      z-index: 10001;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+      border: 1px solid #bbdefb;
+    }
+    .promo-modal.active .modal-card {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #94a3b8;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+    .modal-close-btn:hover {
+      color: #475569;
+    }
+    .modal-header {
+      margin-bottom: 1.2rem;
+    }
+    .modal-badge {
+      background: #e3f2fd;
+      color: #1e88e5;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+      color: #1e88e5;
+      font-weight: bold;
+      margin: 0;
+    }
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+    .modal-warning-text {
+      background: #fff9db;
+      border: 1px solid #ffe3e3;
+      padding: 0.8rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #856404;
+      line-height: 1.5;
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+    .modal-warning-text strong {
+      color: #d9480f;
+    }
+    .modal-desc {
+      font-size: 0.9rem;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    .modal-qrcode-wrapper {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 1rem;
+      border-radius: 12px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .modal-qrcode-wrapper img {
+      width: 140px;
+      height: 140px;
+      display: block;
+      border-radius: 6px;
+    }
+    .qrcode-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .modal-features {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .modal-features span {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+    .modal-footer {
+      display: flex;
+      gap: 0.8rem;
+    }
+    .modal-footer button {
+      flex: 1;
+      padding: 0.7rem 0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .modal-footer .btn-primary {
+      background: #1e88e5;
+      color: #ffffff;
+    }
+    .modal-footer .btn-primary:hover {
+      background: #1565c0;
+    }
+    .modal-footer .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .modal-footer .btn-secondary:hover {
+      background: #e2e8f0;
+    }
   </style>
 </head>
 <body>
@@ -78,7 +240,87 @@ const pageDesc = description || t('site.subtitle');
     <slot />
   </main>
   <BirthdayAudio />
-    <BirthdayClickEffects />
-    <Footer />
+  <BirthdayClickEffects />
+  <Footer />
+
+  <!-- 小程序推荐弹窗 -->
+  <div class="promo-modal" id="promoModal" style="display: none;">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="关闭">&times;</button>
+      <div class="modal-header">
+        <span class="modal-badge">📱 体验升级推荐</span>
+        <h2>使用微信小程序获得最佳体验</h2>
+      </div>
+      <div class="modal-body">
+        <div class="modal-warning-text">
+          ⚠️ <strong>网络访问提示：</strong>由于本网页服务器部署于海外，受国内网络节点波动影响，部分地区可能会出现<strong>图片加载失败、访问卡顿或打不开</strong>的问题。
+        </div>
+        <p class="modal-desc">
+          为了获得更加稳定、秒级加载的访问速度，以及更完美的手机端交互排版，建议您体验官方微信小程序<strong>「樊星宇宙」</strong>。
+        </p>
+        <div class="modal-qrcode-wrapper">
+          <img src="/img/miniprogram-qrcode.jpg" alt="樊星宇宙微信小程序码" />
+          <span class="qrcode-label">微信扫码或长按识别</span>
+        </div>
+        <div class="modal-features">
+          <span>⚡ 国内加速节点</span>
+          <span>🎮 手机答题与小游戏</span>
+          <span>📖 战绩数据筛选</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="modalDismissBtn">我知道了</button>
+        <button class="btn-secondary" id="modalNeverShowTodayBtn">今日不再提示</button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function() {
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('promoModal');
+        const closeBtn = document.getElementById('modalCloseBtn');
+        const dismissBtn = document.getElementById('modalDismissBtn');
+        const neverShowBtn = document.getElementById('modalNeverShowTodayBtn');
+        const backdrop = document.getElementById('modalBackdrop');
+
+        if (!modal) return;
+
+        // Check if dismissed until date is in the future
+        const dismissedUntil = localStorage.getItem('fzd_promo_dismissed_until');
+        if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
+          return; // Don't show
+        }
+
+        // Show the modal with a small delay for better visual flow
+        setTimeout(function() {
+          modal.style.display = 'flex';
+          // Trigger transition
+          setTimeout(function() {
+            modal.classList.add('active');
+          }, 20);
+        }, 1500);
+
+        function closeModal() {
+          modal.classList.remove('active');
+          setTimeout(function() {
+            modal.style.display = 'none';
+          }, 300);
+        }
+
+        closeBtn?.addEventListener('click', closeModal);
+        dismissBtn?.addEventListener('click', closeModal);
+        backdrop?.addEventListener('click', closeModal);
+
+        neverShowBtn?.addEventListener('click', function() {
+          // Dismiss for 24 hours
+          const oneDay = 24 * 60 * 60 * 1000;
+          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + oneDay).toString());
+          closeModal();
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
