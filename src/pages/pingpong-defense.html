@@ -205,10 +205,10 @@ SAVE.cleared = SAVE.cleared || [];    // [levelIndex...]
 // ====================== 防御单位定义 ======================
 // unlockLevel: 从第几关开始可用(0 表示一开始就有)
 const DEFENDERS = {
-  server:  { name:'乒乓射手', emoji:'🌱', cost:100, hp:120, cd:0,   unlockLevel:0, kind:'shooter', interval:1.5, dmg:20, color:'#66bb6a', desc:'像豌豆射手一样连发乒乓球' },
+  server:  { name:'乒乓球拍', emoji:'🏓', cost:100, hp:120, cd:0,   unlockLevel:0, kind:'shooter', interval:1.5, dmg:20, color:'#fffde7', desc:'球拍弹击,连发乒乓球' },
   cabinet: { name:'向日葵',   emoji:'🌻', cost:50,  hp:100, cd:0,   unlockLevel:0, kind:'producer', interval:8, color:'#ffb300', desc:'定时产出阳光(冠军荣誉)' },
-  wall:    { name:'坚果墙',   emoji:'🥜', cost:50,  hp:420, cd:0,   unlockLevel:0, kind:'wall', color:'#8d6e63', desc:'高血量肉盾,替队友扛住噪音' },
-  loop:    { name:'弧圈竹笋', emoji:'🎍', cost:175, hp:120, cd:0,   unlockLevel:1, kind:'shooter', interval:1.5, dmg:20, pierce:true, color:'#43a047', desc:'正手弧圈,一发穿透整行' },
+  wall:    { name:'乒乓球桌', emoji:'', table:true, cost:50,  hp:420, cd:0,   unlockLevel:0, kind:'wall', color:'#1565c0', desc:'掀起球桌立成盾牌,扛住僵尸啃咬' },
+  loop:    { name:'发球机器人', emoji:'🤖', cost:175, hp:120, cd:0,   unlockLevel:1, kind:'shooter', interval:1.5, dmg:20, pierce:true, color:'#b0bec5', desc:'重旋弧圈球,一发穿透整行' },
   referee: { name:'寒冰裁判', emoji:'❄️', cost:150, hp:120, cd:0,   unlockLevel:2, kind:'shooter', interval:1.8, dmg:10, slow:true, color:'#4fc3f7', desc:'冰冻乒乓球减速僵尸' },
   smash:   { name:'樱桃爆冲', emoji:'🍒', cost:125, hp:1,   cd:0,   unlockLevel:2, kind:'bomb', dmg:1800, color:'#ef5350', desc:'一记爆冲扣杀,清空整行' },
 };
@@ -216,19 +216,35 @@ const DEF_ORDER = ['server','cabinet','wall','loop','referee','smash'];
 
 // ====================== 怪物定义(饭圈僵尸) ======================
 // acc: 头顶配饰,标识饭圈身份;本体统一画成蹒跚僵尸
+// dead: 死亡宣言(随机抽取)。风格混编:嘴硬破防式 / 饭圈黑话讽刺式 / 官方通报式 / 流量消散式
+// COMMON_DEAD 为全体僵尸共享的通用池,与各自专属池合并抽取
+const COMMON_DEAD = [
+  '你最棒!健康完赛!',
+  '我们被研究了…',
+  '我们被针对了…',
+  '不是实力问题,是剧本问题!',
+  '已被批评教育,罚款500',
+  '责令删除主页并公开道歉',
+  '该账号因发布不实信息已禁言',
+  '热度归零,词条沉底',
+  '掉粉 -10086',
+  '转评赞…清零了',
+  '超话解散,各回各家',
+  '打投群已就地解散',
+];
 const ENEMIES = {
   follower:   { name:'跟风僵尸',   emoji:'🧟', acc:'',    hp:110,  speed:14, dmg:18, color:'#90a4ae',
-                dead:['哦…原来输球就是输球啊','我好像…不该跟着骂'] },
+                dead:['哦…原来输球就是输球啊','大家骂我才跟着骂的…','原来我根本没看过比赛','取关了取关了','跟错风了,撤!'] },
   troll:      { name:'水军僵尸',   emoji:'🧟', acc:'💬',  hp:55,   speed:24, dmg:14, color:'#7e57c2',
-                dead:['复制粘贴…失败','水军也是要下班的'] },
+                dead:['复制粘贴…失败','群主!工资结一下!','水军也是要下班的','5毛到账,人没了','控评失败,撤退!','对不起,我是兼职的'] },
   blamer:     { name:'甩锅僵尸',   emoji:'🧟', acc:'🍳',  hp:170,  speed:15, dmg:22, color:'#ff7043',
-                dead:['这锅…甩不出去了','明明是我不会打'] },
+                dead:['这锅…甩不出去了','输了?一定是球台的问题!','都怪灯光!都怪地胶!','明明是我不会打','这球拍,早有预谋!','锅太重,压死我了'] },
   conspiracy: { name:'阴谋论僵尸', emoji:'🧟', acc:'🕵️', hp:130,  speed:14, dmg:12, ranged:true, color:'#455a64',
-                dead:['断拍…也许真是意外?','证据呢?我也没有'] },
+                dead:['断拍…也许真是意外?','小作文…还没写完…','证据呢?我也没有','真相是——啊!','连夜编的剧本,白编了','惊天大瓜,烂在肚子里了'] },
   coach:      { name:'云教练僵尸', emoji:'🧟', acc:'📋',  hp:340,  speed:11, dmg:20, armor:.5, aura:true, color:'#546e7a',
-                dead:['健康…完赛就好?','原来我根本不懂球'] },
+                dead:['健康…完赛就好?','这球要是我来打…','战术板上都写了,你们不听!','原来我根本不懂球','纸上谈兵,兵败了','云指导下线,记得三连'] },
   patron:     { name:'榜一僵尸',   emoji:'🧟', acc:'👑',  hp:240,  speed:12, dmg:18, heal:true, color:'#ec407a',
-                dead:['我的哥哥…不需要我打投','原来他只想好好打球'] },
+                dead:['我的哥哥…不需要我打投','原来他只想好好打球','打钱…打不动了','榜一的位置,让给理智','集资款…原路退回','应援色,褪色了'] },
   boss:       { name:'饭圈僵尸王', emoji:'🧟', acc:'📢',  hp:3200, speed:8,  dmg:40, boss:true, armor:.25, color:'#c62828',
                 dead:['体育…原来本该是这样的啊'] },
 };
@@ -240,9 +256,9 @@ const LEVELS = [
   {
     name: '第一关 · 赛后评论区',
     dialogTitle: '赛后评论区',
-    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>金牌</b>收集阳光——含金量越高阳光越多,抽到<b>奥运单打金牌</b>直接 +800!<br>种下<b>乒乓射手</b>和<b>向日葵</b>,先守住这一关。',
+    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>金牌</b>收集阳光——含金量越高阳光越多,抽到<b>奥运单打金牌</b>直接 +800!<br>种下<b>乒乓球拍</b>和<b>向日葵</b>,先守住这一关。',
     startHonor: 150,
-    unlockText: '解锁新植物:🎍 弧圈竹笋(一发穿透整行)',
+    unlockText: '解锁新装备:🤖 发球机器人(一发穿透整行)',
     waves: [
       { at: 4,  spawns: grp('follower',2) },
       { at: 16, spawns: grp('follower',3) },
@@ -253,7 +269,7 @@ const LEVELS = [
   {
     name: '第二关 · 热搜风暴',
     dialogTitle: '热搜风暴',
-    dialog: '"去德国打球=输送技术","双杀队友=偷着研究"……<br><b>甩锅僵尸</b>、<b>阴谋论僵尸</b>、<b>云教练僵尸</b>带着编好的剧本啃进了草坪。<br>阴谋论僵尸会<b>远程</b>砸问号,云教练僵尸会<b>拖慢</b>你的植物——用<b>弧圈竹笋</b>和<b>寒冰裁判</b>回敬它们。',
+    dialog: '"去德国打球=输送技术","双杀队友=偷着研究"……<br><b>甩锅僵尸</b>、<b>阴谋论僵尸</b>、<b>云教练僵尸</b>带着编好的剧本啃进了草坪。<br>阴谋论僵尸会<b>远程</b>砸问号,云教练僵尸会<b>拖慢</b>你的植物——用<b>发球机器人</b>和<b>寒冰裁判</b>回敬它们。',
     startHonor: 175,
     unlockText: '解锁新植物:❄️ 寒冰裁判(冰冻减速) & 🍒 樱桃爆冲(清行)',
     waves: [
@@ -560,7 +576,9 @@ function update(dt) {
   const before = enemies.length;
   enemies = enemies.filter(e => {
     if (e.hp <= 0) {
-      addFloat(e.x, cellCenterY(e.row) - 18, '「' + pick(e.def.dead) + '」', e.def.color, e.def.boss ? 22 : 14);
+      // Boss 只用专属宣言;小怪 6:4 混抽专属池与通用池
+      const pool = e.def.boss ? e.def.dead : (Math.random() < 0.6 ? e.def.dead : COMMON_DEAD);
+      addFloat(e.x, cellCenterY(e.row) - 18, '「' + pick(pool) + '」', e.def.color, e.def.boss ? 22 : 14);
       return false;
     }
     return true;
@@ -694,7 +712,11 @@ function drawTopBar() {
     ctx.strokeStyle = selectedCard === key ? '#fff' : 'rgba(255,255,255,.25)'; ctx.lineWidth = selectedCard === key ? 3 : 1; ctx.stroke();
     ctx.globalAlpha = afford ? 1 : 0.55;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = '24px serif'; ctx.fillStyle = '#fff'; ctx.fillText(def.emoji, cx + 22, cardY + 26);
+    if (def.table) {
+      drawTable(cx + 22, cardY + 28, 28, 24, null);
+    } else {
+      ctx.font = '24px serif'; ctx.fillStyle = '#fff'; ctx.fillText(def.emoji, cx + 22, cardY + 26);
+    }
     ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
     ctx.fillText(def.name, cx + 40, cardY + 20);
     ctx.font = 'bold 13px sans-serif'; ctx.fillStyle = '#ffe082';
@@ -707,14 +729,44 @@ function drawPlacementHint() {
   // 需要鼠标位置;简单起见高亮所有空格边框
 }
 
+// 立起来的乒乓球桌(肉盾造型):蓝色桌面+白色边线/中线+桌腿
+function drawTable(x, y, w, h, hpRatio) {
+  ctx.save();
+  ctx.translate(x, y);
+  // 桌腿
+  ctx.fillStyle = '#37474f';
+  ctx.fillRect(-w * 0.32, h * 0.32, w * 0.12, h * 0.2);
+  ctx.fillRect(w * 0.2, h * 0.32, w * 0.12, h * 0.2);
+  // 桌面(受损越重颜色越暗)
+  const shade = hpRatio == null ? 1 : (0.55 + 0.45 * hpRatio);
+  ctx.fillStyle = 'rgb(' + Math.round(21 * shade + 20) + ',' + Math.round(101 * shade + 20) + ',' + Math.round(192 * shade + 20) + ')';
+  roundRect(-w / 2, -h / 2, w, h * 0.84, 4); ctx.fill();
+  // 白色边线 + 中线
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1.5, w * 0.03);
+  roundRect(-w / 2 + 2, -h / 2 + 2, w - 4, h * 0.84 - 4, 3); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, -h / 2 + 2); ctx.lineTo(0, -h / 2 + h * 0.84 - 2); ctx.stroke();
+  // 裂纹(残血时)
+  if (hpRatio != null && hpRatio < 0.45) {
+    ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-w * 0.3, -h * 0.3); ctx.lineTo(-w * 0.05, 0); ctx.lineTo(-w * 0.25, h * 0.25); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(w * 0.25, -h * 0.2); ctx.lineTo(w * 0.1, h * 0.1); ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawDefender(d) {
   const x = d.x, y = d.y;
-  // 身体底座
-  ctx.fillStyle = d.def.color; ctx.globalAlpha = 0.9;
-  roundRect(x - CELL_W / 2 + 8, y - CELL_H / 2 + 8, CELL_W - 16, CELL_H - 16, 10); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.font = Math.floor(CELL_H * 0.42) + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(d.def.emoji, x, y - 2);
+  if (d.def.table) {
+    // 乒乓球桌肉盾:不画底座,直接画立起来的球桌
+    drawTable(x, y, CELL_W * 0.74, CELL_H * 0.7, d.hp / d.maxHp);
+  } else {
+    // 身体底座
+    ctx.fillStyle = d.def.color; ctx.globalAlpha = 0.9;
+    roundRect(x - CELL_W / 2 + 8, y - CELL_H / 2 + 8, CELL_W - 16, CELL_H - 16, 10); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.font = Math.floor(CELL_H * 0.42) + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(d.def.emoji, x, y - 2);
+  }
   // 血条
   if (d.hp < d.maxHp) {
     const w = CELL_W - 24, hp = Math.max(0, d.hp / d.maxHp);
@@ -783,10 +835,6 @@ function drawMedal(m) {
   }
   ctx.font = [20, 24, 30][tier] + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('🥇', 0, 0);
-  // 分值
-  ctx.font = 'bold ' + [10, 11, 13][tier] + 'px sans-serif';
-  ctx.fillStyle = '#5d4037';
-  ctx.fillText('+' + m.medal.v, 0, R * 0.62);
   ctx.restore();
 }
 
