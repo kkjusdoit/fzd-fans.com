@@ -89,7 +89,8 @@
         <b>饭圈,像僵尸一样涌来了。</b><br>
         甩锅僵尸、阴谋论僵尸、控评水军僵尸……<br>
         它们嘴里念着"健康完赛""研究队友""输送技术"。<br>
-        种下植物,收集<b>阳光</b>(每一缕都是真实的冠军荣誉),守住草坪。
+        种下植物,点击收集<b>金牌</b>——那都是他真实拿过的冠军。<br>
+        金牌含金量越高,阳光越多:<b>奥运单打 +800</b>,团体 +100,巡回赛 +25。
       </div>
       <button class="btn" id="btn-start">进入战役</button>
     </div>
@@ -145,44 +146,51 @@ const CELL_W = BOARD_W / COLS;
 const CELL_H = BOARD_H / ROWS;
 const HOME_X = BOARD_X;                     // 越过此线即被清台机拦截 / 失败
 
-// 荣誉勋章:收集时随机抽取一项真实冠军头衔飘字(加权:奥运金牌优先,其次世乒赛/世界杯/大满贯单打,再次其他冠军)
-// w = 抽取权重
+// ====================== 金牌池(肉鸽抽取) ======================
+// 每一缕阳光都是一枚真实金牌:v = 阳光分值(按含金量),w = 抽中概率权重(越大越常见)
+// 分值梯度:奥运单打800 > 世乒赛单打400 > 世界杯/大满贯单打150-200 > 奥运/世乒赛团体80-100 > 巡回赛/其他25-50
 const MEDAL_POOL = [
-  // ① 奥运(最高优先)
-  { t:'2024 巴黎奥运会男单金牌', w:10 },
-  { t:'2024 巴黎奥运会男团金牌', w:8 },
-  { t:'2021 东京奥运会男团金牌', w:8 },
-  // ② 世乒赛/世锦赛单打
-  { t:'2022 成都世乒赛男团冠军', w:5 },
-  { t:'2021 休斯敦世乒赛男单冠军', w:6 },
-  { t:'2023 德班世乒赛男单冠军', w:6 },
-  // ③ 世界杯/大满贯单打
-  { t:'2016 男乒世界杯冠军', w:4 },
-  { t:'2018 男乒世界杯冠军', w:4 },
-  { t:'2019 男乒世界杯冠军', w:4 },
-  { t:'2020 男乒世界杯冠军', w:4 },
-  { t:'2021 WTT世界杯决赛冠军', w:4 },
-  { t:'2022 WTT新加坡大满贯冠军', w:4 },
-  { t:'2023 WTT新加坡大满贯冠军', w:4 },
-  // ④ 其他冠军/荣誉
-  { t:'2025 全运会男单冠军', w:2 },
-  { t:'全运会6金', w:2 },
-  { t:'德甲三连冠', w:2 },
-  { t:'全锦赛男单第一人', w:2 },
-  { t:'2017 亚锦赛男单冠军', w:1 },
-  { t:'2018 雅加达亚运会男团冠军', w:1 },
-  { t:'2016 国际乒联总决赛冠军', w:1 },
-  { t:'2018 国际乒联总决赛冠军', w:1 },
-  { t:'2023 WTT新乡冠军赛冠军', w:1 },
-  { t:'超级全满贯', w:2 },
+  // ★★★ 至高荣誉(极稀有,一枚起飞)
+  { t:'2024 巴黎奥运会男单金牌', v:800, w:1 },
+  { t:'2021 休斯敦世乒赛男单冠军', v:400, w:2 },
+  { t:'2023 德班世乒赛男单冠军', v:400, w:2 },
+  // ★★ 世界杯/大满贯单打(稀有)
+  { t:'2016 男乒世界杯冠军', v:200, w:3 },
+  { t:'2018 男乒世界杯冠军', v:200, w:3 },
+  { t:'2019 男乒世界杯冠军', v:200, w:3 },
+  { t:'2020 男乒世界杯冠军', v:200, w:3 },
+  { t:'2021 WTT世界杯决赛冠军', v:200, w:3 },
+  { t:'2022 WTT新加坡大满贯冠军', v:150, w:4 },
+  { t:'2023 WTT新加坡大满贯冠军', v:150, w:4 },
+  { t:'2016 国际乒联总决赛冠军', v:150, w:4 },
+  { t:'2018 国际乒联总决赛冠军', v:150, w:4 },
+  // ★ 团体/全运/亚运(小惊喜)
+  { t:'2024 巴黎奥运会男团金牌', v:100, w:6 },
+  { t:'2021 东京奥运会男团金牌', v:100, w:6 },
+  { t:'2022 成都世乒赛男团冠军', v:80,  w:6 },
+  { t:'2018 世乒赛团体冠军', v:80, w:6 },
+  { t:'2025 全运会男单冠军', v:100, w:5 },
+  { t:'2021 全运会男单冠军', v:100, w:5 },
+  { t:'2018 雅加达亚运会男团冠军', v:80, w:5 },
+  { t:'2017 亚锦赛男单冠军', v:80, w:5 },
+  // 常规冠军(常见,基础阳光)
+  { t:'2023 WTT新乡冠军赛冠军', v:50, w:10 },
+  { t:'2020 全国锦标赛男单冠军', v:50, w:10 },
+  { t:'德甲联赛冠军', v:50, w:10 },
+  { t:'2019 卡塔尔公开赛男单冠军', v:25, w:14 },
+  { t:'2018 中国公开赛男单冠军', v:25, w:14 },
+  { t:'2017 澳大利亚公开赛冠军', v:25, w:14 },
+  { t:'2016 波兰公开赛冠军', v:25, w:14 },
+  { t:'2015 科威特公开赛冠军', v:25, w:14 },
+  { t:'2013 全运会男团冠军', v:25, w:14 },
+  { t:'乒超联赛冠军', v:25, w:14 },
 ];
 const MEDAL_TOTAL_W = MEDAL_POOL.reduce((s, m) => s + m.w, 0);
-function pickMedalLabel() {
+function pickMedal() {
   let r = Math.random() * MEDAL_TOTAL_W;
-  for (const m of MEDAL_POOL) { r -= m.w; if (r <= 0) return m.t; }
-  return MEDAL_POOL[0].t;
+  for (const m of MEDAL_POOL) { r -= m.w; if (r <= 0) return m; }
+  return MEDAL_POOL[MEDAL_POOL.length - 1];
 }
-const MEDAL_VALUE = 25;
 
 // ====================== 存档 ======================
 const SAVE_KEY = 'fzd_td_progress';
@@ -232,7 +240,7 @@ const LEVELS = [
   {
     name: '第一关 · 赛后评论区',
     dialogTitle: '赛后评论区',
-    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>阳光</b>收集冠军荣誉,种下<b>乒乓射手</b>和<b>向日葵</b>——先守住这一关。',
+    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>金牌</b>收集阳光——含金量越高阳光越多,抽到<b>奥运单打金牌</b>直接 +800!<br>种下<b>乒乓射手</b>和<b>向日葵</b>,先守住这一关。',
     startHonor: 150,
     unlockText: '解锁新植物:🎍 弧圈竹笋(一发穿透整行)',
     waves: [
@@ -285,7 +293,7 @@ let defenders = [];   // {type,row,col,x,y,hp,maxHp,fireT,def}
 let enemies = [];     // {type,row,x,hp,maxHp,speed,def,slowT,eaten(target),atkT,summonT,healT,phase}
 let bullets = [];     // 我方子弹 {x,y,row,dmg,pierce,slow,hit:Set,vx}
 let hostiles = [];    // 敌方投射物 {x,y,row,dmg,vx}
-let medals = [];      // {x,y,vy,label,collected,landT}
+let medals = [];      // {x,y,vy,landY,life,medal:{t,v,w}}
 let floats = [];      // 飘字 {x,y,text,color,t,vy,size}
 let mowers = [];      // 清台机 {row,used,x,active}
 let selectedCard = null;
@@ -334,12 +342,14 @@ function canvasPoint(evt) {
 
 function handleTap(px, py) {
   if (state !== 'playing') return;
-  // 1) 优先收集勋章
+  // 1) 优先收集金牌(点击半径放宽,移动端更好点)
   for (let i = medals.length - 1; i >= 0; i--) {
     const m = medals[i];
-    if (Math.hypot(px - m.x, py - m.y) < 34) {
-      honor += MEDAL_VALUE;
-      addFloat(m.x, m.y - 10, '☀️ ' + m.label + ' +' + MEDAL_VALUE, '#ffd54f', 15);
+    if (Math.hypot(px - m.x, py - m.y) < 46) {
+      honor += m.medal.v;
+      const big = m.medal.v >= 150;
+      addFloat(m.x, m.y - 10, '🥇 ' + m.medal.t + ' +' + m.medal.v, big ? '#ffab00' : '#ffd54f', big ? 20 : 15);
+      if (m.medal.v >= 400) addBanner('🏆 ' + m.medal.t + '!阳光 +' + m.medal.v);
       medals.splice(i, 1);
       return;
     }
@@ -424,7 +434,7 @@ function update(dt) {
   // 勋章自然掉落
   medalDropT -= dt;
   if (medalDropT <= 0) {
-    medalDropT = rand(7, 11);
+    medalDropT = rand(5, 8);
     dropMedal(rand(BOARD_X + 40, BOARD_X + BOARD_W - 40), -20, rand(BOARD_Y + 40, BOARD_Y + BOARD_H - 40));
   }
   for (const m of medals) {
@@ -569,7 +579,7 @@ function update(dt) {
 }
 
 function dropMedal(x, startY, landY) {
-  medals.push({ x, y: startY, landY, vy: 130, life: 9, label: pickMedalLabel() });
+  medals.push({ x, y: startY, landY, vy: 130, life: 10, medal: pickMedal() });
 }
 
 // ====================== 结算 ======================
@@ -666,7 +676,7 @@ function drawTopBar() {
   ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = '#ffd54f';
   ctx.fillText('☀️ ' + Math.floor(honor), 18, 32);
   ctx.font = '12px sans-serif'; ctx.fillStyle = '#ffe0b2';
-  ctx.fillText('阳光·荣誉', 20, 58);
+  ctx.fillText('阳光(金牌)', 20, 58);
   // 关卡名 + 进度
   ctx.textAlign = 'right'; ctx.font = 'bold 15px sans-serif'; ctx.fillStyle = '#fff3e0';
   ctx.fillText(level ? level.name : '', W - 16, 24);
@@ -749,28 +759,34 @@ function drawEnemy(e) {
 }
 
 function drawMedal(m) {
-  // 经典 PvZ 阳光造型:金色光球 + 光芒,中间是冠军勋章
+  // 经典 PvZ 阳光造型:金色光球+光芒,中心是金牌;含金量越高,阳光越大越金
+  const tier = m.medal.v >= 400 ? 2 : (m.medal.v >= 100 ? 1 : 0);
+  const R = [22, 28, 36][tier];
   ctx.save();
   ctx.translate(m.x, m.y);
   const pulse = 1 + Math.sin(m.life * 5) * 0.06;
   ctx.scale(pulse, pulse);
-  const g = ctx.createRadialGradient(0, 0, 4, 0, 0, 24);
-  g.addColorStop(0, 'rgba(255,241,118,.95)');
-  g.addColorStop(0.7, 'rgba(255,213,79,.75)');
+  const g = ctx.createRadialGradient(0, 0, 4, 0, 0, R);
+  g.addColorStop(0, tier === 2 ? 'rgba(255,213,0,.98)' : 'rgba(255,241,118,.95)');
+  g.addColorStop(0.7, tier === 2 ? 'rgba(255,171,0,.85)' : 'rgba(255,213,79,.75)');
   g.addColorStop(1, 'rgba(255,213,79,0)');
   ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fill();
   // 光芒
-  ctx.strokeStyle = 'rgba(255,224,130,.8)'; ctx.lineWidth = 2;
+  ctx.strokeStyle = tier === 2 ? 'rgba(255,196,0,.95)' : 'rgba(255,224,130,.8)'; ctx.lineWidth = tier === 2 ? 3 : 2;
   for (let i = 0; i < 8; i++) {
     const a = i * Math.PI / 4 + m.life;
     ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * 18, Math.sin(a) * 18);
-    ctx.lineTo(Math.cos(a) * 25, Math.sin(a) * 25);
+    ctx.moveTo(Math.cos(a) * (R - 6), Math.sin(a) * (R - 6));
+    ctx.lineTo(Math.cos(a) * (R + 2), Math.sin(a) * (R + 2));
     ctx.stroke();
   }
-  ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('🏅', 0, 0);
+  ctx.font = [20, 24, 30][tier] + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🥇', 0, 0);
+  // 分值
+  ctx.font = 'bold ' + [10, 11, 13][tier] + 'px sans-serif';
+  ctx.fillStyle = '#5d4037';
+  ctx.fillText('+' + m.medal.v, 0, R * 0.62);
   ctx.restore();
 }
 
