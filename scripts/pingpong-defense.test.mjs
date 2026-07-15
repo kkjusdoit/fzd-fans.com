@@ -141,6 +141,7 @@ function createContext() {
         defenders = []; enemies = []; bullets = []; hostiles = []; medals = []; floats = [];
         selectedCard = null; cardCooldowns = {}; banner = null; killQuoteCd = 0;
       },
+      finishAllWaves() { level.waves = [{ at: 0, spawns: [] }]; waveIdx = 1; elapsed = 5; },
     };
   })();`);
   vm.runInNewContext(script, sandbox, { filename: GAME_FILE.pathname });
@@ -180,10 +181,10 @@ test('healing affects living targets but never revives a dead enemy', () => {
   const { game } = createContext();
   game.startLevel(2);
   game.isolateWorld();
-  const patron = entityFrom(game.ENEMIES.patron, { type: 'patron', x: 500, healT: 0 });
+  const dataZombie = entityFrom(game.ENEMIES.data, { type: 'data', x: 500, healT: 0 });
   const dead = entityFrom(game.ENEMIES.troll, { type: 'troll', x: 510, hp: 0 });
   const wounded = entityFrom(game.ENEMIES.troll, { type: 'troll', x: 520, hp: 20 });
-  game.enemies = [patron, dead, wounded];
+  game.enemies = [dataZombie, dead, wounded];
 
   game.update(1 / 60);
 
@@ -192,6 +193,10 @@ test('healing affects living targets but never revives a dead enemy', () => {
 });
 
 test('one mower clears simultaneous breaches and a full-health boss', async t => {
+  const sweepUntilClear = game => {
+    for (let i = 0; i < 300 && game.enemies.length; i++) game.update(1 / 60);
+  };
+
   await t.test('two enemies in one lane do not cause a false loss', () => {
     const { game } = createContext();
     game.startLevel(0);
@@ -202,8 +207,10 @@ test('one mower clears simultaneous breaches and a full-health boss', async t =>
     ];
     game.update(1 / 60);
     assert.equal(game.state, 'playing');
-    assert.equal(game.enemies.length, 0);
     assert.equal(game.mowers[0].used, true);
+    sweepUntilClear(game);
+    assert.equal(game.state, 'playing');
+    assert.equal(game.enemies.length, 0);
   });
 
   await t.test('boss is cleared in one sweep', () => {
@@ -211,7 +218,7 @@ test('one mower clears simultaneous breaches and a full-health boss', async t =>
     game.startLevel(2);
     game.isolateWorld();
     game.enemies = [entityFrom(game.ENEMIES.boss, { type: 'boss', x: game.HOME_X + 5 })];
-    game.update(1 / 60);
+    sweepUntilClear(game);
     assert.equal(game.state, 'playing');
     assert.equal(game.enemies.length, 0);
   });
@@ -226,6 +233,23 @@ test('one mower clears simultaneous breaches and a full-health boss', async t =>
     game.update(1 / 60);
     assert.equal(game.state, 'lost');
   });
+});
+
+test('victory waits until an active mower finishes its sweep', () => {
+  const { game } = createContext();
+  game.startLevel(0);
+  game.isolateWorld();
+  game.finishAllWaves();
+  game.enemies = [entityFrom(game.ENEMIES.follower, { x: game.HOME_X + 5 })];
+
+  for (let i = 0; i < 120 && game.enemies.length; i++) game.update(1 / 60);
+  assert.equal(game.enemies.length, 0);
+  assert.equal(game.mowers[0].active, true, 'mower should still be sweeping after the kill');
+  assert.equal(game.state, 'playing', 'result panel must not appear mid-sweep');
+
+  for (let i = 0; i < 400 && game.state === 'playing'; i++) game.update(1 / 60);
+  assert.equal(game.mowers[0].active, false);
+  assert.equal(game.state, 'won');
 });
 
 test('the second level exposes the referee requested by its tutorial', () => {

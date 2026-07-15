@@ -22,7 +22,7 @@ plain white background (for easy cutout), no text, 1024x1024
 | plant-table.png | canvas 自绘球桌 | An upright blue table-tennis table standing vertically like a shield wall, white boundary lines and center line, sturdy metal legs braced against the ground, cartoon dents and scratches showing battle damage |
 | plant-robot.png | 🤖 | A cute retro serving-machine robot on wheels, funnel-shaped ball launcher head loaded with ping-pong balls, spiral spin effect at the muzzle suggesting piercing topspin shots |
 | plant-referee.png | ❄️ | An ice-blue referee character shaped like a frosty snow plant, wearing a referee cap and whistle, holding up a small yellow card, frost particles around |
-| plant-cherry.png | 🍒 | Twin cherry bomb characters with mischievous grinning faces, fuses lit with tiny sparks, one cherry winding up like smashing a ping-pong ball |
+| plant-balloon.png | 🎈 | A whimsical red hot-air balloon weapon with a small wicker basket, a lit fuse and tiny sparks around the balloon, descending toward the battlefield moments before exploding, playful and energetic rather than dangerous |
 
 ## 二、僵尸(饭圈怪)7 张
 
@@ -33,9 +33,9 @@ plain white background (for easy cutout), no text, 1024x1024
 | zombie-follower.png | 🧟 | plain zombie scrolling its phone blankly, question marks floating above head |
 | zombie-troll.png | 🧟💬 | zombie with multiple chat-bubble stickers stuck all over its body, typing on two phones at once |
 | zombie-blamer.png | 🧟🍳 | zombie carrying a huge black cooking pot on its back, pointing finger sideways at someone else |
-| zombie-conspiracy.png | 🧟🕵️ | zombie in a detective trench coat and magnifying glass, surrounded by floating question marks, holding a scroll of scribbled "evidence" |
-| zombie-coach.png | 🧟📋 | zombie wearing a whistle and holding a tactics clipboard covered in nonsense doodles, pretending to be a coach |
-| zombie-patron.png | 🧟👑 | zombie wearing a golden crown and luxury scarf, throwing paper money into the air, smartphone showing a ranking list |
+| zombie-conspiracy.png | 🧟🕵️ | zombie in a detective trench coat, surrounded by floating conspiracy notes, holding a small throwing axe ready to hurl |
+| zombie-shield.png | 🧟🛡️ | heavily armored zombie holding an oversized metal shield covered with muted chat bubbles, blocking attacks while projecting a suppressive control aura |
+| zombie-data.png | 🧟📈 | zombie operating several smartphones at once, surrounded by artificial rising data charts and fake engagement counters, teal tech accessories, acting as a support unit that restores nearby zombies |
 | zombie-boss.png | 🧟📢 | giant boss zombie holding a huge megaphone, wearing a cape made of trending-topic banners, crowd of tiny phone screens floating around it, imposing but comical |
 
 ## 三、道具/特效 5 张
@@ -45,7 +45,7 @@ plain white background (for easy cutout), no text, 1024x1024
 | sun-medal.png | 🥇+canvas 光晕 | A glowing golden sun with a gold championship medal embedded in its center, radiating warm rays, sparkling |
 | ball-normal.png | canvas 圆 | A white ping-pong ball with motion blur streak, cartoon style |
 | ball-ice.png | canvas 圆 | An ice-crystal coated ping-pong ball trailing frost particles |
-| ball-question.png | ❓ | A dark purple question-mark projectile with ominous smoke trail (enemy attack) |
+| weapon-axe.png | 🪓 | A small cartoon throwing axe spinning rapidly in flight, exaggerated motion streaks, comical enemy projectile |
 | lawnmower.png | 🚜 | A small red vintage lawnmower with cartoon eyes, ready to charge |
 
 ## 四、可选场景 2 张
