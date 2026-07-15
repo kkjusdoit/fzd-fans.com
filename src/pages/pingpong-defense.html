@@ -90,7 +90,7 @@
         甩锅僵尸、阴谋论僵尸、控评水军僵尸……<br>
         它们嘴里念着"健康完赛""研究队友""输送技术"。<br>
         种下植物,点击收集<b>金牌</b>——那都是他真实拿过的冠军。<br>
-        金牌含金量越高,阳光越多:<b>奥运单打 +800</b>,团体 +100,巡回赛 +25。
+        金牌含金量越高,荣誉值越多:<b>奥运单打 +800</b>,团体 +100,巡回赛 +25。
       </div>
       <button class="btn" id="btn-start">进入战役</button>
     </div>
@@ -206,7 +206,7 @@ SAVE.cleared = SAVE.cleared || [];    // [levelIndex...]
 // unlockLevel: 从第几关开始可用(0 表示一开始就有)
 const DEFENDERS = {
   server:  { name:'乒乓球拍', emoji:'🏓', cost:100, hp:120, cd:0,   unlockLevel:0, kind:'shooter', interval:1.5, dmg:20, color:'#fffde7', desc:'球拍弹击,连发乒乓球' },
-  cabinet: { name:'向日葵',   emoji:'🌻', cost:50,  hp:100, cd:0,   unlockLevel:0, kind:'producer', interval:8, color:'#ffb300', desc:'定时产出阳光(冠军荣誉)' },
+  cabinet: { name:'向日葵',   emoji:'🌻', cost:50,  hp:100, cd:0,   unlockLevel:0, kind:'producer', interval:8, color:'#ffb300', desc:'定时产出金牌(荣誉值)' },
   wall:    { name:'乒乓球桌', emoji:'', table:true, cost:50,  hp:420, cd:0,   unlockLevel:0, kind:'wall', color:'#1565c0', desc:'掀起球桌立成盾牌,扛住僵尸啃咬' },
   loop:    { name:'发球机器人', emoji:'🤖', cost:175, hp:120, cd:0,   unlockLevel:1, kind:'shooter', interval:1.5, dmg:20, pierce:true, color:'#b0bec5', desc:'重旋弧圈球,一发穿透整行' },
   referee: { name:'寒冰裁判', emoji:'❄️', cost:150, hp:120, cd:0,   unlockLevel:2, kind:'shooter', interval:1.8, dmg:10, slow:true, color:'#4fc3f7', desc:'冰冻乒乓球减速僵尸' },
@@ -256,7 +256,7 @@ const LEVELS = [
   {
     name: '第一关 · 赛后评论区',
     dialogTitle: '赛后评论区',
-    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>金牌</b>收集阳光——含金量越高阳光越多,抽到<b>奥运单打金牌</b>直接 +800!<br>种下<b>乒乓球拍</b>和<b>向日葵</b>,先守住这一关。',
+    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风僵尸</b>和<b>水军僵尸</b>顺着热搜爬上了草坪。<br>点击掉落的<b>金牌</b>积累荣誉值——含金量越高荣誉值越多,抽到<b>奥运单打金牌</b>直接 +800!<br>种下<b>乒乓球拍</b>和<b>向日葵</b>,先守住这一关。',
     startHonor: 150,
     unlockText: '解锁新装备:🤖 发球机器人(一发穿透整行)',
     waves: [
@@ -364,8 +364,8 @@ function handleTap(px, py) {
     if (Math.hypot(px - m.x, py - m.y) < 46) {
       honor += m.medal.v;
       const big = m.medal.v >= 150;
-      addFloat(m.x, m.y - 10, '🥇 ' + m.medal.t + ' +' + m.medal.v, big ? '#ffab00' : '#ffd54f', big ? 20 : 15);
-      if (m.medal.v >= 400) addBanner('🏆 ' + m.medal.t + '!阳光 +' + m.medal.v);
+      addFloat(m.x, m.y - 10, '🏆 夺冠!' + m.medal.t + ' +' + m.medal.v, big ? '#ffab00' : '#ffd54f', big ? 20 : 15);
+      if (m.medal.v >= 400) addBanner('🏆 生涯高光时刻!' + m.medal.t + ' +' + m.medal.v);
       medals.splice(i, 1);
       return;
     }
@@ -379,7 +379,7 @@ function handleTap(px, py) {
       if (px >= cx && px <= cx + cardW) {
         const key = cards[i];
         if (honor >= DEFENDERS[key].cost) selectedCard = (selectedCard === key ? null : key);
-        else addFloat(cx + cardW / 2, 84, '阳光不足', '#ff8a80', 14);
+        else addFloat(cx + cardW / 2, 84, '荣誉值不足', '#ff8a80', 14);
         return;
       }
     }
@@ -666,14 +666,17 @@ function draw() {
   for (const e of enemies) drawEnemy(e);
   // 勋章
   for (const m of medals) drawMedal(m);
-  // 飘字
+  // 飘字(按文字实际宽度夹在画布内,不飘出屏幕)
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const f of floats) {
     ctx.globalAlpha = Math.min(1, f.t);
     ctx.font = 'bold ' + f.size + 'px sans-serif';
+    const tw = ctx.measureText(f.text).width;
+    const fx = Math.max(tw / 2 + 8, Math.min(W - tw / 2 - 8, f.x));
+    const fy = Math.max(f.size + 6, Math.min(H - 10, f.y));
     ctx.fillStyle = f.color;
     ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 3;
-    ctx.strokeText(f.text, f.x, f.y); ctx.fillText(f.text, f.x, f.y);
+    ctx.strokeText(f.text, fx, fy); ctx.fillText(f.text, fx, fy);
   }
   ctx.globalAlpha = 1;
   // 横幅
@@ -694,7 +697,7 @@ function drawTopBar() {
   ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = '#ffd54f';
   ctx.fillText('☀️ ' + Math.floor(honor), 18, 32);
   ctx.font = '12px sans-serif'; ctx.fillStyle = '#ffe0b2';
-  ctx.fillText('阳光(金牌)', 20, 58);
+  ctx.fillText('荣誉值', 20, 58);
   // 关卡名 + 进度
   ctx.textAlign = 'right'; ctx.font = 'bold 15px sans-serif'; ctx.fillStyle = '#fff3e0';
   ctx.fillText(level ? level.name : '', W - 16, 24);
