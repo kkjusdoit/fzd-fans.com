@@ -30,8 +30,9 @@
   .overlay {
     position: absolute; inset: 0; z-index: 40; display: none;
     flex-direction: column; justify-content: center; align-items: center;
-    padding: 24px; text-align: center; color: #fff;
+    padding: 20px; text-align: center; color: #fff;
     background: rgba(15, 40, 12, .84); backdrop-filter: blur(4px);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
   }
   .overlay.show { display: flex; }
   .panel {
@@ -71,6 +72,19 @@
   .rotate-hint .ico { font-size: 60px; animation: rot 2s ease-in-out infinite; }
   @keyframes rot { 0%,100% { transform: rotate(0); } 50% { transform: rotate(90deg); } }
   @media (max-aspect-ratio: 1/1) { .rotate-hint.on { display: flex; } }
+  /* 矮视口(横屏手机):压缩排版,确保按钮首屏可见;仍保留滚动兜底。放在末尾以覆盖前面同名规则 */
+  @media (max-height: 520px) {
+    .overlay { justify-content: flex-start; padding: 8px; }
+    .panel { padding: 10px 16px; }
+    .title { font-size: clamp(18px, 5vh, 28px); letter-spacing: 1px; margin: 0 0 2px; }
+    .subtitle { font-size: 12px; margin: 0 0 5px; }
+    .story { font-size: clamp(11px, 2.5vh, 13px); line-height: 1.35; margin: 3px 0 7px; }
+    .btn { padding: 7px 22px; font-size: 15px; margin: 3px; }
+    .levels { gap: 8px; margin: 7px 0; }
+    .lv-card { width: 118px; padding: 9px 8px; }
+    .lv-card .lv-sub { min-height: 0; }
+    .lv-card h3 { margin: 2px 0 3px; font-size: 15px; }
+  }
 </style>
 </head>
 <body>
@@ -232,6 +246,26 @@ const COMMON_DEAD = [
   '超话解散,各回各家',
   '打投群已就地解散',
 ];
+// 防御方击杀调侃语录:击败僵尸/爆冲清行时随机飘出(金色,带冷却防刷屏)
+const KILL_QUOTES = [
+  '有什么事,跟我的超级全满贯说去吧',
+  '有什么事,跟我的大金牌说去吧',
+  '有意见?跟巴黎的那块金牌反映',
+  '不服?先赢个世界冠军再说',
+  '这一板,替休斯敦问好',
+  '11:0,下一位',
+  '小作文再长,也接不住这一板',
+  '热搜能刷,比分刷不了',
+  '键盘敲得响,球台上见真章',
+  '这球叫暴冲,记进小作文里吧',
+  '弧圈球,不接受反驳',
+  '双杀?那叫实力,谢谢',
+  '研究我?先研究怎么接发球吧',
+  '德国刚寄回来的旋转,签收一下',
+  '这分数,菜谱里可查不到',
+];
+let killQuoteCd = 0; // 冷却,避免同屏刷太多
+
 const ENEMIES = {
   follower:   { name:'跟风僵尸',   emoji:'🧟', acc:'',    hp:110,  speed:14, dmg:18, color:'#90a4ae',
                 dead:['哦…原来输球就是输球啊','大家骂我才跟着骂的…','原来我根本没看过比赛','取关了取关了','跟错风了,撤!'] },
@@ -391,10 +425,12 @@ function handleTap(px, py) {
     const def = DEFENDERS[selectedCard];
     if (honor < def.cost) return;
     if (def.kind === 'bomb') {
-      // 暴冲扣杀:立即清一行
+      // 暴冲扣杀:立即清一行,必飘一句调侃
       honor -= def.cost;
       const bx = cellCenterX(col), by = cellCenterY(row);
       addFloat(bx, by, '💥 暴冲!', '#ff5252', 30);
+      addFloat(bx, by + 30, '💬 ' + pick(KILL_QUOTES), '#ffd54f', 16);
+      killQuoteCd = 3.5;
       for (const e of enemies) if (e.row === row) e.hp -= def.dmg;
       selectedCard = null;
       return;
@@ -574,11 +610,17 @@ function update(dt) {
 
   // 死亡结算
   const before = enemies.length;
+  if (killQuoteCd > 0) killQuoteCd -= dt;
   enemies = enemies.filter(e => {
     if (e.hp <= 0) {
       // Boss 只用专属宣言;小怪 6:4 混抽专属池与通用池
       const pool = e.def.boss ? e.def.dead : (Math.random() < 0.6 ? e.def.dead : COMMON_DEAD);
       addFloat(e.x, cellCenterY(e.row) - 18, '「' + pick(pool) + '」', e.def.color, e.def.boss ? 22 : 14);
+      // 防御方调侃语录(带冷却,约每 3.5 秒最多一句,避免刷屏)
+      if (killQuoteCd <= 0) {
+        killQuoteCd = 3.5;
+        addFloat(cellCenterX(1), cellCenterY(e.row) + 6, '💬 ' + pick(KILL_QUOTES), '#ffd54f', 15);
+      }
       return false;
     }
     return true;
