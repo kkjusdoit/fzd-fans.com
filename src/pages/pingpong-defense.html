@@ -1222,9 +1222,26 @@ function togglePause() {
 
 // ====================== 缩放适配 ======================
 let canvasDpr = 0;
+function visibleViewportSize(wrap) {
+  // iOS Safari 横屏展开地址栏时，100vh/100dvh 和 layout viewport 可能仍高于
+  // 用户真正能看到的区域。visualViewport 才是当前未被浏览器工具栏遮挡的尺寸。
+  const viewport = window.visualViewport;
+  const width = viewport && viewport.width ? viewport.width : (window.innerWidth || wrap.clientWidth);
+  const height = viewport && viewport.height ? viewport.height : (window.innerHeight || wrap.clientHeight);
+  return {
+    width: Math.max(1, Math.floor(width)),
+    height: Math.max(1, Math.floor(height)),
+  };
+}
+
 function resize() {
   const wrap = document.getElementById('wrap');
-  const vw = wrap.clientWidth, vh = wrap.clientHeight;
+  const viewport = visibleViewportSize(wrap);
+  const vw = viewport.width, vh = viewport.height;
+  // 同步父容器高度，避免画布虽然缩小了，却仍在较高的 layout viewport 中
+  // 垂直居中，最终再次被 visual viewport 从上下裁切。
+  wrap.style.width = vw + 'px';
+  wrap.style.height = vh + 'px';
   const scale = Math.min(vw / W, vh / H);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   if (dpr !== canvasDpr) {
@@ -1239,6 +1256,12 @@ function resize() {
   scheduleFrame();
 }
 window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', resize);
+  // Safari 地址栏展开/收起有时只改变 visual viewport 的位置并触发 scroll。
+  window.visualViewport.addEventListener('scroll', resize);
+}
 document.addEventListener('visibilitychange', syncEnvironmentPause);
 window.addEventListener('pagehide', () => {
   if (state !== 'playing' && state !== 'paused') return;

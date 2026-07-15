@@ -37,7 +37,7 @@ class FakeElement {
   getBoundingClientRect() { return { left: 0, top: 0, width: 960, height: 600 }; }
 }
 
-function createContext() {
+function createContext(options = {}) {
   const elements = new Map();
   const windowListeners = new Map();
   const documentListeners = new Map();
@@ -70,6 +70,19 @@ function createContext() {
     dispatch() { for (const listener of mediaListeners) listener({ matches: this.matches }); },
   };
 
+  const visualViewportListeners = new Map();
+  const visualViewport = options.visualViewport ? {
+    width: options.visualViewport.width,
+    height: options.visualViewport.height,
+    addEventListener(type, listener) {
+      if (!visualViewportListeners.has(type)) visualViewportListeners.set(type, []);
+      visualViewportListeners.get(type).push(listener);
+    },
+    dispatch(type) {
+      for (const listener of visualViewportListeners.get(type) || []) listener({ type });
+    },
+  } : null;
+
   const document = {
     hidden: false,
     getElementById: getElement,
@@ -90,6 +103,7 @@ function createContext() {
     },
     dispatch(type) { for (const listener of windowListeners.get(type) || []) listener({ type }); },
   };
+  if (visualViewport) window.visualViewport = visualViewport;
 
   const fixedMath = Object.create(Math);
   fixedMath.random = () => 0.5;
@@ -150,6 +164,7 @@ function createContext() {
     game: sandbox.__gameTest,
     element: getElement,
     portraitMedia,
+    visualViewport,
     document,
     setNow(value) { now = value; },
   };
@@ -159,6 +174,27 @@ function entityFrom(def, overrides = {}) {
   return { type: 'test', def, row: 0, x: 500, hp: def.hp, maxHp: def.hp,
     speed: 0, slowT: 0, atkT: 0, summonT: 4, healT: 3, phase: 0, ...overrides };
 }
+
+test('landscape Safari fits the full canvas inside the visible viewport', () => {
+  const { element, visualViewport } = createContext({
+    // 与用户截图接近：布局视口足够宽，但地址栏展开后可视高度明显变矮。
+    visualViewport: { width: 2048, height: 809 },
+  });
+  const wrap = element('wrap');
+  const canvas = element('game');
+
+  assert.equal(wrap.style.width, '2048px');
+  assert.equal(wrap.style.height, '809px');
+  assert.ok(parseFloat(canvas.style.width) <= 2048);
+  assert.ok(parseFloat(canvas.style.height) <= 809);
+  assert.equal(parseFloat(canvas.style.height), 809);
+
+  // 模拟 Safari 地址栏进一步展开；visualViewport 事件必须立即重新缩放。
+  visualViewport.height = 700;
+  visualViewport.dispatch('resize');
+  assert.equal(wrap.style.height, '700px');
+  assert.equal(parseFloat(canvas.style.height), 700);
+});
 
 test('a projectile-killed boss cannot act or summon in the same frame', () => {
   const { game } = createContext();
