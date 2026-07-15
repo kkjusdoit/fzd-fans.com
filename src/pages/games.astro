@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+// 上线开关:置为 true 后《植物大战饭圈》卡片才会显示(游戏页本身仍可通过直链访问,便于测试)
+const SHOW_PVZ_GAME = false;
 ---
 
 <BaseLayout title="打爆一切">
@@ -9,15 +11,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </header>
 
     <div class="games-grid">
-      <!-- 游戏 1: 乒坛保卫战 -->
+      <!-- 游戏 1: 植物大战饭圈(测试中,由 SHOW_PVZ_GAME 开关控制) -->
+      {SHOW_PVZ_GAME && (
       <a href="/pingpong-defense.html" class="game-card pvz">
-        <div class="game-icon">🛡️</div>
+        <div class="game-icon">🧟</div>
         <div class="game-info">
-          <h2>乒坛保卫战</h2>
-          <p>塔防新作!甩锅侠、阴谋论者、控评水军兵临球台，用发球机、弧圈手和奖杯柜守住防线，让体育回归体育！</p>
+          <h2>植物大战饭圈</h2>
+          <p>经典塔防致敬之作!甩锅僵尸、阴谋论僵尸、水军僵尸涌上草坪,种下乒乓射手和向日葵,收集冠军荣誉阳光,让体育回归体育!</p>
           <span class="play-btn">开始游戏 →</span>
         </div>
       </a>
+      )}
 
       <!-- 游戏 2: 打爆一切 -->
       <a href="/breakit" class="game-card breakit">
