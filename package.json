@@ -10,6 +10,7 @@
     "news:add": "node --env-file=.env scripts/add_news.mjs",
     "news:sync": "node scripts/sync_news.mjs",
     "endorsements:sync": "node scripts/sync_endorsements.mjs",
+    "test:game": "node --test scripts/pingpong-defense.test.mjs",
     "astro": "astro"
   },
   "dependencies": {
