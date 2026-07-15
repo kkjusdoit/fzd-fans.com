@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>乒坛保卫战 · 樊振东的互联网档案馆</title>
+<link rel="icon" type="image/png" href="/favicon.png" />
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; overflow: hidden;
+    background: linear-gradient(135deg, #0d3b66 0%, #1565c0 60%, #1e88e5 100%);
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Arial', sans-serif;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+    width: 100vw; height: 100vh; height: 100dvh;
+  }
+  #wrap {
+    position: relative; width: 100vw; height: 100vh; height: 100dvh;
+    display: flex; justify-content: center; align-items: center; overflow: hidden;
+  }
+  #game { background: #0d47a1; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.4); display: block; }
+  #back-btn {
+    position: absolute; top: 14px; left: 14px; z-index: 50;
+    background: linear-gradient(to bottom, #42a5f5, #1565c0); color: #fff; text-decoration: none;
+    padding: 7px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;
+    box-shadow: 0 3px #0d3b66; border: none;
+  }
+  #back-btn:active { transform: translateY(3px); box-shadow: 0 0 #0d3b66; }
+  /* Overlay panels (menu / dialog / mapselect / result) */
+  .overlay {
+    position: absolute; inset: 0; z-index: 40; display: none;
+    flex-direction: column; justify-content: center; align-items: center;
+    padding: 24px; text-align: center; color: #fff;
+    background: rgba(6, 28, 58, .82); backdrop-filter: blur(4px);
+  }
+  .overlay.show { display: flex; }
+  .panel {
+    max-width: 560px; width: 100%; background: rgba(13, 71, 161, .55);
+    border: 1px solid rgba(255,255,255,.18); border-radius: 18px; padding: 26px 22px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  }
+  .title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; letter-spacing: 2px;
+    background: linear-gradient(45deg, #ffd54f, #fff, #90caf9); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 6px; }
+  .subtitle { color: #bbdefb; font-size: 15px; margin: 0 0 18px; letter-spacing: 1px; }
+  .story { color: #e3f2fd; font-size: clamp(14px, 3.4vw, 17px); line-height: 1.9; margin: 10px 0 20px; text-align: left; }
+  .story b { color: #ffd54f; }
+  .btn {
+    display: inline-block; cursor: pointer; border: none; margin: 6px;
+    background: linear-gradient(45deg, #ffb300, #ffca28); color: #4e2f00;
+    padding: 13px 34px; font-size: 18px; font-weight: 800; border-radius: 40px;
+    box-shadow: 0 5px #b37400; transition: transform .1s;
+  }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px #b37400; }
+  .btn.ghost { background: rgba(255,255,255,.14); color: #fff; box-shadow: 0 5px rgba(0,0,0,.25); }
+  .levels { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 14px 0; }
+  .lv-card {
+    width: 150px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 14px; padding: 16px 12px; cursor: pointer; transition: transform .12s, background .2s;
+  }
+  .lv-card:active { transform: scale(.96); }
+  .lv-card.locked { opacity: .45; filter: grayscale(.6); cursor: not-allowed; }
+  .lv-card h3 { margin: 4px 0 6px; font-size: 17px; }
+  .lv-card .lv-sub { font-size: 12px; color: #bbdefb; min-height: 32px; }
+  .lv-card .stars { font-size: 16px; margin-top: 8px; color: #ffd54f; letter-spacing: 2px; }
+  .unlock-tip { color: #a5d6a7; font-size: 14px; margin-top: 10px; }
+  .rotate-hint {
+    position: absolute; inset: 0; z-index: 60; display: none;
+    flex-direction: column; justify-content: center; align-items: center; gap: 14px;
+    background: rgba(6,28,58,.95); color: #fff; font-size: 18px; text-align: center; padding: 30px;
+  }
+  .rotate-hint .ico { font-size: 60px; animation: rot 2s ease-in-out infinite; }
+  @keyframes rot { 0%,100% { transform: rotate(0); } 50% { transform: rotate(90deg); } }
+  @media (max-aspect-ratio: 1/1) { .rotate-hint.on { display: flex; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <a id="back-btn" href="/games">← 返回</a>
+  <canvas id="game" width="960" height="600"></canvas>
+
+  <!-- 主菜单 -->
+  <div id="ov-menu" class="overlay">
+    <div class="panel">
+      <h1 class="title">乒坛保卫战</h1>
+      <p class="subtitle">让 · 体育 · 回归 · 体育</p>
+      <div class="story">
+        在没有乒乓饭圈以前,人们输球就输了,不找理由。<br>
+        后来,球台的另一端涌来了<b>甩锅侠</b>、<b>阴谋论者</b>、<b>控评水军</b>……<br>
+        他们把每一场胜负,都编成了阴谋、菜谱和"健康完赛"。<br>
+        现在,轮到你用<b>荣誉</b>与<b>球拍</b>,守住这张干净的球台。
+      </div>
+      <button class="btn" id="btn-start">进入战役</button>
+    </div>
+  </div>
+
+  <!-- 选关 -->
+  <div id="ov-map" class="overlay">
+    <div class="panel">
+      <h1 class="title" style="font-size:clamp(22px,5vw,34px)">选择关卡</h1>
+      <div class="levels" id="level-list"></div>
+      <button class="btn ghost" id="btn-map-back">返回菜单</button>
+    </div>
+  </div>
+
+  <!-- 剧情 / 过场 -->
+  <div id="ov-dialog" class="overlay">
+    <div class="panel">
+      <h1 class="title" id="dlg-title" style="font-size:clamp(22px,5vw,34px)"></h1>
+      <div class="story" id="dlg-body"></div>
+      <button class="btn" id="btn-dlg-next">开始防守</button>
+    </div>
+  </div>
+
+  <!-- 结算 -->
+  <div id="ov-result" class="overlay">
+    <div class="panel">
+      <h1 class="title" id="res-title"></h1>
+      <div class="story" id="res-body" style="text-align:center"></div>
+      <div id="res-stars" style="font-size:38px;color:#ffd54f;letter-spacing:6px;margin:6px 0 4px"></div>
+      <div id="res-unlock" class="unlock-tip"></div>
+      <div>
+        <button class="btn" id="btn-res-next">继续</button>
+        <button class="btn ghost" id="btn-res-retry">重玩本关</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rotate-hint on"><div class="ico">📱</div><div>请横屏握持手机<br>体验最佳防守视角</div></div>
+</div>
+
+<script>
+"use strict";
+(function () {
+// ====================== 常量与画布 ======================
+const CV = document.getElementById('game');
+const ctx = CV.getContext('2d');
+const W = 960, H = 600;
+const COLS = 9, ROWS = 5;
+const BOARD_X = 8, BOARD_Y = 96;          // 棋盘起点
+const BOARD_W = W - BOARD_X * 2;
+const BOARD_H = H - BOARD_Y - 12;
+const CELL_W = BOARD_W / COLS;
+const CELL_H = BOARD_H / ROWS;
+const HOME_X = BOARD_X;                     // 越过此线即被清台机拦截 / 失败
+
+// 荣誉勋章标签(收集时飘字,兼作荣誉图鉴彩蛋)
+const MEDAL_LABELS = [
+  '德甲三连冠', '超级全满贯', '全运会6金', '全锦赛男单第一人',
+  '世界杯冠军', '世乒赛男单冠军', '奥运会男团金牌', '亚锦赛冠军',
+  '大满贯', '总决赛冠军', '亚运会冠军', '男子世界杯三连冠'
+];
+const MEDAL_VALUE = 25;
+
+// ====================== 存档 ======================
+const SAVE_KEY = 'fzd_td_progress';
+function loadSave() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveGame(s) { try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) {} }
+let SAVE = loadSave();
+SAVE.stars = SAVE.stars || {};        // { levelIndex: starCount }
+SAVE.cleared = SAVE.cleared || [];    // [levelIndex...]
+
+// ====================== 防御单位定义 ======================
+// unlockLevel: 从第几关开始可用(0 表示一开始就有)
+const DEFENDERS = {
+  server:  { name:'发球机',   emoji:'🏓', cost:100, hp:120, cd:0,   unlockLevel:0, kind:'shooter', interval:1.5, dmg:20, color:'#26a69a', desc:'直线发乒乓球,基本功不间断' },
+  cabinet: { name:'奖杯柜',   emoji:'🏆', cost:50,  hp:100, cd:0,   unlockLevel:0, kind:'producer', interval:8, color:'#ffb300', desc:'定时产出荣誉勋章' },
+  wall:    { name:'球拍墙',   emoji:'🛡️', cost:50,  hp:420, cd:0,   unlockLevel:0, kind:'wall', color:'#8d6e63', desc:'高血量肉盾,替队友扛住噪音' },
+  loop:    { name:'弧圈手',   emoji:'🌀', cost:175, hp:120, cd:0,   unlockLevel:1, kind:'shooter', interval:1.5, dmg:20, pierce:true, color:'#5c6bc0', desc:'正手弧圈,一发穿透整行' },
+  referee: { name:'裁判',     emoji:'🟨', cost:150, hp:120, cd:0,   unlockLevel:2, kind:'shooter', interval:1.8, dmg:10, slow:true, color:'#fdd835', desc:'黄牌减速全行敌人' },
+  smash:   { name:'暴冲扣杀', emoji:'💥', cost:125, hp:1,   cd:0,   unlockLevel:2, kind:'bomb', dmg:1800, color:'#ef5350', desc:'一次性清空整行' },
+};
+const DEF_ORDER = ['server','cabinet','wall','loop','referee','smash'];
+
+// ====================== 怪物定义 ======================
+const ENEMIES = {
+  follower:   { name:'跟风路人', emoji:'🚶', hp:110,  speed:14, dmg:18, color:'#90a4ae',
+                dead:['哦…原来输球就是输球啊','我好像…不该跟着骂'] },
+  troll:      { name:'控评水军', emoji:'💬', hp:55,   speed:24, dmg:14, color:'#7e57c2',
+                dead:['复制粘贴…失败','水军也是要下班的'] },
+  blamer:     { name:'甩锅侠',   emoji:'🤡', hp:170,  speed:15, dmg:22, color:'#ff7043',
+                dead:['这锅…甩不出去了','明明是我不会打'] },
+  conspiracy: { name:'阴谋论者', emoji:'🕵️', hp:130,  speed:14, dmg:12, ranged:true, color:'#455a64',
+                dead:['断拍…也许真是意外?','证据呢?我也没有'] },
+  coach:      { name:'云教练',   emoji:'📋', hp:340,  speed:11, dmg:20, armor:.5, aura:true, color:'#546e7a',
+                dead:['健康…完赛就好?','原来我根本不懂球'] },
+  patron:     { name:'榜一大姐', emoji:'👑', hp:240,  speed:12, dmg:18, heal:true, color:'#ec407a',
+                dead:['我的哥哥…不需要我打投','原来他只想好好打球'] },
+  boss:       { name:'饭圈祭司', emoji:'📢', hp:3200, speed:8,  dmg:40, boss:true, armor:.25, color:'#c62828',
+                dead:['体育…原来本该是这样的啊'] },
+};
+
+// ====================== 关卡数据 ======================
+// wave: 每波 { at: 秒, spawns:[{type, row(可选,默认随机)}] }
+function grp(type, n) { return Array.from({length:n}, () => ({type})); }
+const LEVELS = [
+  {
+    name: '第一关 · 赛后评论区',
+    dialogTitle: '赛后评论区',
+    dialog: '一场普通的胜利之后,评论区却炸开了锅。<b>跟风路人</b>和<b>控评水军</b>顺着热搜涌来。<br>点击掉落的<b>勋章</b>收集荣誉,把<b>发球机</b>摆上球台——先守住这一关。',
+    startHonor: 150,
+    unlockText: '解锁新单位:🌀 弧圈手(一发穿透整行)',
+    waves: [
+      { at: 4,  spawns: grp('follower',2) },
+      { at: 16, spawns: grp('follower',3) },
+      { at: 30, spawns: [...grp('troll',4), ...grp('follower',2)] },
+      { at: 46, spawns: [...grp('follower',4), ...grp('troll',4)], last:true },
+    ],
+  },
+  {
+    name: '第二关 · 热搜风暴',
+    dialogTitle: '热搜风暴',
+    dialog: '"去德国打球=输送技术","双杀队友=偷着研究"……<br><b>甩锅侠</b>、<b>阴谋论者</b>、<b>云教练</b>带着编好的剧本上了热搜。<br>阴谋论者会<b>远程</b>砸问号,云教练会<b>拖慢</b>你的防线——用<b>弧圈手</b>和<b>裁判</b>回敬他们。',
+    startHonor: 175,
+    unlockText: '解锁新单位:🟨 裁判(黄牌减速) & 💥 暴冲扣杀(清行)',
+    waves: [
+      { at: 4,  spawns: grp('follower',3) },
+      { at: 16, spawns: [...grp('blamer',2), ...grp('troll',3)] },
+      { at: 30, spawns: [...grp('conspiracy',2), ...grp('follower',3)] },
+      { at: 44, spawns: [...grp('coach',1), ...grp('blamer',2)], surge:true },
+      { at: 60, spawns: [...grp('conspiracy',2), ...grp('troll',5)] },
+      { at: 76, spawns: [...grp('coach',1), ...grp('blamer',3), ...grp('conspiracy',2)], last:true, surge:true },
+    ],
+  },
+  {
+    name: '第三关 · 巅峰对决',
+    dialogTitle: '巅峰对决',
+    dialog: '流量的尽头,是<b>榜一大姐</b>与<b>饭圈祭司</b>。<br>祭司会召唤水军、掀起热搜风暴,给全场怪物加速。<br>用你解锁的全部单位,打完这最后一战——让球台,回到它本来的样子。',
+    startHonor: 200,
+    unlockText: '',
+    waves: [
+      { at: 4,  spawns: [...grp('follower',3), ...grp('troll',3)] },
+      { at: 18, spawns: [...grp('blamer',3), ...grp('conspiracy',2)] },
+      { at: 32, spawns: [...grp('coach',2), ...grp('troll',5)], surge:true },
+      { at: 48, spawns: [...grp('patron',1), ...grp('conspiracy',3)] },
+      { at: 64, spawns: [...grp('coach',2), ...grp('blamer',3), ...grp('patron',1)] },
+      { at: 82, spawns: [...grp('troll',8)], surge:true },
+      { at: 96, spawns: [...grp('patron',2), ...grp('conspiracy',3), ...grp('coach',2)] },
+      { at: 112, spawns: [...grp('boss',1)], last:true, boss:true },
+    ],
+  },
+];
+
+// ====================== 游戏状态 ======================
+let state = 'menu';   // menu | playing | paused
+let level = null;     // 当前关卡对象
+let levelIndex = 0;
+let honor = 150;
+let defenders = [];   // {type,row,col,x,y,hp,maxHp,fireT,def}
+let enemies = [];     // {type,row,x,hp,maxHp,speed,def,slowT,eaten(target),atkT,summonT,healT,phase}
+let bullets = [];     // 我方子弹 {x,y,row,dmg,pierce,slow,hit:Set,vx}
+let hostiles = [];    // 敌方投射物 {x,y,row,dmg,vx}
+let medals = [];      // {x,y,vy,label,collected,landT}
+let floats = [];      // 飘字 {x,y,text,color,t,vy,size}
+let mowers = [];      // 清台机 {row,used,x,active}
+let selectedCard = null;
+let waveIdx = 0;
+let elapsed = 0;      // 关卡内计时
+let medalDropT = 0;
+let surgeT = 0;       // 热搜风暴剩余时间(全体加速)
+let lastTs = 0;
+
+// ====================== 工具函数 ======================
+function cellCenterX(col) { return BOARD_X + col * CELL_W + CELL_W / 2; }
+function cellCenterY(row) { return BOARD_Y + row * CELL_H + CELL_H / 2; }
+function rowFromY(y) { return Math.floor((y - BOARD_Y) / CELL_H); }
+function colFromX(x) { return Math.floor((x - BOARD_X) / CELL_W); }
+function rand(a, b) { return a + Math.random() * (b - a); }
+function pick(arr) { return arr[(Math.random() * arr.length) | 0]; }
+
+function addFloat(x, y, text, color, size) {
+  floats.push({ x, y, text, color: color || '#fff', t: 1.4, vy: -34, size: size || 16 });
+}
+
+// ====================== 关卡启停 ======================
+function startLevel(idx) {
+  levelIndex = idx;
+  level = LEVELS[idx];
+  honor = level.startHonor;
+  defenders = []; enemies = []; bullets = []; hostiles = []; medals = []; floats = [];
+  selectedCard = null; waveIdx = 0; elapsed = 0; medalDropT = 3; surgeT = 0;
+  mowers = [];
+  for (let r = 0; r < ROWS; r++) mowers.push({ row: r, used: false, x: HOME_X - 30, active: false });
+  state = 'playing';
+  hideAllOverlays();
+}
+
+function availableDefenders() {
+  return DEF_ORDER.filter(k => DEFENDERS[k].unlockLevel <= levelIndex);
+}
+
+// ====================== 输入 ======================
+function canvasPoint(evt) {
+  const rect = CV.getBoundingClientRect();
+  const cx = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left;
+  const cy = (evt.touches ? evt.touches[0].clientY : evt.clientY) - rect.top;
+  return { x: cx / rect.width * W, y: cy / rect.height * H };
+}
+
+function handleTap(px, py) {
+  if (state !== 'playing') return;
+  // 1) 优先收集勋章
+  for (let i = medals.length - 1; i >= 0; i--) {
+    const m = medals[i];
+    if (Math.hypot(px - m.x, py - m.y) < 34) {
+      honor += MEDAL_VALUE;
+      addFloat(m.x, m.y - 10, '🏅 ' + m.label + ' +' + MEDAL_VALUE, '#ffd54f', 15);
+      medals.splice(i, 1);
+      return;
+    }
+  }
+  // 2) 卡槽点击
+  const cards = availableDefenders();
+  const cardW = 96, gap = 6, startX = 150;
+  if (py < 88 && py > 10) {
+    for (let i = 0; i < cards.length; i++) {
+      const cx = startX + i * (cardW + gap);
+      if (px >= cx && px <= cx + cardW) {
+        const key = cards[i];
+        if (honor >= DEFENDERS[key].cost) selectedCard = (selectedCard === key ? null : key);
+        else addFloat(cx + cardW / 2, 84, '荣誉不足', '#ff8a80', 14);
+        return;
+      }
+    }
+  }
+  // 3) 棋盘放置
+  if (selectedCard && px > BOARD_X && px < BOARD_X + BOARD_W && py > BOARD_Y && py < BOARD_Y + BOARD_H) {
+    const col = colFromX(px), row = rowFromY(py);
+    if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return;
+    const def = DEFENDERS[selectedCard];
+    if (honor < def.cost) return;
+    if (def.kind === 'bomb') {
+      // 暴冲扣杀:立即清一行
+      honor -= def.cost;
+      const bx = cellCenterX(col), by = cellCenterY(row);
+      addFloat(bx, by, '💥 暴冲!', '#ff5252', 30);
+      for (const e of enemies) if (e.row === row) e.hp -= def.dmg;
+      selectedCard = null;
+      return;
+    }
+    if (defenders.some(d => d.row === row && d.col === col)) return; // 已占用
+    honor -= def.cost;
+    defenders.push({
+      type: selectedCard, def, row, col,
+      x: cellCenterX(col), y: cellCenterY(row),
+      hp: def.hp, maxHp: def.hp, fireT: def.interval || 0, slowMul: 1,
+    });
+    selectedCard = null;
+  }
+}
+
+CV.addEventListener('mousedown', e => { const p = canvasPoint(e); handleTap(p.x, p.y); });
+CV.addEventListener('touchstart', e => { e.preventDefault(); const p = canvasPoint(e); handleTap(p.x, p.y); }, { passive: false });
+
+// ====================== 波次调度 ======================
+function updateWaves(dt) {
+  if (waveIdx >= level.waves.length) return;
+  const wave = level.waves[waveIdx];
+  if (elapsed >= wave.at) {
+    for (const s of wave.spawns) {
+      spawnEnemy(s.type, (s.row != null) ? s.row : (Math.random() * ROWS) | 0);
+    }
+    if (wave.surge) { surgeT = 8; addBanner('🔥 热搜风暴!怪物加速'); }
+    if (wave.boss) { addBanner('👑 BOSS · 饭圈祭司登场'); }
+    waveIdx++;
+  }
+}
+
+function spawnEnemy(type, row) {
+  const d = ENEMIES[type];
+  enemies.push({
+    type, def: d, row,
+    x: W + rand(0, 60), hp: d.hp, maxHp: d.hp,
+    speed: d.speed, slowT: 0, atkT: 0, summonT: 4, healT: 3, phase: 0,
+  });
+}
+
+let banner = null;
+function addBanner(text) { banner = { text, t: 2.4 }; }
+
+// ====================== 更新逻辑 ======================
+function update(dt) {
+  if (state !== 'playing') return;
+  elapsed += dt;
+  if (surgeT > 0) surgeT -= dt;
+
+  updateWaves(dt);
+
+  // 勋章自然掉落
+  medalDropT -= dt;
+  if (medalDropT <= 0) {
+    medalDropT = rand(7, 11);
+    dropMedal(rand(BOARD_X + 40, BOARD_X + BOARD_W - 40), -20, rand(BOARD_Y + 40, BOARD_Y + BOARD_H - 40));
+  }
+  for (const m of medals) {
+    if (m.y < m.landY) { m.y += m.vy * dt; if (m.y > m.landY) m.y = m.landY; }
+    m.life -= dt;
+  }
+  medals = medals.filter(m => m.life > 0);
+
+  // 防御单位
+  const surgeMul = surgeT > 0 ? 1.6 : 1;
+  for (const d of defenders) {
+    d.slowMul = 1;
+    // 云教练光环:附近防御单位攻速下降
+    for (const e of enemies) {
+      if (e.def.aura && e.row === d.row && Math.abs(e.x - d.x) < CELL_W * 1.6) d.slowMul = 1.8;
+    }
+    if (d.def.kind === 'producer') {
+      d.fireT -= dt;
+      if (d.fireT <= 0) { d.fireT = d.def.interval; dropMedal(d.x, d.y, d.y - 4); }
+    } else if (d.def.kind === 'shooter') {
+      const enemyAhead = enemies.some(e => e.row === d.row && e.x > d.x - 6 && e.x < W);
+      d.fireT -= dt;
+      if (enemyAhead && d.fireT <= 0) {
+        d.fireT = d.def.interval * d.slowMul;
+        bullets.push({
+          x: d.x + 18, y: d.y - 6, row: d.row, dmg: d.def.dmg,
+          pierce: !!d.def.pierce, slow: !!d.def.slow, vx: 420, hit: new Set(),
+          color: d.def.slow ? '#fdd835' : (d.def.pierce ? '#7986cb' : '#e0f7fa'),
+        });
+      }
+    }
+  }
+
+  // 我方子弹
+  for (const b of bullets) {
+    b.x += b.vx * dt;
+    for (const e of enemies) {
+      if (e.row !== b.row) continue;
+      if (b.hit.has(e)) continue;
+      if (b.x >= e.x - 22 && b.x <= e.x + 22) {
+        const dmg = b.dmg * (e.def.armor ? (1 - e.def.armor) : 1);
+        e.hp -= dmg;
+        if (b.slow) e.slowT = 3;
+        b.hit.add(e);
+        if (!b.pierce) { b.dead = true; break; }
+      }
+    }
+  }
+  bullets = bullets.filter(b => !b.dead && b.x < W + 20);
+
+  // 敌方投射物(阴谋论者问号弹)
+  for (const h of hostiles) {
+    h.x += h.vx * dt;
+    for (const d of defenders) {
+      if (d.row === h.row && Math.abs(d.x - h.x) < 20) { d.hp -= h.dmg; h.dead = true; break; }
+    }
+  }
+  hostiles = hostiles.filter(h => !h.dead && h.x > BOARD_X - 20);
+
+  // 怪物
+  for (const e of enemies) {
+    const slowMul = e.slowT > 0 ? 0.45 : 1;
+    if (e.slowT > 0) e.slowT -= dt;
+    const spd = e.speed * slowMul * surgeMul;
+
+    // 是否被防御单位挡住(啃咬)
+    let blocker = null;
+    for (const d of defenders) {
+      if (d.row === e.row && e.x - 20 <= d.x + 20 && e.x > d.x - 4) { blocker = d; break; }
+    }
+
+    // 远程怪:在防线前一格停下投掷
+    if (e.def.ranged && !blocker) {
+      let target = null;
+      for (const d of defenders) if (d.row === e.row && d.x < e.x && e.x - d.x < CELL_W * 3) { target = d; break; }
+      if (target) {
+        e.atkT -= dt;
+        if (e.atkT <= 0) { e.atkT = 1.6; hostiles.push({ x: e.x - 16, y: cellCenterY(e.row) - 8, row: e.row, dmg: e.def.dmg, vx: -260 }); }
+      } else { e.x -= spd * dt; }
+    } else if (blocker) {
+      e.atkT -= dt;
+      if (e.atkT <= 0) { e.atkT = 0.6; blocker.hp -= e.def.dmg; }
+    } else {
+      e.x -= spd * dt;
+    }
+
+    // Boss 技能
+    if (e.def.boss) {
+      e.summonT -= dt;
+      if (e.summonT <= 0) { e.summonT = 9; for (let i = 0; i < 3; i++) spawnEnemy('troll', (Math.random() * ROWS) | 0); addBanner('📢 祭司召唤控评水军!'); surgeT = Math.max(surgeT, 5); }
+      const ratio = e.hp / e.maxHp;
+      if (ratio < 0.66 && e.phase < 1) { e.phase = 1; addFloat(e.x, cellCenterY(e.row) - 30, '"研究队友!"', '#ffcdd2', 18); }
+      if (ratio < 0.33 && e.phase < 2) { e.phase = 2; addFloat(e.x, cellCenterY(e.row) - 30, '"菜谱都背下来了!"', '#ffcdd2', 18); }
+    }
+    // 榜一大姐治疗光环
+    if (e.def.heal) {
+      e.healT -= dt;
+      if (e.healT <= 0) {
+        e.healT = 4;
+        for (const o of enemies) if (o !== e && Math.abs(o.x - e.x) < CELL_W * 2 && o.hp < o.maxHp) { o.hp = Math.min(o.maxHp, o.hp + 30); }
+        addFloat(e.x, cellCenterY(e.row) - 24, '💰打投回血', '#f8bbd0', 14);
+      }
+    }
+
+    // 到家判定
+    if (e.x < HOME_X + 6) {
+      const mw = mowers[e.row];
+      if (mw && !mw.used) { mw.used = true; mw.active = true; }
+      else { triggerLose(); return; }
+    }
+  }
+
+  // 清台机冲刺(被触发后横扫本行)
+  for (const mw of mowers) {
+    if (mw.active) {
+      mw.x += 620 * dt;
+      for (const e of enemies) if (e.row === mw.row && Math.abs(e.x - mw.x) < 40) e.hp -= 999;
+      if (mw.x > W + 40) mw.active = false;
+    }
+  }
+
+  // 死亡结算
+  const before = enemies.length;
+  enemies = enemies.filter(e => {
+    if (e.hp <= 0) {
+      addFloat(e.x, cellCenterY(e.row) - 18, '「' + pick(e.def.dead) + '」', e.def.color, e.def.boss ? 22 : 14);
+      return false;
+    }
+    return true;
+  });
+  defenders = defenders.filter(d => d.hp > 0);
+
+  // 飘字
+  for (const f of floats) { f.y += f.vy * dt; f.t -= dt; }
+  floats = floats.filter(f => f.t > 0);
+  if (banner) { banner.t -= dt; if (banner.t <= 0) banner = null; }
+
+  // 胜利判定:所有波次已生成 且 场上无敌人
+  if (waveIdx >= level.waves.length && enemies.length === 0 && elapsed > (level.waves[level.waves.length - 1].at + 2)) {
+    triggerWin();
+  }
+}
+
+function dropMedal(x, startY, landY) {
+  medals.push({ x, y: startY, landY, vy: 130, life: 9, label: pick(MEDAL_LABELS) });
+}
+
+// ====================== 结算 ======================
+function starsForLevel() {
+  const used = mowers.filter(m => m.used).length;
+  if (used === 0) return 3;
+  if (used <= 2) return 2;
+  return 1;
+}
+function triggerWin() {
+  state = 'won';
+  const stars = starsForLevel();
+  SAVE.stars[levelIndex] = Math.max(SAVE.stars[levelIndex] || 0, stars);
+  if (SAVE.cleared.indexOf(levelIndex) < 0) SAVE.cleared.push(levelIndex);
+  saveGame(SAVE);
+  showResult(true, stars);
+}
+function triggerLose() {
+  state = 'lost';
+  showResult(false, 0);
+}
+
+// ====================== 渲染 ======================
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  // 背景球台
+  ctx.fillStyle = '#0d47a1';
+  ctx.fillRect(0, 0, W, H);
+  // 顶栏
+  drawTopBar();
+  // 球台格子
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = BOARD_X + c * CELL_W, y = BOARD_Y + r * CELL_H;
+      ctx.fillStyle = ((r + c) % 2 === 0) ? '#1565c0' : '#1976d2';
+      ctx.fillRect(x + 1, y + 1, CELL_W - 2, CELL_H - 2);
+    }
+  }
+  // 中网(球台白线)
+  ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(BOARD_X + BOARD_W / 2, BOARD_Y); ctx.lineTo(BOARD_X + BOARD_W / 2, BOARD_Y + BOARD_H); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2;
+  ctx.strokeRect(BOARD_X, BOARD_Y, BOARD_W, BOARD_H);
+  // 放置高亮
+  if (selectedCard) drawPlacementHint();
+
+  // 清台机
+  for (const mw of mowers) {
+    const y = cellCenterY(mw.row);
+    ctx.font = '26px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🛼', mw.x, y);
+  }
+
+  // 防御单位
+  for (const d of defenders) drawDefender(d);
+  // 敌方投射物
+  for (const h of hostiles) { ctx.font = '20px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('❓', h.x, h.y); }
+  // 子弹
+  for (const b of bullets) {
+    ctx.beginPath(); ctx.fillStyle = b.color;
+    ctx.arc(b.x, b.y, b.pierce ? 9 : 7, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  // 怪物
+  for (const e of enemies) drawEnemy(e);
+  // 勋章
+  for (const m of medals) drawMedal(m);
+  // 飘字
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const f of floats) {
+    ctx.globalAlpha = Math.min(1, f.t);
+    ctx.font = 'bold ' + f.size + 'px sans-serif';
+    ctx.fillStyle = f.color;
+    ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 3;
+    ctx.strokeText(f.text, f.x, f.y); ctx.fillText(f.text, f.x, f.y);
+  }
+  ctx.globalAlpha = 1;
+  // 横幅
+  if (banner) {
+    ctx.globalAlpha = Math.min(1, banner.t);
+    ctx.fillStyle = 'rgba(198,40,40,.85)';
+    ctx.fillRect(0, H / 2 - 34, W, 68);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 30px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(banner.text, W / 2, H / 2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawTopBar() {
+  ctx.fillStyle = '#0a3d91'; ctx.fillRect(0, 0, W, 92);
+  // 荣誉值
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.font = 'bold 24px sans-serif'; ctx.fillStyle = '#ffd54f';
+  ctx.fillText('🏅 ' + Math.floor(honor), 18, 32);
+  ctx.font = '12px sans-serif'; ctx.fillStyle = '#90caf9';
+  ctx.fillText('荣誉值', 22, 58);
+  // 关卡名 + 进度
+  ctx.textAlign = 'right'; ctx.font = 'bold 15px sans-serif'; ctx.fillStyle = '#e3f2fd';
+  ctx.fillText(level ? level.name : '', W - 16, 24);
+  ctx.font = '12px sans-serif'; ctx.fillStyle = '#90caf9';
+  ctx.fillText('波次 ' + Math.min(waveIdx, level ? level.waves.length : 0) + ' / ' + (level ? level.waves.length : 0), W - 16, 46);
+  // 卡槽
+  const cards = availableDefenders();
+  const cardW = 96, gap = 6, startX = 150, cardY = 12, cardH = 68;
+  for (let i = 0; i < cards.length; i++) {
+    const key = cards[i], def = DEFENDERS[key];
+    const cx = startX + i * (cardW + gap);
+    const afford = honor >= def.cost;
+    ctx.fillStyle = selectedCard === key ? '#ffca28' : (afford ? '#1e88e5' : '#37474f');
+    roundRect(cx, cardY, cardW, cardH, 8); ctx.fill();
+    ctx.strokeStyle = selectedCard === key ? '#fff' : 'rgba(255,255,255,.25)'; ctx.lineWidth = selectedCard === key ? 3 : 1; ctx.stroke();
+    ctx.globalAlpha = afford ? 1 : 0.55;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '24px serif'; ctx.fillStyle = '#fff'; ctx.fillText(def.emoji, cx + 22, cardY + 26);
+    ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
+    ctx.fillText(def.name, cx + 40, cardY + 20);
+    ctx.font = 'bold 13px sans-serif'; ctx.fillStyle = '#ffe082';
+    ctx.fillText('🏅' + def.cost, cx + 40, cardY + 44);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawPlacementHint() {
+  // 需要鼠标位置;简单起见高亮所有空格边框
+}
+
+function drawDefender(d) {
+  const x = d.x, y = d.y;
+  // 身体底座
+  ctx.fillStyle = d.def.color; ctx.globalAlpha = 0.9;
+  roundRect(x - CELL_W / 2 + 8, y - CELL_H / 2 + 8, CELL_W - 16, CELL_H - 16, 10); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.font = Math.floor(CELL_H * 0.42) + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(d.def.emoji, x, y - 2);
+  // 血条
+  if (d.hp < d.maxHp) {
+    const w = CELL_W - 24, hp = Math.max(0, d.hp / d.maxHp);
+    ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(x - w / 2, y + CELL_H / 2 - 14, w, 5);
+    ctx.fillStyle = hp > 0.4 ? '#66bb6a' : '#ef5350'; ctx.fillRect(x - w / 2, y + CELL_H / 2 - 14, w * hp, 5);
+  }
+}
+
+function drawEnemy(e) {
+  const x = e.x, y = cellCenterY(e.row);
+  const s = e.def.boss ? Math.floor(CELL_H * 0.9) : Math.floor(CELL_H * 0.5);
+  if (e.def.boss) {
+    ctx.fillStyle = 'rgba(198,40,40,.35)';
+    ctx.beginPath(); ctx.arc(x, y, CELL_H * 0.62, 0, Math.PI * 2); ctx.fill();
+  }
+  if (e.slowT > 0) { ctx.fillStyle = 'rgba(100,181,246,.35)'; ctx.beginPath(); ctx.arc(x, y, s * 0.6, 0, Math.PI * 2); ctx.fill(); }
+  ctx.font = s + 'px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(e.def.emoji, x, y);
+  // 血条
+  const w = e.def.boss ? CELL_W * 1.4 : CELL_W - 26;
+  const hp = Math.max(0, e.hp / e.maxHp);
+  ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(x - w / 2, y - s / 2 - 12, w, 6);
+  ctx.fillStyle = e.def.boss ? '#ff1744' : (hp > 0.4 ? '#ffca28' : '#ef5350');
+  ctx.fillRect(x - w / 2, y - s / 2 - 12, w * hp, 6);
+}
+
+function drawMedal(m) {
+  ctx.save();
+  ctx.translate(m.x, m.y);
+  ctx.font = '30px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  // 光晕
+  ctx.shadowColor = '#ffd54f'; ctx.shadowBlur = 14;
+  ctx.fillText('🏅', 0, 0);
+  ctx.restore();
+}
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+// ====================== 主循环 ======================
+function loop(ts) {
+  const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0);
+  lastTs = ts;
+  if (state === 'playing') update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ====================== 缩放适配 ======================
+function resize() {
+  const wrap = document.getElementById('wrap');
+  const vw = wrap.clientWidth, vh = wrap.clientHeight;
+  const scale = Math.min(vw / W, vh / H);
+  CV.style.width = (W * scale) + 'px';
+  CV.style.height = (H * scale) + 'px';
+}
+window.addEventListener('resize', resize);
+
+// ====================== UI / 覆盖层 ======================
+const ov = {
+  menu: document.getElementById('ov-menu'),
+  map: document.getElementById('ov-map'),
+  dialog: document.getElementById('ov-dialog'),
+  result: document.getElementById('ov-result'),
+};
+function hideAllOverlays() { Object.values(ov).forEach(o => o.classList.remove('show')); }
+function showOverlay(name) { hideAllOverlays(); ov[name].classList.add('show'); }
+
+function buildMap() {
+  const list = document.getElementById('level-list');
+  list.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const unlocked = i === 0 || SAVE.cleared.indexOf(i - 1) >= 0;
+    const stars = SAVE.stars[i] || 0;
+    const card = document.createElement('div');
+    card.className = 'lv-card' + (unlocked ? '' : ' locked');
+    card.innerHTML = '<div style="font-size:30px">' + ['📣','🔥','👑'][i] + '</div>' +
+      '<h3>' + lv.name.split(' · ')[0] + '</h3>' +
+      '<div class="lv-sub">' + lv.name.split(' · ')[1] + '</div>' +
+      '<div class="stars">' + (unlocked ? ('★★★'.slice(0, stars) + '☆☆☆'.slice(0, 3 - stars)) : '🔒') + '</div>';
+    if (unlocked) card.addEventListener('click', () => openDialog(i));
+    list.appendChild(card);
+  });
+}
+
+let pendingLevel = 0;
+function openDialog(i) {
+  pendingLevel = i;
+  document.getElementById('dlg-title').textContent = LEVELS[i].dialogTitle;
+  document.getElementById('dlg-body').innerHTML = LEVELS[i].dialog;
+  showOverlay('dialog');
+}
+
+function showResult(win, stars) {
+  const t = document.getElementById('res-title');
+  const b = document.getElementById('res-body');
+  const st = document.getElementById('res-stars');
+  const un = document.getElementById('res-unlock');
+  const nextBtn = document.getElementById('btn-res-next');
+  if (win) {
+    t.textContent = '防守成功!';
+    t.style.color = '#a5d6a7';
+    if (levelIndex === LEVELS.length - 1) {
+      b.innerHTML = '谣言散尽,球台如初。<br>体育就是体育,热爱就是热爱。<br><b>—— 2026,继续打爆一切</b>';
+    } else {
+      b.innerHTML = '这一轮噪音,被你挡了回去。';
+    }
+    st.textContent = '★★★'.slice(0, stars) + '☆☆☆'.slice(0, 3 - stars);
+    un.textContent = LEVELS[levelIndex].unlockText || '';
+    nextBtn.textContent = levelIndex < LEVELS.length - 1 ? '下一关' : '回到选关';
+  } else {
+    t.textContent = '球台失守…';
+    t.style.color = '#ef9a9a';
+    b.innerHTML = '噪音冲破了防线。<br>别灰心——真正的强大,是一次次重新站上球台。';
+    st.textContent = '';
+    un.textContent = '';
+    nextBtn.textContent = '重新挑战';
+  }
+  showOverlay('result');
+}
+
+// 按钮事件
+document.getElementById('btn-start').addEventListener('click', () => { buildMap(); showOverlay('map'); });
+document.getElementById('btn-map-back').addEventListener('click', () => showOverlay('menu'));
+document.getElementById('btn-dlg-next').addEventListener('click', () => startLevel(pendingLevel));
+document.getElementById('btn-res-retry').addEventListener('click', () => startLevel(levelIndex));
+document.getElementById('btn-res-next').addEventListener('click', () => {
+  if (state === 'won' && levelIndex < LEVELS.length - 1) { openDialog(levelIndex + 1); }
+  else { buildMap(); showOverlay('map'); }
+});
+
+// ====================== 启动 ======================
+resize();
+showOverlay('menu');
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
