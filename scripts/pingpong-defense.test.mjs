@@ -217,10 +217,10 @@ test('healing affects living targets but never revives a dead enemy', () => {
   const { game } = createContext();
   game.startLevel(2);
   game.isolateWorld();
-  const dataZombie = entityFrom(game.ENEMIES.data, { type: 'data', x: 500, healT: 0 });
+  const smirker = entityFrom(game.ENEMIES.smirk, { type: 'smirk', x: 500, healT: 0 });
   const dead = entityFrom(game.ENEMIES.troll, { type: 'troll', x: 510, hp: 0 });
   const wounded = entityFrom(game.ENEMIES.troll, { type: 'troll', x: 520, hp: 20 });
-  game.enemies = [dataZombie, dead, wounded];
+  game.enemies = [smirker, dead, wounded];
 
   game.update(1 / 60);
 
@@ -384,4 +384,19 @@ test('economy and burst values stay within the balanced envelope', () => {
     { cost: game.DEFENDERS.smash.cost, damage: game.DEFENDERS.smash.dmg, cooldown: game.DEFENDERS.smash.cd },
     { cost: 175, damage: 600, cooldown: 16 },
   );
+});
+
+test('levels two and three spawn 20% tougher zombies than level one', () => {
+  const { game } = createContext();
+  const base = game.ENEMIES.follower.hp;
+
+  game.startLevel(0);
+  game.spawnEnemy('follower', 0);
+  assert.equal(game.enemies.at(-1).hp, base);
+
+  for (const levelIdx of [1, 2]) {
+    game.startLevel(levelIdx);
+    game.spawnEnemy('follower', 0);
+    assert.equal(game.enemies.at(-1).hp, Math.round(base * 1.2));
+  }
 });

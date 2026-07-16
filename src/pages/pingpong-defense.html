@@ -279,19 +279,19 @@ const KILL_QUOTES = [
 let killQuoteCd = 0; // 冷却,避免同屏刷太多
 
 const ENEMIES = {
-  follower:   { name:'跟风僵尸',   emoji:'🧟', acc:'',    hp:110,  speed:14, dmg:18, color:'#90a4ae',
+  follower:   { name:'跟风僵尸',   emoji:'🧟', acc:'',    hp:120,  speed:14, dmg:18, color:'#90a4ae',
                 dead:['哦…原来输球就是输球啊','大家骂我才跟着骂的…','原来我根本没看过比赛','取关了取关了','跟错风了，撤！'] },
-  troll:      { name:'水军僵尸',   emoji:'🧟', acc:'💬',  hp:55,   speed:24, dmg:14, color:'#7e57c2',
+  troll:      { name:'水军僵尸',   emoji:'🧟', acc:'💬',  hp:60,   speed:24, dmg:14, color:'#7e57c2',
                 dead:['复制粘贴…失败','群主！工资结一下！','水军也是要下班的','5毛到账，人没了','控评失败，撤退！','对不起，我是兼职的'] },
-  blamer:     { name:'甩锅僵尸',   emoji:'🧟', acc:'🍳',  hp:170,  speed:15, dmg:22, color:'#ff7043',
+  blamer:     { name:'甩锅僵尸',   emoji:'🧟', acc:'🍳',  hp:185,  speed:15, dmg:22, color:'#ff7043',
                 dead:['这锅…甩不出去了','输了？一定是球台的问题！','都怪灯光！都怪地胶！','明明是我不会打','这球拍，早有预谋！','锅太重，压死我了'] },
-  conspiracy: { name:'阴谋论僵尸', emoji:'🧟', acc:'🕵️', hp:130,  speed:14, dmg:12, ranged:true, color:'#455a64',
+  conspiracy: { name:'阴谋论僵尸', emoji:'🧟', acc:'🕵️', hp:142,  speed:14, dmg:12, ranged:true, color:'#455a64',
                 dead:['断拍…也许真是意外？','小作文…还没写完…','证据呢？我也没有','真相是——啊！','连夜编的剧本，白编了','惊天大瓜，烂在肚子里了'] },
-  shield:     { name:'控评盾卫僵尸', emoji:'🧟', acc:'🛡️', hp:340,  speed:11, dmg:20, armor:.5, aura:true, color:'#546e7a',
+  shield:     { name:'控评盾卫僵尸', emoji:'🧟', acc:'🛡️', hp:370,  speed:11, dmg:20, armor:.5, aura:true, color:'#546e7a',
                 dead:['控不住了……','评论区恢复正常了','屏蔽词失效了','话术模板过期了','控评失败，撤退！','真实声音压不住了'] },
-  data:       { name:'数据注水僵尸', emoji:'🧟', acc:'📈', hp:240,  speed:12, dmg:18, heal:true, color:'#26a69a',
-                dead:['数据回落了……','机器号全部掉线','虚假热度撑不住了','刷量通道已关闭','注水榜单现原形','后台曲线崩了！'] },
-  boss:       { name:'饭圈僵尸王', emoji:'🧟', acc:'📢',  hp:3200, speed:8,  dmg:40, boss:true, armor:.25, color:'#c62828',
+  smirk:      { name:'偷笑僵尸',   emoji:'🧟', acc:'😏',  hp:260,  speed:12, dmg:18, heal:true, color:'#26a69a',
+                dead:['笑不出来了……','嘴角终于压下去了','这下真绷不住了','乐子人乐不动了','脸都笑僵了','偷笑，被抓包了'] },
+  boss:       { name:'饭圈僵尸王', emoji:'🧟', acc:'📢',  hp:3450, speed:8,  dmg:40, boss:true, armor:.25, color:'#c62828',
                 dead:['体育…原来本该是这样的啊'] },
 };
 
@@ -315,8 +315,9 @@ const LEVELS = [
   {
     name: '第二关 · 热搜风暴',
     dialogTitle: '热搜风暴',
-    dialog: '“去德国打球=输送技术”……<br><b>甩锅僵尸</b>、<b>阴谋论僵尸</b>、<b>控评盾卫僵尸</b>带着编好的剧本啃进了草坪。<br>阴谋论僵尸会<b>远程</b>投掷飞斧，控评盾卫僵尸拥有<b>高额减伤</b>，还会<b>压制</b>附近植物的攻击速度——用<b>发球机器人</b>和<b>寒冰裁判</b>突破它们。',
+    dialog: '“人在德甲，锅从天降。”<br><b>甩锅僵尸</b>、<b>阴谋论僵尸</b>、<b>控评盾卫僵尸</b>带着编好的剧本啃进了草坪。<br>阴谋论僵尸会<b>远程</b>投掷飞斧，控评盾卫僵尸拥有<b>高额减伤</b>，还会<b>压制</b>附近植物的攻击速度——用<b>发球机器人</b>和<b>寒冰裁判</b>突破它们。',
     startHonor: 175,
+    mult: 1.2,
     unlockText: '解锁新装备：🎈 爆破热气球（清空整行，使用后冷却）',
     waves: [
       { at: 4,  spawns: grp('follower',3) },
@@ -330,17 +331,18 @@ const LEVELS = [
   {
     name: '第三关 · 巅峰对决',
     dialogTitle: '巅峰对决',
-    dialog: '流量的尽头，是<b>数据注水僵尸</b>与<b>饭圈僵尸王</b>。<br>数据注水僵尸会给附近敌人持续回血，僵尸王还会召唤水军、掀起热搜风暴，给全场僵尸加速。<br>用你解锁的全部植物，打完这最后一战——让草坪，回到它本来的样子。',
+    dialog: '流量的尽头，是<b>偷笑僵尸</b>与<b>饭圈僵尸王</b>。<br>偷笑僵尸躲在人群后面阴阳怪气，会给附近敌人持续回血，僵尸王还会召唤水军、掀起热搜风暴，给全场僵尸加速。<br>用你解锁的全部植物，打完这最后一战——让草坪，回到它本来的样子。',
     startHonor: 200,
+    mult: 1.2,
     unlockText: '',
     waves: [
       { at: 4,  spawns: [...grp('follower',3), ...grp('troll',3)] },
       { at: 18, spawns: [...grp('blamer',3), ...grp('conspiracy',2)] },
       { at: 32, spawns: [...grp('shield',2), ...grp('troll',5)], surge:true },
-      { at: 48, spawns: [...grp('data',1), ...grp('conspiracy',3)] },
-      { at: 64, spawns: [...grp('shield',2), ...grp('blamer',3), ...grp('data',1)] },
+      { at: 48, spawns: [...grp('smirk',1), ...grp('conspiracy',3)] },
+      { at: 64, spawns: [...grp('shield',2), ...grp('blamer',3), ...grp('smirk',1)] },
       { at: 82, spawns: [...grp('troll',8)], surge:true },
-      { at: 96, spawns: [...grp('data',2), ...grp('conspiracy',3), ...grp('shield',2)] },
+      { at: 96, spawns: [...grp('smirk',2), ...grp('conspiracy',3), ...grp('shield',2)] },
       { at: 112, spawns: [...grp('boss',1)], last:true, boss:true },
     ],
   },
@@ -499,9 +501,11 @@ function updateWaves(dt) {
 
 function spawnEnemy(type, row) {
   const d = ENEMIES[type];
+  const mult = (level && level.mult) || 1;   // 关卡难度系数(二三关 1.2)
+  const hp = Math.round(d.hp * mult);
   enemies.push({
     type, def: d, row,
-    x: W + rand(0, 60), hp: d.hp, maxHp: d.hp,
+    x: W + rand(0, 60), hp, maxHp: hp,
     speed: d.speed, slowT: 0, atkT: 0, summonT: 4, healT: 3, phase: 0,
   });
 }
@@ -642,13 +646,13 @@ function update(dt) {
       if (ratio < 0.66 && e.phase < 1) { e.phase = 1; addFloat(e.x, cellCenterY(e.row) - 30, '“研究队友！”', '#ffcdd2', 18); }
       if (ratio < 0.33 && e.phase < 2) { e.phase = 2; addFloat(e.x, cellCenterY(e.row) - 30, '“菜谱都背下来了！”', '#ffcdd2', 18); }
     }
-    // 数据注水僵尸治疗光环
+    // 偷笑僵尸治疗光环
     if (e.def.heal) {
       e.healT -= dt;
       if (e.healT <= 0) {
         e.healT = 4;
         for (const o of enemies) if (o !== e && o.hp > 0 && Math.abs(o.x - e.x) < CELL_W * 2 && o.hp < o.maxHp) { o.hp = Math.min(o.maxHp, o.hp + 30); }
-        addFloat(e.x, cellCenterY(e.row) - 24, '📈 数据注水回血', '#80cbc4', 14);
+        addFloat(e.x, cellCenterY(e.row) - 24, '😏 阴阳怪气回血', '#80cbc4', 14);
       }
     }
 
@@ -657,7 +661,7 @@ function update(dt) {
       const mw = mowers[e.row];
       if (mw && !mw.used) {
         mw.used = true; mw.active = true; mw.x = HOME_X - 26;
-        addFloat(HOME_X + 70, cellCenterY(e.row) - 26, '🚜 清台机出动！', '#fff59d', 16);
+        addFloat(HOME_X + 70, cellCenterY(e.row) - 26, '🥇 超级金满贯，金牌碾压！', '#fff59d', 16);
       }
     }
   }
@@ -748,22 +752,20 @@ function draw() {
   // 放置高亮
   if (selectedCard) drawPlacementHint();
 
-  // 割草机(清台机)
+  // 清台机:超级金满贯大金牌,滚过整行碾压饭圈
   for (const mw of mowers) {
     const y = cellCenterY(mw.row);
     if (!mw.used) {
-      // 待命:停靠带上画个停车位衬底,让它读得出来是"一台机器"
       ctx.fillStyle = 'rgba(0,0,0,.25)';
-      ctx.beginPath(); ctx.ellipse(mw.x, y + 14, 19, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(mw.x, y + 16, 18, 6, 0, 0, Math.PI * 2); ctx.fill();
     } else if (mw.active) {
-      // 冲刺中:车后扬尘
-      ctx.fillStyle = 'rgba(255,255,255,.55)';
+      // 冲刺中:身后金色尾迹
+      ctx.fillStyle = 'rgba(255,213,79,.5)';
       for (let i = 1; i <= 3; i++) {
-        ctx.beginPath(); ctx.arc(mw.x - 20 - i * 13, y + rand(-9, 9), 6 - i, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(mw.x - 18 - i * 12, y + rand(-8, 8), 6 - i, 0, Math.PI * 2); ctx.fill();
       }
     }
-    ctx.font = '34px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('🚜', mw.x, y);
+    drawBigMedal(mw.x, y, mw.x * 0.06);
   }
 
   // 防御单位
@@ -943,6 +945,32 @@ function drawDefender(d) {
   }
 }
 
+// 大金牌(清台机的显示形态):内盘随 x 位置旋转,像硬币一样滚过草坪,文字保持正立
+function drawBigMedal(x, y, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  const R = 21;
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2);
+  ctx.fillStyle = '#f9a825'; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#e65100'; ctx.stroke();
+  ctx.rotate(rot);
+  ctx.beginPath(); ctx.arc(0, 0, R - 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffd54f'; ctx.fill();
+  ctx.strokeStyle = 'rgba(230,81,0,.6)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * (R - 9), Math.sin(a) * (R - 9));
+    ctx.lineTo(Math.cos(a) * (R - 4), Math.sin(a) * (R - 4));
+    ctx.stroke();
+  }
+  ctx.rotate(-rot);
+  ctx.fillStyle = '#bf360c'; ctx.font = 'bold 17px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('冠', 0, 1);
+  ctx.restore();
+}
+
 function zombieLimb(x1, y1, x2, y2, width, color) {
   ctx.strokeStyle = color;
   ctx.lineWidth = width;
@@ -1041,18 +1069,18 @@ function drawZombieCharacter(e, s) {
     ctx.fillStyle = '#eceff1'; ctx.font = 'bold 18px sans-serif'; ctx.fillText('控', 25, 9);
     zombieLimb(-18, -3, -33, 9, 9, skin);
     ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(-35, 11, 5, 0, Math.PI * 2); ctx.fill();
-  } else if (e.type === 'data') {
-    // 数据注水辅助怪：多部手机和上升曲线形成清楚的治疗型剪影。
+  } else if (e.type === 'smirk') {
+    // 偷笑辅助怪:捂嘴弯腰+"嘻嘻"气泡,阴阳怪气地给同伴回血。
     zombieLimb(-7, 17, -12, 38, 7, skin); zombieLimb(8, 17, 13, 38, 7, skin);
     ctx.fillStyle = '#00796b'; ctx.beginPath(); ctx.moveTo(-16,-8); ctx.lineTo(16,-8); ctx.lineTo(22,26); ctx.lineTo(-20,26); ctx.closePath(); ctx.fill(); ctx.stroke();
     zombieFace(0, -25, 16, 18, skin, 'slack');
-    zombieLimb(-13, -2, -30, -13, 6, skin); zombieLimb(15, -2, 31, -14, 6, skin);
-    ctx.fillStyle = '#263238'; ctx.fillRect(-39, -25, 15, 25); ctx.strokeRect(-39, -25, 15, 25);
-    ctx.fillRect(27, -27, 15, 25); ctx.strokeRect(27, -27, 15, 25);
-    ctx.fillStyle = '#80cbc4'; ctx.fillRect(-36, -22, 9, 16); ctx.fillRect(30, -24, 9, 16);
-    ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 3; ctx.beginPath();
-    ctx.moveTo(-9, 12); ctx.lineTo(-1, 3); ctx.lineTo(7, 8); ctx.lineTo(17, -5); ctx.stroke();
-    ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.moveTo(17,-5); ctx.lineTo(10,-3); ctx.lineTo(15,3); ctx.closePath(); ctx.fill();
+    zombieLimb(-13, -2, -30, -13, 6, skin);
+    zombieLimb(15, -2, 9, -15, 6, skin);
+    ctx.fillStyle = skin; ctx.strokeStyle = '#263238'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.ellipse(5, -16, 10, 7, .45, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fffde7'; ctx.beginPath(); ctx.ellipse(31, -40, 15, 11, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#37474f'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('嘻嘻', 31, -40);
   } else {
     // BOSS：巨型宽体、披风、扩音器、手机屏幕光环。
     ctx.fillStyle = 'rgba(255,23,68,.24)'; ctx.beginPath(); ctx.arc(0, -5, 43, 0, Math.PI * 2); ctx.fill();
