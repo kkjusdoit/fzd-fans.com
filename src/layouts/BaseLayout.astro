@@ -271,7 +271,6 @@ const pageDesc = description || t('site.subtitle');
       </div>
       <div class="modal-footer">
         <button class="btn-primary" id="modalDismissBtn">我知道了</button>
-        <button class="btn-secondary" id="modalNeverShowTodayBtn">今日不再提示</button>
       </div>
     </div>
   </div>
@@ -282,7 +281,6 @@ const pageDesc = description || t('site.subtitle');
         const modal = document.getElementById('promoModal');
         const closeBtn = document.getElementById('modalCloseBtn');
         const dismissBtn = document.getElementById('modalDismissBtn');
-        const neverShowBtn = document.getElementById('modalNeverShowTodayBtn');
         const backdrop = document.getElementById('modalBackdrop');
 
         if (!modal) return;
@@ -302,23 +300,19 @@ const pageDesc = description || t('site.subtitle');
           }, 20);
         }, 1500);
 
-        function closeModal() {
+        function dismissModal() {
+          // Dismiss for 3 days (covers "当天不再提示" and "三天内不再提示")
+          const threeDays = 3 * 24 * 60 * 60 * 1000;
+          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + threeDays).toString());
           modal.classList.remove('active');
           setTimeout(function() {
             modal.style.display = 'none';
           }, 300);
         }
 
-        closeBtn?.addEventListener('click', closeModal);
-        dismissBtn?.addEventListener('click', closeModal);
-        backdrop?.addEventListener('click', closeModal);
-
-        neverShowBtn?.addEventListener('click', function() {
-          // Dismiss for 24 hours
-          const oneDay = 24 * 60 * 60 * 1000;
-          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + oneDay).toString());
-          closeModal();
-        });
+        closeBtn?.addEventListener('click', dismissModal);
+        dismissBtn?.addEventListener('click', dismissModal);
+        backdrop?.addEventListener('click', dismissModal);
       });
     })();
   </script>
