@@ -129,9 +129,12 @@ function initial(brand: string) {
                     </h3>
                     <div class="bc-tags">
                       <span class="bc-cat">{i.category}</span>
-                      <span class="bc-role">{i.role}</span>
                     </div>
-                    {i.slogan && <p class="bc-slogan">「{i.slogan}」</p>}
+                    <div class="bc-copy">
+                      <p><span>代言身份 / 角色定位</span>{i.role}</p>
+                      {i.slogan && <p><span>官方核心传播文案 / 广告语</span>{i.slogan}</p>}
+                      {i.notes && <p><span>协同传播深度与产品力印证</span>{i.notes}</p>}
+                    </div>
                     <div class="bc-foot">
                       <span class="bc-date">{i.signDate}</span>
                       <span class="bc-type">{tm.icon} {tm.label}</span>
@@ -256,6 +259,12 @@ function initial(brand: string) {
   .bc-cat { background: #eef2f6; color: #5a6b7d; }
   .bc-role { background: #e3f2fd; color: #1565c0; }
   .bc-slogan { font-size: 0.85rem; color: #5a6b7d; font-style: italic; margin: 0.2rem 0 0.6rem; }
+  .bc-copy { margin: 0.15rem 0 0.75rem; display: grid; gap: 0.5rem; }
+  .bc-copy p { margin: 0; color: #5a6b7d; font-size: 0.78rem; line-height: 1.65; }
+  .bc-copy span {
+    display: block; margin-bottom: 0.12rem; color: #8797a8; font-size: 0.68rem;
+    font-weight: 700;
+  }
   .bc-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; }
   .bc-date { font-size: 0.78rem; color: #8797a8; }
   .bc-type { font-size: 0.75rem; font-weight: 600; color: #5c6bc0; }
