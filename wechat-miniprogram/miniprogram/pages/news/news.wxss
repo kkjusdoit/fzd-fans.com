@@ -1,0 +1,143 @@
+.container {
+  padding: 20rpx 24rpx 60rpx;
+  background: #f7f8fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.news-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 0 30rpx;
+}
+.news-header .title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #222;
+}
+.news-header .desc {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 10rpx;
+}
+
+/* 筛选 chip */
+.filter-scroll {
+  white-space: nowrap;
+  margin-bottom: 30rpx;
+}
+.chip {
+  display: inline-block;
+  padding: 12rpx 28rpx;
+  margin-right: 16rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #555;
+  font-size: 26rpx;
+}
+.chip.active {
+  background: #1e88e5;
+  color: #fff;
+  border-color: #1e88e5;
+}
+
+/* 时间轴 */
+.timeline {
+  position: relative;
+  padding-left: 72rpx;
+}
+.timeline-line {
+  position: absolute;
+  left: 30rpx;
+  top: 12rpx;
+  bottom: 12rpx;
+  width: 3rpx;
+  background: linear-gradient(to bottom, #1e88e5, #90caf9);
+}
+.year-label {
+  position: relative;
+  margin: 0 0 20rpx -30rpx;
+  z-index: 3;
+}
+.year-label text {
+  display: inline-block;
+  background: #1e88e5;
+  color: #fff;
+  font-weight: 700;
+  font-size: 28rpx;
+  padding: 4rpx 22rpx;
+  border-radius: 999rpx;
+  box-shadow: 0 3rpx 10rpx rgba(30, 136, 229, 0.25);
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 34rpx;
+}
+.tl-dot {
+  position: absolute;
+  left: -66rpx;
+  top: 6rpx;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #fff;
+  border: 4rpx solid #fff;
+  box-shadow: 0 3rpx 10rpx rgba(30, 136, 229, 0.25);
+  z-index: 2;
+}
+.tl-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 26rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+.tl-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.tl-date {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 16rpx;
+}
+.tl-tag {
+  font-size: 22rpx;
+  color: #fff;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+}
+.tl-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.4;
+  margin-bottom: 10rpx;
+}
+.tl-summary {
+  display: block;
+  font-size: 27rpx;
+  color: #666;
+  line-height: 1.65;
+  margin-bottom: 12rpx;
+}
+.tl-img {
+  width: 100%;
+  border-radius: 12rpx;
+  margin-top: 8rpx;
+}
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  padding: 120rpx 0;
+  font-size: 28rpx;
+}

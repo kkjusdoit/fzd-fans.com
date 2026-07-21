@@ -5,7 +5,9 @@ Component({
   pageLifetimes: {
     show() {
       const now = new Date();
-      const targetDate = new Date('2026-07-15T00:00:00');
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      const targetDate = isDouyin ? new Date('2026-07-26T00:00:00') : new Date('2026-07-15T00:00:00');
       this.setData({
         showGames: now > targetDate
       });

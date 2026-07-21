@@ -1,0 +1,65 @@
+<view class="container">
+  <!-- 叙事英雄区 -->
+  <view class="hero">
+    <text class="hero-badge">🤝 同行者</text>
+    <text class="hero-title">与他并肩的球队，选择他的品牌</text>
+    <text class="hero-lead">运动器材、消费电子、高端汽车、奢侈时装、美妆护肤……从并肩作战的职业俱乐部，到横跨 {{stats.categories}} 个行业的品牌，樊振东赢得的信任早已越过乒乓球台的边界。记录的不是他征服了多少，而是有多少球队与品牌主动选择与他同行——看这份影响力如何一路破圈生长。</text>
+    <view class="hero-stats">
+      <view class="hs"><text class="n">{{stats.total}}</text><text class="l">同行伙伴</text></view>
+      <view class="hs"><text class="n">{{stats.categories}}</text><text class="l">覆盖行业</text></view>
+      <view class="hs"><text class="n">{{stats.active}}</text><text class="l">进行中</text></view>
+    </view>
+  </view>
+
+  <!-- 破圈广度 -->
+  <view class="breadth">
+    <text class="sec-title">🌐 破圈广度</text>
+    <view class="cat-cloud">
+      <view class="cat-pill" wx:for="{{breadth}}" wx:key="category">
+        <text>{{item.category}}</text><text class="cat-num">{{item.count}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 类型筛选 -->
+  <scroll-view class="filter-scroll" scroll-x="true" enable-flex>
+    <view class="chip {{activeType === 'all' ? 'active' : ''}}" data-type="all" bindtap="onFilterTap">全部 {{stats.total}}</view>
+    <view class="chip {{activeType === item.key ? 'active' : ''}}" wx:for="{{types}}" wx:key="key" data-type="{{item.key}}" bindtap="onFilterTap">{{item.icon}} {{item.label}} {{item.count}}</view>
+  </scroll-view>
+
+  <!-- 逐年版图 -->
+  <view class="year-block" wx:for="{{groups}}" wx:for-item="group" wx:key="year">
+    <view class="year-marker"><text>{{group.year}}</text></view>
+    <view class="brand-grid">
+      <view class="brand-card" wx:for="{{group.list}}" wx:key="id">
+        <view class="bc-top">
+          <view class="bc-logo">
+            <image wx:if="{{item.logo}}" class="bc-logo-img" src="{{item.logo}}" mode="aspectFit"></image>
+            <text wx:else>{{item.initial}}</text>
+          </view>
+          <text class="bc-status {{item.status}}">{{item.statusLabel}}</text>
+        </view>
+        <text class="bc-brand">{{item.brand}}</text>
+        <view class="bc-tags">
+          <text class="bc-cat">{{item.category}}</text>
+          <text class="bc-role">{{item.role}}</text>
+        </view>
+        <text class="bc-slogan" wx:if="{{item.slogan}}">「{{item.slogan}}」</text>
+        <view class="bc-foot">
+          <text class="bc-date">{{item.signDate}}</text>
+          <text class="bc-type">{{item.typeIcon}} {{item.typeLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 可信度页脚 -->
+  <view class="foot">
+    <text>📊 数据整理自公开报道与品牌官方发布，力求客观，仅供参考。</text>
+    <text>如有错漏或新合作信息，欢迎邮件指正共建：</text>
+    <view class="foot-email" bindtap="copyEmail">
+      <text class="foot-email-text">kkjusdoit@gmail.com</text>
+      <text class="foot-email-btn">点击复制</text>
+    </view>
+  </view>
+</view>

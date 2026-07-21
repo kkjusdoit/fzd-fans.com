@@ -1,0 +1,140 @@
+.container {
+  padding: 0 0 60rpx;
+  background: #f7f9fc;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 英雄区 —— 蓝白渐变 */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 50rpx 40rpx 40rpx;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f8fbff 100%);
+}
+.hero-badge {
+  background: #1e88e5;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 6rpx 22rpx;
+  border-radius: 30rpx;
+  margin-bottom: 20rpx;
+}
+.hero-title { font-size: 40rpx; font-weight: 800; color: #1a2b40; line-height: 1.4; }
+.hero-lead { font-size: 26rpx; color: #5a6b7d; line-height: 1.7; margin: 18rpx 0 30rpx; }
+.hero-stats { display: flex; gap: 60rpx; }
+.hs { display: flex; flex-direction: column; align-items: center; }
+.hs .n { font-size: 52rpx; font-weight: 800; color: #1e88e5; line-height: 1; }
+.hs .l { font-size: 22rpx; color: #8797a8; margin-top: 8rpx; }
+
+/* 破圈广度 */
+.breadth { padding: 34rpx 24rpx 10rpx; }
+.sec-title { font-size: 32rpx; font-weight: 700; color: #1a2b40; }
+.cat-cloud { display: flex; flex-wrap: wrap; gap: 14rpx; margin-top: 18rpx; }
+.cat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #fff;
+  border: 1rpx solid #e3eaf2;
+  border-radius: 999rpx;
+  padding: 8rpx 20rpx;
+  font-size: 24rpx;
+  color: #44586c;
+}
+.cat-num { background: #e3f2fd; color: #1e88e5; font-size: 20rpx; padding: 0 10rpx; border-radius: 999rpx; }
+
+/* 筛选 */
+.filter-scroll { white-space: nowrap; padding: 24rpx; }
+.chip {
+  display: inline-block;
+  padding: 12rpx 26rpx;
+  margin-right: 16rpx;
+  border: 1rpx solid #d8e2ec;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #44586c;
+  font-size: 26rpx;
+}
+.chip.active { background: #1e88e5; color: #fff; border-color: #1e88e5; }
+
+/* 逐年 */
+.year-block { padding: 0 24rpx; margin-bottom: 20rpx; }
+.year-marker { display: flex; align-items: center; margin: 16rpx 0 20rpx; }
+.year-marker text {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #1e88e5;
+  background: #e3f2fd;
+  padding: 6rpx 24rpx;
+  border-radius: 12rpx;
+}
+
+.brand-grid { display: flex; flex-wrap: wrap; justify-content: space-between; }
+.brand-card {
+  width: 48%;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1rpx solid #eef2f6;
+  border-radius: 18rpx;
+  padding: 22rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(30, 136, 229, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+.bc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14rpx; }
+.bc-logo {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 18rpx;
+  background: #f4f8fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1e88e5;
+  overflow: hidden;
+}
+.bc-logo-img { width: 100%; height: 100%; }
+.bc-status { font-size: 20rpx; padding: 3rpx 14rpx; border-radius: 999rpx; font-weight: 600; }
+.bc-status.active { background: #e3f2fd; color: #1565c0; }
+.bc-status.completed { background: #f1f3f5; color: #868e96; }
+.bc-brand { display: block; font-size: 30rpx; font-weight: 600; color: #1a2b40; margin-bottom: 12rpx; }
+.bc-tags { display: flex; flex-wrap: wrap; gap: 8rpx; margin-bottom: 10rpx; }
+.bc-cat, .bc-role { font-size: 20rpx; padding: 3rpx 12rpx; border-radius: 6rpx; }
+.bc-cat { background: #eef2f6; color: #5a6b7d; }
+.bc-role { background: #e3f2fd; color: #1565c0; }
+.bc-slogan { display: block; font-size: 24rpx; color: #5a6b7d; margin: 4rpx 0 12rpx; }
+.bc-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10rpx; }
+.bc-date { font-size: 22rpx; color: #8797a8; }
+.bc-type { font-size: 22rpx; font-weight: 600; color: #5c6bc0; }
+
+/* 页脚 */
+.foot {
+  margin: 40rpx 24rpx 0;
+  padding: 26rpx 30rpx;
+  background: #f8fbff;
+  border: 1rpx solid #e3eaf2;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.foot text { font-size: 22rpx; color: #8797a8; line-height: 1.6; text-align: center; }
+.foot-email {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  margin-top: 12rpx;
+  padding: 12rpx 24rpx;
+  background: #e3f2fd;
+  border-radius: 10rpx;
+}
+.foot-email-text { font-size: 24rpx; color: #1565c0; font-weight: 600; }
+.foot-email-btn { font-size: 20rpx; color: #1e88e5; border: 1rpx solid #90caf9; padding: 2rpx 12rpx; border-radius: 999rpx; }

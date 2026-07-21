@@ -4,6 +4,7 @@ App<IAppOption>({
     lang: 'zh' // 默认为中文
   },
   onLaunch() {
+    console.log('App launch triggered!!!');
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())

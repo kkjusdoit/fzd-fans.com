@@ -1,4 +1,6 @@
 import { content } from '../../data/content';
+import { news } from '../../data/news';
+import { endorsements } from '../../data/endorsements';
 
 const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
   fzd101: { zh: 'FZD 101', en: 'FZD 101' },
@@ -89,16 +91,40 @@ Component({
             icon: CATEGORY_ICONS[c] || '📄'
           };
         });
-        
-      this.setData({ 
+
+      // 注入「快讯」入口（非 content 栏目，数据来自 news.js）
+      categories.unshift({
+        id: 'news',
+        name: lang === 'zh' ? '快讯' : 'News',
+        count: (news as any[]).length,
+        icon: '📰'
+      });
+
+      // 注入「同行者」入口（效力球队 + 品牌代言，数据来自 endorsements.js）
+      categories.push({
+        id: 'endorsements',
+        name: lang === 'zh' ? '同行者' : 'Companions',
+        count: (endorsements as any[]).length,
+        icon: '🤝'
+      });
+
+      this.setData({
         categories,
         currentLang: lang
       });
     },
-    
+
     onCategoryTap(e: any) {
       const category = e.currentTarget.dataset.category;
-      if (category === 'arena') {
+      if (category === 'news') {
+        wx.navigateTo({
+          url: '../news/news'
+        });
+      } else if (category === 'endorsements') {
+        wx.navigateTo({
+          url: '../endorsements/endorsements'
+        });
+      } else if (category === 'arena') {
         wx.navigateTo({
           url: '../timeline/timeline'
         });
