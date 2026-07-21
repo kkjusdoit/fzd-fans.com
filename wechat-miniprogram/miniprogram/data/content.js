@@ -231,6 +231,25 @@ module.exports = {
     "body": "<h2>2024 Paris Olympics Men&#39;s Singles Quarterfinal: Fan Zhendong vs Zhang Tomokazu</h2>\n<p>Full match review - highly recommend turning on comments!</p>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1a9KczoEZi&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong Defends National Games Men&#39;s Singles Title</h2>\n<p>Watch the full journey in one go!</p>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1VQCiBiEUs&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong - Karaoke Panda! Cover Song Collection</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1wA411P7TQ&p=24&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Heart of Bayi, Life in All Its Forms</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV17rhHzXEQE&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong 2017 Birthday Tribute - Original Song &quot;Walking Together&quot;</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1g4411g7UF&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<p><em>To be continued...</em></p>\n"
   },
   {
+    "id": "links-zh-2026-07-20-sports-lifestyle",
+    "category": "links",
+    "lang": "zh",
+    "filename": "2026-07-20-sports-lifestyle.md",
+    "title": "东方体育日报：成为明星社会体育指导员，樊振东——科学去运动 人人皆冠军！",
+    "titleEn": "",
+    "description": "《东方体育日报》报道樊振东正式出任“明星社会体育指导员”，由施之皓亲手颁发纪念奖牌，并发出首条倡议，呼吁广大市民“科学去运动，人人皆冠军”。",
+    "tags": [
+      "官方",
+      "媒体",
+      "报道",
+      "剪报",
+      "东方体育日报"
+    ],
+    "author": "",
+    "translated": false,
+    "body": "<p><img src=\"https://fzd-fans.com/img/2026-07-20-sports-lifestyle.png\" alt=\"东方体育日报剪报\"></p>\n<h3>报纸剪报：东方体育日报（2026年7月20日 星期一 A12版）</h3>\n<p><strong>本报记者：丁荣</strong></p>\n<p>近日，“上海银行”2026上海乒乓球双打俱乐部团体赛分站赛杨浦站收官仪式在复兴岛都市运动园落幕。奥运冠军樊振东在仪式上正式以全新身份——由中国乒乓学院院长、上海市社区体育协会会长施之皓亲手颁发纪念奖牌，成为“明星社会体育指导员”。</p>\n<p>在担任“明星社会体育指导员”后，樊振东通过上海市社会体育指导视频发出第一条倡议，呼吁广大市民“科学去运动 人人皆冠军！”</p>\n<p>“社会体育指导员”是全民健身志愿服务队伍，取之于人民，用之于人民。这一身份是对樊振东长期深耕上海群众乒乓球运动的高度认可，也是上海持续推进社会体育指导员队伍系统化改革、推动队伍向青年化专业化转型的生动缩影。</p>\n<p>早在几年前，樊振东便与上海群众乒乓球运动结下深厚缘分：2024年，他与上海乒协互动的相关视频全网播放量突破1亿次；2025年，他又连续参与“国乒三进”系列赛事，让专业乒乓球的魅力带到社区、校园与市民身边。</p>\n<p>今年年初，中国乒乓学院院长、上海市社区体育协会会长施之皓曾公开表示，要找一个合适的契机，将樊振东拉回到上海与乒乓世界冠军的监督，“让振东活跃起来”。如今，这份约定以官方认证的“明星社会体育指导员”身份落地，既兑现了承诺，也为上海群众体育事业注入了新的活力。</p>\n<hr>\n<p><em>原文链接与图片版权归《东方体育日报》所有。欢迎投稿/推荐，请发送邮件至 <a href=\"mailto:kkjusdoit@gmail.com\">kkjusdoit@gmail.com（点击复制）</a></em></p>\n"
+  },
+  {
     "id": "links-zh-2026-milan-winter-olympics",
     "category": "links",
     "lang": "zh",
@@ -317,7 +336,7 @@ module.exports = {
     ],
     "author": "",
     "translated": false,
-    "body": "<ul>\n<li><p><a href=\"https://mp.weixin.qq.com/s/xDsIOGbu-l2QjoIQXXPukg\">2024-8-4 三联生活周刊：樊振东，在巴黎超越所有版本的自己</a></p>\n</li>\n<li><p><a href=\"https://mp.weixin.qq.com/s/3WADN6CdFD5V-DmHN-SmWg\">2025-11-20 中国新闻报：伤痕不再可见</a></p>\n</li>\n<li><p><a href=\"https://www.workercn.cn/c/2026-01-07/8702379.shtml\">2026-01-07 工人日报：声音｜有一种想念叫&quot;樊振东&quot;</a></p>\n</li>\n<li><p><a href=\"https://fzd-fans.com/links/2026-milan-winter-olympics\">2026-02-09 新浪新闻：樊振东与杨扬再度同框，跨越8年的期待与传承</a></p>\n</li>\n</ul>\n<h2><em>未完待续...(欢迎投稿/推荐，请发送邮件至 <a href=\"mailto:kkjusdoit@gmail.com\">kkjusdoit@gmail.com（点击复制）</a>）</em></h2>\n"
+    "body": "<ul>\n<li><p><a href=\"https://mp.weixin.qq.com/s/xDsIOGbu-l2QjoIQXXPukg\">2024-8-4 三联生活周刊：樊振东，在巴黎超越所有版本的自己</a></p>\n</li>\n<li><p><a href=\"https://mp.weixin.qq.com/s/3WADN6CdFD5V-DmHN-SmWg\">2025-11-20 中国新闻报：伤痕不再可见</a></p>\n</li>\n<li><p><a href=\"https://www.workercn.cn/c/2026-01-07/8702379.shtml\">2026-01-07 工人日报：声音｜有一种想念叫&quot;樊振东&quot;</a></p>\n</li>\n<li><p><a href=\"https://fzd-fans.com/links/2026-milan-winter-olympics\">2026-02-09 新浪新闻：樊振东与杨扬再度同框，跨越8年的期待与传承</a></p>\n</li>\n<li><p><a href=\"https://fzd-fans.com/links/2026-07-20-sports-lifestyle\">2026-07-20 东方体育日报：成为明星社会体育指导员，樊振东——科学去运动 人人皆冠军！</a></p>\n</li>\n</ul>\n<h2><em>未完待续...(欢迎投稿/推荐，请发送邮件至 <a href=\"mailto:kkjusdoit@gmail.com\">kkjusdoit@gmail.com（点击复制）</a>）</em></h2>\n"
   },
   {
     "id": "links-zh-saarland-office-praises-fzd",

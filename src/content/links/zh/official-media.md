@@ -16,7 +16,7 @@ translated: false
 
 - [2026-02-09 新浪新闻：樊振东与杨扬再度同框，跨越8年的期待与传承](/links/2026-milan-winter-olympics)
 
-
+- [2026-07-20 东方体育日报：成为明星社会体育指导员，樊振东——科学去运动 人人皆冠军！](/links/2026-07-20-sports-lifestyle)
 
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---
