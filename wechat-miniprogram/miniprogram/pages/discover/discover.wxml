@@ -46,13 +46,13 @@
     <view class="menu-card card-about" bindtap="navigateTo" data-url="/pages/about/about">
       <view class="card-icon">ℹ️</view>
       <view class="card-info">
-        <text class="card-title">关于本站</text>
-        <text class="card-desc">关于初衷、版权和技术栈说明</text>
+        <text class="card-title">关于本项目</text>
+        <text class="card-desc">关于初衷与技术说明</text>
       </view>
     </view>
   </view>
   
   <view class="footer">
-    <text class="footer-text">樊振东的互联网档案馆 · fzd-fans.com</text>
+    <text class="footer-text">樊振东的互联网档案馆</text>
   </view>
 </view>

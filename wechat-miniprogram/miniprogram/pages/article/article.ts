@@ -52,9 +52,9 @@ Component({
           data: copyData,
           success: () => {
             wx.showToast({
-              title: isMail ? '邮箱已复制，欢迎投稿' : '链接已复制，请在浏览器中打开',
+              title: isMail ? '邮箱已复制' : '链接已复制',
               icon: 'none',
-              duration: 2500
+              duration: 2000
             });
           }
         });

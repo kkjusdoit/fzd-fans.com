@@ -50,9 +50,9 @@ Component({
         data: url,
         success: () => {
           wx.showToast({
-            title: '链接已复制，请在浏览器中粘贴打开',
+            title: '链接已复制',
             icon: 'none',
-            duration: 2500
+            duration: 2000
           });
         }
       });

@@ -1,6 +1,6 @@
 <view class="container">
   <view class="header">
-    <text class="title">关于这个网站</text>
+    <text class="title">关于本项目</text>
   </view>
 
   <view class="content">
@@ -10,7 +10,7 @@
         喜欢樊振东的人大多是慕强而来，但我想记录的重点不是樊振东的战绩，而是更耀眼的意志、人品、纯真、良善、机智、幽默，以及他在喧嚣中的清醒与坚守、直面荆棘时的捍卫与孤勇。
       </text>
       <text class="p">
-        这个网站就像一本需要集思广益、不断完善的杂志。这种主观记录本身不像已成定论的过往成绩一样毋庸置疑，只能用个人心中的尺子衡量。
+        本项目就像一本需要集思广益、不断完善的归档日志。这种主观记录本身不像已成定论的过往成绩一样毋庸置疑，只能用个人心中的尺子衡量。
       </text>
       <text class="p">
         我的原则是尽可能尊重事实、不违反公序良俗，一切为了宣扬樊振东精神，希望他能成为更多人的偶像。
@@ -20,18 +20,18 @@
     <view class="section">
       <text class="h2">内容来源</text>
       <text class="p">
-        这一年多，互联网冲浪刷了几百小时关于樊振东的短视频和微博、公众号等内容，此番无非是将脑海中的内容整理分类记录在案。素材收集于互联网各处，如有侵权或事实有纰漏之处，可联系删改。
+        这一年多，互联网冲浪刷了几百小时关于樊振东的短视频与公开报道内容，此番无非是将脑海中的内容整理分类记录在案。素材收集于互联网各处，如有侵权或事实有纰漏之处，可联系删改。
       </text>
     </view>
 
     <view class="section">
       <text class="h2">参与贡献</text>
       <text class="p">
-        这是一个开放的项目，欢迎所有樊振东的球迷参与贡献内容。如果你有好的素材、故事、链接，欢迎发送邮件进行投稿投递：
+        这是一个开放的项目，欢迎所有樊振东的球迷参与贡献内容。如果你有好的素材或故事，欢迎联系我们：
       </text>
       <view class="action-buttons-grid">
         <view class="action-btn-item" bindtap="copyEmail" data-email="kkjusdoit@gmail.com">
-          <text class="action-btn-text">复制投稿邮箱【kkjusdoit@gmail.com】</text>
+          <text class="action-btn-text">点击复制联系邮箱</text>
         </view>
       </view>
     </view>
@@ -41,14 +41,6 @@
       <text class="p">
         限于个人能力，加之参考资料庞杂，整理过程中虽已尽力考证，但也难免出现理解偏差或表述不当。如有纰漏，欢迎批评指正，我会第一时间进行勘误。
       </text>
-    </view>
-
-    <view class="section">
-      <text class="h2">相关链接</text>
-      <view class="link-item" bindtap="openArticle" data-url="https://mp.weixin.qq.com/s/YpElhONaPWjn1nIx9uMULg">
-        <text class="link-text">樊振东的互联网档案馆｜fzd-fans.com 网站建成纪实</text>
-        <text class="arrow">➔</text>
-      </view>
     </view>
   </view>
 </view>

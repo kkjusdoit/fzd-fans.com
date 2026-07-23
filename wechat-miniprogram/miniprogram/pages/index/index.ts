@@ -150,13 +150,13 @@ Component({
     },
     onShareAppMessage() {
       return {
-        title: '樊振东的互联网档案馆 · fzd-fans.com',
+        title: '樊振东的互联网档案馆',
         path: '/pages/index/index'
       };
     },
     onShareTimeline() {
       return {
-        title: '樊振东的互联网档案馆 · fzd-fans.com'
+        title: '樊振东的互联网档案馆'
       };
     }
   }

@@ -15,7 +15,7 @@
       </view>
       
       <view class="game-actions">
-        <button class="action-btn copy" bindtap="copyLink" data-url="{{item.url}}">复制链接到浏览器游玩</button>
+        <button class="action-btn copy" bindtap="copyLink" data-url="{{item.url}}">复制链接</button>
       </view>
     </view>
   </view>

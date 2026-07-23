@@ -8,7 +8,7 @@
     </view>
     <view class="title-badge">🏓 Fan Zhendong Archive</view>
     <text class="title">{{currentLang === 'zh' ? '樊振东的互联网档案馆' : 'Fan Zhendong Archive'}}</text>
-    <text class="subtitle">fzd-fans.com</text>
+    <text class="subtitle">{{currentLang === 'zh' ? '民间粉丝共建·档案整理工程' : 'Fan-curated Archive'}}</text>
   </view>
   
   <!-- Categories Grid -->
