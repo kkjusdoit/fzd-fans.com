@@ -42,5 +42,13 @@
         限于个人能力，加之参考资料庞杂，整理过程中虽已尽力考证，但也难免出现理解偏差或表述不当。如有纰漏，欢迎批评指正，我会第一时间进行勘误。
       </text>
     </view>
+
+    <view class="section" wx:if="{{showWebsiteLink}}">
+      <text class="h2">相关链接</text>
+      <view class="link-item" bindtap="openArticle" data-url="https://mp.weixin.qq.com/s/YpElhONaPWjn1nIx9uMULg">
+        <text class="link-text">樊振东的互联网档案馆｜fzd-fans.com 网站建成纪实</text>
+        <text class="arrow">➔</text>
+      </view>
+    </view>
   </view>
 </view>

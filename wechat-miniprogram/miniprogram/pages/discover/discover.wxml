@@ -53,6 +53,7 @@
   </view>
   
   <view class="footer">
-    <text class="footer-text">樊振东的互联网档案馆</text>
+    <text class="footer-text" wx:if="{{showDomain}}">樊振东的档案馆 · fzd-fans.com</text>
+    <text class="footer-text" wx:else>樊振东的档案馆</text>
   </view>
 </view>

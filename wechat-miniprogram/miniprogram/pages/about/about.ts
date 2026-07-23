@@ -13,6 +13,18 @@ Component({
     hasUserInfo: false,
     canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     canIUseNicknameComp: wx.canIUse('input.type.nickname'),
+    showWebsiteLink: false
+  },
+  pageLifetimes: {
+    show() {
+      const now = new Date();
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      const targetDate = isDouyin ? new Date('2026-08-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      this.setData({
+        showWebsiteLink: now > targetDate
+      });
+    }
   },
   methods: {
     // 事件处理函数
