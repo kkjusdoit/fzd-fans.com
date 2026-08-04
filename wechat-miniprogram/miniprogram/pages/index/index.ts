@@ -92,13 +92,7 @@ Component({
           };
         });
 
-      // 注入「快讯」入口（非 content 栏目，数据来自 news.js）
-      categories.unshift({
-        id: 'news',
-        name: lang === 'zh' ? '快讯' : 'News',
-        count: (news as any[]).length,
-        icon: '📰'
-      });
+      // 「快讯」入口已暂时下掉
 
       // 注入「同行者」入口（效力球队 + 品牌代言，数据来自 endorsements.js）
       categories.push({
