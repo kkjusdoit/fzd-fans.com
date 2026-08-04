@@ -14,8 +14,8 @@ translated: false
 - “萨尔布吕肯俱乐部为樊振东开出税后50万欧＋3%股份”的伪命题拆解（法律结构与财务体量层面的不可行性）
 - 区分“善意造谣”与“恶意中伤”，阐明正本清源与理性支持的价值
 
-👉 阅读原文（微信公众号）：<a href="https://mp.weixin.qq.com/s/h_6UuBERYuzEEiGqfO_ivA" target="_blank" rel="noopener">那些有关樊振东的流传甚广的谣言｜以及介绍一种甄别各种互联网谣言的神器</a>
+👉 相关阅读：<a href="https://mp.weixin.qq.com/s/h_6UuBERYuzEEiGqfO_ivA" target="_blank" rel="noopener">那些有关樊振东的流传甚广的谣言｜以及介绍一种甄别各种互联网谣言的神器</a>
 
 — 
 
-如需将此类内容按专题归档为“辟谣与核查”，后续可在网站中建立专门聚合页统一呈现。欢迎补充线索与材料，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>
+如需将此类内容按专题归档为“辟谣与核查”，后续可在网站中建立专门聚合页统一呈现。欢迎补充线索与材料。

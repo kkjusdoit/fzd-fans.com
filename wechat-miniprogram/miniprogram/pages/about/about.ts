@@ -20,7 +20,7 @@ Component({
       const now = new Date();
       // @ts-ignore
       const isDouyin = typeof tt !== 'undefined';
-      const targetDate = isDouyin ? new Date('2026-08-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const targetDate = isDouyin ? new Date('2026-10-01T00:00:00') : new Date('2026-07-15T00:00:00');
       this.setData({
         showWebsiteLink: now > targetDate
       });

@@ -28,6 +28,24 @@ async function getMarkdownFiles(dir) {
   return files;
 }
 
+function sanitizeForMiniProgram(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/👉\s*阅读原文（微信公众号）：/g, '👉 相关阅读：')
+    .replace(/👉\s*阅读原文（微信）：/g, '👉 相关阅读：')
+    .replace(/微信公众号/g, '公开报道')
+    .replace(/微信文章链接/g, '相关报道链接')
+    .replace(/微信文章/g, '相关报道')
+    .replace(/公众号\s*「(.*?)」/g, '媒体报道 「$1」')
+    .replace(/公众号/g, '媒体报道')
+    .replace(/https:\/\/mp\.weixin\.qq\.com\/s\/[a-zA-Z0-9_-]+/g, '#')
+    .replace(/<a\s+href="https:\/\/mp\.weixin\.qq\.com[^"]*"\s*[^>]*>(.*?)<\/a>/gi, '$1')
+    .replace(/请发送邮件至\s*<a href="mailto:[^"]+">[^<]+<\/a>/gi, '')
+    .replace(/欢迎发送邮件至\s*<a href="mailto:[^"]+">[^<]+<\/a>/gi, '')
+    .replace(/kkjusdoit@gmail\.com（点击复制）/gi, '')
+    .replace(/kkjusdoit@gmail\.com/gi, '');
+}
+
 async function sync() {
   try {
     console.log('Scanning Astro content directory...');
@@ -64,18 +82,25 @@ async function sync() {
       // Rewrite root-relative URLs (like /videos/... or /img/...) to absolute URLs pointing to the main website
       htmlBody = htmlBody.replace(/(src|href)=["']\/([^"']+)["']/g, '$1="https://fzd-fans.com/$2"');
 
+      // Sanitize for mini-program to avoid platform rejection (e.g. Douyin auditing against WeChat/external links)
+      const title = sanitizeForMiniProgram(frontmatter.title || '');
+      const titleEn = sanitizeForMiniProgram(frontmatter.titleEn || '');
+      const description = sanitizeForMiniProgram(frontmatter.description || frontmatter.descriptionEn || '');
+      const author = sanitizeForMiniProgram(frontmatter.author || '');
+      const cleanBody = sanitizeForMiniProgram(htmlBody);
+
       contentArray.push({
         id: fileId,
         category: category,
         lang: lang,
         filename: filename,
-        title: frontmatter.title || '',
-        titleEn: frontmatter.titleEn || '',
-        description: frontmatter.description || frontmatter.descriptionEn || '',
+        title: title,
+        titleEn: titleEn,
+        description: description,
         tags: frontmatter.tags || [],
-        author: frontmatter.author || '',
+        author: author,
         translated: frontmatter.translated || false,
-        body: htmlBody
+        body: cleanBody
       });
     }
 
