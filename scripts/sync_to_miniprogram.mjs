@@ -30,7 +30,16 @@ async function getMarkdownFiles(dir) {
 
 function sanitizeForMiniProgram(str) {
   if (typeof str !== 'string') return str;
-  return str
+  let s = str;
+
+  // 1. Remove/replace external <a> tags with just their inner text
+  s = s.replace(/<a\s+[^>]*href=["'](https?:\/\/(?:weibo\.com|weiboshu\.com|space\.bilibili\.com|www\.bilibili\.com|bilibili\.com|workercn\.cn|mp\.weixin\.qq\.com|img\.xinshu\.me)[^"']*)["'][^>]*>(.*?)<\/a>/gi, '$2');
+  
+  // 2. Remove any remaining raw URLs pointing to third party platforms
+  s = s.replace(/https?:\/\/(?:weibo\.com|weiboshu\.com|space\.bilibili\.com|www\.bilibili\.com|bilibili\.com|workercn\.cn|mp\.weixin\.qq\.com)[^\s<"']*/gi, '#');
+
+  // 3. Clean up platform names and redirection phrases
+  s = s
     .replace(/👉\s*阅读原文（微信公众号）：/g, '👉 相关阅读：')
     .replace(/👉\s*阅读原文（微信）：/g, '👉 相关阅读：')
     .replace(/微信公众号/g, '公开报道')
@@ -38,12 +47,18 @@ function sanitizeForMiniProgram(str) {
     .replace(/微信文章/g, '相关报道')
     .replace(/公众号\s*「(.*?)」/g, '媒体报道 「$1」')
     .replace(/公众号/g, '媒体报道')
-    .replace(/https:\/\/mp\.weixin\.qq\.com\/s\/[a-zA-Z0-9_-]+/g, '#')
-    .replace(/<a\s+href="https:\/\/mp\.weixin\.qq\.com[^"]*"\s*[^>]*>(.*?)<\/a>/gi, '$1')
+    .replace(/B站原视频链接/g, '原视频播放')
+    .replace(/Original Bilibili Video/g, 'Original Video')
+    .replace(/点击复制B站视频链接/g, '观看视频')
+    .replace(/B站/g, '视频')
+    .replace(/Bilibili/g, 'Video')
+    .replace(/微博书/g, '整理归档')
     .replace(/请发送邮件至\s*<a href="mailto:[^"]+">[^<]+<\/a>/gi, '')
     .replace(/欢迎发送邮件至\s*<a href="mailto:[^"]+">[^<]+<\/a>/gi, '')
     .replace(/kkjusdoit@gmail\.com（点击复制）/gi, '')
     .replace(/kkjusdoit@gmail\.com/gi, '');
+
+  return s;
 }
 
 async function sync() {

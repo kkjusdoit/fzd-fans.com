@@ -41,6 +41,16 @@ Component({
       });
     },
     copyEmail(e: any) {
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      if (isDouyin) {
+        wx.showToast({
+          title: '感谢您的关注',
+          icon: 'none',
+          duration: 1500
+        });
+        return;
+      }
       const email = e.currentTarget.dataset.email || 'kkjusdoit@gmail.com';
       wx.setClipboardData({
         data: email,

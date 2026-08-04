@@ -13,11 +13,16 @@ Component({
         // Deep copy to prevent modifying the database module
         const articleCopy = JSON.parse(JSON.stringify(article));
         
-        // Dynamic replacement: replace any iframe (like Bilibili embedded players) with a clean link card
+        // Dynamic replacement: replace any iframe (like Bilibili embedded players) with a clean card on Douyin
         let body = articleCopy.body || '';
+        // @ts-ignore
+        const isDouyin = typeof tt !== 'undefined';
         const iframeRegex = /<iframe[^>]*src="[^"]*bvid=([a-zA-Z0-9]+)[^"]*"[^>]*><\/iframe>/g;
         body = body.replace(iframeRegex, (_: string, bvid: string) => {
-          return `<a href="https://www.bilibili.com/video/${bvid}" class="video-link-btn" style="display:block;padding:12px;margin:10px 0;background-color:#f1f5f9;color:#1e88e5;text-align:center;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #cbd5e1;">🎬 点击复制B站视频链接（${bvid}）前往观看</a>`;
+          if (isDouyin) {
+            return `<div class="video-link-btn" style="display:block;padding:12px;margin:10px 0;background-color:#f1f5f9;color:#334155;text-align:center;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #cbd5e1;">🎬 精彩赛事回顾（编号：${bvid}）</div>`;
+          }
+          return `<a href="https://www.bilibili.com/video/${bvid}" class="video-link-btn" style="display:block;padding:12px;margin:10px 0;background-color:#f1f5f9;color:#1e88e5;text-align:center;border-radius:8px;font-size:13px;font-weight:500;border:1px solid #cbd5e1;">🎬 精彩视频记录（${bvid}）</a>`;
         });
         
         articleCopy.body = body;
@@ -30,6 +35,17 @@ Component({
     },
     
     onLinkTap(e: any) {
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      if (isDouyin) {
+        wx.showToast({
+          title: '已处于完整展示模式',
+          icon: 'none',
+          duration: 1500
+        });
+        return;
+      }
+
       const href = e.detail.href;
       if (!href) return;
       

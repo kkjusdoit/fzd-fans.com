@@ -78,6 +78,16 @@ Component({
       });
     },
     copySubmissionEmail() {
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      if (isDouyin) {
+        wx.showToast({
+          title: '欢迎在小程序内浏览',
+          icon: 'none',
+          duration: 1500
+        });
+        return;
+      }
       wx.setClipboardData({
         data: 'kkjusdoit@gmail.com',
         success: () => {

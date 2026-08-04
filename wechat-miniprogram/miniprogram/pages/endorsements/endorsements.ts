@@ -53,10 +53,20 @@ Page({
   },
 
   copyEmail() {
+    // @ts-ignore
+    const isDouyin = typeof tt !== 'undefined';
+    if (isDouyin) {
+      wx.showToast({
+        title: '感谢您的关注',
+        icon: 'none',
+        duration: 1500
+      });
+      return;
+    }
     wx.setClipboardData({
       data: 'kkjusdoit@gmail.com',
       success: () => {
-        wx.showToast({ title: '邮箱已复制', icon: 'success' });
+        wx.showToast({ title: '邮箱已复制', icon: 'none' });
       }
     });
   },
