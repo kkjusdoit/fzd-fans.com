@@ -182,6 +182,26 @@ module.exports = {
     "body": "<h1>How to Pronounce &quot;Fan Zhendong&quot;</h1>\n<p>Many international fans are unsure how to pronounce &quot;Fan Zhendong&quot;. Here&#39;s your complete guide!</p>\n<h2>The Name in Chinese</h2>\n<p><strong>樊振东</strong> (Fán Zhèndōng)</p>\n<h2>Syllable Breakdown</h2>\n<table>\n<thead>\n<tr>\n<th>Character</th>\n<th>Pinyin</th>\n<th>IPA</th>\n<th>Sounds Like</th>\n</tr>\n</thead>\n<tbody><tr>\n<td>樊</td>\n<td>Fán</td>\n<td>/fɑn/</td>\n<td>Like &quot;fun&quot; but with &quot;ah&quot;</td>\n</tr>\n<tr>\n<td>振</td>\n<td>Zhèn</td>\n<td>/ʈʂən/</td>\n<td>Like &quot;jun&quot; with a &quot;zh&quot; sound</td>\n</tr>\n<tr>\n<td>东</td>\n<td>Dōng</td>\n<td>/tʊŋ/</td>\n<td>Like &quot;dong&quot; in &quot;ding-dong&quot;</td>\n</tr>\n</tbody></table>\n<h2>Full IPA Transcription</h2>\n<p><code>/fɑn ʈʂən tʊŋ/</code></p>\n<h2>Cultural Note</h2>\n<p>In Chinese culture, the family name comes first. So &quot;Fan Zhendong&quot; means &quot;Zhendong of the Fan family&quot;. </p>\n<p>The family name <strong>Fan (樊)</strong> is relatively rare in China, making it quite distinctive.</p>\n"
   },
   {
+    "id": "links-en-2013-11-17-german-newspaper",
+    "category": "links",
+    "lang": "en",
+    "filename": "2013-11-17-german-newspaper.md",
+    "title": "Berliner Morgenpost: 16-Year-Old is China's New Table Tennis Prodigy",
+    "titleEn": "",
+    "description": "Berliner Morgenpost reported on November 17, 2013, that 16-year-old Chinese prodigy Fan Zhendong amazed the German media by defeating Ovtcharov to win the German Open.",
+    "tags": [
+      "Official",
+      "Media",
+      "Report",
+      "Clipping",
+      "Berliner Morgenpost",
+      "German Open"
+    ],
+    "author": "",
+    "translated": true,
+    "body": "<p><img src=\"https://fzd-fans.com/img/news/2013-11-17-german-newspaper.jpg\" alt=\"Berliner Morgenpost Clipping\"></p>\n<h3>Newspaper Clipping: Chinese Table Tennis Prodigy Amazes German Media</h3>\n<p><strong>[German <em>Berliner Morgenpost</em> Website Report, November 17] Headline: 16-Year-Old is China&#39;s New Table Tennis Prodigy</strong></p>\n<p>In the Max-Schmeling-Halle in Berlin, more than 5,000 spectators cheered for the German table tennis star: &quot;Dima, Dima!&quot; National team coach Jörg Roßkopf tried during the break to teach the European champion the secret to winning the German Open final.</p>\n<p>World No. 5 Dimitrij Ovtcharov didn&#39;t play poorly even when clearly trailing. But his good technique wasn&#39;t quite enough, because the player standing across the table was a cut above. The 16-year-old Chinese youngster Fan Zhendong shattered all of Ovtcharov&#39;s efforts on Sunday, defeating him with a score of 4-1.</p>\n<p>&quot;He plays very fast, his victory was well-deserved,&quot; admitted finalist Ovtcharov. &quot;It&#39;s truly unbelievable how quickly the Chinese produce athletes of such a high level.&quot; A year ago, he didn&#39;t even know Fan Zhendong. Later, Fan became the World Junior Table Tennis Champion. And then he defeated Ovtcharov in the Chinese Table Tennis Super League.</p>\n<p>In the recent ITTF Polish Open, Fan Zhendong became the youngest champion in ITTF World Tour history. He smiled and admitted at the time: &quot;My next step is to become a World Champion and an Olympic Champion.&quot;</p>\n<p>He has just defeated compatriot Zhang Jike, who holds both those titles, in Berlin, as well as the 2013 European Championship runner-up Vladimir Samsonov, and ultimately defeated the European Champion Ovtcharov. These achievements have given him a lot of new confidence and show that he is by no means just a dreamer.</p>\n<hr>\n<p><em>Original link and image copyright belong to Berliner Morgenpost. Welcome to submit/recommend, please email to <a href=\"mailto:\"> (Click to Copy)</a></em></p>\n"
+  },
+  {
     "id": "links-en-interview-collection",
     "category": "links",
     "lang": "en",
@@ -229,6 +249,26 @@ module.exports = {
     "author": "",
     "translated": true,
     "body": "<h2>2024 Paris Olympics Men&#39;s Singles Quarterfinal: Fan Zhendong vs Zhang Tomokazu</h2>\n<p>Full match review - highly recommend turning on comments!</p>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1a9KczoEZi&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong Defends National Games Men&#39;s Singles Title</h2>\n<p>Watch the full journey in one go!</p>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1VQCiBiEUs&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong - Karaoke Panda! Cover Song Collection</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1wA411P7TQ&p=24&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Heart of Bayi, Life in All Its Forms</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV17rhHzXEQE&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<h2>Fan Zhendong 2017 Birthday Tribute - Original Song &quot;Walking Together&quot;</h2>\n<iframe src=\"https://fzd-fans.com//player.bilibili.com/player.html?bvid=BV1g4411g7UF&autoplay=0\" width=\"100%\" height=\"500\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"></iframe><hr>\n<p><em>To be continued...</em></p>\n"
+  },
+  {
+    "id": "links-zh-2013-11-17-german-newspaper",
+    "category": "links",
+    "lang": "zh",
+    "filename": "2013-11-17-german-newspaper.md",
+    "title": "德国《柏林晨邮报》：16岁少年是中国新的乒乓球神童，引德报惊叹",
+    "titleEn": "",
+    "description": "德国《柏林晨邮报》网站2013年11月17日报道，年仅16岁的中国小将樊振东在德国公开赛战胜奥恰洛夫夺冠，展现惊人实力。",
+    "tags": [
+      "官方",
+      "媒体",
+      "报道",
+      "剪报",
+      "柏林晨邮报",
+      "德国公开赛"
+    ],
+    "author": "",
+    "translated": false,
+    "body": "<p><img src=\"https://fzd-fans.com/img/news/2013-11-17-german-newspaper.jpg\" alt=\"德国《柏林晨邮报》剪报\"></p>\n<h3>报纸剪报：中国乒乓球神童引德报惊叹</h3>\n<p><strong>【德国《柏林晨邮报》网站11月17日报道】题：16岁少年是中国新的乒乓球神童</strong></p>\n<p>在柏林施梅林体育馆，5000余名观众对着德国乒乓球新星欢呼：“迪马，迪马！”国家队教练约尔格·罗斯科普夫试图在休息期间向这位欧洲冠军传授如何赢得德国公开赛决赛的秘诀。</p>\n<p>世界排名第五的迪米特里·奥恰洛夫在明显落后的情况下也没有打出臭球。但他的良好技术还不够优秀，因为站在桌子对面的选手技高一筹。现年仅16岁的中国小将樊振东周日让奥恰洛夫的一切努力化为泡影，以4比1的比分战胜了他。</p>\n<p>“他出手非常快，获胜是应该的，”决赛选手奥恰洛夫承认，“中国人这么快就推出如此高水平的运动员，真是令人难以置信。”一年前他还认识樊振东。后来樊振东成为世界青少年乒乓球锦标赛冠军。再后来他在中国乒乓球俱乐部超级联赛中战胜了奥恰洛夫。</p>\n<p>在不久前的国际乒联巡回赛波兰公开赛中，樊振东成为国际乒联巡回赛最年轻的冠军。他当时笑着承认：“下一步我要成为世界冠军和奥运会冠军。”</p>\n<p>他在柏林刚刚击败了拥有这两个头衔的同胞张继科和2013年欧锦赛亚军弗拉基米尔·萨姆索诺夫，并最终击败了欧锦赛冠军奥恰洛夫。这些成就给他带来了很多新的自信并表明他绝不是一个梦想家。</p>\n<hr>\n<p><em>原文链接与图片版权归《柏林晨邮报》所有。欢迎投稿/推荐，</em></p>\n"
   },
   {
     "id": "links-zh-2026-07-20-sports-lifestyle",
