@@ -1,5 +1,4 @@
 import { content } from '../../data/content';
-import { news } from '../../data/news';
 import { endorsements } from '../../data/endorsements';
 
 const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
@@ -116,11 +115,7 @@ Component({
 
     onCategoryTap(e: any) {
       const category = e.currentTarget.dataset.category;
-      if (category === 'news') {
-        wx.navigateTo({
-          url: '../news/news'
-        });
-      } else if (category === 'endorsements') {
+      if (category === 'endorsements') {
         wx.navigateTo({
           url: '../endorsements/endorsements'
         });
