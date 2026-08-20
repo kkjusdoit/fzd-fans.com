@@ -25,10 +25,6 @@ const i18n = {
   restartBtn: isEn ? 'Restart' : '重来',
   soundOn: isEn ? 'Sound: ON' : '声音: 开启',
   soundOff: isEn ? 'Sound: OFF' : '声音: 静音',
-  modeDong: isEn ? '🏓 Place Dong' : '🏓 找咚模式',
-  modeCross: isEn ? '❌ Mark Cross' : '❌ 排除模式',
-  modeCycle: isEn ? '🔄 Cycle Tap' : '🔄 循环模式',
-  autoCross: isEn ? '⚡ Auto-Cross' : '⚡ 自动划叉',
   placed: isEn ? 'Dongs' : '已放咚',
   difficulty: {
     easy: isEn ? 'Easy' : '简单',
@@ -44,7 +40,6 @@ const i18n = {
   backToLevels: isEn ? 'Levels Menu ≡' : '返回选关 ≡',
   timeSpent: isEn ? 'Time' : '用时',
   movesCount: isEn ? 'Moves' : '步数',
-  loadingLevels: isEn ? 'Loading level pack...' : '正在加载关卡数据...',
   close: isEn ? 'Close' : '关闭'
 };
 ---
@@ -144,32 +139,6 @@ const i18n = {
       </div>
     </div>
   </main>
-
-  <!-- 底部操作与辅助工具栏 -->
-  <footer class="game-controls">
-    <div class="mode-switch-group">
-      <button type="button" class="mode-btn active" data-mode="cycle" id="btn-mode-cycle">
-        <span class="mode-icon">🔄</span>
-        <span>{i18n.modeCycle}</span>
-      </button>
-      <button type="button" class="mode-btn" data-mode="dong" id="btn-mode-dong">
-        <span class="mode-icon">🏓</span>
-        <span>{i18n.modeDong}</span>
-      </button>
-      <button type="button" class="mode-btn" data-mode="cross" id="btn-mode-cross">
-        <span class="mode-icon">❌</span>
-        <span>{i18n.modeCross}</span>
-      </button>
-    </div>
-
-    <div class="aux-tools">
-      <label class="toggle-control" title="放咚后自动在同排行列及周围填充❌">
-        <input type="checkbox" id="chk-auto-cross" checked />
-        <span class="toggle-slider"></span>
-        <span class="toggle-label">{i18n.autoCross}</span>
-      </label>
-    </div>
-  </footer>
 
   <!-- 选关模态弹窗 (Levels Modal) -->
   <div class="modal-backdrop" id="modal-levels" style="display: none;">
@@ -396,7 +365,7 @@ const i18n = {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0.6rem 0;
+    margin: 0.8rem 0;
   }
 
   .board-container {
@@ -406,7 +375,7 @@ const i18n = {
     padding: 0.9rem;
     box-shadow: 0 12px 36px rgba(78, 64, 55, 0.12);
     width: 100%;
-    max-width: min(92vw, 560px, calc(100vh - 290px));
+    max-width: min(92vw, 560px, calc(100vh - 250px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
@@ -449,42 +418,14 @@ const i18n = {
     transform: scale(0.96);
   }
 
-  /* 单元格状态：❌ 排除 */
-  .cell-cross {
-    position: relative;
-    width: 45%;
-    height: 45%;
-    opacity: 0.75;
-    pointer-events: none;
-  }
-
-  .cell-cross::before, .cell-cross::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: #3d302c;
-    border-radius: 2px;
-  }
-
-  .cell-cross::before {
-    transform: translateY(-50%) rotate(45deg);
-  }
-
-  .cell-cross::after {
-    transform: translateY(-50%) rotate(-45deg);
-  }
-
   /* 单元格状态：🏓 樊振东头像 */
   .cell-dong-avatar {
-    width: 82%;
-    height: 82%;
+    width: 84%;
+    height: 84%;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
     pointer-events: none;
     animation: popDong 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
@@ -509,96 +450,6 @@ const i18n = {
     animation: pulseHint 1.2s infinite;
     border-color: #ffd700 !important;
     z-index: 5;
-  }
-
-  /* 底部操作栏 */
-  .game-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-    margin-top: 0.6rem;
-    flex-wrap: wrap;
-  }
-
-  .mode-switch-group {
-    display: inline-flex;
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    border-radius: 1.2rem;
-    padding: 0.25rem;
-    box-shadow: 0 2px 8px rgba(78, 64, 55, 0.06);
-  }
-
-  .mode-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: transparent;
-    border: none;
-    padding: 0.5rem 0.85rem;
-    border-radius: 1rem;
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: #7a635c;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-
-  .mode-btn.active {
-    background: #3d302c;
-    color: #ffffff;
-    box-shadow: 0 3px 8px rgba(61, 48, 44, 0.25);
-  }
-
-  .aux-tools {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .toggle-control {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #6e554d;
-    cursor: pointer;
-  }
-
-  .toggle-control input {
-    display: none;
-  }
-
-  .toggle-slider {
-    width: 36px;
-    height: 20px;
-    background: #d4c5bd;
-    border-radius: 20px;
-    position: relative;
-    transition: background 0.2s;
-  }
-
-  .toggle-slider::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: white;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-
-  .toggle-control input:checked + .toggle-slider {
-    background: #1e88e5;
-  }
-
-  .toggle-control input:checked + .toggle-slider::after {
-    transform: translateX(16px);
   }
 
   /* 弹窗通用样式 */
@@ -938,16 +789,6 @@ const i18n = {
     .btn-text {
       display: none;
     }
-    .game-controls {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .mode-switch-group {
-      justify-content: center;
-    }
-    .aux-tools {
-      justify-content: center;
-    }
   }
 </style>
 
@@ -986,19 +827,16 @@ const i18n = {
   // 音效控制器
   class SoundManager {
     private matchSound: HTMLAudioElement;
-    private explosionSound: HTMLAudioElement;
     private winSound: HTMLAudioElement;
     private fzdSound: HTMLAudioElement;
     public enabled: boolean = true;
 
     constructor() {
       this.matchSound = new Audio('/audio/itemmatch.ogg');
-      this.explosionSound = new Audio('/audio/new_explosion.wav');
       this.winSound = new Audio('/audio/level_win.ogg');
       this.fzdSound = new Audio('/audio/fanzhendong.wav');
 
       this.matchSound.volume = 0.45;
-      this.explosionSound.volume = 0.25;
       this.winSound.volume = 0.55;
       this.fzdSound.volume = 0.7;
     }
@@ -1007,12 +845,6 @@ const i18n = {
       if (!this.enabled) return;
       this.matchSound.currentTime = 0;
       this.matchSound.play().catch(() => {});
-    }
-
-    playCross() {
-      if (!this.enabled) return;
-      this.explosionSound.currentTime = 0;
-      this.explosionSound.play().catch(() => {});
     }
 
     playWin() {
@@ -1036,17 +868,13 @@ const i18n = {
     private currentLevelId: number = 1;
     private maxUnlockedLevel: number = 1;
     private currentLevelData: any = null;
-    private gridState: number[][] = []; // 0=Empty, 1=Cross, 2=Dong
+    private gridState: boolean[][] = []; // true = has Dong, false = empty
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private undoStack: string[] = []; // JSON snapshots
     private moveCount: number = 0;
     private startTime: number = 0;
     private timerInterval: any = null;
     private elapsedSeconds: number = 0;
-    
-    // 设置
-    private touchMode: 'cycle' | 'dong' | 'cross' = 'cycle';
-    private autoCross: boolean = true;
     private sounds: SoundManager;
 
     constructor() {
@@ -1077,8 +905,6 @@ const i18n = {
           const parsed = JSON.parse(saved);
           if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
-          if (parsed.autoCross !== undefined) this.autoCross = parsed.autoCross;
-          if (parsed.touchMode) this.touchMode = parsed.touchMode;
           if (parsed.soundEnabled !== undefined) this.sounds.enabled = parsed.soundEnabled;
         }
       } catch (e) {
@@ -1092,8 +918,6 @@ const i18n = {
         const payload: any = {
           currentLevelId: this.currentLevelId,
           maxUnlockedLevel: this.maxUnlockedLevel,
-          autoCross: this.autoCross,
-          touchMode: this.touchMode,
           soundEnabled: this.sounds.enabled
         };
 
@@ -1148,36 +972,12 @@ const i18n = {
 
     // 初始化 DOM 引用与状态
     private initDOMElements() {
-      const chkAuto = document.getElementById('chk-auto-cross') as HTMLInputElement;
-      if (chkAuto) chkAuto.checked = this.autoCross;
-
       const soundIcon = document.getElementById('sound-icon');
       if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
-
-      this.updateModeButtons();
     }
 
     // 事件绑定
     private initEvents() {
-      // 模式切换
-      document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const mode = (e.currentTarget as HTMLElement).getAttribute('data-mode') as any;
-          this.touchMode = mode;
-          this.updateModeButtons();
-          this.saveStorage(false);
-        });
-      });
-
-      // 自动划叉开关
-      const chkAuto = document.getElementById('chk-auto-cross') as HTMLInputElement;
-      if (chkAuto) {
-        chkAuto.addEventListener('change', () => {
-          this.autoCross = chkAuto.checked;
-          this.saveStorage(false);
-        });
-      }
-
       // 音效开关
       const btnSound = document.getElementById('btn-sound');
       if (btnSound) {
@@ -1224,17 +1024,6 @@ const i18n = {
       });
     }
 
-    private updateModeButtons() {
-      document.querySelectorAll('.mode-btn').forEach(btn => {
-        const mode = btn.getAttribute('data-mode');
-        if (mode === this.touchMode) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-    }
-
     // 随机获取一款樊振东头像
     private getRandomAvatar(): string {
       const idx = Math.floor(Math.random() * AVATAR_PATHS.length);
@@ -1274,7 +1063,7 @@ const i18n = {
     // 初始化棋盘数据与暂存恢复
     private initBoardState(data: any) {
       const size = data.size;
-      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(false));
       this.cellAvatars.clear();
       this.undoStack = [];
       this.moveCount = 0;
@@ -1290,7 +1079,7 @@ const i18n = {
             // 恢复已放咚的随机头像
             for (let r = 0; r < size; r++) {
               for (let c = 0; c < size; c++) {
-                if (this.gridState[r][c] === 2) {
+                if (this.gridState[r][c]) {
                   this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
                 }
               }
@@ -1343,14 +1132,8 @@ const i18n = {
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
-          // 点击事件
+          // 点击事件：放咚 / 移除咚
           cellEl.addEventListener('click', () => this.handleCellClick(r, c));
-
-          // 右键 / 长按标 ❌
-          cellEl.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            this.handleCellRightClick(r, c);
-          });
 
           gridEl.appendChild(cellEl);
         }
@@ -1372,82 +1155,28 @@ const i18n = {
       }, 1000);
     }
 
-    // 单元格点击处理
+    // 单元格点击处理：直接放咚 / 移除咚
     private handleCellClick(r: number, c: number) {
       this.clearHintHighlights();
       this.pushUndoSnapshot();
 
-      const currentVal = this.gridState[r][c];
-      let nextVal = 0;
+      const hasDong = this.gridState[r][c];
+      const willHaveDong = !hasDong;
 
-      if (this.touchMode === 'cycle') {
-        // 空白 (0) -> 标❌ (1) -> 放置咚 (2) -> 空白 (0)
-        if (currentVal === 0) nextVal = 1;
-        else if (currentVal === 1) nextVal = 2;
-        else nextVal = 0;
-      } else if (this.touchMode === 'dong') {
-        // 放咚模式：如果是咚则清空，否则放咚
-        nextVal = currentVal === 2 ? 0 : 2;
-      } else if (this.touchMode === 'cross') {
-        // 标叉模式：如果是叉则清空，否则标叉
-        nextVal = currentVal === 1 ? 0 : 1;
-      }
-
-      this.gridState[r][c] = nextVal;
+      this.gridState[r][c] = willHaveDong;
       this.moveCount++;
 
       // 播放音效与随机头像分配
-      if (nextVal === 2) {
+      if (willHaveDong) {
         this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         this.sounds.playPlace();
-        // 自动划叉辅助
-        if (this.autoCross) {
-          this.applyAutoCross(r, c);
-        }
       } else {
         this.cellAvatars.delete(`${r},${c}`);
-        if (nextVal === 1) {
-          this.sounds.playCross();
-        }
       }
 
       this.updateBoardDisplay();
       this.saveStorage(true);
       this.checkWinCondition();
-    }
-
-    // 右键快速标 ❌
-    private handleCellRightClick(r: number, c: number) {
-      this.pushUndoSnapshot();
-      const currentVal = this.gridState[r][c];
-      const nextVal = currentVal === 1 ? 0 : 1;
-      this.gridState[r][c] = nextVal;
-      if (nextVal !== 2) this.cellAvatars.delete(`${r},${c}`);
-      this.sounds.playCross();
-      this.updateBoardDisplay();
-      this.saveStorage(true);
-    }
-
-    // 自动划叉辅助：当在 (r, c) 放置咚时，自动将同行、同列、同色块、八邻域的空位标❌
-    private applyAutoCross(dongRow: number, dongCol: number) {
-      const size = this.currentLevelData.size;
-      const regionId = this.currentLevelData.regions[dongRow][dongCol];
-
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (r === dongRow && c === dongCol) continue;
-          if (this.gridState[r][c] !== 0) continue; // 已有内容不覆盖
-
-          const isSameRow = (r === dongRow);
-          const isSameCol = (c === dongCol);
-          const isSameRegion = (this.currentLevelData.regions[r][c] === regionId);
-          const isNeighbor = Math.abs(r - dongRow) <= 1 && Math.abs(c - dongCol) <= 1;
-
-          if (isSameRow || isSameCol || isSameRegion || isNeighbor) {
-            this.gridState[r][c] = 1; // 标记 ❌
-          }
-        }
-      }
     }
 
     // 保存撤销快照
@@ -1478,7 +1207,7 @@ const i18n = {
     private handleRestart() {
       const size = this.currentLevelData.size;
       this.pushUndoSnapshot();
-      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(false));
       this.cellAvatars.clear();
       this.elapsedSeconds = 0;
       this.startTimer();
@@ -1502,7 +1231,7 @@ const i18n = {
         for (const step of data.hints) {
           if (step.action === 'cat' && step.cells && step.cells.length > 0) {
             const cell = step.cells[0];
-            if (this.gridState[cell.row][cell.col] !== 2) {
+            if (!this.gridState[cell.row][cell.col]) {
               msg = step.text.replace(/猫/g, '咚');
               targetRow = cell.row;
               targetCol = cell.col;
@@ -1515,7 +1244,7 @@ const i18n = {
       // 如果未找到具体步，但答案中还有未放置的咚
       if (targetRow === -1 && data.solution) {
         for (const pos of data.solution) {
-          if (this.gridState[pos.row][pos.col] !== 2) {
+          if (!this.gridState[pos.row][pos.col]) {
             targetRow = pos.row;
             targetCol = pos.col;
             msg = `提示：第 ${targetRow + 1} 行、第 ${targetCol + 1} 列这里可以放置一个咚。`;
@@ -1553,19 +1282,14 @@ const i18n = {
 
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          const val = this.gridState[r][c];
+          const hasDong = this.gridState[r][c];
           const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
           if (!cellEl) continue;
 
           cellEl.classList.remove('conflict');
           cellEl.innerHTML = '';
 
-          if (val === 1) {
-            // ❌ 排除
-            const cross = document.createElement('div');
-            cross.className = 'cell-cross';
-            cellEl.appendChild(cross);
-          } else if (val === 2) {
+          if (hasDong) {
             // 🏓 樊振东随机头像
             dongCount++;
             dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
@@ -1625,7 +1349,7 @@ const i18n = {
       const dongs: { r: number; c: number; region: number }[] = [];
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          if (this.gridState[r][c] === 2) {
+          if (this.gridState[r][c]) {
             dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
           }
         }
