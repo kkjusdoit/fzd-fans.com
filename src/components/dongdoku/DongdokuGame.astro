@@ -178,7 +178,7 @@ const i18n = {
       <p class="win-subtitle">{i18n.gameOverSubtitle}</p>
       
       <div class="win-avatar-showcase">
-        <img src="/game/assets/image-%20002.webp" alt="Fan Zhendong Cheer Up" id="gameover-avatar-img" class="win-avatar-large" />
+        <div class="gameover-avatar-box"></div>
       </div>
 
       <div class="win-actions">
@@ -196,7 +196,7 @@ const i18n = {
       <p class="win-subtitle">{i18n.winSubtitle}</p>
       
       <div class="win-avatar-showcase">
-        <img src="/game/assets/image-%20000.webp" alt="Fan Zhendong Win" id="win-avatar-img" class="win-avatar-large" />
+        <div class="win-avatar-large-box" id="win-avatar-box"></div>
         <div class="win-gold-badge">🥇 PARIS 2024 CHAMPION</div>
       </div>
 
@@ -463,12 +463,14 @@ const i18n = {
     border: 2.5px solid #ffffff;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+    transition: transform 0.12s ease, filter 0.12s ease;
     overflow: hidden !important;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .grid-cell:hover {
@@ -507,19 +509,23 @@ const i18n = {
     align-items: center;
     justify-content: center;
     pointer-events: none;
+    border-radius: inherit;
+    overflow: hidden;
   }
 
+  /* 精致圆形头像（基于 background-image，绝对保证为圆形且 100% 适配单元格不溢出） */
   .cell-dong-avatar {
-    width: 86% !important;
-    height: 86% !important;
-    max-width: 86% !important;
-    max-height: 86% !important;
-    object-fit: cover;
-    object-position: center 25%;
+    width: 82%;
+    height: 82%;
     border-radius: 50%;
+    background-size: cover;
+    background-position: center 20%;
+    background-repeat: no-repeat;
     border: 2.5px solid #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    animation: popDong 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+    animation: popDong 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    box-sizing: border-box;
+    flex-shrink: 0;
   }
 
   /* 🚫 找错咚 / 规则冲突覆盖图层 */
@@ -535,8 +541,8 @@ const i18n = {
   }
 
   .ban-svg {
-    width: 70%;
-    height: 70%;
+    width: 68%;
+    height: 68%;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   }
 
@@ -753,13 +759,22 @@ const i18n = {
     margin-bottom: 1.2rem;
   }
 
-  .win-avatar-large {
+  .win-avatar-large-box, .gameover-avatar-box {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     border: 4px solid #ffd700;
     box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
-    object-fit: cover;
+    background-size: cover;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+  }
+
+  .gameover-avatar-box {
+    border-color: #ef5350;
+    box-shadow: 0 8px 24px rgba(239, 83, 80, 0.4);
+    background-image: url('/game/assets/image-%20002.webp');
   }
 
   .win-gold-badge {
@@ -1061,11 +1076,9 @@ const i18n = {
     private isGameOver: boolean = false;
     private sounds: SoundManager;
 
-    // 单双击手势判定变量
-    private clickTimer: any = null;
-    private lastClickTime: number = 0;
-    private lastClickRow: number = -1;
-    private lastClickCol: number = -1;
+    // 单双击手势快速分流系统（支持极速连点）
+    private cellTimers: Map<string, any> = new Map();
+    private cellLastClicks: Map<string, number> = new Map();
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1290,7 +1303,7 @@ const i18n = {
       this.cellAvatars.clear();
       this.undoStack = [];
       this.moveCount = 0;
-      this.lives = 3; // 重置 3 条命
+      this.lives = 3;
       this.isGameOver = false;
 
       try {
@@ -1352,21 +1365,10 @@ const i18n = {
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
-          // 绑定单双击手势分流器
-          cellEl.addEventListener('click', (e) => {
-            e.preventDefault();
+          // 绑定手势分流器
+          cellEl.addEventListener('pointerdown', (e) => {
             if (this.isGameOver) return;
-            this.handleCellPointer(r, c);
-          });
-
-          cellEl.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            if (this.isGameOver) return;
-            if (this.clickTimer) {
-              clearTimeout(this.clickTimer);
-              this.clickTimer = null;
-            }
-            this.handleDoubleClick(r, c);
+            this.handleCellTap(r, c);
           });
 
           gridEl.appendChild(cellEl);
@@ -1389,29 +1391,31 @@ const i18n = {
       }, 1000);
     }
 
-    // 单双击手势分流器（240ms 判定窗口）
-    private handleCellPointer(r: number, c: number) {
+    // 零延迟单双击手势分流核心
+    private handleCellTap(r: number, c: number) {
+      const key = `${r},${c}`;
       const now = Date.now();
-      const isSameCell = (this.lastClickRow === r && this.lastClickCol === c);
-      const isQuickClick = (now - this.lastClickTime < 240);
+      const lastClick = this.cellLastClicks.get(key) || 0;
+      const isQuick = (now - lastClick < 280);
 
-      if (isSameCell && isQuickClick) {
-        if (this.clickTimer) {
-          clearTimeout(this.clickTimer);
-          this.clickTimer = null;
+      if (isQuick) {
+        // 第二次点击在 280ms 内到达 -> 立即触发双击！
+        const existingTimer = this.cellTimers.get(key);
+        if (existingTimer) {
+          clearTimeout(existingTimer);
+          this.cellTimers.delete(key);
         }
-        this.lastClickTime = 0;
+        this.cellLastClicks.delete(key);
         this.handleDoubleClick(r, c);
       } else {
-        this.lastClickTime = now;
-        this.lastClickRow = r;
-        this.lastClickCol = c;
-
-        if (this.clickTimer) clearTimeout(this.clickTimer);
-        this.clickTimer = setTimeout(() => {
+        // 记录第一次点击
+        this.cellLastClicks.set(key, now);
+        const timer = setTimeout(() => {
+          this.cellTimers.delete(key);
+          this.cellLastClicks.delete(key);
           this.handleSingleClick(r, c);
-          this.clickTimer = null;
         }, 220);
+        this.cellTimers.set(key, timer);
       }
     }
 
@@ -1422,7 +1426,7 @@ const i18n = {
 
       const currentVal = this.gridState[r][c];
 
-      // 如果当前已经是咚咚，单击不覆盖
+      // 如果当前已经是咚咚，单击不改变
       if (currentVal === 2) return;
 
       const nextVal = currentVal === 1 ? 0 : 1;
@@ -1459,17 +1463,16 @@ const i18n = {
         this.sounds.playPlace();
       }
 
-      // 更新棋盘并检测违规冲突
+      // 实时更新棋盘并获取冲突咚的数量
       const conflictCount = this.updateBoardDisplay();
 
-      // 如果放置了新咚咚且产生违规冲突，扣除 1 条命！
+      // 如果放置了新咚咚且触发了违规冲突，扣除 1 条命！
       if (placedNewDong && conflictCount > 0) {
         this.lives--;
         this.updateLivesDisplay();
         this.sounds.playConflict();
         this.showToast(`💔 触犯规则找错咚！扣除 1 条命（剩余 ${Math.max(0, this.lives)} 条）`, 'error');
 
-        // 检查生命值是否归零
         if (this.lives <= 0) {
           this.handleGameOver();
           return;
@@ -1574,7 +1577,7 @@ const i18n = {
       document.querySelectorAll('.grid-cell.hint-active').forEach(el => el.classList.remove('hint-active'));
     }
 
-    // 刷新棋盘视图并返回冲突咚的数量
+    // 刷新棋盘视图并返回冲突咚的数量（100% 完美圆形头像适配）
     private updateBoardDisplay(): number {
       if (!this.currentLevelData) return 0;
       const size = this.currentLevelData.size;
@@ -1644,11 +1647,11 @@ const i18n = {
             const dongWrap = document.createElement('div');
             dongWrap.className = 'cell-dong-wrap';
             
-            const img = document.createElement('img');
-            img.className = 'cell-dong-avatar';
-            img.src = avatarPath;
-            img.alt = 'Dong';
-            dongWrap.appendChild(img);
+            // 使用 background-image 的 div 严格限制为圆形且 100% 居中无溢出
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'cell-dong-avatar';
+            avatarDiv.style.backgroundImage = `url("${avatarPath}")`;
+            dongWrap.appendChild(avatarDiv);
 
             // 1:1 叠加 🚫 找错禁止标志
             if (isConflict) {
@@ -1717,10 +1720,6 @@ const i18n = {
     private handleGameOver() {
       this.isGameOver = true;
       if (this.timerInterval) clearInterval(this.timerInterval);
-
-      const avatar = document.getElementById('gameover-avatar-img') as HTMLImageElement;
-      if (avatar) avatar.src = this.getRandomAvatar();
-
       this.openModal('modal-gameover');
     }
 
@@ -1736,8 +1735,10 @@ const i18n = {
 
       this.saveStorage(false);
 
-      const winAvatar = document.getElementById('win-avatar-img') as HTMLImageElement;
-      if (winAvatar) winAvatar.src = this.getRandomAvatar();
+      const winAvatarBox = document.getElementById('win-avatar-box');
+      if (winAvatarBox) {
+        winAvatarBox.style.backgroundImage = `url("${this.getRandomAvatar()}")`;
+      }
 
       const winTime = document.getElementById('win-time');
       const winMoves = document.getElementById('win-moves');
