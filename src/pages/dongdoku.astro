@@ -5,38 +5,18 @@ import DongdokuGame from '../components/dongdoku/DongdokuGame.astro';
 
 <BaseLayout 
   title="找咚 (Dongdoku) - 樊振东主题数独解谜小游戏"
-  description="经典彩色领地皇后排雷数独变种游戏！每个领地找出一个咚，行与列各一个，咚咚互不相碰。挑战全网1000+关卡！"
+  description="经典彩色领地皇后数独游戏！每个领地找出一个咚，行与列各一个，咚咚互不相碰。挑战全网1000+关卡！"
 >
   <div class="dongdoku-page-wrap">
-    <div class="page-title-header">
-      <h1>🏓 找咚 (Dongdoku)</h1>
-      <p>每个领地找出一个咚，咚咚之间不相碰！</p>
-    </div>
     <DongdokuGame lang="zh" />
   </div>
 </BaseLayout>
 
 <style>
   .dongdoku-page-wrap {
-    min-height: 85vh;
-    padding: 1rem 0.5rem 2rem;
-  }
-  .page-title-header {
-    text-align: center;
-    margin-bottom: 0.5rem;
-  }
-  .page-title-header h1 {
-    font-size: 2.2rem;
-    font-weight: 900;
-    margin: 0;
-    background: linear-gradient(45deg, #1e88e5, #42a5f5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .page-title-header p {
-    color: #795548;
-    margin: 0.3rem 0 0.5rem;
-    font-weight: 600;
-    font-size: 0.95rem;
+    min-height: 80vh;
+    padding: 0.5rem 0.5rem 1.5rem;
+    display: flex;
+    justify-content: center;
   }
 </style>
