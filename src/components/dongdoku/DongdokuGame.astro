@@ -9,14 +9,13 @@ const isEn = lang === 'en';
 // Text dictionary
 const i18n = {
   title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
-  subtitle: isEn ? 'One Dong per region, row, and column. Dongs cannot touch!' : '每个领地找出一个咚，咚咚之间不相碰！',
-  rulesTitle: isEn ? 'Game Rules' : '核心规则',
   rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
   rule1Desc: isEn ? '每行每列正好 1 个咚' : '每行每列正好 1 个咚',
   rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
+  tipGesture: isEn ? '💡 Single click to mark ❌ | Double click to place 🏓' : '💡 单击标记 ❌ 排除，双击确定 🏓 咚咚',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -26,6 +25,7 @@ const i18n = {
   soundOn: isEn ? 'Sound: ON' : '声音: 开启',
   soundOff: isEn ? 'Sound: OFF' : '声音: 静音',
   placed: isEn ? 'Dongs' : '已放咚',
+  errWrongPos: isEn ? '❌ Oops, no Dong here!' : '❌ 哎呀，这里不是咚咚哦！',
   difficulty: {
     easy: isEn ? 'Easy' : '简单',
     medium: isEn ? 'Medium' : '中等',
@@ -124,11 +124,16 @@ const i18n = {
     </div>
   </section>
 
-  <!-- 提示提示条 (Hint Bar) -->
-  <div class="hint-message-box" id="hint-message-box" style="display: none;">
-    <span class="hint-icon">💡</span>
-    <span class="hint-text" id="hint-text"></span>
-    <button type="button" class="hint-close" id="btn-close-hint">×</button>
+  <!-- 操作小贴士 -->
+  <div class="gesture-tip-bar">
+    <span>{i18n.tipGesture}</span>
+  </div>
+
+  <!-- 提示条 / 报错提示条 (Toast Bar) -->
+  <div class="toast-message-box" id="toast-message-box" style="display: none;">
+    <span class="toast-icon" id="toast-icon">💡</span>
+    <span class="toast-text" id="toast-text"></span>
+    <button type="button" class="toast-close" id="btn-close-toast">×</button>
   </div>
 
   <!-- 核心游戏棋盘区 -->
@@ -195,7 +200,7 @@ const i18n = {
   .dongdoku-container {
     max-width: 720px;
     margin: 0 auto;
-    padding: 0.25rem 0.5rem 2rem;
+    padding: 0.2rem 0.5rem 2rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #3d302c;
     user-select: none;
@@ -212,7 +217,7 @@ const i18n = {
     background: #ffffff;
     border: 1px solid #ebdcd5;
     border-radius: 1.2rem;
-    padding: 0.5rem 0.8rem;
+    padding: 0.45rem 0.8rem;
     box-shadow: 0 4px 16px rgba(78, 64, 55, 0.08);
     flex-wrap: wrap;
   }
@@ -302,7 +307,7 @@ const i18n = {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
-    margin: 0.6rem 0 0.4rem;
+    margin: 0.5rem 0 0.35rem;
   }
 
   .rule-card {
@@ -311,7 +316,7 @@ const i18n = {
     gap: 0.45rem;
     background: #ffffff;
     border: 1px solid #f0e2db;
-    border-radius: 0.9rem;
+    border-radius: 0.85rem;
     padding: 0.45rem 0.6rem;
     box-shadow: 0 2px 8px rgba(78, 64, 55, 0.04);
   }
@@ -337,32 +342,52 @@ const i18n = {
     white-space: nowrap;
   }
 
-  /* 提示条 */
-  .hint-message-box {
-    background: #fff9db;
-    border: 1px solid #ffe066;
+  /* 手势提示条 */
+  .gesture-tip-bar {
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #8c736c;
+    margin: 0.2rem 0 0.3rem;
+  }
+
+  /* 提示与报错条 */
+  .toast-message-box {
     border-radius: 0.8rem;
     padding: 0.5rem 0.8rem;
-    margin: 0.4rem 0;
+    margin: 0.3rem 0 0.4rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    color: #744210;
     font-size: 0.82rem;
     font-weight: 700;
-    box-shadow: 0 3px 10px rgba(230, 180, 0, 0.12);
-    animation: fadeIn 0.25s ease;
+    animation: fadeIn 0.2s ease;
   }
 
-  .hint-message-box .hint-text {
+  .toast-message-box.toast-hint {
+    background: #fff9db;
+    border: 1px solid #ffe066;
+    color: #744210;
+    box-shadow: 0 3px 10px rgba(230, 180, 0, 0.12);
+  }
+
+  .toast-message-box.toast-error {
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #c62828;
+    box-shadow: 0 3px 10px rgba(244, 67, 54, 0.15);
+    animation: shakeToast 0.35s ease-in-out;
+  }
+
+  .toast-text {
     flex: 1;
   }
 
-  .hint-close {
+  .toast-close {
     background: none;
     border: none;
     font-size: 1.1rem;
-    color: #744210;
+    color: inherit;
     cursor: pointer;
     line-height: 1;
   }
@@ -372,7 +397,7 @@ const i18n = {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0.5rem 0;
+    margin: 0.4rem 0;
   }
 
   .board-container {
@@ -382,7 +407,7 @@ const i18n = {
     padding: 0.75rem;
     box-shadow: 0 10px 30px rgba(78, 64, 55, 0.10);
     width: 100%;
-    max-width: min(90vw, 500px, calc(100vh - 210px));
+    max-width: min(90vw, 490px, calc(100vh - 220px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
@@ -398,7 +423,7 @@ const i18n = {
     box-sizing: border-box;
   }
 
-  /* 棋盘格子：绝对包含，严禁图片溢出 */
+  /* 棋盘格子 */
   .grid-cell {
     position: relative;
     width: 100%;
@@ -411,6 +436,9 @@ const i18n = {
     transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
     overflow: hidden !important;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .grid-cell:hover {
@@ -424,7 +452,36 @@ const i18n = {
     transform: scale(0.96);
   }
 
-  /* 单元格状态：🏓 樊振东头像（严格圆形绝对居中约束） */
+  /* 单元格状态：❌ 排除叉（单击产生） */
+  .cell-cross {
+    position: relative;
+    width: 45%;
+    height: 45%;
+    pointer-events: none;
+    animation: popCross 0.18s ease forwards;
+  }
+
+  .cell-cross::before, .cell-cross::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 3.5px;
+    background: #3e2723;
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+
+  .cell-cross::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .cell-cross::after {
+    transform: translateY(-50%) rotate(-45deg);
+  }
+
+  /* 单元格状态：🏓 樊振东头像（双击正确产生） */
   .cell-dong-avatar {
     position: absolute;
     top: 7%;
@@ -436,25 +493,31 @@ const i18n = {
     object-fit: cover;
     object-position: center 25%;
     border-radius: 50%;
-    border: 2px solid #ffffff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     pointer-events: none;
-    animation: popDong 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popDong 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  /* 错误冲突态 */
-  .grid-cell.conflict {
-    border-color: #ff3344 !important;
-    animation: shakeCell 0.4s ease-in-out;
+  /* 错误报错状态（双击错误格子时触发） */
+  .grid-cell.cell-error-shake {
+    border-color: #ff1744 !important;
+    animation: errorShake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+    z-index: 10;
   }
 
-  .grid-cell.conflict::after {
-    content: '';
+  .grid-cell.cell-error-shake::after {
+    content: '🚫';
     position: absolute;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     inset: 0;
-    background: rgba(255, 0, 40, 0.25);
+    background: rgba(255, 23, 68, 0.35);
     pointer-events: none;
     border-radius: inherit;
+    animation: fadeErrorIcon 0.6s ease forwards;
   }
 
   /* 提示高亮态 */
@@ -761,16 +824,35 @@ const i18n = {
     to { opacity: 1; transform: scale(1); }
   }
 
+  @keyframes popCross {
+    from { transform: scale(0.2); opacity: 0; }
+    to { transform: scale(1); opacity: 0.85; }
+  }
+
   @keyframes popDong {
     0% { transform: scale(0); opacity: 0; }
     70% { transform: scale(1.12); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
   }
 
-  @keyframes shakeCell {
+  @keyframes errorShake {
+    10%, 90% { transform: translate3d(-3px, 0, 0); }
+    20%, 80% { transform: translate3d(5px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+  }
+
+  @keyframes fadeErrorIcon {
+    0% { opacity: 0; transform: scale(0.5); }
+    30% { opacity: 1; transform: scale(1.1); }
+    70% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.8); }
+  }
+
+  @keyframes shakeToast {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-4px); }
-    40%, 80% { transform: translateX(4px); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
   }
 
   @keyframes pulseHint {
@@ -809,9 +891,11 @@ const i18n = {
 
   // ==========================================
   // 《找咚》(Dongdoku) 客户端核心引擎
+  // 单击：标记 ❌ 排除
+  // 双击：确定是 🏓 咚咚（正确放头像，错误报错提示）
   // ==========================================
 
-  // 色彩配置表（柔和莫兰迪马卡龙色盘，与 Meowdoku 一致）
+  // 色彩配置表（莫兰迪马卡龙色盘）
   const REGION_COLORS = [
     '#6CB6DC', // 0: 天空蓝 Sky Blue
     '#A9D893', // 1: 嫩绿 Soft Green
@@ -830,7 +914,7 @@ const i18n = {
     '#74B9FF'  // 14: 湛蓝 Clear Blue
   ];
 
-  // 24 款经典樊振东头像库（点开随机出现）
+  // 24 款经典樊振东头像库
   const AVATAR_PATHS = Array.from({ length: 24 }, (_, i) => {
     const num = i.toString().padStart(3, '0');
     return `/game/assets/image-%20${num}.webp`;
@@ -842,21 +926,73 @@ const i18n = {
     private winSound: HTMLAudioElement;
     private fzdSound: HTMLAudioElement;
     public enabled: boolean = true;
+    private audioCtx: AudioContext | null = null;
 
     constructor() {
       this.matchSound = new Audio('/audio/itemmatch.ogg');
       this.winSound = new Audio('/audio/level_win.ogg');
       this.fzdSound = new Audio('/audio/fanzhendong.wav');
 
-      this.matchSound.volume = 0.45;
+      this.matchSound.volume = 0.5;
       this.winSound.volume = 0.55;
       this.fzdSound.volume = 0.7;
     }
 
+    private getAudioCtx() {
+      if (!this.audioCtx) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) this.audioCtx = new AudioContextClass();
+      }
+      return this.audioCtx;
+    }
+
+    // 单击标叉轻微短音
+    playClick() {
+      if (!this.enabled) return;
+      try {
+        const ctx = this.getAudioCtx();
+        if (ctx) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.05);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.05);
+        }
+      } catch (e) {}
+    }
+
+    // 双击正确放置咚咚音效
     playPlace() {
       if (!this.enabled) return;
       this.matchSound.currentTime = 0;
       this.matchSound.play().catch(() => {});
+    }
+
+    // 双击错误报错蜂鸣音
+    playError() {
+      if (!this.enabled) return;
+      try {
+        const ctx = this.getAudioCtx();
+        if (ctx) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.22);
+          gain.gain.setValueAtTime(0.18, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.22);
+        }
+      } catch (e) {}
     }
 
     playWin() {
@@ -876,11 +1012,11 @@ const i18n = {
     private levelCache: Map<number, any> = new Map();
     private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
     
-    // 游戏状态
+    // 游戏状态: 0 = Empty, 1 = Cross (❌), 2 = Dong (🏓)
     private currentLevelId: number = 1;
     private maxUnlockedLevel: number = 1;
     private currentLevelData: any = null;
-    private gridState: boolean[][] = []; // true = has Dong, false = empty
+    private gridState: number[][] = []; 
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private undoStack: string[] = []; // JSON snapshots
     private moveCount: number = 0;
@@ -889,11 +1025,17 @@ const i18n = {
     private elapsedSeconds: number = 0;
     private sounds: SoundManager;
 
+    // 单双击手势判定变量
+    private clickTimer: any = null;
+    private lastClickTime: number = 0;
+    private lastClickRow: number = -1;
+    private lastClickCol: number = -1;
+
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
       this.sounds = new SoundManager();
       
-      // 将初始内嵌关卡存入缓存
+      // 载入内嵌初始关卡
       for (const [idStr, data] of Object.entries(INITIAL_LEVELS)) {
         this.levelCache.set(Number(idStr), data);
       }
@@ -902,10 +1044,10 @@ const i18n = {
       this.initDOMElements();
       this.initEvents();
       
-      // 立即加载并渲染当前关卡（零延迟！）
+      // 立即加载并渲染当前关卡
       this.loadLevel(this.currentLevelId);
 
-      // 后台静默拉取关卡总目录清单
+      // 后台静默拉取关卡总清单
       this.fetchManifest();
     }
 
@@ -965,7 +1107,6 @@ const i18n = {
         return this.levelCache.get(levelId);
       }
 
-      // 计算对应的 pack_X.json (50个一组，1-50 -> 0, 51-100 -> 1...)
       const packIdx = Math.floor((levelId - 1) / 50);
       try {
         const res = await fetch(`/data/dongdoku/pack_${packIdx}.json`);
@@ -982,13 +1123,11 @@ const i18n = {
       return null;
     }
 
-    // 初始化 DOM 引用与状态
     private initDOMElements() {
       const soundIcon = document.getElementById('sound-icon');
       if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
     }
 
-    // 事件绑定
     private initEvents() {
       // 音效开关
       const btnSound = document.getElementById('btn-sound');
@@ -1011,9 +1150,8 @@ const i18n = {
       document.getElementById('btn-hint')?.addEventListener('click', () => this.handleHint());
 
       // 关闭提示条
-      document.getElementById('btn-close-hint')?.addEventListener('click', () => {
-        const hintBox = document.getElementById('hint-message-box');
-        if (hintBox) hintBox.style.display = 'none';
+      document.getElementById('btn-close-toast')?.addEventListener('click', () => {
+        this.hideToast();
         this.clearHintHighlights();
       });
 
@@ -1042,6 +1180,30 @@ const i18n = {
       return AVATAR_PATHS[idx];
     }
 
+    // 判断该位置是否为本关的正确解
+    private isCorrectDong(r: number, c: number): boolean {
+      if (!this.currentLevelData || !this.currentLevelData.solution) return false;
+      return this.currentLevelData.solution.some((pos: any) => pos.row === r && pos.col === c);
+    }
+
+    // 显示 Toast 提示（提示信息 / 报错信息）
+    private showToast(msg: string, type: 'hint' | 'error' = 'hint') {
+      const box = document.getElementById('toast-message-box');
+      const text = document.getElementById('toast-text');
+      const icon = document.getElementById('toast-icon');
+      if (!box || !text || !icon) return;
+
+      text.textContent = msg;
+      icon.textContent = type === 'error' ? '⚠️' : '💡';
+      box.className = `toast-message-box ${type === 'error' ? 'toast-error' : 'toast-hint'}`;
+      box.style.display = 'flex';
+    }
+
+    private hideToast() {
+      const box = document.getElementById('toast-message-box');
+      if (box) box.style.display = 'none';
+    }
+
     // 加载指定关卡
     public async loadLevel(levelId: number) {
       if (levelId < 1) levelId = 1;
@@ -1055,7 +1217,6 @@ const i18n = {
 
       let data = this.levelCache.get(levelId);
       if (!data) {
-        // 显示加载提示
         const gridEl = document.getElementById('game-grid');
         if (gridEl) gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">正在加载关卡...</div>';
         data = await this.fetchLevelData(levelId);
@@ -1075,12 +1236,11 @@ const i18n = {
     // 初始化棋盘数据与暂存恢复
     private initBoardState(data: any) {
       const size = data.size;
-      this.gridState = Array.from({ length: size }, () => Array(size).fill(false));
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
       this.cellAvatars.clear();
       this.undoStack = [];
       this.moveCount = 0;
 
-      // 检查是否有未完成的暂存进度
       try {
         const saved = localStorage.getItem('dongdoku_save_v1');
         if (saved) {
@@ -1088,10 +1248,9 @@ const i18n = {
           if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
             this.gridState = parsed.boardState.grid;
             this.elapsedSeconds = parsed.boardState.elapsed || 0;
-            // 恢复已放咚的随机头像
             for (let r = 0; r < size; r++) {
               for (let c = 0; c < size; c++) {
-                if (this.gridState[r][c]) {
+                if (this.gridState[r][c] === 2) {
                   this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
                 }
               }
@@ -1105,7 +1264,6 @@ const i18n = {
 
     // 渲染 UI 与网格
     private renderUI(data: any) {
-      // 更新顶部信息
       const curLvlNum = document.getElementById('cur-level-num');
       if (curLvlNum) curLvlNum.textContent = data.id.toString();
 
@@ -1118,11 +1276,8 @@ const i18n = {
       const targetCount = document.getElementById('target-count');
       if (targetCount) targetCount.textContent = data.size.toString();
 
-      // 关闭提示条
-      const hintBox = document.getElementById('hint-message-box');
-      if (hintBox) hintBox.style.display = 'none';
+      this.hideToast();
 
-      // 渲染棋盘
       const gridEl = document.getElementById('game-grid');
       if (!gridEl) return;
 
@@ -1140,12 +1295,24 @@ const i18n = {
           cellEl.setAttribute('data-col', c.toString());
           cellEl.setAttribute('data-region', regionId.toString());
           
-          // 设置莫兰迪马卡龙区域颜色
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
-          // 点击事件：放咚 / 移除咚
-          cellEl.addEventListener('click', () => this.handleCellClick(r, c));
+          // 绑定单双击手势分流器
+          cellEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.handleCellPointer(r, c);
+          });
+
+          // 桌面端双击加速监听（兼容）
+          cellEl.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            if (this.clickTimer) {
+              clearTimeout(this.clickTimer);
+              this.clickTimer = null;
+            }
+            this.handleDoubleClick(r, c);
+          });
 
           gridEl.appendChild(cellEl);
         }
@@ -1167,28 +1334,128 @@ const i18n = {
       }, 1000);
     }
 
-    // 单元格点击处理：直接放咚 / 移除咚
-    private handleCellClick(r: number, c: number) {
+    // 单双击手势分流器（240ms 窗口）
+    private handleCellPointer(r: number, c: number) {
+      const now = Date.now();
+      const isSameCell = (this.lastClickRow === r && this.lastClickCol === c);
+      const isQuickClick = (now - this.lastClickTime < 240);
+
+      if (isSameCell && isQuickClick) {
+        // 判定为双击！
+        if (this.clickTimer) {
+          clearTimeout(this.clickTimer);
+          this.clickTimer = null;
+        }
+        this.lastClickTime = 0;
+        this.handleDoubleClick(r, c);
+      } else {
+        // 记录第一次点击，延迟等待是否有第二次点击
+        this.lastClickTime = now;
+        this.lastClickRow = r;
+        this.lastClickCol = c;
+
+        if (this.clickTimer) clearTimeout(this.clickTimer);
+        this.clickTimer = setTimeout(() => {
+          this.handleSingleClick(r, c);
+          this.clickTimer = null;
+        }, 220);
+      }
+    }
+
+    // 【单击逻辑】：标记 ❌ 排除 / 取消 ❌
+    private handleSingleClick(r: number, c: number) {
       this.clearHintHighlights();
       this.pushUndoSnapshot();
 
-      const hasDong = this.gridState[r][c];
-      const willHaveDong = !hasDong;
+      const currentVal = this.gridState[r][c];
 
-      this.gridState[r][c] = willHaveDong;
+      // 如果当前是咚咚，单击不随意改变（需双击取消或双击操作）
+      if (currentVal === 2) return;
+
+      // 0 (空白) <-> 1 (❌ 排除)
+      const nextVal = currentVal === 1 ? 0 : 1;
+      this.gridState[r][c] = nextVal;
       this.moveCount++;
 
-      // 播放音效与随机头像分配
-      if (willHaveDong) {
-        this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
-        this.sounds.playPlace();
-      } else {
+      this.sounds.playClick();
+      this.updateBoardDisplay();
+      this.saveStorage(true);
+    }
+
+    // 【双击逻辑】：确定是 🏓 咚咚（正确放置头像，错误报错提示）
+    private handleDoubleClick(r: number, c: number) {
+      this.clearHintHighlights();
+
+      const currentVal = this.gridState[r][c];
+
+      // 如果已经是咚咚，双击则是取消咚咚
+      if (currentVal === 2) {
+        this.pushUndoSnapshot();
+        this.gridState[r][c] = 0;
         this.cellAvatars.delete(`${r},${c}`);
+        this.moveCount++;
+        this.sounds.playClick();
+        this.updateBoardDisplay();
+        this.saveStorage(true);
+        return;
       }
+
+      // 校验是否为本关正确解
+      const isCorrect = this.isCorrectDong(r, c);
+
+      if (!isCorrect) {
+        // ❌ 错误位置！触发报错提示与震动
+        this.sounds.playError();
+        this.showToast(`❌ 哎呀，第 ${r + 1} 行第 ${c + 1} 列不是咚咚哦！请仔细推导~`, 'error');
+
+        const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+        if (cellEl) {
+          cellEl.classList.remove('cell-error-shake');
+          // 强制重绘以重新触发动画
+          void (cellEl as HTMLElement).offsetWidth;
+          cellEl.classList.add('cell-error-shake');
+          setTimeout(() => {
+            cellEl.classList.remove('cell-error-shake');
+          }, 600);
+        }
+        return;
+      }
+
+      // ✅ 正确位置！放置咚咚
+      this.pushUndoSnapshot();
+      this.gridState[r][c] = 2;
+      this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
+      this.moveCount++;
+      this.sounds.playPlace();
+
+      // 自动将同行、同列、同区域、周围8格自动填充 ❌ 排除
+      this.autoFillCrosses(r, c);
 
       this.updateBoardDisplay();
       this.saveStorage(true);
       this.checkWinCondition();
+    }
+
+    // 正确放咚后，自动将排除格标 ❌
+    private autoFillCrosses(dongRow: number, dongCol: number) {
+      const size = this.currentLevelData.size;
+      const regionId = this.currentLevelData.regions[dongRow][dongCol];
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (r === dongRow && c === dongCol) continue;
+          if (this.gridState[r][c] === 2) continue; // 不覆盖已有咚
+
+          const isSameRow = (r === dongRow);
+          const isSameCol = (c === dongCol);
+          const isSameRegion = (this.currentLevelData.regions[r][c] === regionId);
+          const isNeighbor = Math.abs(r - dongRow) <= 1 && Math.abs(c - dongCol) <= 1;
+
+          if (isSameRow || isSameCol || isSameRegion || isNeighbor) {
+            this.gridState[r][c] = 1; // 标 ❌
+          }
+        }
+      }
     }
 
     // 保存撤销快照
@@ -1219,10 +1486,11 @@ const i18n = {
     private handleRestart() {
       const size = this.currentLevelData.size;
       this.pushUndoSnapshot();
-      this.gridState = Array.from({ length: size }, () => Array(size).fill(false));
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
       this.cellAvatars.clear();
       this.elapsedSeconds = 0;
       this.startTimer();
+      this.hideToast();
       this.updateBoardDisplay();
       this.saveStorage(true);
     }
@@ -1231,8 +1499,6 @@ const i18n = {
     private handleHint() {
       if (!this.currentLevelData) return;
       const data = this.currentLevelData;
-      const hintBox = document.getElementById('hint-message-box');
-      const hintText = document.getElementById('hint-text');
 
       let msg = data.opening || '观察只有一个可能空格的行、列或颜色区域！';
       let targetRow = -1;
@@ -1243,7 +1509,7 @@ const i18n = {
         for (const step of data.hints) {
           if (step.action === 'cat' && step.cells && step.cells.length > 0) {
             const cell = step.cells[0];
-            if (!this.gridState[cell.row][cell.col]) {
+            if (this.gridState[cell.row][cell.col] !== 2) {
               msg = step.text.replace(/猫/g, '咚');
               targetRow = cell.row;
               targetCol = cell.col;
@@ -1253,22 +1519,19 @@ const i18n = {
         }
       }
 
-      // 如果未找到具体步，但答案中还有未放置的咚
+      // 如果未找到具体步，从正确解中挑选一个尚未放置的咚
       if (targetRow === -1 && data.solution) {
         for (const pos of data.solution) {
-          if (!this.gridState[pos.row][pos.col]) {
+          if (this.gridState[pos.row][pos.col] !== 2) {
             targetRow = pos.row;
             targetCol = pos.col;
-            msg = `提示：第 ${targetRow + 1} 行、第 ${targetCol + 1} 列这里可以放置一个咚。`;
+            msg = `提示：第 ${targetRow + 1} 行、第 ${targetCol + 1} 列这里确定是一个咚咚。`;
             break;
           }
         }
       }
 
-      if (hintBox && hintText) {
-        hintText.textContent = msg;
-        hintBox.style.display = 'flex';
-      }
+      this.showToast(msg, 'hint');
 
       // 高亮目标格子
       if (targetRow !== -1 && targetCol !== -1) {
@@ -1284,28 +1547,29 @@ const i18n = {
       document.querySelectorAll('.grid-cell.hint-active').forEach(el => el.classList.remove('hint-active'));
     }
 
-    // 刷新棋盘视图与冲突检测
+    // 刷新棋盘视图
     private updateBoardDisplay() {
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
 
       let dongCount = 0;
-      const dongs: { r: number; c: number; region: number }[] = [];
 
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          const hasDong = this.gridState[r][c];
+          const val = this.gridState[r][c];
           const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
           if (!cellEl) continue;
 
-          cellEl.classList.remove('conflict');
           cellEl.innerHTML = '';
 
-          if (hasDong) {
+          if (val === 1) {
+            // ❌ 排除
+            const cross = document.createElement('div');
+            cross.className = 'cell-cross';
+            cellEl.appendChild(cross);
+          } else if (val === 2) {
             // 🏓 樊振东随机头像
             dongCount++;
-            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
-
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1324,32 +1588,6 @@ const i18n = {
       // 更新进度
       const placedEl = document.getElementById('placed-count');
       if (placedEl) placedEl.textContent = dongCount.toString();
-
-      // 冲突检测
-      const conflictCells = new Set<string>();
-
-      for (let i = 0; i < dongs.length; i++) {
-        for (let j = i + 1; j < dongs.length; j++) {
-          const d1 = dongs[i];
-          const d2 = dongs[j];
-
-          const isSameRow = (d1.r === d2.r);
-          const isSameCol = (d1.c === d2.c);
-          const isSameRegion = (d1.region === d2.region);
-          const isTouching = Math.abs(d1.r - d2.r) <= 1 && Math.abs(d1.c - d2.c) <= 1;
-
-          if (isSameRow || isSameCol || isSameRegion || isTouching) {
-            conflictCells.add(`${d1.r},${d1.c}`);
-            conflictCells.add(`${d2.r},${d2.c}`);
-          }
-        }
-      }
-
-      conflictCells.forEach(key => {
-        const [r, c] = key.split(',');
-        const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
-        if (cellEl) cellEl.classList.add('conflict');
-      });
     }
 
     // 检查通关状态
@@ -1357,64 +1595,37 @@ const i18n = {
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
 
-      // 收集所有放咚的位置
-      const dongs: { r: number; c: number; region: number }[] = [];
+      // 统计所有正确放置的咚
+      let foundCount = 0;
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          if (this.gridState[r][c]) {
-            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
+          if (this.gridState[r][c] === 2) {
+            foundCount++;
           }
         }
       }
 
-      // 数量必须等于 size
-      if (dongs.length !== size) return;
-
-      // 检查行、列、区域是否完全不重复
-      const rows = new Set<number>();
-      const cols = new Set<number>();
-      const regions = new Set<number>();
-
-      for (const d of dongs) {
-        if (rows.has(d.r) || cols.has(d.c) || regions.has(d.region)) return;
-        rows.add(d.r);
-        cols.add(d.c);
-        regions.add(d.region);
+      // 当放置的咚数量等于关卡总数且都正确时，判定通关
+      if (foundCount === size) {
+        this.handleVictory();
       }
-
-      // 检查两两是否八邻域接触
-      for (let i = 0; i < dongs.length; i++) {
-        for (let j = i + 1; j < dongs.length; j++) {
-          if (Math.abs(dongs[i].r - dongs[j].r) <= 1 && Math.abs(dongs[i].c - dongs[j].c) <= 1) {
-            return;
-          }
-        }
-      }
-
-      // 验证通过！通关！
-      this.handleVictory();
     }
 
     // 通关结算
     private handleVictory() {
       if (this.timerInterval) clearInterval(this.timerInterval);
 
-      // 播放胜利音效
       this.sounds.playWin();
 
-      // 解锁下一关
       if (this.currentLevelId >= this.maxUnlockedLevel) {
         this.maxUnlockedLevel = Math.min(1000, this.currentLevelId + 1);
       }
 
-      // 记录已通关
       this.saveStorage(false);
 
-      // 胜利头像随机展示
       const winAvatar = document.getElementById('win-avatar-img') as HTMLImageElement;
       if (winAvatar) winAvatar.src = this.getRandomAvatar();
 
-      // 弹出胜利弹窗
       const winTime = document.getElementById('win-time');
       const winMoves = document.getElementById('win-moves');
       const mins = Math.floor(this.elapsedSeconds / 60).toString().padStart(2, '0');
@@ -1432,10 +1643,8 @@ const i18n = {
       const gridEl = document.getElementById('levels-grid');
       if (!tabsEl || !gridEl) return;
 
-      // 确定当前选中的分页 pack
       const currentPackIdx = Math.floor((this.currentLevelId - 1) / 50);
 
-      // 渲染分页 Tabs
       tabsEl.innerHTML = '';
       for (let p = 0; p < 20; p++) {
         const start = p * 50 + 1;
