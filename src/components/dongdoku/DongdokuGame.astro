@@ -15,7 +15,7 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single click to mark ✖ | Double click to confirm 🏓 (1 try per cell!)' : '💡 单击标记 ✖ 排除，双击确定 🏓 咚咚（找错立即亮 🚫 扣 1 条命）',
+  tipGesture: isEn ? '💡 Single click (or Right-click) to mark ✖ | Double click to confirm 🏓' : '💡 单击/右击标记 ✖ 排除，双击确定 🏓 咚咚（找错立即亮 🚫 扣 1 条命）',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -1031,8 +1031,10 @@ const i18n = {
     // 双击确定正确咚咚音效
     playPlace() {
       if (!this.enabled) return;
-      this.matchSound.currentTime = 0;
-      this.matchSound.play().catch(() => {});
+      try {
+        this.matchSound.currentTime = 0;
+        this.matchSound.play().catch(() => {});
+      } catch (e) {}
     }
 
     // 找错咚违规蜂鸣音（扣命音效）
@@ -1058,12 +1060,14 @@ const i18n = {
 
     playWin() {
       if (!this.enabled) return;
-      this.winSound.currentTime = 0;
-      this.winSound.play().catch(() => {});
-      setTimeout(() => {
-        this.fzdSound.currentTime = 0;
-        this.fzdSound.play().catch(() => {});
-      }, 500);
+      try {
+        this.winSound.currentTime = 0;
+        this.winSound.play().catch(() => {});
+        setTimeout(() => {
+          this.fzdSound.currentTime = 0;
+          this.fzdSound.play().catch(() => {});
+        }, 500);
+      } catch (e) {}
     }
   }
 
@@ -1086,8 +1090,7 @@ const i18n = {
     private lives: number = 3; // 3条命
     private sounds: SoundManager;
 
-    // 单双击独立状态分流系统
-    private cellClickCount: Map<string, number> = new Map();
+    // 单双击定时器
     private cellTimers: Map<string, any> = new Map();
 
     constructor() {
@@ -1339,7 +1342,7 @@ const i18n = {
       } catch (e) {}
     }
 
-    // 渲染 UI 与网格
+    // 渲染 UI 与网格（支持单击、原生双击、右键标记）
     private renderUI(data: any) {
       const curLvlNum = document.getElementById('cur-level-num');
       if (curLvlNum) curLvlNum.textContent = data.id.toString();
@@ -1376,10 +1379,46 @@ const i18n = {
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
-          // 绑定标准无障碍点击分流器
+          const key = `${r},${c}`;
+
+          // 1. 原生双击事件监听（100% 捕获系统级/触控级双击）
+          cellEl.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.cellTimers.has(key)) {
+              clearTimeout(this.cellTimers.get(key));
+              this.cellTimers.delete(key);
+            }
+            this.handleDoubleClick(r, c);
+          });
+
+          // 2. 单击事件监听（300ms 窗口防抖，确保双击时不误触发单击）
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
-            this.onCellClick(r, c);
+            if (this.lives <= 0) return;
+            const currentVal = this.gridState[r][c];
+            if (currentVal === 2 || currentVal === 3) return;
+
+            if (this.cellTimers.has(key)) {
+              clearTimeout(this.cellTimers.get(key));
+              this.cellTimers.delete(key);
+            }
+
+            const timer = setTimeout(() => {
+              this.cellTimers.delete(key);
+              this.handleSingleClick(r, c);
+            }, 300);
+            this.cellTimers.set(key, timer);
+          });
+
+          // 3. 电脑端右键单击：直接标记 ✖（0 毫秒延迟）
+          cellEl.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (this.cellTimers.has(key)) {
+              clearTimeout(this.cellTimers.get(key));
+              this.cellTimers.delete(key);
+            }
+            this.handleSingleClick(r, c);
           });
 
           gridEl.appendChild(cellEl);
@@ -1402,41 +1441,9 @@ const i18n = {
       }, 1000);
     }
 
-    // 极速单双击分流器（210ms 防抖捕获）
-    private onCellClick(r: number, c: number) {
-      if (this.lives <= 0) return;
-
-      const currentVal = this.gridState[r][c];
-      // 如果已经是已确定的正确咚(2)或已找错锁定的格子(3)，绝不再允许修改
-      if (currentVal === 2 || currentVal === 3) return;
-
-      const key = `${r},${c}`;
-      const count = (this.cellClickCount.get(key) || 0) + 1;
-      this.cellClickCount.set(key, count);
-
-      const existingTimer = this.cellTimers.get(key);
-      if (existingTimer) {
-        clearTimeout(existingTimer);
-      }
-
-      if (count === 1) {
-        // 单击：等待 210ms 确认是否发生第二次点击
-        const timer = setTimeout(() => {
-          this.cellTimers.delete(key);
-          this.cellClickCount.delete(key);
-          this.handleSingleClick(r, c);
-        }, 210);
-        this.cellTimers.set(key, timer);
-      } else if (count >= 2) {
-        // 双击：立即执行确定操作！0 毫秒等待！
-        this.cellTimers.delete(key);
-        this.cellClickCount.delete(key);
-        this.handleDoubleClick(r, c);
-      }
-    }
-
     // 【单击逻辑】：标记 ✖ 排除 / 取消 ✖
     private handleSingleClick(r: number, c: number) {
+      if (this.lives <= 0) return;
       this.clearHintHighlights();
       this.pushUndoSnapshot();
 
@@ -1454,6 +1461,7 @@ const i18n = {
 
     // 【双击逻辑】：确定该格为咚咚（每格仅一次机会！对则亮头像，错则亮 🚫 扣 1 条命）
     private handleDoubleClick(r: number, c: number) {
+      if (this.lives <= 0) return;
       this.clearHintHighlights();
       this.pushUndoSnapshot();
 
