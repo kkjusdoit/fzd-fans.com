@@ -11,6 +11,16 @@ const SHOW_PVZ_GAME = true;
     </header>
 
     <div class="games-grid">
+      <!-- 游戏 0: 找咚 (Dongdoku) -->
+      <a href="/dongdoku" class="game-card dongdoku">
+        <div class="game-icon">🏓</div>
+        <div class="game-info">
+          <h2>找咚 (Dongdoku)</h2>
+          <p>每个领地找出一个咚，行列各一，八向隔离！经典领地皇后排雷解谜，挑战1000+关卡，支持自动断点续玩！</p>
+          <span class="play-btn">开始挑战 →</span>
+        </div>
+      </a>
+
       <!-- 游戏 1: 植物大战饭圈(测试中,由 SHOW_PVZ_GAME 开关控制) -->
       {SHOW_PVZ_GAME && (
       <a href="/pingpong-defense.html" class="game-card pvz">

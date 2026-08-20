@@ -1,0 +1,1899 @@
+---
+import { INITIAL_LEVELS } from './initialLevels';
+
+interface Props {
+  lang?: 'zh' | 'en';
+}
+
+const { lang = 'zh' } = Astro.props;
+const isEn = lang === 'en';
+
+// Text dictionary
+const i18n = {
+  title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
+  subtitle: isEn ? 'One Dong per region, row, and column. Dongs cannot touch!' : '每个领地找出一个咚，咚咚之间不相碰！',
+  rulesTitle: isEn ? 'Game Rules' : '核心规则',
+  rule1Title: isEn ? '1. Row & Column' : '1. 行列唯一',
+  rule1Desc: isEn ? 'Exactly 1 Dong in each row & column' : '每行、每列必须且只能放 1 个咚',
+  rule2Title: isEn ? '2. Color Region' : '2. 领地唯一',
+  rule2Desc: isEn ? 'Exactly 1 Dong in each color area' : '每个彩色区域必须且只能放 1 个咚',
+  rule3Title: isEn ? '3. No Touching' : '3. 八向隔离',
+  rule3Desc: isEn ? 'Dongs cannot touch diagonally or adjacent' : '咚与咚不能相邻（包括对角线）',
+  levelLabel: isEn ? 'Level' : '第',
+  levelSuffix: isEn ? '' : '关',
+  levelsBtn: isEn ? 'Levels' : '选关',
+  hintBtn: isEn ? 'Hint' : '提示',
+  undoBtn: isEn ? 'Undo' : '撤销',
+  restartBtn: isEn ? 'Restart' : '重来',
+  soundOn: isEn ? 'Sound: ON' : '声音: 开启',
+  soundOff: isEn ? 'Sound: OFF' : '声音: 静音',
+  modeDong: isEn ? '🏓 Place Dong' : '🏓 找咚模式',
+  modeCross: isEn ? '❌ Mark Cross' : '❌ 排除模式',
+  modeCycle: isEn ? '🔄 Cycle Tap' : '🔄 循环模式',
+  autoCross: isEn ? '⚡ Auto-Cross' : '⚡ 自动划叉',
+  changeAvatar: isEn ? '🖼️ Change Avatar' : '🖼️ 换咚头像',
+  placed: isEn ? 'Dongs' : '已放咚',
+  difficulty: {
+    easy: isEn ? 'Easy' : '简单',
+    medium: isEn ? 'Medium' : '中等',
+    hard: isEn ? 'Hard' : '困难',
+    expert: isEn ? 'Expert' : '大师',
+    tutorial: isEn ? 'Tutorial' : '教学'
+  },
+  winTitle: isEn ? 'Level Completed!' : '恭喜通关！',
+  winSubtitle: isEn ? 'Great logic and sharp deduction!' : '大满贯级的观察力与逻辑推导！',
+  nextLevel: isEn ? 'Next Level ➡️' : '下一关 ➡️',
+  replayLevel: isEn ? 'Replay 🔄' : '再玩一次 🔄',
+  backToLevels: isEn ? 'Levels Menu ≡' : '返回选关 ≡',
+  timeSpent: isEn ? 'Time' : '用时',
+  movesCount: isEn ? 'Moves' : '步数',
+  loadingLevels: isEn ? 'Loading level pack...' : '正在加载关卡数据...',
+  close: isEn ? 'Close' : '关闭'
+};
+---
+
+<div class="dongdoku-container" id="dongdoku-app" data-lang={lang} data-initial-levels={JSON.stringify(INITIAL_LEVELS)}>
+  <!-- 顶部控制与状态栏 -->
+  <header class="game-header">
+    <div class="header-left">
+      <button type="button" class="btn-icon" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span class="btn-text">{i18n.levelsBtn}</span>
+      </button>
+      <div class="level-indicator">
+        <span class="level-badge" id="level-badge">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
+        <span class="diff-badge" id="cur-diff-badge">{i18n.difficulty.easy}</span>
+        <span class="size-badge" id="cur-size-badge">4×4</span>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="progress-pill" id="progress-pill" title={i18n.placed}>
+        <span class="pill-icon">🏓</span>
+        <span id="placed-count">0</span> / <span id="target-count">4</span>
+      </div>
+      <div class="timer-pill" id="timer-pill">
+        <span class="timer-icon">⏱️</span>
+        <span id="timer-display">00:00</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button type="button" class="btn-icon" id="btn-hint" title={i18n.hintBtn} aria-label={i18n.hintBtn}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M9 18h6M10 22h4M8.4 14.3a6 6 0 1 1 7.2 0c-.9.7-1.2 1.4-1.2 2.2H9.6c0-.8-.3-1.5-1.2-2.2Z"></path>
+        </svg>
+        <span class="btn-text">{i18n.hintBtn}</span>
+      </button>
+      <button type="button" class="btn-icon" id="btn-undo" title={i18n.undoBtn} aria-label={i18n.undoBtn}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M9 7 5 11l4 4M5 11h9a5 5 0 0 1 0 10h-3"></path>
+        </svg>
+        <span class="btn-text">{i18n.undoBtn}</span>
+      </button>
+      <button type="button" class="btn-icon" id="btn-restart" title={i18n.restartBtn} aria-label={i18n.restartBtn}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"></path>
+        </svg>
+        <span class="btn-text">{i18n.restartBtn}</span>
+      </button>
+      <button type="button" class="btn-icon" id="btn-sound" title={i18n.soundOn} aria-label={i18n.soundOn}>
+        <span id="sound-icon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 上方三大规则卡片 -->
+  <section class="rules-banner" id="rules-banner" aria-label={i18n.rulesTitle}>
+    <div class="rule-card">
+      <div class="rule-icon">🏓</div>
+      <div class="rule-body">
+        <h3>{i18n.rule1Title}</h3>
+        <p>{i18n.rule1Desc}</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">🎨</div>
+      <div class="rule-body">
+        <h3>{i18n.rule2Title}</h3>
+        <p>{i18n.rule2Desc}</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">🚫</div>
+      <div class="rule-body">
+        <h3>{i18n.rule3Title}</h3>
+        <p>{i18n.rule3Desc}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 提示提示条 (Hint Bar) -->
+  <div class="hint-message-box" id="hint-message-box" style="display: none;">
+    <span class="hint-icon">💡</span>
+    <span class="hint-text" id="hint-text"></span>
+    <button type="button" class="hint-close" id="btn-close-hint">×</button>
+  </div>
+
+  <!-- 核心游戏棋盘区 -->
+  <main class="board-wrapper">
+    <div class="board-container" id="board-container">
+      <div class="game-grid" id="game-grid">
+        <!-- 动态生成格子 -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部操作与辅助工具栏 -->
+  <footer class="game-controls">
+    <div class="mode-switch-group">
+      <button type="button" class="mode-btn active" data-mode="cycle" id="btn-mode-cycle">
+        <span class="mode-icon">🔄</span>
+        <span>{i18n.modeCycle}</span>
+      </button>
+      <button type="button" class="mode-btn" data-mode="dong" id="btn-mode-dong">
+        <span class="mode-icon">🏓</span>
+        <span>{i18n.modeDong}</span>
+      </button>
+      <button type="button" class="mode-btn" data-mode="cross" id="btn-mode-cross">
+        <span class="mode-icon">❌</span>
+        <span>{i18n.modeCross}</span>
+      </button>
+    </div>
+
+    <div class="aux-tools">
+      <label class="toggle-control" title="放咚后自动在同排行列及周围填充❌">
+        <input type="checkbox" id="chk-auto-cross" checked />
+        <span class="toggle-slider"></span>
+        <span class="toggle-label">{i18n.autoCross}</span>
+      </label>
+      <button type="button" class="btn-avatar-picker" id="btn-open-avatars">
+        <img src="/game/assets/image-%20000.webp" alt="Avatar" id="current-avatar-img" class="avatar-thumb" />
+        <span>{i18n.changeAvatar}</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- 选关模态弹窗 (Levels Modal) -->
+  <div class="modal-backdrop" id="modal-levels" style="display: none;">
+    <div class="modal-content modal-levels-content">
+      <div class="modal-header">
+        <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
+        <button type="button" class="modal-close" id="btn-close-levels">×</button>
+      </div>
+      <div class="levels-pack-tabs" id="levels-pack-tabs">
+        <!-- 分页 Tabs: 1-50, 51-100, 101-150 ... -->
+      </div>
+      <div class="levels-grid-wrapper">
+        <div class="levels-grid" id="levels-grid">
+          <!-- 关卡卡片 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头像选择弹窗 (Avatar Modal) -->
+  <div class="modal-backdrop" id="modal-avatars" style="display: none;">
+    <div class="modal-content modal-avatars-content">
+      <div class="modal-header">
+        <h2>{i18n.changeAvatar} (24款经典咚)</h2>
+        <button type="button" class="modal-close" id="btn-close-avatars">×</button>
+      </div>
+      <div class="avatars-grid" id="avatars-grid">
+        <!-- 24 款头像选项 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 通关胜利弹窗 (Win Modal) -->
+  <div class="modal-backdrop" id="modal-win" style="display: none;">
+    <div class="modal-content modal-win-content">
+      <div class="win-trophy">🏆</div>
+      <h2 class="win-title">{i18n.winTitle}</h2>
+      <p class="win-subtitle">{i18n.winSubtitle}</p>
+      
+      <div class="win-avatar-showcase">
+        <img src="/game/assets/image-%20000.webp" alt="Fan Zhendong Win" id="win-avatar-img" class="win-avatar-large" />
+        <div class="win-gold-badge">🥇 PARIS 2024 CHAMPION</div>
+      </div>
+
+      <div class="win-stats-grid">
+        <div class="stat-box">
+          <span class="stat-label">{i18n.timeSpent}</span>
+          <span class="stat-value" id="win-time">00:24</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">{i18n.movesCount}</span>
+          <span class="stat-value" id="win-moves">8</span>
+        </div>
+      </div>
+
+      <div class="win-actions">
+        <button type="button" class="btn-primary" id="btn-next-level">{i18n.nextLevel}</button>
+        <button type="button" class="btn-secondary" id="btn-replay-level">{i18n.replayLevel}</button>
+        <button type="button" class="btn-secondary" id="btn-win-levels">{i18n.backToLevels}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* 基础容器 */
+  .dongdoku-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 1rem 0.75rem 3rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #3d302c;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* 顶部控制栏 */
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 1.25rem;
+    padding: 0.6rem 1rem;
+    box-shadow: 0 4px 16px rgba(78, 64, 55, 0.08);
+    flex-wrap: wrap;
+  }
+
+  .header-left, .header-center, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .level-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .level-badge {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #3d302c;
+  }
+
+  .diff-badge, .size-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .diff-badge {
+    background: #eef7f2;
+    color: #2e7d32;
+  }
+
+  .size-badge {
+    background: #f4effa;
+    color: #6a1b9a;
+  }
+
+  .progress-pill, .timer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #fdf6f0;
+    border: 1px solid #eedfd8;
+    padding: 0.3rem 0.65rem;
+    border-radius: 1rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #705851;
+  }
+
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #ffffff;
+    border: 1px solid #e5d5cd;
+    color: #6e554d;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.85rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 5px rgba(78, 64, 55, 0.06);
+  }
+
+  .btn-icon:hover {
+    background: #fbf5f2;
+    color: #1e88e5;
+    border-color: #bbdefb;
+    transform: translateY(-1px);
+  }
+
+  .btn-icon:active {
+    transform: translateY(1px);
+  }
+
+  /* 上方三大规则面板 */
+  .rules-banner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    margin: 1rem 0;
+  }
+
+  .rule-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #ffffff;
+    border: 1px solid #f0e2db;
+    border-radius: 1rem;
+    padding: 0.65rem 0.8rem;
+    box-shadow: 0 2px 10px rgba(78, 64, 55, 0.04);
+  }
+
+  .rule-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .rule-body h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #3d302c;
+  }
+
+  .rule-body p {
+    margin: 0.15rem 0 0;
+    font-size: 0.72rem;
+    color: #7d655f;
+    line-height: 1.25;
+  }
+
+  /* 提示条 */
+  .hint-message-box {
+    background: #fff9db;
+    border: 1px solid #ffe066;
+    border-radius: 0.85rem;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #744210;
+    font-size: 0.88rem;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(230, 180, 0, 0.12);
+    animation: fadeIn 0.25s ease;
+  }
+
+  .hint-message-box .hint-text {
+    flex: 1;
+  }
+
+  .hint-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #744210;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* 核心棋盘区 */
+  .board-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+  }
+
+  .board-container {
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 1.6rem;
+    padding: 0.9rem;
+    box-shadow: 0 12px 36px rgba(78, 64, 55, 0.12);
+    width: 100%;
+    max-width: min(92vw, 560px, calc(100vh - 280px));
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .game-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    gap: clamp(4px, 1.2vw, 8px);
+  }
+
+  /* 棋盘格子 */
+  .grid-cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: clamp(8px, 2vw, 14px);
+    border: 2.5px solid #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+    overflow: hidden;
+  }
+
+  .grid-cell:hover {
+    transform: scale(1.03);
+    filter: brightness(1.06);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+  }
+
+  .grid-cell:active {
+    transform: scale(0.96);
+  }
+
+  /* 单元格状态：❌ 排除 */
+  .cell-cross {
+    position: relative;
+    width: 45%;
+    height: 45%;
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .cell-cross::before, .cell-cross::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #3d302c;
+    border-radius: 2px;
+  }
+
+  .cell-cross::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .cell-cross::after {
+    transform: translateY(-50%) rotate(-45deg);
+  }
+
+  /* 单元格状态：🏓 樊振东头像 */
+  .cell-dong-avatar {
+    width: 82%;
+    height: 82%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    animation: popDong 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  /* 错误冲突态 */
+  .grid-cell.conflict {
+    border-color: #ff3344 !important;
+    animation: shakeCell 0.4s ease-in-out;
+  }
+
+  .grid-cell.conflict::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 0, 40, 0.25);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* 提示高亮态 */
+  .grid-cell.hint-active {
+    animation: pulseHint 1.2s infinite;
+    border-color: #ffd700 !important;
+    z-index: 5;
+  }
+
+  /* 底部操作栏 */
+  .game-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .mode-switch-group {
+    display: inline-flex;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 1.2rem;
+    padding: 0.25rem;
+    box-shadow: 0 2px 8px rgba(78, 64, 55, 0.06);
+  }
+
+  .mode-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.85rem;
+    border-radius: 1rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #7a635c;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .mode-btn.active {
+    background: #3d302c;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(61, 48, 44, 0.25);
+  }
+
+  .aux-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .toggle-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #6e554d;
+    cursor: pointer;
+  }
+
+  .toggle-control input {
+    display: none;
+  }
+
+  .toggle-slider {
+    width: 36px;
+    height: 20px;
+    background: #d4c5bd;
+    border-radius: 20px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .toggle-control input:checked + .toggle-slider {
+    background: #1e88e5;
+  }
+
+  .toggle-control input:checked + .toggle-slider::after {
+    transform: translateX(16px);
+  }
+
+  .btn-avatar-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #6e554d;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(78, 64, 55, 0.06);
+  }
+
+  .btn-avatar-picker:hover {
+    background: #fbf5f2;
+    border-color: #bbdefb;
+  }
+
+  .avatar-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* 弹窗通用样式 */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 20, 15, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .modal-content {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 100%;
+    animation: scaleUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid #f0e4dd;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #3d302c;
+  }
+
+  .modal-close {
+    background: #f5ece7;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #705851;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover {
+    background: #ebdcd5;
+    color: #000;
+  }
+
+  /* 选关弹窗 */
+  .modal-levels-content {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .levels-pack-tabs {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.8rem 1.2rem;
+    overflow-x: auto;
+    border-bottom: 1px solid #f0e4dd;
+    background: #fcf9f7;
+  }
+
+  .pack-tab-btn {
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid #ebdcd5;
+    background: white;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #705851;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .pack-tab-btn.active {
+    background: #1e88e5;
+    color: white;
+    border-color: #1e88e5;
+  }
+
+  .levels-grid-wrapper {
+    padding: 1.2rem;
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .level-card {
+    aspect-ratio: 1 / 1;
+    border-radius: 0.85rem;
+    border: 1.5px solid #ebdcd5;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  .level-card:hover {
+    transform: translateY(-2px);
+    border-color: #1e88e5;
+    box-shadow: 0 5px 12px rgba(30, 136, 229, 0.18);
+  }
+
+  .level-card.completed {
+    background: #f0fbf5;
+    border-color: #a3e0bf;
+    color: #1b5e20;
+  }
+
+  .level-card.completed::after {
+    content: '★';
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 0.75rem;
+    color: #fbc02d;
+  }
+
+  .level-card.current {
+    border-color: #1e88e5;
+    background: #e3f2fd;
+    color: #1565c0;
+    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.3);
+  }
+
+  .level-card .lvl-num {
+    font-size: 1.05rem;
+  }
+
+  .level-card .lvl-size {
+    font-size: 0.65rem;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  /* 头像选择弹窗 */
+  .modal-avatars-content {
+    max-width: 580px;
+    padding-bottom: 1.5rem;
+  }
+
+  .avatars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.8rem;
+    padding: 1.2rem;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .avatar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    border: 2px solid #ebdcd5;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #ffffff;
+  }
+
+  .avatar-card:hover {
+    transform: scale(1.05);
+    border-color: #1e88e5;
+  }
+
+  .avatar-card.active {
+    border-color: #1e88e5;
+    background: #e3f2fd;
+    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.3);
+  }
+
+  .avatar-card-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  .avatar-card-name {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #4e342e;
+    text-align: center;
+  }
+
+  /* 通关胜利弹窗 */
+  .modal-win-content {
+    max-width: 440px;
+    text-align: center;
+    padding: 2rem 1.5rem 1.8rem;
+  }
+
+  .win-trophy {
+    font-size: 3.5rem;
+    animation: bounceTrophy 0.8s infinite alternate;
+  }
+
+  .win-title {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #e65100, #ff9800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .win-subtitle {
+    margin: 0 0 1.2rem;
+    color: #795548;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .win-avatar-showcase {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.2rem;
+  }
+
+  .win-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #ffd700;
+    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
+    object-fit: cover;
+  }
+
+  .win-gold-badge {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffd700;
+    color: #5d4037;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .win-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-box {
+    background: #fdf6f0;
+    border: 1px solid #f0e0d6;
+    border-radius: 1rem;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: #8d6e63;
+    font-weight: 700;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #3e2723;
+  }
+
+  .win-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, #1e88e5, #42a5f5);
+    color: white;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(30, 136, 229, 0.35);
+    transition: all 0.15s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.45);
+  }
+
+  .btn-secondary {
+    background: #f5ebe6;
+    color: #5d4037;
+    border: none;
+    padding: 0.65rem;
+    border-radius: 1rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover {
+    background: #ebdcd5;
+  }
+
+  /* 动画 */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes popDong {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes shakeCell {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+  }
+
+  @keyframes pulseHint {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+    50% { box-shadow: 0 0 0 8px rgba(255, 215, 0, 0); }
+  }
+
+  @keyframes bounceTrophy {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+  }
+
+  /* 响应式适配 */
+  @media (max-width: 640px) {
+    .rules-banner {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+    .rule-card {
+      padding: 0.4rem 0.6rem;
+    }
+    .rule-icon {
+      font-size: 1.1rem;
+    }
+    .game-header {
+      padding: 0.5rem;
+    }
+    .btn-text {
+      display: none;
+    }
+    .game-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .mode-switch-group {
+      justify-content: center;
+    }
+    .aux-tools {
+      justify-content: space-between;
+    }
+  }
+</style>
+
+<script>
+  // ==========================================
+  // 《找咚》(Dongdoku) 客户端核心引擎
+  // ==========================================
+
+  // 色彩配置表（柔和莫兰迪马卡龙色盘，与 Meowdoku 一致）
+  const REGION_COLORS = [
+    '#6CB6DC', // 0: 天空蓝 Sky Blue
+    '#A9D893', // 1: 嫩绿 Soft Green
+    '#E8C94F', // 2: 暖阳黄 Soft Yellow
+    '#D896B3', // 3: 蔷薇粉 Soft Pink
+    '#67C5BF', // 4: 薄荷绿 Mint Teal
+    '#DD84CB', // 5: 薰衣草紫 Magenta
+    '#FAB1A0', // 6: 暖杏桃 Warm Peach
+    '#A29BFE', // 7: 浅紫 Lavender
+    '#FD79A8', // 8: 亮粉 Hot Pink
+    '#81ECEC', // 9: 青碧 Bright Cyan
+    '#FDCB6E', // 10: 太阳金 Sun Yellow
+    '#B2BEC3', // 11: 银灰 Cool Silver
+    '#55EFC4', // 12: 翡翠绿 Light Emerald
+    '#E17055', // 13: 暖陶红 Terracotta
+    '#74B9FF'  // 14: 湛蓝 Clear Blue
+  ];
+
+  // 24 款经典樊振东头像库
+  const AVATAR_LIST = [
+    { id: 0, path: '/game/assets/image-%20000.webp', name: '军礼咚' },
+    { id: 1, path: '/game/assets/image-%20001.webp', name: '夺冠比心' },
+    { id: 2, path: '/game/assets/image-%20002.webp', name: '金牌咬咬' },
+    { id: 3, path: '/game/assets/image-%20003.webp', name: '微笑咚' },
+    { id: 4, path: '/game/assets/image-%20004.webp', name: '巴黎之巅' },
+    { id: 5, path: '/game/assets/image-%20005.webp', name: '严肃战神' },
+    { id: 6, path: '/game/assets/image-%20006.webp', name: '萌萌小胖' },
+    { id: 7, path: '/game/assets/image-%20007.webp', name: '霸气握拳' },
+    { id: 8, path: '/game/assets/image-%20008.webp', name: '擦汗咚' },
+    { id: 9, path: '/game/assets/image-%20009.webp', name: '欢呼咚' },
+    { id: 10, path: '/game/assets/image-%20010.webp', name: '沉思咚' },
+    { id: 11, path: '/game/assets/image-%20011.webp', name: '可爱歪头' },
+    { id: 12, path: '/game/assets/image-%20012.webp', name: '发球聚精' },
+    { id: 13, path: '/game/assets/image-%20013.webp', name: '经典侧颜' },
+    { id: 14, path: '/game/assets/image-%20014.webp', name: '德甲新发型' },
+    { id: 15, path: '/game/assets/image-%20015.webp', name: '开心大笑' },
+    { id: 16, path: '/game/assets/image-%20016.webp', name: '双手比心' },
+    { id: 17, path: '/game/assets/image-%20017.webp', name: '领奖台' },
+    { id: 18, path: '/game/assets/image-%20018.webp', name: '球拍战术' },
+    { id: 19, path: '/game/assets/image-%20019.webp', name: '红衣战神' },
+    { id: 20, path: '/game/assets/image-%20020.webp', name: '蓝衣国手' },
+    { id: 21, path: '/game/assets/image-%20021.webp', name: '金牌之吻' },
+    { id: 22, path: '/game/assets/image-%20022.webp', name: '赛后致谢' },
+    { id: 23, path: '/game/assets/image-%20023.webp', name: '大满贯' },
+  ];
+
+  // 音效控制器
+  class SoundManager {
+    private matchSound: HTMLAudioElement;
+    private explosionSound: HTMLAudioElement;
+    private winSound: HTMLAudioElement;
+    private fzdSound: HTMLAudioElement;
+    public enabled: boolean = true;
+
+    constructor() {
+      this.matchSound = new Audio('/audio/itemmatch.ogg');
+      this.explosionSound = new Audio('/audio/new_explosion.wav');
+      this.winSound = new Audio('/audio/level_win.ogg');
+      this.fzdSound = new Audio('/audio/fanzhendong.wav');
+
+      this.matchSound.volume = 0.45;
+      this.explosionSound.volume = 0.25;
+      this.winSound.volume = 0.55;
+      this.fzdSound.volume = 0.7;
+    }
+
+    playPlace() {
+      if (!this.enabled) return;
+      this.matchSound.currentTime = 0;
+      this.matchSound.play().catch(() => {});
+    }
+
+    playCross() {
+      if (!this.enabled) return;
+      this.explosionSound.currentTime = 0;
+      this.explosionSound.play().catch(() => {});
+    }
+
+    playWin() {
+      if (!this.enabled) return;
+      this.winSound.currentTime = 0;
+      this.winSound.play().catch(() => {});
+      setTimeout(() => {
+        this.fzdSound.currentTime = 0;
+        this.fzdSound.play().catch(() => {});
+      }, 500);
+    }
+  }
+
+  // 游戏主控制器
+  class DongdokuApp {
+    private container: HTMLElement;
+    private initialLevels: Record<number, any>;
+    private levelCache: Map<number, any> = new Map();
+    private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
+    
+    // 游戏状态
+    private currentLevelId: number = 1;
+    private maxUnlockedLevel: number = 1;
+    private currentLevelData: any = null;
+    private gridState: number[][] = []; // 0=Empty, 1=Cross, 2=Dong
+    private undoStack: string[] = []; // JSON snapshots
+    private moveCount: number = 0;
+    private startTime: number = 0;
+    private timerInterval: any = null;
+    private elapsedSeconds: number = 0;
+    
+    // 设置
+    private touchMode: 'cycle' | 'dong' | 'cross' = 'cycle';
+    private autoCross: boolean = true;
+    private currentAvatarIndex: number = 0;
+    private sounds: SoundManager;
+
+    constructor() {
+      this.container = document.getElementById('dongdoku-app')!;
+      this.sounds = new SoundManager();
+      
+      const rawInit = this.container.getAttribute('data-initial-levels');
+      this.initialLevels = rawInit ? JSON.parse(rawInit) : {};
+      
+      // 将初始内嵌关卡存入缓存
+      for (const [idStr, data] of Object.entries(this.initialLevels)) {
+        this.levelCache.set(Number(idStr), data);
+      }
+
+      this.loadStorage();
+      this.initDOMElements();
+      this.initEvents();
+      this.fetchManifest().then(() => {
+        this.loadLevel(this.currentLevelId);
+      });
+    }
+
+    // 从 LocalStorage 加载记录
+    private loadStorage() {
+      try {
+        const saved = localStorage.getItem('dongdoku_save_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
+          if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
+          if (parsed.autoCross !== undefined) this.autoCross = parsed.autoCross;
+          if (parsed.touchMode) this.touchMode = parsed.touchMode;
+          if (parsed.avatarIndex !== undefined) this.currentAvatarIndex = parsed.avatarIndex;
+          if (parsed.soundEnabled !== undefined) this.sounds.enabled = parsed.soundEnabled;
+        }
+      } catch (e) {
+        console.warn('Failed to parse localStorage', e);
+      }
+    }
+
+    // 保存到 LocalStorage
+    private saveStorage(saveBoard: boolean = true) {
+      try {
+        const payload: any = {
+          currentLevelId: this.currentLevelId,
+          maxUnlockedLevel: this.maxUnlockedLevel,
+          autoCross: this.autoCross,
+          touchMode: this.touchMode,
+          avatarIndex: this.currentAvatarIndex,
+          soundEnabled: this.sounds.enabled
+        };
+
+        if (saveBoard) {
+          payload.boardState = {
+            levelId: this.currentLevelId,
+            grid: this.gridState,
+            elapsed: this.elapsedSeconds
+          };
+        }
+
+        localStorage.setItem('dongdoku_save_v1', JSON.stringify(payload));
+      } catch (e) {
+        console.warn('Failed to save to localStorage', e);
+      }
+    }
+
+    // 获取关卡总索引清单
+    private async fetchManifest() {
+      try {
+        const res = await fetch('/data/dongdoku/manifest.json');
+        if (res.ok) {
+          this.manifest = await res.json();
+        }
+      } catch (e) {
+        console.warn('Failed to fetch manifest', e);
+      }
+    }
+
+    // 动态获取关卡数据（带分包缓存）
+    private async fetchLevelData(levelId: number): Promise<any> {
+      if (this.levelCache.has(levelId)) {
+        return this.levelCache.get(levelId);
+      }
+
+      // 计算对应的 pack_X.json (50个一组，1-50 -> 0, 51-100 -> 1...)
+      const packIdx = Math.floor((levelId - 1) / 50);
+      try {
+        const res = await fetch(`/data/dongdoku/pack_${packIdx}.json`);
+        if (res.ok) {
+          const packData = await res.json();
+          for (const [lid, data] of Object.entries(packData)) {
+            this.levelCache.set(Number(lid), data);
+          }
+          return this.levelCache.get(levelId);
+        }
+      } catch (e) {
+        console.error(`Failed to fetch pack ${packIdx}`, e);
+      }
+      return null;
+    }
+
+    // 初始化 DOM 引用与状态
+    private initDOMElements() {
+      const chkAuto = document.getElementById('chk-auto-cross') as HTMLInputElement;
+      if (chkAuto) chkAuto.checked = this.autoCross;
+
+      const soundIcon = document.getElementById('sound-icon');
+      if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
+
+      this.updateAvatarDisplay();
+      this.updateModeButtons();
+    }
+
+    // 事件绑定
+    private initEvents() {
+      // 模式切换
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const mode = (e.currentTarget as HTMLElement).getAttribute('data-mode') as any;
+          this.touchMode = mode;
+          this.updateModeButtons();
+          this.saveStorage(false);
+        });
+      });
+
+      // 自动划叉开关
+      const chkAuto = document.getElementById('chk-auto-cross') as HTMLInputElement;
+      if (chkAuto) {
+        chkAuto.addEventListener('change', () => {
+          this.autoCross = chkAuto.checked;
+          this.saveStorage(false);
+        });
+      }
+
+      // 音效开关
+      const btnSound = document.getElementById('btn-sound');
+      if (btnSound) {
+        btnSound.addEventListener('click', () => {
+          this.sounds.enabled = !this.sounds.enabled;
+          const soundIcon = document.getElementById('sound-icon');
+          if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
+          this.saveStorage(false);
+        });
+      }
+
+      // 撤销
+      document.getElementById('btn-undo')?.addEventListener('click', () => this.handleUndo());
+
+      // 重来
+      document.getElementById('btn-restart')?.addEventListener('click', () => this.handleRestart());
+
+      // 提示
+      document.getElementById('btn-hint')?.addEventListener('click', () => this.handleHint());
+
+      // 关闭提示条
+      document.getElementById('btn-close-hint')?.addEventListener('click', () => {
+        const hintBox = document.getElementById('hint-message-box');
+        if (hintBox) hintBox.style.display = 'none';
+        this.clearHintHighlights();
+      });
+
+      // 选关弹窗
+      document.getElementById('btn-open-levels')?.addEventListener('click', () => this.openLevelsModal());
+      document.getElementById('btn-close-levels')?.addEventListener('click', () => this.closeModal('modal-levels'));
+      document.getElementById('btn-win-levels')?.addEventListener('click', () => {
+        this.closeModal('modal-win');
+        this.openLevelsModal();
+      });
+
+      // 头像弹窗
+      document.getElementById('btn-open-avatars')?.addEventListener('click', () => this.openAvatarModal());
+      document.getElementById('btn-close-avatars')?.addEventListener('click', () => this.closeModal('modal-avatars'));
+
+      // 胜利弹窗中的下一关 / 重玩
+      document.getElementById('btn-next-level')?.addEventListener('click', () => {
+        this.closeModal('modal-win');
+        this.loadLevel(this.currentLevelId + 1);
+      });
+      document.getElementById('btn-replay-level')?.addEventListener('click', () => {
+        this.closeModal('modal-win');
+        this.handleRestart();
+      });
+    }
+
+    private updateModeButtons() {
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        const mode = btn.getAttribute('data-mode');
+        if (mode === this.touchMode) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    private updateAvatarDisplay() {
+      const avatar = AVATAR_LIST[this.currentAvatarIndex] || AVATAR_LIST[0];
+      const thumb = document.getElementById('current-avatar-img') as HTMLImageElement;
+      if (thumb) thumb.src = avatar.path;
+
+      const winAvatar = document.getElementById('win-avatar-img') as HTMLImageElement;
+      if (winAvatar) winAvatar.src = avatar.path;
+    }
+
+    // 加载指定关卡
+    public async loadLevel(levelId: number) {
+      if (levelId < 1) levelId = 1;
+      if (levelId > 1000) levelId = 1000;
+
+      this.currentLevelId = levelId;
+      if (levelId > this.maxUnlockedLevel) {
+        this.maxUnlockedLevel = levelId;
+      }
+      this.saveStorage(false);
+
+      // 显示加载提示
+      const gridEl = document.getElementById('game-grid');
+      if (gridEl) gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">正在加载关卡...</div>';
+
+      const data = await this.fetchLevelData(levelId);
+      if (!data) {
+        alert('关卡数据加载失败，请检查网络');
+        return;
+      }
+
+      this.currentLevelData = data;
+      this.initBoardState(data);
+      this.renderUI(data);
+      this.startTimer();
+    }
+
+    // 初始化棋盘数据与暂存恢复
+    private initBoardState(data: any) {
+      const size = data.size;
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.undoStack = [];
+      this.moveCount = 0;
+
+      // 检查是否有未完成的暂存进度
+      try {
+        const saved = localStorage.getItem('dongdoku_save_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
+            this.gridState = parsed.boardState.grid;
+            this.elapsedSeconds = parsed.boardState.elapsed || 0;
+          } else {
+            this.elapsedSeconds = 0;
+          }
+        }
+      } catch (e) {}
+
+      // 如果是新手关卡有 starter cat，锁定它
+      if (data.solution && data.id === 0) {
+        // starter
+      }
+    }
+
+    // 渲染 UI 与网格
+    private renderUI(data: any) {
+      // 更新顶部信息
+      const curLvlNum = document.getElementById('cur-level-num');
+      if (curLvlNum) curLvlNum.textContent = data.id.toString();
+
+      const diffBadge = document.getElementById('cur-diff-badge');
+      if (diffBadge) diffBadge.textContent = data.diffText || '简单';
+
+      const sizeBadge = document.getElementById('cur-size-badge');
+      if (sizeBadge) sizeBadge.textContent = `${data.size}×${data.size}`;
+
+      const targetCount = document.getElementById('target-count');
+      if (targetCount) targetCount.textContent = data.size.toString();
+
+      // 关闭提示条
+      const hintBox = document.getElementById('hint-message-box');
+      if (hintBox) hintBox.style.display = 'none';
+
+      // 渲染棋盘
+      const gridEl = document.getElementById('game-grid');
+      if (!gridEl) return;
+
+      const size = data.size;
+      gridEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+      gridEl.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
+      gridEl.innerHTML = '';
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const regionId = data.regions[r][c];
+          const cellEl = document.createElement('div');
+          cellEl.className = 'grid-cell';
+          cellEl.setAttribute('data-row', r.toString());
+          cellEl.setAttribute('data-col', c.toString());
+          cellEl.setAttribute('data-region', regionId.toString());
+          
+          // 设置莫兰迪马卡龙区域颜色
+          const color = REGION_COLORS[regionId % REGION_COLORS.length];
+          cellEl.style.backgroundColor = color;
+
+          // 点击事件
+          cellEl.addEventListener('click', () => this.handleCellClick(r, c));
+
+          // 右键 / 长按标 ❌
+          cellEl.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            this.handleCellRightClick(r, c);
+          });
+
+          gridEl.appendChild(cellEl);
+        }
+      }
+
+      this.updateBoardDisplay();
+    }
+
+    // 计时器
+    private startTimer() {
+      if (this.timerInterval) clearInterval(this.timerInterval);
+      this.startTime = Date.now() - this.elapsedSeconds * 1000;
+      this.timerInterval = setInterval(() => {
+        this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+        const mins = Math.floor(this.elapsedSeconds / 60).toString().padStart(2, '0');
+        const secs = (this.elapsedSeconds % 60).toString().padStart(2, '0');
+        const disp = document.getElementById('timer-display');
+        if (disp) disp.textContent = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    // 单元格点击处理
+    private handleCellClick(r: number, c: number) {
+      this.clearHintHighlights();
+      this.pushUndoSnapshot();
+
+      const currentVal = this.gridState[r][c];
+      let nextVal = 0;
+
+      if (this.touchMode === 'cycle') {
+        // 空白 (0) -> 标❌ (1) -> 放置咚 (2) -> 空白 (0)
+        if (currentVal === 0) nextVal = 1;
+        else if (currentVal === 1) nextVal = 2;
+        else nextVal = 0;
+      } else if (this.touchMode === 'dong') {
+        // 放咚模式：如果是咚则清空，否则放咚
+        nextVal = currentVal === 2 ? 0 : 2;
+      } else if (this.touchMode === 'cross') {
+        // 标叉模式：如果是叉则清空，否则标叉
+        nextVal = currentVal === 1 ? 0 : 1;
+      }
+
+      this.gridState[r][c] = nextVal;
+      this.moveCount++;
+
+      // 播放音效
+      if (nextVal === 2) {
+        this.sounds.playPlace();
+        // 自动划叉辅助
+        if (this.autoCross) {
+          this.applyAutoCross(r, c);
+        }
+      } else if (nextVal === 1) {
+        this.sounds.playCross();
+      }
+
+      this.updateBoardDisplay();
+      this.saveStorage(true);
+      this.checkWinCondition();
+    }
+
+    // 右键快速标 ❌
+    private handleCellRightClick(r: number, c: number) {
+      this.pushUndoSnapshot();
+      this.gridState[r][c] = this.gridState[r][c] === 1 ? 0 : 1;
+      this.sounds.playCross();
+      this.updateBoardDisplay();
+      this.saveStorage(true);
+    }
+
+    // 自动划叉辅助：当在 (r, c) 放置咚时，自动将同行、同列、同色块、八邻域的空位标❌
+    private applyAutoCross(dongRow: number, dongCol: number) {
+      const size = this.currentLevelData.size;
+      const regionId = this.currentLevelData.regions[dongRow][dongCol];
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (r === dongRow && c === dongCol) continue;
+          if (this.gridState[r][c] !== 0) continue; // 已有内容不覆盖
+
+          const isSameRow = (r === dongRow);
+          const isSameCol = (c === dongCol);
+          const isSameRegion = (this.currentLevelData.regions[r][c] === regionId);
+          const isNeighbor = Math.abs(r - dongRow) <= 1 && Math.abs(c - dongCol) <= 1;
+
+          if (isSameRow || isSameCol || isSameRegion || isNeighbor) {
+            this.gridState[r][c] = 1; // 标记 ❌
+          }
+        }
+      }
+    }
+
+    // 保存撤销快照
+    private pushUndoSnapshot() {
+      if (this.undoStack.length >= 40) this.undoStack.shift();
+      this.undoStack.push(JSON.stringify(this.gridState));
+    }
+
+    // 撤销操作
+    private handleUndo() {
+      if (this.undoStack.length === 0) return;
+      const last = this.undoStack.pop();
+      if (last) {
+        this.gridState = JSON.parse(last);
+        this.updateBoardDisplay();
+        this.saveStorage(true);
+      }
+    }
+
+    // 重来本关
+    private handleRestart() {
+      const size = this.currentLevelData.size;
+      this.pushUndoSnapshot();
+      this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.elapsedSeconds = 0;
+      this.startTimer();
+      this.updateBoardDisplay();
+      this.saveStorage(true);
+    }
+
+    // 提示功能
+    private handleHint() {
+      if (!this.currentLevelData) return;
+      const data = this.currentLevelData;
+      const hintBox = document.getElementById('hint-message-box');
+      const hintText = document.getElementById('hint-text');
+
+      let msg = data.opening || '观察只有一个可能空格的行、列或颜色区域！';
+      let targetRow = -1;
+      let targetCol = -1;
+
+      // 如果关卡带有逻辑推导步数
+      if (data.hints && data.hints.length > 0) {
+        // 寻找第一个未被正确放置咚的提示步
+        for (const step of data.hints) {
+          if (step.action === 'cat' && step.cells && step.cells.length > 0) {
+            const cell = step.cells[0];
+            if (this.gridState[cell.row][cell.col] !== 2) {
+              msg = step.text.replace(/猫/g, '咚');
+              targetRow = cell.row;
+              targetCol = cell.col;
+              break;
+            }
+          }
+        }
+      }
+
+      // 如果未找到具体步，但答案中还有未放置的咚
+      if (targetRow === -1 && data.solution) {
+        for (const pos of data.solution) {
+          if (this.gridState[pos.row][pos.col] !== 2) {
+            targetRow = pos.row;
+            targetCol = pos.col;
+            msg = `提示：第 ${targetRow + 1} 行、第 ${targetCol + 1} 列这里可以放置一个咚。`;
+            break;
+          }
+        }
+      }
+
+      if (hintBox && hintText) {
+        hintText.textContent = msg;
+        hintBox.style.display = 'flex';
+      }
+
+      // 高亮目标格子
+      if (targetRow !== -1 && targetCol !== -1) {
+        const cellEl = document.querySelector(`.grid-cell[data-row="${targetRow}"][data-col="${targetCol}"]`);
+        if (cellEl) {
+          this.clearHintHighlights();
+          cellEl.classList.add('hint-active');
+        }
+      }
+    }
+
+    private clearHintHighlights() {
+      document.querySelectorAll('.grid-cell.hint-active').forEach(el => el.classList.remove('hint-active'));
+    }
+
+    // 刷新棋盘视图与冲突检测
+    private updateBoardDisplay() {
+      if (!this.currentLevelData) return;
+      const size = this.currentLevelData.size;
+      const avatar = AVATAR_LIST[this.currentAvatarIndex] || AVATAR_LIST[0];
+
+      let dongCount = 0;
+      const dongs: { r: number; c: number; region: number }[] = [];
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const val = this.gridState[r][c];
+          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
+          if (!cellEl) continue;
+
+          cellEl.classList.remove('conflict');
+          cellEl.innerHTML = '';
+
+          if (val === 1) {
+            // ❌ 排除
+            const cross = document.createElement('div');
+            cross.className = 'cell-cross';
+            cellEl.appendChild(cross);
+          } else if (val === 2) {
+            // 🏓 樊振东头像
+            dongCount++;
+            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
+
+            const img = document.createElement('img');
+            img.className = 'cell-dong-avatar';
+            img.src = avatar.path;
+            img.alt = 'Dong';
+            cellEl.appendChild(img);
+          }
+        }
+      }
+
+      // 更新进度
+      const placedEl = document.getElementById('placed-count');
+      if (placedEl) placedEl.textContent = dongCount.toString();
+
+      // 冲突检测
+      const conflictCells = new Set<string>();
+
+      for (let i = 0; i < dongs.length; i++) {
+        for (let j = i + 1; j < dongs.length; j++) {
+          const d1 = dongs[i];
+          const d2 = dongs[j];
+
+          const isSameRow = (d1.r === d2.r);
+          const isSameCol = (d1.c === d2.c);
+          const isSameRegion = (d1.region === d2.region);
+          const isTouching = Math.abs(d1.r - d2.r) <= 1 && Math.abs(d1.c - d2.c) <= 1;
+
+          if (isSameRow || isSameCol || isSameRegion || isTouching) {
+            conflictCells.add(`${d1.r},${d1.c}`);
+            conflictCells.add(`${d2.r},${d2.c}`);
+          }
+        }
+      }
+
+      conflictCells.forEach(key => {
+        const [r, c] = key.split(',');
+        const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+        if (cellEl) cellEl.classList.add('conflict');
+      });
+    }
+
+    // 检查通关状态
+    private checkWinCondition() {
+      if (!this.currentLevelData) return;
+      const size = this.currentLevelData.size;
+
+      // 收集所有放咚的位置
+      const dongs: { r: number; c: number; region: number }[] = [];
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (this.gridState[r][c] === 2) {
+            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
+          }
+        }
+      }
+
+      // 数量必须等于 size
+      if (dongs.length !== size) return;
+
+      // 检查行、列、区域是否完全不重复
+      const rows = new Set<number>();
+      const cols = new Set<number>();
+      const regions = new Set<number>();
+
+      for (const d of dongs) {
+        if (rows.has(d.r) || cols.has(d.c) || regions.has(d.region)) return;
+        rows.add(d.r);
+        cols.add(d.c);
+        regions.add(d.region);
+      }
+
+      // 检查两两是否八邻域接触
+      for (let i = 0; i < dongs.length; i++) {
+        for (let j = i + 1; j < dongs.length; j++) {
+          if (Math.abs(dongs[i].r - dongs[j].r) <= 1 && Math.abs(dongs[i].c - dongs[j].c) <= 1) {
+            return;
+          }
+        }
+      }
+
+      // 验证通过！通关！
+      this.handleVictory();
+    }
+
+    // 通关结算
+    private handleVictory() {
+      if (this.timerInterval) clearInterval(this.timerInterval);
+
+      // 播放胜利音效
+      this.sounds.playWin();
+
+      // 解锁下一关
+      if (this.currentLevelId >= this.maxUnlockedLevel) {
+        this.maxUnlockedLevel = Math.min(1000, this.currentLevelId + 1);
+      }
+
+      // 记录已通关
+      this.saveStorage(false);
+
+      // 弹出胜利弹窗
+      const winTime = document.getElementById('win-time');
+      const winMoves = document.getElementById('win-moves');
+      const mins = Math.floor(this.elapsedSeconds / 60).toString().padStart(2, '0');
+      const secs = (this.elapsedSeconds % 60).toString().padStart(2, '0');
+
+      if (winTime) winTime.textContent = `${mins}:${secs}`;
+      if (winMoves) winMoves.textContent = this.moveCount.toString();
+
+      this.openModal('modal-win');
+    }
+
+    // 选关弹窗逻辑
+    private openLevelsModal() {
+      const tabsEl = document.getElementById('levels-pack-tabs');
+      const gridEl = document.getElementById('levels-grid');
+      if (!tabsEl || !gridEl) return;
+
+      // 确定当前选中的分页 pack
+      const currentPackIdx = Math.floor((this.currentLevelId - 1) / 50);
+
+      // 渲染分页 Tabs
+      tabsEl.innerHTML = '';
+      for (let p = 0; p < 20; p++) {
+        const start = p * 50 + 1;
+        const end = (p + 1) * 50;
+        const tabBtn = document.createElement('button');
+        tabBtn.className = `pack-tab-btn ${p === currentPackIdx ? 'active' : ''}`;
+        tabBtn.textContent = `${start} - ${end}`;
+        tabBtn.addEventListener('click', () => {
+          document.querySelectorAll('.pack-tab-btn').forEach(b => b.classList.remove('active'));
+          tabBtn.classList.add('active');
+          this.renderLevelsGrid(p);
+        });
+        tabsEl.appendChild(tabBtn);
+      }
+
+      this.renderLevelsGrid(currentPackIdx);
+      this.openModal('modal-levels');
+    }
+
+    // 渲染选关网格
+    private renderLevelsGrid(packIdx: number) {
+      const gridEl = document.getElementById('levels-grid');
+      if (!gridEl) return;
+      gridEl.innerHTML = '';
+
+      const start = packIdx * 50 + 1;
+      const end = (packIdx + 1) * 50;
+
+      for (let lid = start; lid <= end; lid++) {
+        const card = document.createElement('div');
+        const isCurrent = lid === this.currentLevelId;
+        const isCompleted = lid < this.maxUnlockedLevel;
+        
+        card.className = `level-card ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}`;
+        
+        const manifestItem = this.manifest.find(m => m.id === lid);
+        const sizeText = manifestItem ? `${manifestItem.size}×${manifestItem.size}` : '';
+
+        card.innerHTML = `
+          <span class="lvl-num">${lid}</span>
+          <span class="lvl-size">${sizeText}</span>
+        `;
+
+        card.addEventListener('click', () => {
+          this.closeModal('modal-levels');
+          this.loadLevel(lid);
+        });
+
+        gridEl.appendChild(card);
+      }
+    }
+
+    // 头像选择弹窗
+    private openAvatarModal() {
+      const gridEl = document.getElementById('avatars-grid');
+      if (!gridEl) return;
+      gridEl.innerHTML = '';
+
+      AVATAR_LIST.forEach((av, idx) => {
+        const card = document.createElement('div');
+        card.className = `avatar-card ${idx === this.currentAvatarIndex ? 'active' : ''}`;
+        card.innerHTML = `
+          <img src="${av.path}" class="avatar-card-img" alt="${av.name}" />
+          <span class="avatar-card-name">${av.name}</span>
+        `;
+
+        card.addEventListener('click', () => {
+          this.currentAvatarIndex = idx;
+          this.updateAvatarDisplay();
+          this.updateBoardDisplay();
+          this.saveStorage(false);
+          this.closeModal('modal-avatars');
+        });
+
+        gridEl.appendChild(card);
+      });
+
+      this.openModal('modal-avatars');
+    }
+
+    // 通用弹窗开关
+    private openModal(id: string) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'flex';
+    }
+
+    private closeModal(id: string) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    }
+  }
+
+  // 页面加载完成后启动
+  document.addEventListener('DOMContentLoaded', () => {
+    new DongdokuApp();
+  });
+</script>
