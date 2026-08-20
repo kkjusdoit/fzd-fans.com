@@ -15,7 +15,7 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single click to mark ✖ | Double click to place 🏓' : '💡 单击标记 ✖ 排除，双击放置 🏓 咚咚',
+  tipGesture: isEn ? '💡 Single click to mark ✖ | Double click to place 🏓' : '💡 单击标记 ✖ 排除，快速双击放置 🏓 咚咚',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -455,22 +455,24 @@ const i18n = {
 
   /* 棋盘格子 */
   .grid-cell {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: clamp(8px, 1.8vw, 14px);
-    border: 2.5px solid #ffffff;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    transition: transform 0.12s ease, filter 0.12s ease;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: clamp(8px, 1.8vw, 14px) !important;
+    border: 2.5px solid #ffffff !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.12s ease, filter 0.12s ease !important;
     overflow: hidden !important;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
 
   .grid-cell:hover {
@@ -491,7 +493,7 @@ const i18n = {
     justify-content: center;
     width: 50%;
     height: 50%;
-    pointer-events: none;
+    pointer-events: none !important;
     animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
@@ -508,24 +510,24 @@ const i18n = {
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
+    pointer-events: none !important;
     border-radius: inherit;
     overflow: hidden;
   }
 
   /* 精致圆形头像（基于 background-image，绝对保证为圆形且 100% 适配单元格不溢出） */
   .cell-dong-avatar {
-    width: 82%;
-    height: 82%;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center 20%;
-    background-repeat: no-repeat;
-    border: 2.5px solid #ffffff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+    width: 82% !important;
+    height: 82% !important;
+    border-radius: 50% !important;
+    background-size: cover !important;
+    background-position: center 20% !important;
+    background-repeat: no-repeat !important;
+    border: 2.5px solid #ffffff !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28) !important;
     animation: popDong 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    box-sizing: border-box;
-    flex-shrink: 0;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   /* 🚫 找错咚 / 规则冲突覆盖图层 */
@@ -537,6 +539,7 @@ const i18n = {
     justify-content: center;
     background: rgba(229, 57, 53, 0.28);
     border-radius: inherit;
+    pointer-events: none !important;
     animation: popBan 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
@@ -1073,12 +1076,11 @@ const i18n = {
     private timerInterval: any = null;
     private elapsedSeconds: number = 0;
     private lives: number = 3; // 3条命
-    private isGameOver: boolean = false;
     private sounds: SoundManager;
 
-    // 单双击手势快速分流系统（支持极速连点）
+    // 单双击独立状态分流系统
+    private cellClickCount: Map<string, number> = new Map();
     private cellTimers: Map<string, any> = new Map();
-    private cellLastClicks: Map<string, number> = new Map();
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1129,7 +1131,7 @@ const i18n = {
             levelId: this.currentLevelId,
             grid: this.gridState,
             elapsed: this.elapsedSeconds,
-            lives: this.lives
+            lives: Math.max(1, this.lives) // 永远保证重进至少有生命值
           };
         }
 
@@ -1303,8 +1305,7 @@ const i18n = {
       this.cellAvatars.clear();
       this.undoStack = [];
       this.moveCount = 0;
-      this.lives = 3;
-      this.isGameOver = false;
+      this.lives = 3; // 重置满血 3 条命
 
       try {
         const saved = localStorage.getItem('dongdoku_save_v1');
@@ -1313,7 +1314,9 @@ const i18n = {
           if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
             this.gridState = parsed.boardState.grid;
             this.elapsedSeconds = parsed.boardState.elapsed || 0;
-            if (parsed.boardState.lives !== undefined) this.lives = parsed.boardState.lives;
+            if (parsed.boardState.lives && parsed.boardState.lives > 0) {
+              this.lives = parsed.boardState.lives;
+            }
             for (let r = 0; r < size; r++) {
               for (let c = 0; c < size; c++) {
                 if (this.gridState[r][c] === 2) {
@@ -1365,10 +1368,10 @@ const i18n = {
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
-          // 绑定手势分流器
-          cellEl.addEventListener('pointerdown', (e) => {
-            if (this.isGameOver) return;
-            this.handleCellTap(r, c);
+          // 绑定标准无障碍点击分流器
+          cellEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.onCellClick(r, c);
           });
 
           gridEl.appendChild(cellEl);
@@ -1391,31 +1394,35 @@ const i18n = {
       }, 1000);
     }
 
-    // 零延迟单双击手势分流核心
-    private handleCellTap(r: number, c: number) {
-      const key = `${r},${c}`;
-      const now = Date.now();
-      const lastClick = this.cellLastClicks.get(key) || 0;
-      const isQuick = (now - lastClick < 280);
+    // 极速单双击分流器（业界最强防抖与多击捕获）
+    private onCellClick(r: number, c: number) {
+      if (this.lives <= 0) {
+        this.lives = 3;
+        this.updateLivesDisplay();
+      }
 
-      if (isQuick) {
-        // 第二次点击在 280ms 内到达 -> 立即触发双击！
-        const existingTimer = this.cellTimers.get(key);
-        if (existingTimer) {
-          clearTimeout(existingTimer);
-          this.cellTimers.delete(key);
-        }
-        this.cellLastClicks.delete(key);
-        this.handleDoubleClick(r, c);
-      } else {
-        // 记录第一次点击
-        this.cellLastClicks.set(key, now);
+      const key = `${r},${c}`;
+      const count = (this.cellClickCount.get(key) || 0) + 1;
+      this.cellClickCount.set(key, count);
+
+      const existingTimer = this.cellTimers.get(key);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      if (count === 1) {
+        // 单击：等待 210ms 确认是否发生第二次点击
         const timer = setTimeout(() => {
           this.cellTimers.delete(key);
-          this.cellLastClicks.delete(key);
+          this.cellClickCount.delete(key);
           this.handleSingleClick(r, c);
-        }, 220);
+        }, 210);
         this.cellTimers.set(key, timer);
+      } else if (count >= 2) {
+        // 双击：立即执行！0 毫秒等待！
+        this.cellTimers.delete(key);
+        this.cellClickCount.delete(key);
+        this.handleDoubleClick(r, c);
       }
     }
 
@@ -1504,7 +1511,7 @@ const i18n = {
           this.cellAvatars = new Map(parsed.avatars);
         }
         if (parsed.lives !== undefined) {
-          this.lives = parsed.lives;
+          this.lives = Math.max(1, parsed.lives);
           this.updateLivesDisplay();
         }
         this.updateBoardDisplay();
@@ -1520,7 +1527,6 @@ const i18n = {
       this.cellAvatars.clear();
       this.elapsedSeconds = 0;
       this.lives = 3;
-      this.isGameOver = false;
       this.updateLivesDisplay();
       this.startTimer();
       this.hideToast();
@@ -1680,7 +1686,7 @@ const i18n = {
 
     // 检查通关状态
     private checkWinCondition() {
-      if (!this.currentLevelData || this.isGameOver) return;
+      if (!this.currentLevelData || this.lives <= 0) return;
       const size = this.currentLevelData.size;
 
       const dongs: { r: number; c: number; region: number }[] = [];
@@ -1718,7 +1724,6 @@ const i18n = {
 
     // 挑战失败结算
     private handleGameOver() {
-      this.isGameOver = true;
       if (this.timerInterval) clearInterval(this.timerInterval);
       this.openModal('modal-gameover');
     }
