@@ -15,7 +15,7 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single click (or Right-click) to mark ✖ | Double click to confirm 🏓' : '💡 单击/右击标记 ✖ 排除，双击确定 🏓 咚咚（找错立即亮 🚫 扣 1 条命）',
+  tipGesture: isEn ? '💡 Single click (or Right-click) to mark ✖ | Double click to find Dong 🏓' : '💡 单击/右击标记 ✖ 排除，双击确定 🏓 咚咚（找对出头像，找错亮 🚫 扣 1 条命）',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -1392,7 +1392,7 @@ const i18n = {
             this.handleDoubleClick(r, c);
           });
 
-          // 2. 单击事件监听（300ms 窗口防抖，确保双击时不误触发单击）
+          // 2. 单击事件监听（280ms 窗口防抖，确保双击时不误触发单击）
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.lives <= 0) return;
@@ -1407,7 +1407,7 @@ const i18n = {
             const timer = setTimeout(() => {
               this.cellTimers.delete(key);
               this.handleSingleClick(r, c);
-            }, 300);
+            }, 280);
             this.cellTimers.set(key, timer);
           });
 
@@ -1441,7 +1441,7 @@ const i18n = {
       }, 1000);
     }
 
-    // 【单击逻辑】：标记 ✖ 排除 / 取消 ✖
+    // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖（绝不影响其他任何格子）
     private handleSingleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
@@ -1459,7 +1459,7 @@ const i18n = {
       this.saveStorage(true);
     }
 
-    // 【双击逻辑】：确定该格为咚咚（每格仅一次机会！对则亮头像，错则亮 🚫 扣 1 条命）
+    // 【双击逻辑】：仅针对当前格子判定找对/找错（绝不自动给四周打叉！）
     private handleDoubleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
@@ -1474,21 +1474,17 @@ const i18n = {
       const isSolutionDong = this.currentLevelData?.solution?.some((s: any) => s.row === r && s.col === c);
 
       if (isSolutionDong) {
-        // ✅ 找对了！永久放置樊振东头像
+        // ✅ 找对了！仅在该格子点亮樊振东头像
         this.gridState[r][c] = 2;
         if (!this.cellAvatars.has(`${r},${c}`)) {
           this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         }
         this.sounds.playPlace();
-
-        // 自动辅助：在同一行、同一列、同色块及八向相邻格自动打上 ✖ 排除（原版高级体验）
-        this.autoFillCrossesAroundDong(r, c);
-
         this.updateBoardDisplay();
         this.saveStorage(true);
         this.checkWinCondition();
       } else {
-        // ❌ 找错了！显示异常禁止标志 🚫 并扣除 1 条命
+        // ❌ 找错了！仅在该格子显示异常禁止标志 🚫 并扣除 1 条命
         this.gridState[r][c] = 3;
         if (!this.cellAvatars.has(`${r},${c}`)) {
           this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
@@ -1504,29 +1500,6 @@ const i18n = {
 
         if (this.lives <= 0) {
           this.handleGameOver();
-        }
-      }
-    }
-
-    // 当找对咚时，自动为该咚的同行、同列、同色块和八方向空白格打上 ✖
-    private autoFillCrossesAroundDong(dongRow: number, dongCol: number) {
-      if (!this.currentLevelData) return;
-      const size = this.currentLevelData.size;
-      const targetRegion = this.currentLevelData.regions[dongRow][dongCol];
-
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (r === dongRow && c === dongCol) continue;
-          if (this.gridState[r][c] !== 0) continue; // 只填空白格
-
-          const isSameRow = (r === dongRow);
-          const isSameCol = (c === dongCol);
-          const isSameRegion = (this.currentLevelData.regions[r][c] === targetRegion);
-          const isTouching = Math.abs(r - dongRow) <= 1 && Math.abs(c - dongCol) <= 1;
-
-          if (isSameRow || isSameCol || isSameRegion || isTouching) {
-            this.gridState[r][c] = 1; // 自动标 ✖
-          }
         }
       }
     }
