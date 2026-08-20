@@ -1,6 +1,4 @@
 ---
-import { INITIAL_LEVELS } from './initialLevels';
-
 interface Props {
   lang?: 'zh' | 'en';
 }
@@ -13,11 +11,11 @@ const i18n = {
   title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
   subtitle: isEn ? 'One Dong per region, row, and column. Dongs cannot touch!' : '每个领地找出一个咚，咚咚之间不相碰！',
   rulesTitle: isEn ? 'Game Rules' : '核心规则',
-  rule1Title: isEn ? '1. Row & Column' : '1. 行列唯一',
-  rule1Desc: isEn ? 'Exactly 1 Dong in each row & column' : '每行、每列必须且只能放 1 个咚',
-  rule2Title: isEn ? '2. Color Region' : '2. 领地唯一',
+  rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
+  rule1Desc: isEn ? 'Exactly 1 Dong in each row & col' : '每行、每列必须且只能放 1 个咚',
+  rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
   rule2Desc: isEn ? 'Exactly 1 Dong in each color area' : '每个彩色区域必须且只能放 1 个咚',
-  rule3Title: isEn ? '3. No Touching' : '3. 八向隔离',
+  rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? 'Dongs cannot touch diagonally or adjacent' : '咚与咚不能相邻（包括对角线）',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
@@ -31,7 +29,6 @@ const i18n = {
   modeCross: isEn ? '❌ Mark Cross' : '❌ 排除模式',
   modeCycle: isEn ? '🔄 Cycle Tap' : '🔄 循环模式',
   autoCross: isEn ? '⚡ Auto-Cross' : '⚡ 自动划叉',
-  changeAvatar: isEn ? '🖼️ Change Avatar' : '🖼️ 换咚头像',
   placed: isEn ? 'Dongs' : '已放咚',
   difficulty: {
     easy: isEn ? 'Easy' : '简单',
@@ -52,7 +49,7 @@ const i18n = {
 };
 ---
 
-<div class="dongdoku-container" id="dongdoku-app" data-lang={lang} data-initial-levels={JSON.stringify(INITIAL_LEVELS)}>
+<div class="dongdoku-container" id="dongdoku-app" data-lang={lang}>
   <!-- 顶部控制与状态栏 -->
   <header class="game-header">
     <div class="header-left">
@@ -171,10 +168,6 @@ const i18n = {
         <span class="toggle-slider"></span>
         <span class="toggle-label">{i18n.autoCross}</span>
       </label>
-      <button type="button" class="btn-avatar-picker" id="btn-open-avatars">
-        <img src="/game/assets/image-%20000.webp" alt="Avatar" id="current-avatar-img" class="avatar-thumb" />
-        <span>{i18n.changeAvatar}</span>
-      </button>
     </div>
   </footer>
 
@@ -192,19 +185,6 @@ const i18n = {
         <div class="levels-grid" id="levels-grid">
           <!-- 关卡卡片 -->
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 头像选择弹窗 (Avatar Modal) -->
-  <div class="modal-backdrop" id="modal-avatars" style="display: none;">
-    <div class="modal-content modal-avatars-content">
-      <div class="modal-header">
-        <h2>{i18n.changeAvatar} (24款经典咚)</h2>
-        <button type="button" class="modal-close" id="btn-close-avatars">×</button>
-      </div>
-      <div class="avatars-grid" id="avatars-grid">
-        <!-- 24 款头像选项 -->
       </div>
     </div>
   </div>
@@ -246,7 +226,7 @@ const i18n = {
   .dongdoku-container {
     max-width: 820px;
     margin: 0 auto;
-    padding: 1rem 0.75rem 3rem;
+    padding: 0.5rem 0.5rem 2.5rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #3d302c;
     user-select: none;
@@ -348,7 +328,7 @@ const i18n = {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.6rem;
-    margin: 1rem 0;
+    margin: 0.8rem 0;
   }
 
   .rule-card {
@@ -416,7 +396,7 @@ const i18n = {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1rem 0;
+    margin: 0.6rem 0;
   }
 
   .board-container {
@@ -426,11 +406,12 @@ const i18n = {
     padding: 0.9rem;
     box-shadow: 0 12px 36px rgba(78, 64, 55, 0.12);
     width: 100%;
-    max-width: min(92vw, 560px, calc(100vh - 280px));
+    max-width: min(92vw, 560px, calc(100vh - 290px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
   }
 
   .game-grid {
@@ -438,6 +419,7 @@ const i18n = {
     width: 100%;
     height: 100%;
     gap: clamp(4px, 1.2vw, 8px);
+    box-sizing: border-box;
   }
 
   /* 棋盘格子 */
@@ -453,6 +435,7 @@ const i18n = {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   .grid-cell:hover {
@@ -534,7 +517,7 @@ const i18n = {
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    margin-top: 0.8rem;
+    margin-top: 0.6rem;
     flex-wrap: wrap;
   }
 
@@ -616,34 +599,6 @@ const i18n = {
 
   .toggle-control input:checked + .toggle-slider::after {
     transform: translateX(16px);
-  }
-
-  .btn-avatar-picker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    padding: 0.35rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: #6e554d;
-    cursor: pointer;
-    transition: all 0.15s;
-    box-shadow: 0 2px 6px rgba(78, 64, 55, 0.06);
-  }
-
-  .btn-avatar-picker:hover {
-    background: #fbf5f2;
-    border-color: #bbdefb;
-  }
-
-  .avatar-thumb {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    object-fit: cover;
   }
 
   /* 弹窗通用样式 */
@@ -803,60 +758,6 @@ const i18n = {
     font-size: 0.65rem;
     font-weight: 700;
     opacity: 0.7;
-  }
-
-  /* 头像选择弹窗 */
-  .modal-avatars-content {
-    max-width: 580px;
-    padding-bottom: 1.5rem;
-  }
-
-  .avatars-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 0.8rem;
-    padding: 1.2rem;
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
-  .avatar-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem;
-    border: 2px solid #ebdcd5;
-    border-radius: 1rem;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: #ffffff;
-  }
-
-  .avatar-card:hover {
-    transform: scale(1.05);
-    border-color: #1e88e5;
-  }
-
-  .avatar-card.active {
-    border-color: #1e88e5;
-    background: #e3f2fd;
-    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.3);
-  }
-
-  .avatar-card-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  }
-
-  .avatar-card-name {
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: #4e342e;
-    text-align: center;
   }
 
   /* 通关胜利弹窗 */
@@ -1045,12 +946,14 @@ const i18n = {
       justify-content: center;
     }
     .aux-tools {
-      justify-content: space-between;
+      justify-content: center;
     }
   }
 </style>
 
 <script>
+  import { INITIAL_LEVELS } from './initialLevels';
+
   // ==========================================
   // 《找咚》(Dongdoku) 客户端核心引擎
   // ==========================================
@@ -1074,33 +977,11 @@ const i18n = {
     '#74B9FF'  // 14: 湛蓝 Clear Blue
   ];
 
-  // 24 款经典樊振东头像库
-  const AVATAR_LIST = [
-    { id: 0, path: '/game/assets/image-%20000.webp', name: '军礼咚' },
-    { id: 1, path: '/game/assets/image-%20001.webp', name: '夺冠比心' },
-    { id: 2, path: '/game/assets/image-%20002.webp', name: '金牌咬咬' },
-    { id: 3, path: '/game/assets/image-%20003.webp', name: '微笑咚' },
-    { id: 4, path: '/game/assets/image-%20004.webp', name: '巴黎之巅' },
-    { id: 5, path: '/game/assets/image-%20005.webp', name: '严肃战神' },
-    { id: 6, path: '/game/assets/image-%20006.webp', name: '萌萌小胖' },
-    { id: 7, path: '/game/assets/image-%20007.webp', name: '霸气握拳' },
-    { id: 8, path: '/game/assets/image-%20008.webp', name: '擦汗咚' },
-    { id: 9, path: '/game/assets/image-%20009.webp', name: '欢呼咚' },
-    { id: 10, path: '/game/assets/image-%20010.webp', name: '沉思咚' },
-    { id: 11, path: '/game/assets/image-%20011.webp', name: '可爱歪头' },
-    { id: 12, path: '/game/assets/image-%20012.webp', name: '发球聚精' },
-    { id: 13, path: '/game/assets/image-%20013.webp', name: '经典侧颜' },
-    { id: 14, path: '/game/assets/image-%20014.webp', name: '德甲新发型' },
-    { id: 15, path: '/game/assets/image-%20015.webp', name: '开心大笑' },
-    { id: 16, path: '/game/assets/image-%20016.webp', name: '双手比心' },
-    { id: 17, path: '/game/assets/image-%20017.webp', name: '领奖台' },
-    { id: 18, path: '/game/assets/image-%20018.webp', name: '球拍战术' },
-    { id: 19, path: '/game/assets/image-%20019.webp', name: '红衣战神' },
-    { id: 20, path: '/game/assets/image-%20020.webp', name: '蓝衣国手' },
-    { id: 21, path: '/game/assets/image-%20021.webp', name: '金牌之吻' },
-    { id: 22, path: '/game/assets/image-%20022.webp', name: '赛后致谢' },
-    { id: 23, path: '/game/assets/image-%20023.webp', name: '大满贯' },
-  ];
+  // 24 款经典樊振东头像库（点开随机出现）
+  const AVATAR_PATHS = Array.from({ length: 24 }, (_, i) => {
+    const num = i.toString().padStart(3, '0');
+    return `/game/assets/image-%20${num}.webp`;
+  });
 
   // 音效控制器
   class SoundManager {
@@ -1148,7 +1029,6 @@ const i18n = {
   // 游戏主控制器
   class DongdokuApp {
     private container: HTMLElement;
-    private initialLevels: Record<number, any>;
     private levelCache: Map<number, any> = new Map();
     private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
     
@@ -1157,6 +1037,7 @@ const i18n = {
     private maxUnlockedLevel: number = 1;
     private currentLevelData: any = null;
     private gridState: number[][] = []; // 0=Empty, 1=Cross, 2=Dong
+    private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private undoStack: string[] = []; // JSON snapshots
     private moveCount: number = 0;
     private startTime: number = 0;
@@ -1166,27 +1047,26 @@ const i18n = {
     // 设置
     private touchMode: 'cycle' | 'dong' | 'cross' = 'cycle';
     private autoCross: boolean = true;
-    private currentAvatarIndex: number = 0;
     private sounds: SoundManager;
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
       this.sounds = new SoundManager();
       
-      const rawInit = this.container.getAttribute('data-initial-levels');
-      this.initialLevels = rawInit ? JSON.parse(rawInit) : {};
-      
       // 将初始内嵌关卡存入缓存
-      for (const [idStr, data] of Object.entries(this.initialLevels)) {
+      for (const [idStr, data] of Object.entries(INITIAL_LEVELS)) {
         this.levelCache.set(Number(idStr), data);
       }
 
       this.loadStorage();
       this.initDOMElements();
       this.initEvents();
-      this.fetchManifest().then(() => {
-        this.loadLevel(this.currentLevelId);
-      });
+      
+      // 立即加载并渲染当前关卡（零延迟！）
+      this.loadLevel(this.currentLevelId);
+
+      // 后台静默拉取关卡总目录清单
+      this.fetchManifest();
     }
 
     // 从 LocalStorage 加载记录
@@ -1199,7 +1079,6 @@ const i18n = {
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
           if (parsed.autoCross !== undefined) this.autoCross = parsed.autoCross;
           if (parsed.touchMode) this.touchMode = parsed.touchMode;
-          if (parsed.avatarIndex !== undefined) this.currentAvatarIndex = parsed.avatarIndex;
           if (parsed.soundEnabled !== undefined) this.sounds.enabled = parsed.soundEnabled;
         }
       } catch (e) {
@@ -1215,7 +1094,6 @@ const i18n = {
           maxUnlockedLevel: this.maxUnlockedLevel,
           autoCross: this.autoCross,
           touchMode: this.touchMode,
-          avatarIndex: this.currentAvatarIndex,
           soundEnabled: this.sounds.enabled
         };
 
@@ -1276,7 +1154,6 @@ const i18n = {
       const soundIcon = document.getElementById('sound-icon');
       if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
 
-      this.updateAvatarDisplay();
       this.updateModeButtons();
     }
 
@@ -1336,10 +1213,6 @@ const i18n = {
         this.openLevelsModal();
       });
 
-      // 头像弹窗
-      document.getElementById('btn-open-avatars')?.addEventListener('click', () => this.openAvatarModal());
-      document.getElementById('btn-close-avatars')?.addEventListener('click', () => this.closeModal('modal-avatars'));
-
       // 胜利弹窗中的下一关 / 重玩
       document.getElementById('btn-next-level')?.addEventListener('click', () => {
         this.closeModal('modal-win');
@@ -1362,13 +1235,10 @@ const i18n = {
       });
     }
 
-    private updateAvatarDisplay() {
-      const avatar = AVATAR_LIST[this.currentAvatarIndex] || AVATAR_LIST[0];
-      const thumb = document.getElementById('current-avatar-img') as HTMLImageElement;
-      if (thumb) thumb.src = avatar.path;
-
-      const winAvatar = document.getElementById('win-avatar-img') as HTMLImageElement;
-      if (winAvatar) winAvatar.src = avatar.path;
+    // 随机获取一款樊振东头像
+    private getRandomAvatar(): string {
+      const idx = Math.floor(Math.random() * AVATAR_PATHS.length);
+      return AVATAR_PATHS[idx];
     }
 
     // 加载指定关卡
@@ -1382,11 +1252,14 @@ const i18n = {
       }
       this.saveStorage(false);
 
-      // 显示加载提示
-      const gridEl = document.getElementById('game-grid');
-      if (gridEl) gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">正在加载关卡...</div>';
+      let data = this.levelCache.get(levelId);
+      if (!data) {
+        // 显示加载提示
+        const gridEl = document.getElementById('game-grid');
+        if (gridEl) gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">正在加载关卡...</div>';
+        data = await this.fetchLevelData(levelId);
+      }
 
-      const data = await this.fetchLevelData(levelId);
       if (!data) {
         alert('关卡数据加载失败，请检查网络');
         return;
@@ -1402,6 +1275,7 @@ const i18n = {
     private initBoardState(data: any) {
       const size = data.size;
       this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.cellAvatars.clear();
       this.undoStack = [];
       this.moveCount = 0;
 
@@ -1413,16 +1287,19 @@ const i18n = {
           if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
             this.gridState = parsed.boardState.grid;
             this.elapsedSeconds = parsed.boardState.elapsed || 0;
+            // 恢复已放咚的随机头像
+            for (let r = 0; r < size; r++) {
+              for (let c = 0; c < size; c++) {
+                if (this.gridState[r][c] === 2) {
+                  this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
+                }
+              }
+            }
           } else {
             this.elapsedSeconds = 0;
           }
         }
       } catch (e) {}
-
-      // 如果是新手关卡有 starter cat，锁定它
-      if (data.solution && data.id === 0) {
-        // starter
-      }
     }
 
     // 渲染 UI 与网格
@@ -1519,15 +1396,19 @@ const i18n = {
       this.gridState[r][c] = nextVal;
       this.moveCount++;
 
-      // 播放音效
+      // 播放音效与随机头像分配
       if (nextVal === 2) {
+        this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         this.sounds.playPlace();
         // 自动划叉辅助
         if (this.autoCross) {
           this.applyAutoCross(r, c);
         }
-      } else if (nextVal === 1) {
-        this.sounds.playCross();
+      } else {
+        this.cellAvatars.delete(`${r},${c}`);
+        if (nextVal === 1) {
+          this.sounds.playCross();
+        }
       }
 
       this.updateBoardDisplay();
@@ -1538,7 +1419,10 @@ const i18n = {
     // 右键快速标 ❌
     private handleCellRightClick(r: number, c: number) {
       this.pushUndoSnapshot();
-      this.gridState[r][c] = this.gridState[r][c] === 1 ? 0 : 1;
+      const currentVal = this.gridState[r][c];
+      const nextVal = currentVal === 1 ? 0 : 1;
+      this.gridState[r][c] = nextVal;
+      if (nextVal !== 2) this.cellAvatars.delete(`${r},${c}`);
       this.sounds.playCross();
       this.updateBoardDisplay();
       this.saveStorage(true);
@@ -1569,7 +1453,10 @@ const i18n = {
     // 保存撤销快照
     private pushUndoSnapshot() {
       if (this.undoStack.length >= 40) this.undoStack.shift();
-      this.undoStack.push(JSON.stringify(this.gridState));
+      this.undoStack.push(JSON.stringify({
+        grid: this.gridState,
+        avatars: Array.from(this.cellAvatars.entries())
+      }));
     }
 
     // 撤销操作
@@ -1577,7 +1464,11 @@ const i18n = {
       if (this.undoStack.length === 0) return;
       const last = this.undoStack.pop();
       if (last) {
-        this.gridState = JSON.parse(last);
+        const parsed = JSON.parse(last);
+        this.gridState = parsed.grid;
+        if (parsed.avatars) {
+          this.cellAvatars = new Map(parsed.avatars);
+        }
         this.updateBoardDisplay();
         this.saveStorage(true);
       }
@@ -1588,6 +1479,7 @@ const i18n = {
       const size = this.currentLevelData.size;
       this.pushUndoSnapshot();
       this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
+      this.cellAvatars.clear();
       this.elapsedSeconds = 0;
       this.startTimer();
       this.updateBoardDisplay();
@@ -1607,7 +1499,6 @@ const i18n = {
 
       // 如果关卡带有逻辑推导步数
       if (data.hints && data.hints.length > 0) {
-        // 寻找第一个未被正确放置咚的提示步
         for (const step of data.hints) {
           if (step.action === 'cat' && step.cells && step.cells.length > 0) {
             const cell = step.cells[0];
@@ -1656,7 +1547,6 @@ const i18n = {
     private updateBoardDisplay() {
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
-      const avatar = AVATAR_LIST[this.currentAvatarIndex] || AVATAR_LIST[0];
 
       let dongCount = 0;
       const dongs: { r: number; c: number; region: number }[] = [];
@@ -1676,13 +1566,19 @@ const i18n = {
             cross.className = 'cell-cross';
             cellEl.appendChild(cross);
           } else if (val === 2) {
-            // 🏓 樊振东头像
+            // 🏓 樊振东随机头像
             dongCount++;
             dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
 
+            let avatarPath = this.cellAvatars.get(`${r},${c}`);
+            if (!avatarPath) {
+              avatarPath = this.getRandomAvatar();
+              this.cellAvatars.set(`${r},${c}`, avatarPath);
+            }
+
             const img = document.createElement('img');
             img.className = 'cell-dong-avatar';
-            img.src = avatar.path;
+            img.src = avatarPath;
             img.alt = 'Dong';
             cellEl.appendChild(img);
           }
@@ -1778,6 +1674,10 @@ const i18n = {
       // 记录已通关
       this.saveStorage(false);
 
+      // 胜利头像随机展示
+      const winAvatar = document.getElementById('win-avatar-img') as HTMLImageElement;
+      if (winAvatar) winAvatar.src = this.getRandomAvatar();
+
       // 弹出胜利弹窗
       const winTime = document.getElementById('win-time');
       const winMoves = document.getElementById('win-moves');
@@ -1852,34 +1752,6 @@ const i18n = {
       }
     }
 
-    // 头像选择弹窗
-    private openAvatarModal() {
-      const gridEl = document.getElementById('avatars-grid');
-      if (!gridEl) return;
-      gridEl.innerHTML = '';
-
-      AVATAR_LIST.forEach((av, idx) => {
-        const card = document.createElement('div');
-        card.className = `avatar-card ${idx === this.currentAvatarIndex ? 'active' : ''}`;
-        card.innerHTML = `
-          <img src="${av.path}" class="avatar-card-img" alt="${av.name}" />
-          <span class="avatar-card-name">${av.name}</span>
-        `;
-
-        card.addEventListener('click', () => {
-          this.currentAvatarIndex = idx;
-          this.updateAvatarDisplay();
-          this.updateBoardDisplay();
-          this.saveStorage(false);
-          this.closeModal('modal-avatars');
-        });
-
-        gridEl.appendChild(card);
-      });
-
-      this.openModal('modal-avatars');
-    }
-
     // 通用弹窗开关
     private openModal(id: string) {
       const el = document.getElementById(id);
@@ -1892,8 +1764,16 @@ const i18n = {
     }
   }
 
-  // 页面加载完成后启动
-  document.addEventListener('DOMContentLoaded', () => {
-    new DongdokuApp();
-  });
+  // 页面加载或就绪时立即启动
+  function startDongdoku() {
+    if (document.getElementById('dongdoku-app')) {
+      new DongdokuApp();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startDongdoku);
+  } else {
+    startDongdoku();
+  }
 </script>
