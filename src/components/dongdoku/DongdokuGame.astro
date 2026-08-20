@@ -15,7 +15,7 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single click to mark ❌ | Double click to place 🏓' : '💡 单击标记 ❌ 排除，双击确定 🏓 咚咚',
+  tipGesture: isEn ? '💡 Single click to mark ✖ | Double click to place 🏓' : '💡 单击标记 ✖ 排除，双击放置 🏓 咚咚',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -25,7 +25,6 @@ const i18n = {
   soundOn: isEn ? 'Sound: ON' : '声音: 开启',
   soundOff: isEn ? 'Sound: OFF' : '声音: 静音',
   placed: isEn ? 'Dongs' : '已放咚',
-  errWrongPos: isEn ? '❌ Oops, no Dong here!' : '❌ 哎呀，这里不是咚咚哦！',
   difficulty: {
     easy: isEn ? 'Easy' : '简单',
     medium: isEn ? 'Medium' : '中等',
@@ -452,40 +451,34 @@ const i18n = {
     transform: scale(0.96);
   }
 
-  /* 单元格状态：❌ 排除叉（单击产生） */
-  .cell-cross {
-    position: relative;
-    width: 45%;
-    height: 45%;
+  /* 单元格状态：白色 ✖ 排除叉（单击产生） */
+  .cell-cross-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 50%;
     pointer-events: none;
-    animation: popCross 0.18s ease forwards;
+    animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  .cell-cross::before, .cell-cross::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
+  .cross-svg {
     width: 100%;
-    height: 3.5px;
-    background: #3e2723;
-    border-radius: 2px;
-    opacity: 0.8;
+    height: 100%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
   }
 
-  .cell-cross::before {
-    transform: translateY(-50%) rotate(45deg);
-  }
-
-  .cell-cross::after {
-    transform: translateY(-50%) rotate(-45deg);
-  }
-
-  /* 单元格状态：🏓 樊振东头像（双击正确产生） */
-  .cell-dong-avatar {
+  /* 单元格状态：🏓 樊振东头像容器（双击产生） */
+  .cell-dong-wrap {
     position: absolute;
-    top: 7%;
-    left: 7%;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .cell-dong-avatar {
     width: 86% !important;
     height: 86% !important;
     max-width: 86% !important;
@@ -495,29 +488,31 @@ const i18n = {
     border-radius: 50%;
     border: 2.5px solid #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    pointer-events: none;
     animation: popDong 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  /* 错误报错状态（双击错误格子时触发） */
-  .grid-cell.cell-error-shake {
-    border-color: #ff1744 !important;
-    animation: errorShake 0.45s cubic-bezier(.36,.07,.19,.97) both;
-    z-index: 10;
-  }
-
-  .grid-cell.cell-error-shake::after {
-    content: '🚫';
+  /* 🚫 找错咚 / 规则冲突覆盖图层（1:1 还原 Meowdoku 找错猫标志） */
+  .cell-ban-overlay {
     position: absolute;
-    font-size: 1.5rem;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    inset: 0;
-    background: rgba(255, 23, 68, 0.35);
-    pointer-events: none;
+    background: rgba(229, 57, 53, 0.28);
     border-radius: inherit;
-    animation: fadeErrorIcon 0.6s ease forwards;
+    animation: popBan 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .ban-svg {
+    width: 70%;
+    height: 70%;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  }
+
+  /* 错误冲突态外框警示 */
+  .grid-cell.has-conflict {
+    border-color: #ff1744 !important;
+    animation: errorShake 0.4s ease-in-out;
   }
 
   /* 提示高亮态 */
@@ -825,8 +820,9 @@ const i18n = {
   }
 
   @keyframes popCross {
-    from { transform: scale(0.2); opacity: 0; }
-    to { transform: scale(1); opacity: 0.85; }
+    0% { transform: scale(0.3); opacity: 0; }
+    80% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   @keyframes popDong {
@@ -835,18 +831,17 @@ const i18n = {
     100% { transform: scale(1); opacity: 1; }
   }
 
-  @keyframes errorShake {
-    10%, 90% { transform: translate3d(-3px, 0, 0); }
-    20%, 80% { transform: translate3d(5px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-    40%, 60% { transform: translate3d(6px, 0, 0); }
+  @keyframes popBan {
+    0% { transform: scale(0.4); opacity: 0; }
+    80% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
-  @keyframes fadeErrorIcon {
-    0% { opacity: 0; transform: scale(0.5); }
-    30% { opacity: 1; transform: scale(1.1); }
-    70% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.8); }
+  @keyframes errorShake {
+    10%, 90% { transform: translate3d(-3px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
   }
 
   @keyframes shakeToast {
@@ -891,8 +886,9 @@ const i18n = {
 
   // ==========================================
   // 《找咚》(Dongdoku) 客户端核心引擎
-  // 单击：标记 ❌ 排除
-  // 双击：确定是 🏓 咚咚（正确放头像，错误报错提示）
+  // 单击：标记 ✖ 排除
+  // 双击：放置 🏓 咚咚
+  // 冲突：当放置的咚违反规则时，1:1 叠加 🚫 找错标志与红光抖动
   // ==========================================
 
   // 色彩配置表（莫兰迪马卡龙色盘）
@@ -955,27 +951,27 @@ const i18n = {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(440, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.05);
-          gain.gain.setValueAtTime(0.08, ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+          osc.frequency.setValueAtTime(520, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(780, ctx.currentTime + 0.04);
+          gain.gain.setValueAtTime(0.06, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.04);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
-          osc.stop(ctx.currentTime + 0.05);
+          osc.stop(ctx.currentTime + 0.04);
         }
       } catch (e) {}
     }
 
-    // 双击正确放置咚咚音效
+    // 双击放置咚咚音效
     playPlace() {
       if (!this.enabled) return;
       this.matchSound.currentTime = 0;
       this.matchSound.play().catch(() => {});
     }
 
-    // 双击错误报错蜂鸣音
-    playError() {
+    // 冲突违规蜂鸣音
+    playConflict() {
       if (!this.enabled) return;
       try {
         const ctx = this.getAudioCtx();
@@ -983,14 +979,14 @@ const i18n = {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(180, ctx.currentTime);
-          osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.22);
+          osc.frequency.setValueAtTime(170, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.2);
           gain.gain.setValueAtTime(0.18, ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+          gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.2);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start();
-          osc.stop(ctx.currentTime + 0.22);
+          osc.stop(ctx.currentTime + 0.2);
         }
       } catch (e) {}
     }
@@ -1012,7 +1008,7 @@ const i18n = {
     private levelCache: Map<number, any> = new Map();
     private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
     
-    // 游戏状态: 0 = Empty, 1 = Cross (❌), 2 = Dong (🏓)
+    // 游戏状态: 0 = Empty, 1 = Cross (✖), 2 = Dong (🏓)
     private currentLevelId: number = 1;
     private maxUnlockedLevel: number = 1;
     private currentLevelData: any = null;
@@ -1180,13 +1176,7 @@ const i18n = {
       return AVATAR_PATHS[idx];
     }
 
-    // 判断该位置是否为本关的正确解
-    private isCorrectDong(r: number, c: number): boolean {
-      if (!this.currentLevelData || !this.currentLevelData.solution) return false;
-      return this.currentLevelData.solution.some((pos: any) => pos.row === r && pos.col === c);
-    }
-
-    // 显示 Toast 提示（提示信息 / 报错信息）
+    // 显示 Toast 提示
     private showToast(msg: string, type: 'hint' | 'error' = 'hint') {
       const box = document.getElementById('toast-message-box');
       const text = document.getElementById('toast-text');
@@ -1304,7 +1294,7 @@ const i18n = {
             this.handleCellPointer(r, c);
           });
 
-          // 桌面端双击加速监听（兼容）
+          // 桌面端双击监听加速响应
           cellEl.addEventListener('dblclick', (e) => {
             e.preventDefault();
             if (this.clickTimer) {
@@ -1334,7 +1324,7 @@ const i18n = {
       }, 1000);
     }
 
-    // 单双击手势分流器（240ms 窗口）
+    // 单双击手势分流器（240ms 判定窗口）
     private handleCellPointer(r: number, c: number) {
       const now = Date.now();
       const isSameCell = (this.lastClickRow === r && this.lastClickCol === c);
@@ -1349,7 +1339,7 @@ const i18n = {
         this.lastClickTime = 0;
         this.handleDoubleClick(r, c);
       } else {
-        // 记录第一次点击，延迟等待是否有第二次点击
+        // 记录第一次点击，等待是否有第二次点击
         this.lastClickTime = now;
         this.lastClickRow = r;
         this.lastClickCol = c;
@@ -1362,17 +1352,17 @@ const i18n = {
       }
     }
 
-    // 【单击逻辑】：标记 ❌ 排除 / 取消 ❌
+    // 【单击逻辑】：标记 ✖ 排除 / 取消 ✖
     private handleSingleClick(r: number, c: number) {
       this.clearHintHighlights();
       this.pushUndoSnapshot();
 
       const currentVal = this.gridState[r][c];
 
-      // 如果当前是咚咚，单击不随意改变（需双击取消或双击操作）
+      // 如果当前已经是咚咚，单击不覆盖
       if (currentVal === 2) return;
 
-      // 0 (空白) <-> 1 (❌ 排除)
+      // 0 (空白) <-> 1 (✖ 排除)
       const nextVal = currentVal === 1 ? 0 : 1;
       this.gridState[r][c] = nextVal;
       this.moveCount++;
@@ -1382,80 +1372,32 @@ const i18n = {
       this.saveStorage(true);
     }
 
-    // 【双击逻辑】：确定是 🏓 咚咚（正确放置头像，错误报错提示）
+    // 【双击逻辑】：放置 🏓 咚咚 / 取消咚咚
     private handleDoubleClick(r: number, c: number) {
       this.clearHintHighlights();
+      this.pushUndoSnapshot();
 
       const currentVal = this.gridState[r][c];
 
-      // 如果已经是咚咚，双击则是取消咚咚
       if (currentVal === 2) {
-        this.pushUndoSnapshot();
+        // 如果已经是咚咚，双击则是取消移除
         this.gridState[r][c] = 0;
         this.cellAvatars.delete(`${r},${c}`);
         this.moveCount++;
         this.sounds.playClick();
-        this.updateBoardDisplay();
-        this.saveStorage(true);
-        return;
-      }
-
-      // 校验是否为本关正确解
-      const isCorrect = this.isCorrectDong(r, c);
-
-      if (!isCorrect) {
-        // ❌ 错误位置！触发报错提示与震动
-        this.sounds.playError();
-        this.showToast(`❌ 哎呀，第 ${r + 1} 行第 ${c + 1} 列不是咚咚哦！请仔细推导~`, 'error');
-
-        const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
-        if (cellEl) {
-          cellEl.classList.remove('cell-error-shake');
-          // 强制重绘以重新触发动画
-          void (cellEl as HTMLElement).offsetWidth;
-          cellEl.classList.add('cell-error-shake');
-          setTimeout(() => {
-            cellEl.classList.remove('cell-error-shake');
-          }, 600);
+      } else {
+        // 放置咚咚
+        this.gridState[r][c] = 2;
+        if (!this.cellAvatars.has(`${r},${c}`)) {
+          this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         }
-        return;
+        this.moveCount++;
+        this.sounds.playPlace();
       }
-
-      // ✅ 正确位置！放置咚咚
-      this.pushUndoSnapshot();
-      this.gridState[r][c] = 2;
-      this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
-      this.moveCount++;
-      this.sounds.playPlace();
-
-      // 自动将同行、同列、同区域、周围8格自动填充 ❌ 排除
-      this.autoFillCrosses(r, c);
 
       this.updateBoardDisplay();
       this.saveStorage(true);
       this.checkWinCondition();
-    }
-
-    // 正确放咚后，自动将排除格标 ❌
-    private autoFillCrosses(dongRow: number, dongCol: number) {
-      const size = this.currentLevelData.size;
-      const regionId = this.currentLevelData.regions[dongRow][dongCol];
-
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (r === dongRow && c === dongCol) continue;
-          if (this.gridState[r][c] === 2) continue; // 不覆盖已有咚
-
-          const isSameRow = (r === dongRow);
-          const isSameCol = (c === dongCol);
-          const isSameRegion = (this.currentLevelData.regions[r][c] === regionId);
-          const isNeighbor = Math.abs(r - dongRow) <= 1 && Math.abs(c - dongCol) <= 1;
-
-          if (isSameRow || isSameCol || isSameRegion || isNeighbor) {
-            this.gridState[r][c] = 1; // 标 ❌
-          }
-        }
-      }
     }
 
     // 保存撤销快照
@@ -1547,45 +1489,107 @@ const i18n = {
       document.querySelectorAll('.grid-cell.hint-active').forEach(el => el.classList.remove('hint-active'));
     }
 
-    // 刷新棋盘视图
+    // 刷新棋盘视图与 🚫 找错/冲突标记检测（1:1 还原 Meowdoku）
     private updateBoardDisplay() {
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
 
       let dongCount = 0;
+      const dongs: { r: number; c: number; region: number }[] = [];
 
+      // 1. 收集所有已放咚的位置
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (this.gridState[r][c] === 2) {
+            dongCount++;
+            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
+          }
+        }
+      }
+
+      // 2. 检测所有违规冲突对（同一行、同一列、同一色块、八向相邻）
+      const conflictKeys = new Set<string>();
+      for (let i = 0; i < dongs.length; i++) {
+        for (let j = i + 1; j < dongs.length; j++) {
+          const d1 = dongs[i];
+          const d2 = dongs[j];
+
+          const isSameRow = (d1.r === d2.r);
+          const isSameCol = (d1.c === d2.c);
+          const isSameRegion = (d1.region === d2.region);
+          const isTouching = Math.abs(d1.r - d2.r) <= 1 && Math.abs(d1.c - d2.c) <= 1;
+
+          if (isSameRow || isSameCol || isSameRegion || isTouching) {
+            conflictKeys.add(`${d1.r},${d1.c}`);
+            conflictKeys.add(`${d2.r},${d2.c}`);
+          }
+        }
+      }
+
+      // 如果产生新冲突，播放违规音效
+      if (conflictKeys.size > 0) {
+        this.sounds.playConflict();
+      }
+
+      // 3. 渲染所有单元格内容与状态
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const val = this.gridState[r][c];
           const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
           if (!cellEl) continue;
 
+          cellEl.classList.remove('has-conflict');
           cellEl.innerHTML = '';
 
           if (val === 1) {
-            // ❌ 排除
-            const cross = document.createElement('div');
-            cross.className = 'cell-cross';
-            cellEl.appendChild(cross);
+            // ✖ 排除白色交叉（圆角纯白粗体交叉，带阴影）
+            const crossWrap = document.createElement('div');
+            crossWrap.className = 'cell-cross-wrap';
+            crossWrap.innerHTML = `
+              <svg viewBox="0 0 24 24" class="cross-svg">
+                <line x1="5.5" y1="5.5" x2="18.5" y2="18.5" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round"/>
+                <line x1="18.5" y1="5.5" x2="5.5" y2="18.5" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round"/>
+              </svg>
+            `;
+            cellEl.appendChild(crossWrap);
           } else if (val === 2) {
-            // 🏓 樊振东随机头像
-            dongCount++;
+            // 🏓 樊振东头像
+            const isConflict = conflictKeys.has(`${r},${c}`);
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
               this.cellAvatars.set(`${r},${c}`, avatarPath);
             }
 
+            const dongWrap = document.createElement('div');
+            dongWrap.className = 'cell-dong-wrap';
+            
             const img = document.createElement('img');
             img.className = 'cell-dong-avatar';
             img.src = avatarPath;
             img.alt = 'Dong';
-            cellEl.appendChild(img);
+            dongWrap.appendChild(img);
+
+            // 如果发生规则冲突，1:1 叠加 🚫 找错禁止标志
+            if (isConflict) {
+              cellEl.classList.add('has-conflict');
+              const banOverlay = document.createElement('div');
+              banOverlay.className = 'cell-ban-overlay';
+              banOverlay.innerHTML = `
+                <svg viewBox="0 0 24 24" class="ban-svg">
+                  <circle cx="12" cy="12" r="9.2" fill="rgba(229, 57, 53, 0.25)" stroke="#e53935" stroke-width="3"/>
+                  <line x1="5.4" y1="5.4" x2="18.6" y2="18.6" stroke="#e53935" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              `;
+              dongWrap.appendChild(banOverlay);
+            }
+
+            cellEl.appendChild(dongWrap);
           }
         }
       }
 
-      // 更新进度
+      // 更新已放置计数
       const placedEl = document.getElementById('placed-count');
       if (placedEl) placedEl.textContent = dongCount.toString();
     }
@@ -1595,20 +1599,42 @@ const i18n = {
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
 
-      // 统计所有正确放置的咚
-      let foundCount = 0;
+      // 收集所有放咚的位置
+      const dongs: { r: number; c: number; region: number }[] = [];
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           if (this.gridState[r][c] === 2) {
-            foundCount++;
+            dongs.push({ r, c, region: this.currentLevelData.regions[r][c] });
           }
         }
       }
 
-      // 当放置的咚数量等于关卡总数且都正确时，判定通关
-      if (foundCount === size) {
-        this.handleVictory();
+      // 数量必须等于 size
+      if (dongs.length !== size) return;
+
+      // 检查行、列、区域是否完全不重复
+      const rows = new Set<number>();
+      const cols = new Set<number>();
+      const regions = new Set<number>();
+
+      for (const d of dongs) {
+        if (rows.has(d.r) || cols.has(d.c) || regions.has(d.region)) return;
+        rows.add(d.r);
+        cols.add(d.c);
+        regions.add(d.region);
       }
+
+      // 检查两两是否八邻域接触
+      for (let i = 0; i < dongs.length; i++) {
+        for (let j = i + 1; j < dongs.length; j++) {
+          if (Math.abs(dongs[i].r - dongs[j].r) <= 1 && Math.abs(dongs[i].c - dongs[j].c) <= 1) {
+            return;
+          }
+        }
+      }
+
+      // 验证全部规则通过！触发胜利！
+      this.handleVictory();
     }
 
     // 通关结算
