@@ -7,26 +7,5 @@ import DongdokuGame from '../components/dongdoku/DongdokuGame.astro';
   title="找咚 (Dongdoku) - 樊振东主题数独解谜小游戏"
   description="经典彩色领地皇后数独游戏！每个领地找出一个咚，行与列各一个，咚咚互不相碰。挑战全网1000+关卡！"
 >
-  {import.meta.env.DEV ? <DongdokuGame lang="zh" /> : <div class="dongdoku-page-wrap">
-    <section class="offline-notice" aria-live="polite">
-      <div class="offline-icon">🎮</div>
-      <h1>找咚暂时下线</h1>
-      <p>小游戏正在修复交互问题，修复完成后会重新开放。</p>
-      <a href="/games">返回小游戏大厅</a>
-    </section>
-  </div>}
+  <DongdokuGame lang="zh" />
 </BaseLayout>
-
-<style>
-  .dongdoku-page-wrap {
-    min-height: 80vh;
-    padding: 0.5rem 0.5rem 1.5rem;
-    display: flex;
-    justify-content: center;
-  }
-  .offline-notice { width: min(92vw, 520px); margin: 4rem auto; padding: 3rem 1.5rem; text-align: center; background: #fff; border: 1px solid #ebdcd5; border-radius: 1rem; box-shadow: 0 10px 30px rgba(78,64,55,.1); color: #594a45; }
-  .offline-icon { font-size: 3rem; }
-  .offline-notice h1 { margin: 1rem 0 .6rem; font-size: 1.6rem; }
-  .offline-notice p { margin: 0 0 1.5rem; color: #806f68; }
-  .offline-notice a { display: inline-block; padding: .7rem 1.2rem; border-radius: .5rem; background: #1e88e5; color: #fff; text-decoration: none; }
-</style>
