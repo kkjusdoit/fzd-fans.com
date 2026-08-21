@@ -229,7 +229,6 @@ const i18n = {
 
     <div class="win-actions">
       <button type="button" class="btn-primary" id="btn-next-level">{i18n.nextLevel}</button>
-      <button type="button" class="btn-secondary" id="btn-replay-level">{i18n.replayLevel}</button>
       <button type="button" class="btn-secondary" id="btn-win-levels">{i18n.backToLevels}</button>
     </div>
   </div>
@@ -1373,14 +1372,10 @@ const i18n = {
         this.loadLevel(this.maxUnlockedLevel);
       });
 
-      // 胜利弹窗中的下一关 / 重玩
+      // 胜利弹窗中的下一关
       document.getElementById('btn-next-level')?.addEventListener('click', () => {
         this.closeModal('modal-win');
         this.loadLevel(this.currentLevelId + 1);
-      });
-      document.getElementById('btn-replay-level')?.addEventListener('click', () => {
-        this.closeModal('modal-win');
-        this.handleRestart();
       });
 
       // 游戏结束弹窗中的重新开始 / 选关
@@ -1582,9 +1577,6 @@ const i18n = {
       } else {
         // ❌ 找错了！仅在该格子显示异常禁止标志 🚫 并扣除 1 条命
         this.gridState[r][c] = 3;
-        if (!this.cellAvatars.has(`${r},${c}`)) {
-          this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
-        }
 
         this.lives--;
         this.updateLivesDisplay();
@@ -1660,20 +1652,9 @@ const i18n = {
 
             cellEl.appendChild(dongWrap);
           } else if (val === 3) {
-            // ❌ 找错咚：显示头像并叠加红色 🚫 禁止标志（永久锁定）
-            let avatarPath = this.cellAvatars.get(`${r},${c}`);
-            if (!avatarPath) {
-              avatarPath = this.getRandomAvatar();
-              this.cellAvatars.set(`${r},${c}`, avatarPath);
-            }
-
+            // ❌ 找错咚：只显示红色 🚫 禁止标志，不显示头像
             const dongWrap = document.createElement('div');
             dongWrap.className = 'cell-dong-wrap';
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'cell-dong-avatar';
-            avatarDiv.style.backgroundImage = `url("${avatarPath}")`;
-            dongWrap.appendChild(avatarDiv);
 
             const banOverlay = document.createElement('div');
             banOverlay.className = 'cell-ban-overlay';
