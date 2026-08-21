@@ -618,7 +618,7 @@ const i18n = {
     width: 48%;
     height: 48%;
     pointer-events: none !important;
-    animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popCross 0.1s ease-out forwards;
   }
 
   :global(.cross-svg) {
@@ -675,6 +675,11 @@ const i18n = {
   :global(.grid-cell.has-conflict) {
     border-color: #ff1744 !important;
     animation: errorShake 0.4s ease-in-out;
+  }
+
+  :global(.grid-cell.last-found) {
+    z-index: 6;
+    animation: lastFoundPulse 1.2s ease-in-out;
   }
 
   /* 弹窗通用样式 */
@@ -1121,6 +1126,12 @@ const i18n = {
     40%, 60% { transform: translate3d(5px, 0, 0); }
   }
 
+  @keyframes lastFoundPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    35% { transform: scale(1.06); filter: brightness(1.12); }
+    70% { transform: scale(1.025); filter: brightness(1.06); }
+  }
+
   @keyframes bounceTrophy {
     from { transform: translateY(0); }
     to { transform: translateY(-8px); }
@@ -1223,6 +1234,7 @@ const i18n = {
     // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
     private singleTapTimers: Map<string, any> = new Map();
+    private victoryTimer: any = null;
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1507,15 +1519,16 @@ const i18n = {
               this.lastTapTimes.delete(key);
               this.handleDoubleClick(r, c);
             } else {
-              // 第一次轻点 -> 记录时间并设置防抖
+              // 第一次轻点立即显示/切换 ✖；只保留短窗口用于识别第二次点击。
+              // 这样单击不再等待双击判定窗口，视觉响应接近即时。
               this.lastTapTimes.set(key, now);
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
               }
+              this.handleSingleClick(r, c);
               const timer = setTimeout(() => {
-                this.singleTapTimers.delete(key);
                 this.lastTapTimes.delete(key);
-                this.handleSingleClick(r, c);
+                this.singleTapTimers.delete(key);
               }, 420);
               this.singleTapTimers.set(key, timer);
             }
@@ -1572,6 +1585,9 @@ const i18n = {
           this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         }
         this.updateBoardDisplay();
+        const foundCell = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+        foundCell?.classList.add('last-found');
+        setTimeout(() => foundCell?.classList.remove('last-found'), 1250);
         this.saveStorage(true);
         this.checkWinCondition();
       } else {
@@ -1591,6 +1607,10 @@ const i18n = {
 
     // 重来本关
     private handleRestart() {
+      if (this.victoryTimer) {
+        clearTimeout(this.victoryTimer);
+        this.victoryTimer = null;
+      }
       const size = this.currentLevelData.size;
       this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
       this.cellAvatars.clear();
@@ -1690,7 +1710,12 @@ const i18n = {
       }
 
       if (correctDongs === size) {
-        this.handleVictory();
+        if (this.victoryTimer) return;
+        // 给最后一个头像和玩家成绩留出欣赏时间，再打开结算弹窗。
+        this.victoryTimer = setTimeout(() => {
+          this.victoryTimer = null;
+          this.handleVictory();
+        }, 1200);
       }
     }
 
