@@ -18,8 +18,9 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  quickGuide: isEn ? 'Tap: ✖ Cross · Double-tap: 🏓 Dong · 1 Dong per row/col/color' : '👆 单击标 ✖ · ✌️ 双击放 🏓 · 每行每列每色各 1 咚',
-  rulesBtn: isEn ? 'Rules 📖' : '规则 📖',
+  ruleSingle: isEn ? 'Single: ✖' : '单击打叉 ✖ 排除',
+  ruleDouble: isEn ? 'Double: 🏓' : '双击确定 🏓 找咚',
+  rulesToggle: isEn ? 'Rules' : '三大规则',
   langSwitch: isEn ? '中文' : 'English',
   langHref: isEn ? '/dongdoku' : '/en/dongdoku',
   levelLabel: isEn ? 'Level' : '第',
@@ -61,9 +62,6 @@ const i18n = {
     </div>
 
     <div class="nav-right">
-      <button type="button" class="nav-tool-btn" id="btn-open-rules-modal" title="查看规则">
-        <span>{i18n.rulesBtn}</span>
-      </button>
       <a href={i18n.langHref} class="nav-tool-btn lang-toggle-btn">
         <span>{i18n.langSwitch}</span>
       </a>
@@ -108,10 +106,44 @@ const i18n = {
         </div>
       </div>
 
-      <!-- 操作极简小贴士 -->
-      <div class="console-tips-bar">
-        <span>{i18n.quickGuide}</span>
-      </div>
+      <!-- 可折叠的三大规则面板 -->
+      <section class="rules-collapse-section">
+        <div class="rules-toggle-bar">
+          <div class="gesture-hints-wrap">
+            <span class="gesture-pill">👆 {i18n.ruleSingle}</span>
+            <span class="gesture-pill">✌️ {i18n.ruleDouble}</span>
+          </div>
+          <button type="button" class="btn-toggle-rules" id="btn-toggle-rules" aria-expanded="true">
+            <span>{i18n.rulesToggle}</span>
+            <span class="toggle-arrow" id="rules-toggle-arrow">▲</span>
+          </button>
+        </div>
+
+        <!-- 三大规则卡片 -->
+        <div class="rules-cards-grid" id="rules-cards-box">
+          <div class="rule-card">
+            <div class="rule-icon">🏓</div>
+            <div class="rule-body">
+              <h4>{i18n.rule1Title}</h4>
+              <p>{i18n.rule1Desc}</p>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-icon">🎨</div>
+            <div class="rule-body">
+              <h4>{i18n.rule2Title}</h4>
+              <p>{i18n.rule2Desc}</p>
+            </div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-icon">🚫</div>
+            <div class="rule-body">
+              <h4>{i18n.rule3Title}</h4>
+              <p>{i18n.rule3Desc}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- 核心游戏棋盘 (按可用屏幕高度智能全屏适配) -->
       <div class="board-viewport">
@@ -121,52 +153,6 @@ const i18n = {
       </div>
     </div>
   </main>
-</div>
-
-<!-- 三大规则弹窗 (Modal) -->
-<div class="modal-backdrop" id="modal-rules" style="display: none;">
-  <div class="modal-content modal-rules-content">
-    <div class="modal-header">
-      <div class="modal-title-with-icon">
-        <span class="header-icon">📖</span>
-        <h3>三大游戏规则</h3>
-      </div>
-      <button type="button" class="modal-close" id="btn-close-rules">×</button>
-    </div>
-    <div class="rules-modal-body">
-      <div class="rule-intro-card">
-        <div class="intro-icon">👆</div>
-        <div class="intro-body">
-          <h4>操作手势</h4>
-          <p><strong>单击格子</strong>标记或清除白色 ✖ 排除；<strong>双击格子</strong>确定放置 🏓 樊振东头像（找错立即扣 1 条命）。</p>
-        </div>
-      </div>
-      <div class="rule-intro-card">
-        <div class="intro-icon">🏓</div>
-        <div class="intro-body">
-          <h4>1. 行列唯一</h4>
-          <p>每一行、每一列必须且只能有正好 <strong>1 个咚</strong>。</p>
-        </div>
-      </div>
-      <div class="rule-intro-card">
-        <div class="intro-icon">🎨</div>
-        <div class="intro-body">
-          <h4>2. 领地唯一</h4>
-          <p>每一种相同颜色的领地色块必须且只能有正好 <strong>1 个咚</strong>。</p>
-        </div>
-      </div>
-      <div class="rule-intro-card">
-        <div class="intro-icon">🚫</div>
-        <div class="intro-body">
-          <h4>3. 八向隔离</h4>
-          <p>任意两个咚在横向、纵向及<strong>对角斜向</strong>均不能相邻相碰。</p>
-        </div>
-      </div>
-    </div>
-    <div class="rules-modal-footer">
-      <button type="button" class="btn-primary btn-got-it" id="btn-close-rules-got-it">我知道啦</button>
-    </div>
-  </div>
 </div>
 
 <!-- 选关模态弹窗 (Premium Levels Modal) -->
@@ -268,8 +254,8 @@ const i18n = {
 
   /* 顶部纯享轻量导航栏 */
   .standalone-nav {
-    height: 50px;
-    background: rgba(255, 255, 255, 0.85);
+    height: 48px;
+    background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid #ebdcd5;
     display: flex;
@@ -355,23 +341,23 @@ const i18n = {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 0.8rem;
-    overflow: hidden;
+    padding: 0.4rem 0.6rem;
+    overflow-y: auto;
     box-sizing: border-box;
   }
 
   /* 一体化游戏控制机舱卡片 */
   .game-console-card {
     width: 100%;
-    max-width: min(94vw, 460px, calc(100dvh - 150px));
+    max-width: min(96vw, 490px);
     background: #ffffff;
-    border-radius: 1.5rem;
-    box-shadow: 0 14px 36px rgba(85, 62, 50, 0.08), 0 2px 6px rgba(85, 62, 50, 0.03);
+    border-radius: 1.4rem;
+    box-shadow: 0 12px 32px rgba(85, 62, 50, 0.08), 0 2px 6px rgba(85, 62, 50, 0.03);
     border: 1px solid #ebdcd5;
-    padding: 0.9rem;
+    padding: 0.75rem 0.85rem;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.45rem;
     box-sizing: border-box;
     animation: fadeIn 0.25s ease;
   }
@@ -397,7 +383,7 @@ const i18n = {
     background: #fdfaf8;
     border: 1.5px solid #ebdcd5;
     color: #634a41;
-    padding: 0.32rem 0.6rem;
+    padding: 0.3rem 0.55rem;
     border-radius: 0.75rem;
     font-weight: 800;
     font-size: 0.82rem;
@@ -434,15 +420,15 @@ const i18n = {
     gap: 0.2rem;
     background: #fdf6f0;
     border: 1px solid #ebdcd5;
-    padding: 0.28rem 0.5rem;
+    padding: 0.25rem 0.45rem;
     border-radius: 0.75rem;
     font-weight: 800;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: #6d5248;
   }
 
   .hearts-text {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     letter-spacing: 1px;
   }
 
@@ -456,19 +442,106 @@ const i18n = {
     line-height: 1;
   }
 
-  /* 小贴士栏 */
-  .console-tips-bar {
+  /* 可折叠的三大规则面板 */
+  .rules-collapse-section {
     background: #faf5f1;
     border: 1px solid #f0e2db;
-    border-radius: 0.75rem;
-    padding: 0.28rem 0.55rem;
+    border-radius: 0.85rem;
+    padding: 0.32rem 0.5rem;
+  }
+
+  .rules-toggle-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+  }
+
+  .gesture-hints-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .gesture-pill {
     font-size: 0.74rem;
-    font-weight: 700;
-    color: #7d655f;
-    text-align: center;
+    font-weight: 750;
+    color: #5c443c;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    padding: 0.16rem 0.4rem;
+    border-radius: 0.55rem;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  .btn-toggle-rules {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.55rem;
+    padding: 0.16rem 0.42rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #1e88e5;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-toggle-rules:hover {
+    background: #e3f2fd;
+    border-color: #bbdefb;
+  }
+
+  .toggle-arrow {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+  }
+
+  /* 三大规则卡片网格 */
+  .rules-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px dashed #ebdcd5;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .rule-card {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.65rem;
+    padding: 0.3rem 0.35rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  }
+
+  .rule-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .rule-body h4 {
+    margin: 0;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #3d302c;
+    white-space: nowrap;
+  }
+
+  .rule-body p {
+    margin: 0.02rem 0 0;
+    font-size: 0.64rem;
+    color: #7d655f;
+    line-height: 1.15;
+    white-space: nowrap;
   }
 
   /* 棋盘视口 */
@@ -477,8 +550,8 @@ const i18n = {
     aspect-ratio: 1 / 1;
     background: #faf7f5;
     border: 1.5px solid #ebdcd5;
-    border-radius: 1.2rem;
-    padding: 0.5rem;
+    border-radius: 1.1rem;
+    padding: 0.45rem;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -641,83 +714,6 @@ const i18n = {
   .modal-close:hover {
     background: #ebdcd5;
     color: #000;
-  }
-
-  /* 规则弹窗 (Rules Modal) */
-  .modal-rules-content {
-    max-width: 480px;
-    padding: 1.2rem;
-  }
-
-  .modal-rules-content .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #ebdcd5;
-    padding-bottom: 0.8rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .modal-title-with-icon {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .modal-title-with-icon h3 {
-    margin: 0;
-    font-size: 1.15rem;
-    font-weight: 900;
-    color: #3d302c;
-  }
-
-  .rules-modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
-  }
-
-  .rule-intro-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.6rem;
-    background: #faf6f3;
-    border: 1px solid #ebdcd5;
-    border-radius: 0.9rem;
-    padding: 0.65rem 0.8rem;
-  }
-
-  .intro-icon {
-    font-size: 1.25rem;
-    flex-shrink: 0;
-    line-height: 1.2;
-  }
-
-  .intro-body h4 {
-    margin: 0 0 0.15rem;
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: #3d302c;
-  }
-
-  .intro-body p {
-    margin: 0;
-    font-size: 0.78rem;
-    color: #6d544c;
-    line-height: 1.35;
-  }
-
-  .rules-modal-footer {
-    display: flex;
-    justify-content: center;
-  }
-
-  .btn-got-it {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 0.95rem;
-    border-radius: 0.9rem;
   }
 
   /* 选关弹窗 */
@@ -1128,7 +1124,7 @@ const i18n = {
   /* 手机端微调 */
   @media (max-width: 480px) {
     .standalone-nav {
-      height: 46px;
+      height: 44px;
       padding: 0 0.5rem;
     }
     .back-label {
@@ -1138,12 +1134,12 @@ const i18n = {
       padding: 0.2rem 0.45rem;
     }
     .game-app-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .game-console-card {
-      padding: 0.65rem;
-      border-radius: 1.2rem;
-      gap: 0.45rem;
+      padding: 0.6rem;
+      border-radius: 1.1rem;
+      gap: 0.35rem;
     }
     .current-level-text {
       font-size: 0.95rem;
@@ -1152,10 +1148,17 @@ const i18n = {
       display: none;
     }
     .btn-action-pill {
-      padding: 0.28rem 0.45rem;
+      padding: 0.25rem 0.45rem;
     }
-    .console-tips-bar {
-      font-size: 0.68rem;
+    .rules-collapse-section {
+      padding: 0.25rem 0.4rem;
+    }
+    .rules-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+    .rule-card {
+      padding: 0.2rem 0.3rem;
     }
   }
 </style>
@@ -1210,6 +1213,7 @@ const i18n = {
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private moveCount: number = 0;
     private lives: number = 3; // 3条命
+    private rulesExpanded: boolean = true;
 
     // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
@@ -1242,6 +1246,7 @@ const i18n = {
           const parsed = JSON.parse(saved);
           if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
+          if (parsed.rulesExpanded !== undefined) this.rulesExpanded = parsed.rulesExpanded;
         }
       } catch (e) {
         console.warn('Failed to parse localStorage', e);
@@ -1253,7 +1258,8 @@ const i18n = {
       try {
         const payload: any = {
           currentLevelId: this.currentLevelId,
-          maxUnlockedLevel: this.maxUnlockedLevel
+          maxUnlockedLevel: this.maxUnlockedLevel,
+          rulesExpanded: this.rulesExpanded
         };
 
         if (saveBoard) {
@@ -1308,6 +1314,19 @@ const i18n = {
     private initDOMElements() {
       this.updateLivesDisplay();
       this.updateLevelsModalProgress();
+      this.applyRulesCollapseState();
+    }
+
+    private applyRulesCollapseState() {
+      const cardsBox = document.getElementById('rules-cards-box');
+      const arrow = document.getElementById('rules-toggle-arrow');
+      const btn = document.getElementById('btn-toggle-rules');
+
+      if (cardsBox && arrow && btn) {
+        cardsBox.style.display = this.rulesExpanded ? 'grid' : 'none';
+        arrow.textContent = this.rulesExpanded ? '▲' : '▼';
+        btn.setAttribute('aria-expanded', this.rulesExpanded.toString());
+      }
     }
 
     private updateLivesDisplay() {
@@ -1324,10 +1343,12 @@ const i18n = {
     }
 
     private initEvents() {
-      // 规则弹窗
-      document.getElementById('btn-open-rules-modal')?.addEventListener('click', () => this.openModal('modal-rules'));
-      document.getElementById('btn-close-rules')?.addEventListener('click', () => this.closeModal('modal-rules'));
-      document.getElementById('btn-close-rules-got-it')?.addEventListener('click', () => this.closeModal('modal-rules'));
+      // 规则折叠切换
+      document.getElementById('btn-toggle-rules')?.addEventListener('click', () => {
+        this.rulesExpanded = !this.rulesExpanded;
+        this.applyRulesCollapseState();
+        this.saveStorage(false);
+      });
 
       // 重来
       document.getElementById('btn-restart')?.addEventListener('click', () => this.handleRestart());
