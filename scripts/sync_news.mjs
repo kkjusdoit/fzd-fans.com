@@ -37,7 +37,10 @@ async function sync() {
     });
 
   const skipped = all.length - items.length;
-  await fs.mkdir(MINI_APP_DATA_DIR, { recursive: true });
+  const targetDirs = [
+    path.join(process.cwd(), 'wechat-miniprogram/miniprogram/data'),
+    MINI_APP_DATA_DIR
+  ];
 
   // 顺带导出分类元信息，供小程序筛选器使用
   const cats = Object.entries(NEWS_CATEGORIES).map(([key, m]) => ({ key, ...m }));
@@ -47,9 +50,18 @@ async function sync() {
     `  news: ${JSON.stringify(items, null, 2)},\n` +
     `  categories: ${JSON.stringify(cats, null, 2)}\n` +
     `};\n`;
-  await fs.writeFile(OUTPUT_FILE, out, 'utf-8');
 
-  console.log(`快讯同步完成：写入 ${items.length} 条 → ${OUTPUT_FILE}`);
+  for (const dir of targetDirs) {
+    try {
+      await fs.mkdir(dir, { recursive: true });
+      const targetFile = path.join(dir, 'news.js');
+      await fs.writeFile(targetFile, out, 'utf-8');
+      console.log(`快讯同步完成：写入 ${items.length} 条 → ${targetFile}`);
+    } catch (e) {
+      console.warn(`写入目录 ${dir} 跳过/失败:`, e.message);
+    }
+  }
+
   if (skipped > 0) console.log(`（跳过 ${skipped} 条：draft 或 webOnly）`);
 }
 

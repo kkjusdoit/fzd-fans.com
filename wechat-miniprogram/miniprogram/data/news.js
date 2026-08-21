@@ -1,6 +1,30 @@
 module.exports = {
   news: [
   {
+    "date": "2026-08-21",
+    "category": "business",
+    "categoryLabel": "商务",
+    "categoryIcon": "💼",
+    "categoryColor": "#1e88e5",
+    "title": "成为嘉实多 Castrol 冠军代言人",
+    "summary": "樊振东出任国际领先润滑油品牌嘉实多 Castrol 冠军代言人，以技术之名，在不同赛道直面突破与挑战。",
+    "image": "",
+    "source": "",
+    "highlight": true
+  },
+  {
+    "date": "2026-07-17",
+    "category": "business",
+    "categoryLabel": "商务",
+    "categoryIcon": "💼",
+    "categoryColor": "#1e88e5",
+    "title": "成为 Crocs 卡骆驰全球品牌代言人",
+    "summary": "樊振东出任 Crocs 卡骆驰全球品牌代言人，演绎街头前卫与自信控场态度。",
+    "image": "",
+    "source": "",
+    "highlight": true
+  },
+  {
     "date": "2026-07-05",
     "category": "appearance",
     "categoryLabel": "出席",

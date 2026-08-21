@@ -59,15 +59,28 @@ async function sync() {
     categories: new Set(items.map((i) => i.category)).size
   };
 
-  await fs.mkdir(MINI_APP_DATA_DIR, { recursive: true });
+  const targetDirs = [
+    path.join(process.cwd(), 'wechat-miniprogram/miniprogram/data'),
+    MINI_APP_DATA_DIR
+  ];
+
   const out =
     `module.exports = {\n` +
     `  endorsements: ${JSON.stringify(items, null, 2)},\n` +
     `  types: ${JSON.stringify(types, null, 2)},\n` +
     `  stats: ${JSON.stringify(stats, null, 2)}\n` +
     `};\n`;
-  await fs.writeFile(OUTPUT_FILE, out, 'utf-8');
-  console.log(`代言合作同步完成：写入 ${items.length} 条 → ${OUTPUT_FILE}`);
+
+  for (const dir of targetDirs) {
+    try {
+      await fs.mkdir(dir, { recursive: true });
+      const targetFile = path.join(dir, 'endorsements.js');
+      await fs.writeFile(targetFile, out, 'utf-8');
+      console.log(`代言合作同步完成：写入 ${items.length} 条 → ${targetFile}`);
+    } catch (e) {
+      console.warn(`写入目录 ${dir} 跳过/失败:`, e.message);
+    }
+  }
 }
 
 sync().catch((e) => { console.error('代言同步失败：', e); process.exit(1); });

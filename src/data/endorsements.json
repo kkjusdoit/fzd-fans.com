@@ -348,5 +348,19 @@
     "logo": "img/endorsements/logos/crocs.png",
     "officialUrl": "",
     "productImage": ""
+  },
+  {
+    "id": "castrol",
+    "brand": "嘉实多 Castrol",
+    "signDate": "2026-08-21",
+    "role": "冠军代言人",
+    "category": "润滑油",
+    "slogan": "以技术之名，见证嘉实多有点东西！突破之路，永不止步 —— 一起向前，向上，向未来。",
+    "status": "active",
+    "type": "commercial",
+    "notes": "以追求突破的决心与硬核技术底蕴为契机，跨界携手国际领先润滑油品牌，在不同赛道直面挑战，将冠军硬核实力与技术破局理念深度交融。",
+    "logo": "img/endorsements/logos/castrol.png",
+    "officialUrl": "",
+    "productImage": ""
   }
 ]
