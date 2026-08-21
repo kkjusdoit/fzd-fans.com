@@ -284,6 +284,10 @@ const pageDesc = description || t('site.subtitle');
         const backdrop = document.getElementById('modalBackdrop');
 
         if (!modal) return;
+        // 游戏页面需要持续接收棋盘指针事件，不能被全屏推广弹窗遮挡。
+        if (window.location.pathname === '/dongdoku' || window.location.pathname.startsWith('/dongdoku/') || window.location.pathname.startsWith('/en/dongdoku')) {
+          return;
+        }
 
         // Check if dismissed until date is in the future
         const dismissedUntil = localStorage.getItem('fzd_promo_dismissed_until');

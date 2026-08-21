@@ -454,7 +454,13 @@ const i18n = {
   }
 
   /* 棋盘格子 */
-  .grid-cell {
+  :global(.grid-cell) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font: inherit !important;
+    color: inherit !important;
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
@@ -475,26 +481,26 @@ const i18n = {
     -webkit-tap-highlight-color: transparent !important;
   }
 
-  .grid-cell:hover {
+  :global(.grid-cell:hover) {
     transform: scale(1.03);
     filter: brightness(1.06);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     z-index: 2;
   }
 
-  .grid-cell:active {
+  :global(.grid-cell:active) {
     transform: scale(0.96);
   }
 
-  .grid-cell.cell-locked {
+  :global(.grid-cell.cell-locked) {
     cursor: default !important;
   }
-  .grid-cell.cell-locked:hover {
+  :global(.grid-cell.cell-locked:hover) {
     transform: none !important;
   }
 
   /* 单元格状态：白色 ✖ 排除叉（单击产生） */
-  .cell-cross-wrap {
+  :global(.cell-cross-wrap) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -504,14 +510,14 @@ const i18n = {
     animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  .cross-svg {
+  :global(.cross-svg) {
     width: 100%;
     height: 100%;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
   }
 
   /* 单元格状态：🏓 樊振东头像容器（双击产生） */
-  .cell-dong-wrap {
+  :global(.cell-dong-wrap) {
     position: absolute;
     inset: 0;
     display: flex;
@@ -523,7 +529,7 @@ const i18n = {
   }
 
   /* 精致圆形头像（基于 background-image，绝对保证为圆形且 100% 适配单元格不溢出） */
-  .cell-dong-avatar {
+  :global(.cell-dong-avatar) {
     width: 82% !important;
     height: 82% !important;
     border-radius: 50% !important;
@@ -538,7 +544,7 @@ const i18n = {
   }
 
   /* 🚫 找错咚 / 错误尝试覆盖图层 */
-  .cell-ban-overlay {
+  :global(.cell-ban-overlay) {
     position: absolute;
     inset: 0;
     display: flex;
@@ -550,20 +556,20 @@ const i18n = {
     animation: popBan 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  .ban-svg {
+  :global(.ban-svg) {
     width: 68%;
     height: 68%;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   }
 
   /* 找错态外框警示 */
-  .grid-cell.has-conflict {
+  :global(.grid-cell.has-conflict) {
     border-color: #ff1744 !important;
     animation: errorShake 0.4s ease-in-out;
   }
 
   /* 提示高亮态 */
-  .grid-cell.hint-active {
+  :global(.grid-cell.hint-active) {
     animation: pulseHint 1.2s infinite;
     border-color: #ffd700 !important;
     z-index: 5;
@@ -1092,6 +1098,7 @@ const i18n = {
 
     // 单双击定时器
     private cellTimers: Map<string, any> = new Map();
+    private lastTap: { key: string; at: number } | null = null;
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1370,7 +1377,8 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const regionId = data.regions[r][c];
-          const cellEl = document.createElement('div');
+          const cellEl = document.createElement('button');
+          cellEl.type = 'button';
           cellEl.className = 'grid-cell';
           cellEl.setAttribute('data-row', r.toString());
           cellEl.setAttribute('data-col', c.toString());
@@ -1381,39 +1389,37 @@ const i18n = {
 
           const key = `${r},${c}`;
 
-          // 1. 原生双击事件监听（100% 捕获系统级/触控级双击）
-          cellEl.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (this.cellTimers.has(key)) {
-              clearTimeout(this.cellTimers.get(key));
-              this.cellTimers.delete(key);
-            }
-            this.handleDoubleClick(r, c);
-          });
-
-          // 2. 单击事件监听（280ms 窗口防抖，确保双击时不误触发单击）
+          // 统一点击分发：第一次点击等待短窗口，第二次同格点击立即提交。
+          // 使用原生 button + click，兼容鼠标、触控板、触摸和键盘操作。
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.lives <= 0) return;
             const currentVal = this.gridState[r][c];
             if (currentVal === 2 || currentVal === 3) return;
 
-            if (this.cellTimers.has(key)) {
-              clearTimeout(this.cellTimers.get(key));
-              this.cellTimers.delete(key);
+            const now = Date.now();
+            if (this.lastTap?.key === key && now - this.lastTap.at <= 420) {
+              this.lastTap = null;
+              if (this.cellTimers.has(key)) {
+                clearTimeout(this.cellTimers.get(key));
+                this.cellTimers.delete(key);
+              }
+              this.commitDoubleClick(r, c, key);
+              return;
             }
+            this.lastTap = { key, at: now };
 
             const timer = setTimeout(() => {
               this.cellTimers.delete(key);
               this.handleSingleClick(r, c);
-            }, 280);
+            }, 300);
             this.cellTimers.set(key, timer);
           });
 
           // 3. 电脑端右键单击：直接标记 ✖（0 毫秒延迟）
           cellEl.addEventListener('contextmenu', (e) => {
             e.preventDefault();
+            this.lastTap = null;
             if (this.cellTimers.has(key)) {
               clearTimeout(this.cellTimers.get(key));
               this.cellTimers.delete(key);
@@ -1426,6 +1432,14 @@ const i18n = {
       }
 
       this.updateBoardDisplay();
+    }
+
+    private commitDoubleClick(r: number, c: number, key: string) {
+      if (this.cellTimers.has(key)) {
+        clearTimeout(this.cellTimers.get(key));
+        this.cellTimers.delete(key);
+      }
+      this.handleDoubleClick(r, c);
     }
 
     // 计时器
@@ -1445,10 +1459,9 @@ const i18n = {
     private handleSingleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
-      this.pushUndoSnapshot();
-
       const currentVal = this.gridState[r][c];
       if (currentVal === 2 || currentVal === 3) return; // 锁定格不能改
+      this.pushUndoSnapshot();
 
       const nextVal = (currentVal === 1) ? 0 : 1;
       this.gridState[r][c] = nextVal;
@@ -1463,7 +1476,6 @@ const i18n = {
     private handleDoubleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
-      this.pushUndoSnapshot();
 
       const currentVal = this.gridState[r][c];
       if (currentVal === 2 || currentVal === 3) return; // 已经确定过，无再次机会
@@ -1516,6 +1528,8 @@ const i18n = {
 
     // 撤销操作
     private handleUndo() {
+      // 最终双击提交后不可悔棋：避免“撤销”恢复已裁决格，重新获得机会。
+      if (this.gridState.some(row => row.some(value => value === 2 || value === 3))) return;
       if (this.undoStack.length === 0) return;
       const last = this.undoStack.pop();
       if (last) {
@@ -1607,11 +1621,22 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const val = this.gridState[r][c];
-          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
+          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLButtonElement;
           if (!cellEl) continue;
 
-          cellEl.classList.remove('has-conflict', 'cell-locked');
+          if (val === 2) correctDongCount++;
+
+          // 只重绘状态真正发生变化的格子。否则已有的叉号、头像和错误标志
+          // 会被反复销毁重建，导致每次点击时全盘动画一起重新播放。
+          const renderedState = Number(cellEl.dataset.renderedState ?? '-1');
+          if (renderedState === val) continue;
+          cellEl.dataset.renderedState = val.toString();
+
+          cellEl.classList.toggle('cell-locked', val === 2 || val === 3);
+          cellEl.classList.toggle('has-conflict', val === 3);
           cellEl.innerHTML = '';
+          const stateText = val === 1 ? '已标记排除' : val === 2 ? '已找到咚' : val === 3 ? '找错咚，已锁定' : '空格';
+          cellEl.setAttribute('aria-label', `第 ${r + 1} 行第 ${c + 1} 列，${stateText}`);
 
           if (val === 1) {
             // ✖ 排除白色交叉
@@ -1626,9 +1651,6 @@ const i18n = {
             cellEl.appendChild(crossWrap);
           } else if (val === 2) {
             // ✅ 正确咚咚头像（永久锁定）
-            correctDongCount++;
-            cellEl.classList.add('cell-locked');
-
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1646,8 +1668,6 @@ const i18n = {
             cellEl.appendChild(dongWrap);
           } else if (val === 3) {
             // ❌ 找错咚：显示头像并叠加红色 🚫 禁止标志（永久锁定）
-            cellEl.classList.add('cell-locked', 'has-conflict');
-
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
