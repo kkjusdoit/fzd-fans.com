@@ -9,16 +9,9 @@ const isEn = lang === 'en';
 // Text dictionary
 const i18n = {
   title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
-  rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
-  rule1Desc: isEn ? '每行每列正好 1 个咚' : '每行每列正好 1 个咚',
-  rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
-  rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
-  rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
-  rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single-click to mark ✖ | Double-click to find Dong 🏓 (or switch mode below)' : '💡 单击/右键标 ✖ 排除，双击确定 🏓 咚咚（亦可切换下方单点模式）',
-  modeGesture: isEn ? '👆 Gesture (1-click ✖ / 2-click 🏓)' : '👆 智能手势 (单击 ✖ / 双击 🏓)',
-  modeCross: isEn ? '✖ Cross' : '✖ 标记排除',
-  modeDong: isEn ? '🏓 Dong' : '🏓 找咚确定',
+  ruleSingle: isEn ? 'Single-tap to mark ✖ Cross' : '单击打叉 ✖ 排除',
+  ruleDouble: isEn ? 'Double-tap to place 🏓 Dong' : '双击确定 🏓 找咚',
+  ruleGoal: isEn ? '1 Dong per row, column & color block' : '每行/每列/每色块正好 1 个咚',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -30,14 +23,6 @@ const i18n = {
   placed: isEn ? 'Found' : '已找到',
   lives: isEn ? 'Lives' : '生命值',
   unlockedProgress: isEn ? 'Unlocked Progress' : '已解锁进度',
-  allLevels: isEn ? '1000 Levels Total' : '共 1000 关',
-  difficulty: {
-    easy: isEn ? 'Easy' : '简单',
-    medium: isEn ? 'Medium' : '中等',
-    hard: isEn ? 'Hard' : '困难',
-    expert: isEn ? 'Expert' : '大师',
-    tutorial: isEn ? 'Tutorial' : '教学'
-  },
   gameOverTitle: isEn ? 'Game Over' : '挑战失败 💔',
   gameOverSubtitle: isEn ? 'You used all 3 lives! Don\'t give up, try again!' : '本关 3 次机会已用尽，别灰心，再来一次！',
   retryLevel: isEn ? 'Retry Level 🔄' : '重新挑战本关 🔄',
@@ -54,11 +39,11 @@ const i18n = {
 ---
 
 <div class="dongdoku-container" id="dongdoku-app" data-lang={lang}>
-  <!-- 顶部控制与状态栏 -->
+  <!-- 顶部简约控制与状态栏 -->
   <header class="game-header">
     <div class="header-left">
-      <button type="button" class="btn-icon" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <button type="button" class="btn-icon btn-levels" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -67,43 +52,31 @@ const i18n = {
       </button>
       <div class="level-indicator">
         <span class="level-badge" id="level-badge">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
-        <span class="diff-badge" id="cur-diff-badge">{i18n.difficulty.easy}</span>
-        <span class="size-badge" id="cur-size-badge">4×4</span>
       </div>
     </div>
 
     <div class="header-center">
-      <!-- 3 条命 (Hearts) -->
+      <!-- 3 条命 (Hearts) & 进度 -->
       <div class="lives-pill" id="lives-pill" title={i18n.lives}>
         <span class="lives-display" id="lives-display">❤️❤️❤️</span>
       </div>
       <div class="progress-pill" id="progress-pill" title={i18n.placed}>
         <span class="pill-icon">🏓</span>
-        <span id="placed-count">0</span> / <span id="target-count">4</span>
-      </div>
-      <div class="timer-pill" id="timer-pill">
-        <span class="timer-icon">⏱️</span>
-        <span id="timer-display">00:00</span>
+        <span id="placed-count">0</span>/<span id="target-count">4</span>
       </div>
     </div>
 
     <div class="header-right">
       <button type="button" class="btn-icon" id="btn-hint" title={i18n.hintBtn} aria-label={i18n.hintBtn}>
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M9 18h6M10 22h4M8.4 14.3a6 6 0 1 1 7.2 0c-.9.7-1.2 1.4-1.2 2.2H9.6c0-.8-.3-1.5-1.2-2.2Z"></path>
-        </svg>
+        <span class="icon-emoji">💡</span>
         <span class="btn-text">{i18n.hintBtn}</span>
       </button>
       <button type="button" class="btn-icon" id="btn-undo" title={i18n.undoBtn} aria-label={i18n.undoBtn}>
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M9 7 5 11l4 4M5 11h9a5 5 0 0 1 0 10h-3"></path>
-        </svg>
+        <span class="icon-emoji">↺</span>
         <span class="btn-text">{i18n.undoBtn}</span>
       </button>
       <button type="button" class="btn-icon" id="btn-restart" title={i18n.restartBtn} aria-label={i18n.restartBtn}>
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"></path>
-        </svg>
+        <span class="icon-emoji">↻</span>
         <span class="btn-text">{i18n.restartBtn}</span>
       </button>
       <button type="button" class="btn-icon btn-sound" id="btn-sound" title={i18n.soundOn} aria-label={i18n.soundOn}>
@@ -112,48 +85,23 @@ const i18n = {
     </div>
   </header>
 
-  <!-- 上方三大规则卡片 -->
-  <section class="rules-banner" id="rules-banner" aria-label={i18n.rulesTitle}>
-    <div class="rule-card">
-      <div class="rule-icon">🏓</div>
-      <div class="rule-body">
-        <h3>{i18n.rule1Title}</h3>
-        <p>{i18n.rule1Desc}</p>
-      </div>
+  <!-- 简约清晰的玩法说明条（手机竖屏一目了然） -->
+  <section class="game-rules-tip" aria-label="游戏规则">
+    <div class="rule-tag">
+      <span class="rule-icon">👆</span>
+      <span class="rule-txt">单击 <strong>打叉 ✖ 排除</strong></span>
     </div>
-    <div class="rule-card">
-      <div class="rule-icon">🎨</div>
-      <div class="rule-body">
-        <h3>{i18n.rule2Title}</h3>
-        <p>{i18n.rule2Desc}</p>
-      </div>
+    <div class="rule-divider">·</div>
+    <div class="rule-tag">
+      <span class="rule-icon">✌️</span>
+      <span class="rule-txt">双击 <strong>确定 🏓 找咚</strong></span>
     </div>
-    <div class="rule-card">
-      <div class="rule-icon">🚫</div>
-      <div class="rule-body">
-        <h3>{i18n.rule3Title}</h3>
-        <p>{i18n.rule3Desc}</p>
-      </div>
+    <div class="rule-divider">·</div>
+    <div class="rule-tag">
+      <span class="rule-icon">🎯</span>
+      <span class="rule-txt">每行/列/色 <strong>各 1 咚</strong></span>
     </div>
   </section>
-
-  <!-- 操作模式与快捷工具条 -->
-  <div class="interaction-mode-bar">
-    <button type="button" class="mode-tab-btn active" id="btn-mode-auto">
-      <span class="tab-icon">👆</span>
-      <span class="tab-text">{i18n.modeGesture}</span>
-    </button>
-    <div class="tool-switch-group">
-      <button type="button" class="tool-btn" id="btn-tool-cross" title="单选标记排除模式">
-        <span class="tool-icon">✖</span>
-        <span class="tool-text">{i18n.modeCross}</span>
-      </button>
-      <button type="button" class="tool-btn" id="btn-tool-dong" title="单选确定找咚模式">
-        <span class="tool-icon">🏓</span>
-        <span class="tool-text">{i18n.modeDong}</span>
-      </button>
-    </div>
-  </div>
 
   <!-- 提示条 / 报错提示条 (Toast Bar) -->
   <div class="toast-message-box" id="toast-message-box" style="display: none;">
@@ -162,7 +110,7 @@ const i18n = {
     <button type="button" class="toast-close" id="btn-close-toast">×</button>
   </div>
 
-  <!-- 核心游戏棋盘区 -->
+  <!-- 核心游戏棋盘区（完美适配手机端竖屏） -->
   <main class="board-wrapper">
     <div class="board-container" id="board-container">
       <div class="game-grid" id="game-grid">
@@ -171,7 +119,7 @@ const i18n = {
     </div>
   </main>
 
-  <!-- 选关模态弹窗 (Premium Redesigned Levels Modal) -->
+  <!-- 选关模态弹窗 (Premium Levels Modal) -->
   <div class="modal-backdrop" id="modal-levels" style="display: none;">
     <div class="modal-content modal-levels-content">
       <!-- 选关顶部头图与进度 -->
@@ -239,10 +187,6 @@ const i18n = {
 
       <div class="win-stats-grid">
         <div class="stat-box">
-          <span class="stat-label">{i18n.timeSpent}</span>
-          <span class="stat-value" id="win-time">00:24</span>
-        </div>
-        <div class="stat-box">
           <span class="stat-label">{i18n.movesCount}</span>
           <span class="stat-value" id="win-moves">8</span>
         </div>
@@ -260,9 +204,9 @@ const i18n = {
 <style>
   /* 基础容器 */
   .dongdoku-container {
-    max-width: 720px;
+    max-width: 580px;
     margin: 0 auto;
-    padding: 0.2rem 0.5rem 2rem;
+    padding: 0.2rem 0.4rem 1.5rem;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #3d302c;
     user-select: none;
@@ -270,27 +214,20 @@ const i18n = {
     box-sizing: border-box;
   }
 
-  /* 顶部控制栏 */
+  /* 顶部简约控制栏 */
   .game-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.4rem;
+    gap: 0.35rem;
     background: #ffffff;
     border: 1px solid #ebdcd5;
-    border-radius: 1.2rem;
-    padding: 0.45rem 0.8rem;
-    box-shadow: 0 4px 16px rgba(78, 64, 55, 0.08);
-    flex-wrap: wrap;
+    border-radius: 1.1rem;
+    padding: 0.35rem 0.65rem;
+    box-shadow: 0 3px 12px rgba(78, 64, 55, 0.06);
   }
 
   .header-left, .header-center, .header-right {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .level-indicator {
     display: flex;
     align-items: center;
     gap: 0.3rem;
@@ -298,44 +235,28 @@ const i18n = {
 
   .level-badge {
     font-weight: 900;
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: #3d302c;
+    white-space: nowrap;
   }
 
-  .diff-badge, .size-badge {
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 0.18rem 0.45rem;
-    border-radius: 0.55rem;
-    text-transform: uppercase;
-  }
-
-  .diff-badge {
-    background: #eef7f2;
-    color: #2e7d32;
-  }
-
-  .size-badge {
-    background: #f4effa;
-    color: #6a1b9a;
-  }
-
-  .lives-pill, .progress-pill, .timer-pill {
+  .lives-pill, .progress-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.2rem;
     background: #fdf6f0;
     border: 1px solid #eedfd8;
-    padding: 0.25rem 0.55rem;
-    border-radius: 0.9rem;
+    padding: 0.22rem 0.45rem;
+    border-radius: 0.8rem;
     font-weight: 800;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: #705851;
+    white-space: nowrap;
   }
 
   .lives-display {
-    font-size: 0.9rem;
-    letter-spacing: 2px;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
   }
 
   .btn-icon {
@@ -345,13 +266,19 @@ const i18n = {
     background: #ffffff;
     border: 1px solid #e5d5cd;
     color: #6e554d;
-    padding: 0.35rem 0.55rem;
-    border-radius: 0.75rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: 0.65rem;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: 0 2px 4px rgba(78, 64, 55, 0.05);
+    box-shadow: 0 1px 3px rgba(78, 64, 55, 0.04);
+  }
+
+  .btn-levels {
+    background: #fdf8f5;
+    border-color: #ebdcd5;
+    font-weight: 800;
   }
 
   .btn-icon:hover {
@@ -366,126 +293,58 @@ const i18n = {
   }
 
   .btn-sound {
-    padding: 0.35rem 0.45rem;
+    padding: 0.3rem 0.35rem;
   }
 
-  /* 上方三大规则面板 */
-  .rules-banner {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin: 0.5rem 0 0.35rem;
+  .icon-emoji {
+    font-size: 0.85rem;
   }
 
-  .rule-card {
+  /* 简约清晰规则说明条 */
+  .game-rules-tip {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    background: #ffffff;
-    border: 1px solid #f0e2db;
-    border-radius: 0.85rem;
-    padding: 0.45rem 0.6rem;
-    box-shadow: 0 2px 8px rgba(78, 64, 55, 0.04);
-  }
-
-  .rule-icon {
-    font-size: 1.25rem;
-    flex-shrink: 0;
-  }
-
-  .rule-body h3 {
-    margin: 0;
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #3d302c;
-    white-space: nowrap;
-  }
-
-  .rule-body p {
-    margin: 0.1rem 0 0;
-    font-size: 0.68rem;
-    color: #7d655f;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-
-  /* 操作模式与快捷工具条 */
-  .interaction-mode-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 0.4rem;
-    margin: 0.35rem 0 0.4rem;
+    margin: 0.35rem 0 0.35rem;
     background: #fdfaf8;
-    border: 1px solid #f0e2db;
-    border-radius: 1rem;
-    padding: 0.3rem 0.5rem;
+    border: 1px solid #f2e6e0;
+    border-radius: 0.9rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.76rem;
+    color: #6d544c;
+    flex-wrap: wrap;
   }
 
-  .mode-tab-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: #ffffff;
-    border: 1.5px solid #ebdcd5;
-    padding: 0.3rem 0.65rem;
-    border-radius: 0.75rem;
-    font-size: 0.78rem;
-    font-weight: 800;
-    color: #705851;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-
-  .mode-tab-btn.active {
-    background: #1e88e5;
-    border-color: #1e88e5;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.3);
-  }
-
-  .tool-switch-group {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .tool-btn {
+  .rule-tag {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: #ffffff;
-    border: 1.5px solid #ebdcd5;
-    padding: 0.3rem 0.55rem;
-    border-radius: 0.75rem;
-    font-size: 0.78rem;
-    font-weight: 800;
-    color: #705851;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    white-space: nowrap;
   }
 
-  .tool-btn:hover {
-    border-color: #1e88e5;
-    color: #1e88e5;
+  .rule-tag strong {
+    color: #2b1f1a;
   }
 
-  .tool-btn.active {
-    background: #1e88e5;
-    border-color: #1e88e5;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.3);
+  .rule-icon {
+    font-size: 0.85rem;
+  }
+
+  .rule-divider {
+    color: #d1b8af;
+    font-weight: bold;
   }
 
   /* 提示与报错条 */
   .toast-message-box {
     border-radius: 0.8rem;
-    padding: 0.5rem 0.8rem;
-    margin: 0.3rem 0 0.4rem;
+    padding: 0.45rem 0.75rem;
+    margin: 0.25rem 0 0.35rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 700;
     animation: fadeIn 0.2s ease;
   }
@@ -518,22 +377,22 @@ const i18n = {
     line-height: 1;
   }
 
-  /* 核心棋盘区 */
+  /* 核心棋盘区（手机端竖屏全屏适配） */
   .board-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0.4rem 0;
+    margin: 0.25rem 0;
   }
 
   .board-container {
     background: #ffffff;
     border: 1px solid #ebdcd5;
-    border-radius: 1.5rem;
-    padding: 0.75rem;
-    box-shadow: 0 10px 30px rgba(78, 64, 55, 0.10);
+    border-radius: 1.3rem;
+    padding: 0.6rem;
+    box-shadow: 0 8px 24px rgba(78, 64, 55, 0.08);
     width: 100%;
-    max-width: min(90vw, 490px, calc(100vh - 240px));
+    max-width: min(94vw, 440px, calc(100vh - 170px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
@@ -545,7 +404,7 @@ const i18n = {
     display: grid;
     width: 100%;
     height: 100%;
-    gap: clamp(4px, 1.2vw, 8px);
+    gap: clamp(3px, 1.1vw, 7px);
     box-sizing: border-box;
   }
 
@@ -555,11 +414,11 @@ const i18n = {
     width: 100% !important;
     height: 100% !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: clamp(8px, 1.8vw, 14px) !important;
-    border: 2.5px solid #ffffff !important;
+    border-radius: clamp(7px, 1.6vw, 13px) !important;
+    border: 2.2px solid #ffffff !important;
     cursor: pointer !important;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
-    transition: transform 0.12s ease, filter 0.12s ease !important;
+    transition: transform 0.1s ease, filter 0.1s ease !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     display: flex !important;
@@ -572,14 +431,13 @@ const i18n = {
   }
 
   .grid-cell:hover {
-    transform: scale(1.03);
-    filter: brightness(1.06);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+    filter: brightness(1.05);
     z-index: 2;
   }
 
   .grid-cell:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
   }
 
   .grid-cell.cell-locked {
@@ -618,7 +476,7 @@ const i18n = {
     overflow: hidden;
   }
 
-  /* 精致圆形头像（基于 background-image，绝对保证为圆形且 100% 适配单元格不溢出） */
+  /* 精致圆形头像（基于 background-image） */
   .cell-dong-avatar {
     width: 82% !important;
     height: 82% !important;
@@ -626,7 +484,7 @@ const i18n = {
     background-size: cover !important;
     background-position: center 20% !important;
     background-repeat: no-repeat !important;
-    border: 2.5px solid #ffffff !important;
+    border: 2.2px solid #ffffff !important;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28) !important;
     animation: popDong 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     box-sizing: border-box !important;
@@ -689,11 +547,9 @@ const i18n = {
     animation: scaleUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  /* ========================================================
-     全新优化：高颜值游戏级选关弹窗 (Premium Levels Modal)
-     ======================================================== */
+  /* 选关弹窗 */
   .modal-levels-content {
-    max-width: 660px;
+    max-width: 640px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -704,7 +560,7 @@ const i18n = {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.1rem 1.4rem;
+    padding: 1rem 1.3rem;
     background: linear-gradient(135deg, #ffffff, #fcf8f6);
     border-bottom: 1px solid #ebdcd5;
   }
@@ -723,13 +579,13 @@ const i18n = {
 
   .levels-main-title h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 900;
     color: #3d302c;
   }
 
   .title-emoji {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .levels-subtitle {
@@ -754,9 +610,9 @@ const i18n = {
     background: #e3f2fd;
     color: #1565c0;
     border: 1px solid #bbdefb;
-    padding: 0.35rem 0.75rem;
+    padding: 0.35rem 0.7rem;
     border-radius: 0.75rem;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -792,12 +648,12 @@ const i18n = {
   .levels-pack-nav {
     background: #faf5f2;
     border-bottom: 1px solid #ebdcd5;
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 0.8rem;
   }
 
   .levels-pack-tabs {
     display: flex;
-    gap: 0.45rem;
+    gap: 0.4rem;
     overflow-x: auto;
     padding-bottom: 0.2rem;
     scrollbar-width: thin;
@@ -812,17 +668,16 @@ const i18n = {
   }
 
   .pack-tab-btn {
-    padding: 0.4rem 0.85rem;
-    border-radius: 0.85rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.8rem;
     border: 1.5px solid #ebdcd5;
     background: #ffffff;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
     color: #705851;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
 
   .pack-tab-btn:hover {
@@ -839,7 +694,7 @@ const i18n = {
 
   /* 关卡卡片网格容器 */
   .levels-grid-wrapper {
-    padding: 1.2rem;
+    padding: 1rem;
     overflow-y: auto;
     max-height: 55vh;
     background: #ffffff;
@@ -847,14 +702,14 @@ const i18n = {
 
   .levels-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.65rem;
   }
 
-  /* 关卡精美卡片 */
+  /* 关卡卡片 */
   .level-card {
     aspect-ratio: 1 / 1;
-    border-radius: 1rem;
+    border-radius: 0.95rem;
     border: 1.5px solid #ebdcd5;
     background: #ffffff;
     display: flex;
@@ -864,7 +719,7 @@ const i18n = {
     gap: 0.2rem;
     font-weight: 900;
     cursor: pointer;
-    transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.15s ease;
     position: relative;
     box-shadow: 0 2px 6px rgba(78, 64, 55, 0.05);
     padding: 0.3rem;
@@ -872,13 +727,13 @@ const i18n = {
   }
 
   .level-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     border-color: #1e88e5;
-    box-shadow: 0 6px 16px rgba(30, 136, 229, 0.22);
+    box-shadow: 0 5px 14px rgba(30, 136, 229, 0.22);
   }
 
   .level-card:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
   .level-card .lvl-num {
@@ -895,7 +750,6 @@ const i18n = {
     line-height: 1;
   }
 
-  /* 卡片标签按难度配色 */
   .lvl-badge.diff-4, .lvl-badge.diff-5 {
     background: #e8f5e9;
     color: #2e7d32;
@@ -914,7 +768,6 @@ const i18n = {
     font-weight: 900;
   }
 
-  /* 已通关关卡 */
   .level-card.completed {
     background: #f0fbf5;
     border-color: #a3e0bf;
@@ -929,10 +782,8 @@ const i18n = {
     right: 5px;
     font-size: 0.75rem;
     color: #fbc02d;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
   }
 
-  /* 当前正玩的关卡 */
   .level-card.current {
     border-color: #1e88e5;
     background: #e3f2fd;
@@ -942,21 +793,21 @@ const i18n = {
     color: #1565c0;
   }
 
-  /* 通关胜利弹窗与失败弹窗 */
+  /* 通关胜利与失败弹窗 */
   .modal-win-content {
-    max-width: 440px;
+    max-width: 420px;
     text-align: center;
-    padding: 2rem 1.5rem 1.8rem;
+    padding: 1.8rem 1.4rem;
   }
 
   .win-trophy, .gameover-icon {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     animation: bounceTrophy 0.8s infinite alternate;
   }
 
   .win-title {
-    margin: 0.5rem 0 0.2rem;
-    font-size: 1.8rem;
+    margin: 0.4rem 0 0.2rem;
+    font-size: 1.7rem;
     font-weight: 900;
     background: linear-gradient(45deg, #e65100, #ff9800);
     -webkit-background-clip: text;
@@ -964,8 +815,8 @@ const i18n = {
   }
 
   .gameover-title {
-    margin: 0.5rem 0 0.2rem;
-    font-size: 1.8rem;
+    margin: 0.4rem 0 0.2rem;
+    font-size: 1.7rem;
     font-weight: 900;
     color: #d32f2f;
   }
@@ -973,7 +824,7 @@ const i18n = {
   .win-subtitle {
     margin: 0 0 1.2rem;
     color: #795548;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 600;
   }
 
@@ -984,8 +835,8 @@ const i18n = {
   }
 
   .win-avatar-large-box, .gameover-avatar-box {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     border: 4px solid #ffd700;
     box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
@@ -1017,17 +868,16 @@ const i18n = {
   }
 
   .win-stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.2rem;
   }
 
   .stat-box {
     background: #fdf6f0;
     border: 1px solid #f0e0d6;
     border-radius: 1rem;
-    padding: 0.6rem;
+    padding: 0.5rem 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
@@ -1040,7 +890,7 @@ const i18n = {
   }
 
   .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 900;
     color: #3e2723;
   }
@@ -1048,16 +898,16 @@ const i18n = {
   .win-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .btn-primary {
     background: linear-gradient(45deg, #1e88e5, #42a5f5);
     color: white;
     border: none;
-    padding: 0.85rem;
-    border-radius: 1.2rem;
-    font-size: 1.1rem;
+    padding: 0.8rem;
+    border-radius: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(30, 136, 229, 0.35);
@@ -1066,16 +916,15 @@ const i18n = {
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.45);
   }
 
   .btn-secondary {
     background: #f5ebe6;
     color: #5d4037;
     border: none;
-    padding: 0.65rem;
-    border-radius: 1rem;
-    font-size: 0.92rem;
+    padding: 0.6rem;
+    border-radius: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.15s;
@@ -1137,35 +986,30 @@ const i18n = {
     to { transform: translateY(-8px); }
   }
 
-  /* 响应式适配 */
-  @media (max-width: 640px) {
-    .rules-banner {
-      grid-template-columns: 1fr;
-      gap: 0.35rem;
-    }
-    .rule-card {
-      padding: 0.35rem 0.5rem;
-    }
-    .rule-icon {
-      font-size: 1.1rem;
+  /* 手机竖屏自适应优化 */
+  @media (max-width: 480px) {
+    .dongdoku-container {
+      padding: 0.15rem 0.3rem 1rem;
     }
     .game-header {
-      padding: 0.4rem 0.6rem;
+      padding: 0.3rem 0.45rem;
     }
     .btn-text {
       display: none;
     }
-    .interaction-mode-bar {
-      flex-direction: column;
-      gap: 0.3rem;
+    .btn-icon {
+      padding: 0.3rem 0.4rem;
     }
-    .mode-tab-btn, .tool-switch-group {
-      width: 100%;
-      justify-content: center;
+    .level-badge {
+      font-size: 0.95rem;
     }
-    .tool-btn {
-      flex: 1;
-      justify-content: center;
+    .game-rules-tip {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.4rem;
+      gap: 0.25rem;
+    }
+    .board-container {
+      padding: 0.45rem;
     }
   }
 </style>
@@ -1310,16 +1154,10 @@ const i18n = {
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private undoStack: string[] = []; // JSON snapshots
     private moveCount: number = 0;
-    private startTime: number = 0;
-    private timerInterval: any = null;
-    private elapsedSeconds: number = 0;
     private lives: number = 3; // 3条命
     private sounds: SoundManager;
 
-    // 操作模式: 'auto' (智能手势: 单击✖/双击🏓), 'cross' (单选标叉), 'dong' (单选找咚)
-    private activeMode: 'auto' | 'cross' | 'dong' = 'auto';
-
-    // 硬件级触摸/点击双击捕获状态
+    // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
     private singleTapTimers: Map<string, any> = new Map();
 
@@ -1371,7 +1209,6 @@ const i18n = {
           payload.boardState = {
             levelId: this.currentLevelId,
             grid: this.gridState,
-            elapsed: this.elapsedSeconds,
             lives: Math.max(1, this.lives)
           };
         }
@@ -1438,22 +1275,6 @@ const i18n = {
     }
 
     private initEvents() {
-      // 操作模式切换
-      const btnModeAuto = document.getElementById('btn-mode-auto');
-      const btnToolCross = document.getElementById('btn-tool-cross');
-      const btnToolDong = document.getElementById('btn-tool-dong');
-
-      const setMode = (m: 'auto' | 'cross' | 'dong') => {
-        this.activeMode = m;
-        btnModeAuto?.classList.toggle('active', m === 'auto');
-        btnToolCross?.classList.toggle('active', m === 'cross');
-        btnToolDong?.classList.toggle('active', m === 'dong');
-      };
-
-      btnModeAuto?.addEventListener('click', () => setMode('auto'));
-      btnToolCross?.addEventListener('click', () => setMode(this.activeMode === 'cross' ? 'auto' : 'cross'));
-      btnToolDong?.addEventListener('click', () => setMode(this.activeMode === 'dong' ? 'auto' : 'dong'));
-
       // 音效开关
       const btnSound = document.getElementById('btn-sound');
       if (btnSound) {
@@ -1566,7 +1387,6 @@ const i18n = {
       this.currentLevelData = data;
       this.initBoardState(data);
       this.renderUI(data);
-      this.startTimer();
     }
 
     // 初始化棋盘数据与暂存恢复
@@ -1584,7 +1404,6 @@ const i18n = {
           const parsed = JSON.parse(saved);
           if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
             this.gridState = parsed.boardState.grid;
-            this.elapsedSeconds = parsed.boardState.elapsed || 0;
             if (parsed.boardState.lives && parsed.boardState.lives > 0) {
               this.lives = parsed.boardState.lives;
             }
@@ -1595,23 +1414,15 @@ const i18n = {
                 }
               }
             }
-          } else {
-            this.elapsedSeconds = 0;
           }
         }
       } catch (e) {}
     }
 
-    // 渲染 UI 与网格（支持智能手势、单选模式、原生双击与右键）
+    // 渲染 UI 与网格（手势极速分流：单击 ✖ / 双击 🏓）
     private renderUI(data: any) {
       const curLvlNum = document.getElementById('cur-level-num');
       if (curLvlNum) curLvlNum.textContent = data.id.toString();
-
-      const diffBadge = document.getElementById('cur-diff-badge');
-      if (diffBadge) diffBadge.textContent = data.diffText || '简单';
-
-      const sizeBadge = document.getElementById('cur-size-badge');
-      if (sizeBadge) sizeBadge.textContent = `${data.size}×${data.size}`;
 
       const targetCount = document.getElementById('target-count');
       if (targetCount) targetCount.textContent = data.size.toString();
@@ -1641,32 +1452,19 @@ const i18n = {
 
           const key = `${r},${c}`;
 
-          // 核心点击交互逻辑
+          // 核心单双击分流（智能手势）
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.lives <= 0) return;
             const currentVal = this.gridState[r][c];
             if (currentVal === 2 || currentVal === 3) return;
 
-            // 1. 如果处于单选找咚模式
-            if (this.activeMode === 'dong') {
-              this.handleDoubleClick(r, c);
-              return;
-            }
-
-            // 2. 如果处于单选标叉模式
-            if (this.activeMode === 'cross') {
-              this.handleSingleClick(r, c);
-              return;
-            }
-
-            // 3. 智能手势模式 (单击 ✖ / 双击 🏓)
             const now = Date.now();
             const lastTap = this.lastTapTimes.get(key) || 0;
-            const isDoubleTap = (now - lastTap > 40 && now - lastTap < 360);
+            const isDoubleTap = (now - lastTap > 40 && now - lastTap < 350);
 
             if (isDoubleTap) {
-              // 判定为双击 -> 立即清除单击计时器并执行找咚
+              // 判定为双击 -> 立即清除单击计时器并执行确定找咚
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
                 this.singleTapTimers.delete(key);
@@ -1674,7 +1472,7 @@ const i18n = {
               this.lastTapTimes.delete(key);
               this.handleDoubleClick(r, c);
             } else {
-              // 第一次轻点 -> 记录时间并设置 260ms 防抖
+              // 第一次轻点 -> 记录时间并设置 250ms 防抖
               this.lastTapTimes.set(key, now);
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
@@ -1683,12 +1481,12 @@ const i18n = {
                 this.singleTapTimers.delete(key);
                 this.lastTapTimes.delete(key);
                 this.handleSingleClick(r, c);
-              }, 260);
+              }, 250);
               this.singleTapTimers.set(key, timer);
             }
           });
 
-          // 原生双击捕获（系统双击双保险）
+          // 原生双击捕获（双保险）
           cellEl.addEventListener('dblclick', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1715,19 +1513,6 @@ const i18n = {
       }
 
       this.updateBoardDisplay();
-    }
-
-    // 计时器
-    private startTimer() {
-      if (this.timerInterval) clearInterval(this.timerInterval);
-      this.startTime = Date.now() - this.elapsedSeconds * 1000;
-      this.timerInterval = setInterval(() => {
-        this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
-        const mins = Math.floor(this.elapsedSeconds / 60).toString().padStart(2, '0');
-        const secs = (this.elapsedSeconds % 60).toString().padStart(2, '0');
-        const disp = document.getElementById('timer-display');
-        if (disp) disp.textContent = `${mins}:${secs}`;
-      }, 1000);
     }
 
     // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖
@@ -1828,10 +1613,8 @@ const i18n = {
       this.pushUndoSnapshot();
       this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
       this.cellAvatars.clear();
-      this.elapsedSeconds = 0;
       this.lives = 3;
       this.updateLivesDisplay();
-      this.startTimer();
       this.hideToast();
       this.updateBoardDisplay();
       this.saveStorage(true);
@@ -1975,7 +1758,6 @@ const i18n = {
       if (!this.currentLevelData || this.lives <= 0) return;
       const size = this.currentLevelData.size;
 
-      // 统计所有正确放置的咚
       let correctDongs = 0;
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
@@ -1985,7 +1767,6 @@ const i18n = {
         }
       }
 
-      // 如果全部 size 个咚均已找出
       if (correctDongs === size) {
         this.handleVictory();
       }
@@ -1993,14 +1774,11 @@ const i18n = {
 
     // 挑战失败结算
     private handleGameOver() {
-      if (this.timerInterval) clearInterval(this.timerInterval);
       this.openModal('modal-gameover');
     }
 
     // 通关胜利结算
     private handleVictory() {
-      if (this.timerInterval) clearInterval(this.timerInterval);
-
       this.sounds.playWin();
 
       if (this.currentLevelId >= this.maxUnlockedLevel) {
@@ -2015,18 +1793,13 @@ const i18n = {
         winAvatarBox.style.backgroundImage = `url("${this.getRandomAvatar()}")`;
       }
 
-      const winTime = document.getElementById('win-time');
       const winMoves = document.getElementById('win-moves');
-      const mins = Math.floor(this.elapsedSeconds / 60).toString().padStart(2, '0');
-      const secs = (this.elapsedSeconds % 60).toString().padStart(2, '0');
-
-      if (winTime) winTime.textContent = `${mins}:${secs}`;
       if (winMoves) winMoves.textContent = this.moveCount.toString();
 
       this.openModal('modal-win');
     }
 
-    // 选关弹窗逻辑 (高颜值重构)
+    // 选关弹窗逻辑
     private openLevelsModal() {
       const tabsEl = document.getElementById('levels-pack-tabs');
       const gridEl = document.getElementById('levels-grid');
@@ -2053,7 +1826,6 @@ const i18n = {
       this.renderLevelsGrid(currentPackIdx);
       this.openModal('modal-levels');
 
-      // 滚动选中项到视野内
       setTimeout(() => {
         const activeTab = tabsEl.querySelector('.pack-tab-btn.active') as HTMLElement;
         if (activeTab) {
