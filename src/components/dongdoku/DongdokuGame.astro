@@ -9,9 +9,15 @@ const isEn = lang === 'en';
 // Text dictionary
 const i18n = {
   title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
-  ruleSingle: isEn ? 'Single-tap to mark ✖ Cross' : '单击打叉 ✖ 排除',
-  ruleDouble: isEn ? 'Double-tap to place 🏓 Dong' : '双击确定 🏓 找咚',
-  ruleGoal: isEn ? '1 Dong per row, col & color' : '每行/列/色块正好 1 个咚',
+  rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
+  rule1Desc: isEn ? '每行每列正好 1 个咚' : '每行每列正好 1 个咚',
+  rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
+  rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
+  rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
+  rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
+  ruleSingle: isEn ? 'Single-tap: ✖ Cross' : '单击打叉 ✖ 排除',
+  ruleDouble: isEn ? 'Double-tap: 🏓 Dong' : '双击确定 🏓 找咚',
+  rulesToggle: isEn ? 'Rules' : '三大规则',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -69,21 +75,42 @@ const i18n = {
     </div>
   </header>
 
-  <!-- 简约清晰的玩法说明条 -->
-  <section class="game-rules-tip" aria-label="游戏规则">
-    <div class="rule-tag">
-      <span class="rule-icon">👆</span>
-      <span class="rule-txt">单击 <strong>打叉 ✖ 排除</strong></span>
+  <!-- 规则栏（支持展开/折叠三大规则面板） -->
+  <section class="rules-section" id="rules-section">
+    <div class="rules-bar-header">
+      <div class="rules-quick-summary">
+        <span class="gesture-badge">👆 {i18n.ruleSingle}</span>
+        <span class="gesture-badge">✌️ {i18n.ruleDouble}</span>
+      </div>
+      <button type="button" class="btn-rules-toggle" id="btn-toggle-rules" aria-expanded="true">
+        <span>{i18n.rulesToggle}</span>
+        <span class="toggle-arrow" id="rules-toggle-arrow">▲</span>
+      </button>
     </div>
-    <div class="rule-divider">·</div>
-    <div class="rule-tag">
-      <span class="rule-icon">✌️</span>
-      <span class="rule-txt">双击 <strong>确定 🏓 找咚</strong></span>
-    </div>
-    <div class="rule-divider">·</div>
-    <div class="rule-tag">
-      <span class="rule-icon">🎯</span>
-      <span class="rule-txt">每行/列/色 <strong>各 1 咚</strong></span>
+
+    <!-- 可折叠的三大规则卡片 -->
+    <div class="rules-cards-grid" id="rules-cards-box">
+      <div class="rule-card">
+        <div class="rule-icon">🏓</div>
+        <div class="rule-body">
+          <h4>{i18n.rule1Title}</h4>
+          <p>{i18n.rule1Desc}</p>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🎨</div>
+        <div class="rule-body">
+          <h4>{i18n.rule2Title}</h4>
+          <p>{i18n.rule2Desc}</p>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🚫</div>
+        <div class="rule-body">
+          <h4>{i18n.rule3Title}</h4>
+          <p>{i18n.rule3Desc}</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -277,40 +304,107 @@ const i18n = {
     font-size: 0.95rem;
   }
 
-  /* 简约清晰规则说明条 */
-  .game-rules-tip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.45rem;
+  /* 规则与折叠面板区域 */
+  .rules-section {
     margin: 0.35rem 0 0.35rem;
     background: #fdfaf8;
     border: 1px solid #f2e6e0;
-    border-radius: 0.9rem;
-    padding: 0.35rem 0.6rem;
-    font-size: 0.78rem;
-    color: #6d544c;
+    border-radius: 0.95rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .rules-bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+  }
+
+  .rules-quick-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
     flex-wrap: wrap;
   }
 
-  .rule-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
+  .gesture-badge {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #5c443c;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    padding: 0.18rem 0.45rem;
+    border-radius: 0.6rem;
     white-space: nowrap;
   }
 
-  .rule-tag strong {
-    color: #2b1f1a;
+  .btn-rules-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.6rem;
+    padding: 0.18rem 0.45rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #1e88e5;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-rules-toggle:hover {
+    background: #e3f2fd;
+    border-color: #bbdefb;
+  }
+
+  .toggle-arrow {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+  }
+
+  /* 可折叠的三大规则网格 */
+  .rules-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px dashed #ebdcd5;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .rule-card {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.75rem;
+    padding: 0.35rem 0.45rem;
+    box-shadow: 0 1px 3px rgba(78, 64, 55, 0.03);
   }
 
   .rule-icon {
-    font-size: 0.88rem;
+    font-size: 1.15rem;
+    flex-shrink: 0;
   }
 
-  .rule-divider {
-    color: #d1b8af;
-    font-weight: bold;
+  .rule-body h4 {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #3d302c;
+    white-space: nowrap;
+  }
+
+  .rule-body p {
+    margin: 0.05rem 0 0;
+    font-size: 0.65rem;
+    color: #7d655f;
+    line-height: 1.15;
+    white-space: nowrap;
   }
 
   /* 核心棋盘区（手机端竖屏全屏适配） */
@@ -328,7 +422,7 @@ const i18n = {
     padding: 0.6rem;
     box-shadow: 0 8px 24px rgba(78, 64, 55, 0.08);
     width: 100%;
-    max-width: min(94vw, 440px, calc(100vh - 170px));
+    max-width: min(94vw, 440px, calc(100vh - 200px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
@@ -921,10 +1015,15 @@ const i18n = {
     .level-badge {
       font-size: 0.95rem;
     }
-    .game-rules-tip {
-      font-size: 0.7rem;
+    .rules-section {
+      padding: 0.3rem 0.45rem;
+    }
+    .rules-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+    .rule-card {
       padding: 0.25rem 0.4rem;
-      gap: 0.25rem;
     }
     .board-container {
       padding: 0.45rem;
@@ -982,6 +1081,7 @@ const i18n = {
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private moveCount: number = 0;
     private lives: number = 3; // 3条命
+    private rulesExpanded: boolean = true;
 
     // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
@@ -1014,6 +1114,7 @@ const i18n = {
           const parsed = JSON.parse(saved);
           if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
+          if (parsed.rulesExpanded !== undefined) this.rulesExpanded = parsed.rulesExpanded;
         }
       } catch (e) {
         console.warn('Failed to parse localStorage', e);
@@ -1025,7 +1126,8 @@ const i18n = {
       try {
         const payload: any = {
           currentLevelId: this.currentLevelId,
-          maxUnlockedLevel: this.maxUnlockedLevel
+          maxUnlockedLevel: this.maxUnlockedLevel,
+          rulesExpanded: this.rulesExpanded
         };
 
         if (saveBoard) {
@@ -1080,6 +1182,19 @@ const i18n = {
     private initDOMElements() {
       this.updateLivesDisplay();
       this.updateLevelsModalProgress();
+      this.applyRulesCollapseState();
+    }
+
+    private applyRulesCollapseState() {
+      const cardsBox = document.getElementById('rules-cards-box');
+      const arrow = document.getElementById('rules-toggle-arrow');
+      const btn = document.getElementById('btn-toggle-rules');
+
+      if (cardsBox && arrow && btn) {
+        cardsBox.style.display = this.rulesExpanded ? 'grid' : 'none';
+        arrow.textContent = this.rulesExpanded ? '▲' : '▼';
+        btn.setAttribute('aria-expanded', this.rulesExpanded.toString());
+      }
     }
 
     private updateLivesDisplay() {
@@ -1096,6 +1211,13 @@ const i18n = {
     }
 
     private initEvents() {
+      // 规则折叠切换
+      document.getElementById('btn-toggle-rules')?.addEventListener('click', () => {
+        this.rulesExpanded = !this.rulesExpanded;
+        this.applyRulesCollapseState();
+        this.saveStorage(false);
+      });
+
       // 重来
       document.getElementById('btn-restart')?.addEventListener('click', () => this.handleRestart());
 
