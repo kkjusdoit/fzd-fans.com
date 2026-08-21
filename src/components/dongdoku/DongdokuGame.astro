@@ -15,9 +15,8 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  ruleSingle: isEn ? 'Single-tap: ✖ Cross' : '单击打叉 ✖ 排除',
-  ruleDouble: isEn ? 'Double-tap: 🏓 Dong' : '双击确定 🏓 找咚',
-  rulesToggle: isEn ? 'Rules' : '三大规则',
+  quickGuide: isEn ? 'Tap: ✖ Cross · Double-tap: 🏓 Dong · 1 Dong per row/col/color' : '单击标 ✖ · 双击放 🏓 · 每行每列每色正好 1 咚',
+  rulesBtn: isEn ? 'Rules' : '规则 ⓘ',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -39,402 +38,374 @@ const i18n = {
 };
 ---
 
-<div class="dongdoku-container" id="dongdoku-app" data-lang={lang}>
-  <!-- 顶部极简控制与状态栏 -->
-  <header class="game-header">
-    <div class="header-left">
-      <button type="button" class="btn-icon btn-levels" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-        <span class="btn-text">{i18n.levelsBtn}</span>
-      </button>
-      <div class="level-indicator">
-        <span class="level-badge" id="level-badge">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
-      </div>
-    </div>
+<div class="dongdoku-page-bg">
+  <div class="dongdoku-card" id="dongdoku-app" data-lang={lang}>
+    <!-- 1. 卡片顶部：关卡信息、生命值、状态与操作 -->
+    <header class="game-console-header">
+      <div class="header-main-row">
+        <!-- 选关按钮与当前关卡 -->
+        <div class="level-control-group">
+          <button type="button" class="btn-console-action btn-levels" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <span>{i18n.levelsBtn}</span>
+          </button>
+          <span class="level-title-text">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
+        </div>
 
-    <div class="header-center">
-      <!-- 3 条命 (Hearts) & 进度 -->
-      <div class="lives-pill" id="lives-pill" title={i18n.lives}>
-        <span class="lives-display" id="lives-display">❤️❤️❤️</span>
-      </div>
-      <div class="progress-pill" id="progress-pill" title={i18n.placed}>
-        <span class="pill-icon">🏓</span>
-        <span id="placed-count">0</span>/<span id="target-count">4</span>
-      </div>
-    </div>
+        <!-- 3 条命 (Hearts) & 找咚进度 -->
+        <div class="status-badge-group">
+          <div class="lives-badge" id="lives-pill" title={i18n.lives}>
+            <span class="lives-hearts" id="lives-display">❤️❤️❤️</span>
+          </div>
+          <div class="progress-badge" id="progress-pill" title={i18n.placed}>
+            <span class="pill-dong-icon">🏓</span>
+            <span id="placed-count">0</span>/<span id="target-count">4</span>
+          </div>
+        </div>
 
-    <div class="header-right">
-      <button type="button" class="btn-icon btn-restart" id="btn-restart" title={i18n.restartBtn} aria-label={i18n.restartBtn}>
-        <span class="icon-emoji">↻</span>
-        <span class="btn-text">{i18n.restartBtn}</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- 规则栏（支持展开/折叠三大规则面板） -->
-  <section class="rules-section" id="rules-section">
-    <div class="rules-bar-header">
-      <div class="rules-quick-summary">
-        <span class="gesture-badge">👆 {i18n.ruleSingle}</span>
-        <span class="gesture-badge">✌️ {i18n.ruleDouble}</span>
-      </div>
-      <button type="button" class="btn-rules-toggle" id="btn-toggle-rules" aria-expanded="true">
-        <span>{i18n.rulesToggle}</span>
-        <span class="toggle-arrow" id="rules-toggle-arrow">▲</span>
-      </button>
-    </div>
-
-    <!-- 可折叠的三大规则卡片 -->
-    <div class="rules-cards-grid" id="rules-cards-box">
-      <div class="rule-card">
-        <div class="rule-icon">🏓</div>
-        <div class="rule-body">
-          <h4>{i18n.rule1Title}</h4>
-          <p>{i18n.rule1Desc}</p>
+        <!-- 重来按钮 -->
+        <div class="action-control-group">
+          <button type="button" class="btn-console-action btn-restart" id="btn-restart" title={i18n.restartBtn} aria-label={i18n.restartBtn}>
+            <span class="icon-refresh">↻</span>
+            <span class="action-text">{i18n.restartBtn}</span>
+          </button>
         </div>
       </div>
-      <div class="rule-card">
-        <div class="rule-icon">🎨</div>
-        <div class="rule-body">
-          <h4>{i18n.rule2Title}</h4>
-          <p>{i18n.rule2Desc}</p>
-        </div>
-      </div>
-      <div class="rule-card">
-        <div class="rule-icon">🚫</div>
-        <div class="rule-body">
-          <h4>{i18n.rule3Title}</h4>
-          <p>{i18n.rule3Desc}</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- 核心游戏棋盘区（手机端竖屏全屏适配） -->
-  <main class="board-wrapper">
-    <div class="board-container" id="board-container">
+      <!-- 2. 玩法极简指引 + 规则气泡按钮 -->
+      <div class="game-sub-bar">
+        <div class="quick-guide-txt">
+          <span>{i18n.quickGuide}</span>
+        </div>
+        <button type="button" class="btn-rules-pop" id="btn-open-rules-modal">
+          <span>{i18n.rulesBtn}</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 3. 核心游戏棋盘容器 -->
+    <main class="board-stage">
       <div class="game-grid" id="game-grid">
         <!-- 动态生成格子 -->
       </div>
+    </main>
+  </div>
+</div>
+
+<!-- 三大规则弹窗 (Modal) -->
+<div class="modal-backdrop" id="modal-rules" style="display: none;">
+  <div class="modal-content modal-rules-content">
+    <div class="modal-header">
+      <div class="modal-title-with-icon">
+        <span class="header-icon">📖</span>
+        <h3>三大游戏规则</h3>
+      </div>
+      <button type="button" class="modal-close" id="btn-close-rules">×</button>
     </div>
-  </main>
-
-  <!-- 选关模态弹窗 (Premium Levels Modal) -->
-  <div class="modal-backdrop" id="modal-levels" style="display: none;">
-    <div class="modal-content modal-levels-content">
-      <!-- 选关顶部头图与进度 -->
-      <div class="levels-modal-header">
-        <div class="levels-title-group">
-          <div class="levels-main-title">
-            <span class="title-emoji">🏆</span>
-            <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
-          </div>
-          <p class="levels-subtitle">
-            {i18n.unlockedProgress}: <strong id="levels-unlocked-count">1</strong> / 1000
-          </p>
-        </div>
-        <div class="levels-header-actions">
-          <button type="button" class="btn-jump-current" id="btn-jump-current">{i18n.jumpToCurrent}</button>
-          <button type="button" class="modal-close" id="btn-close-levels">×</button>
+    <div class="rules-modal-body">
+      <div class="rule-intro-card">
+        <div class="intro-icon">👆</div>
+        <div class="intro-body">
+          <h4>操作手势</h4>
+          <p><strong>单击格子</strong>标记或清除白色 ✖ 排除；<strong>双击格子</strong>确定放置 🏓 樊振东头像（找错立即扣 1 条命）。</p>
         </div>
       </div>
-
-      <!-- 分包分页选项卡 -->
-      <div class="levels-pack-nav">
-        <div class="levels-pack-tabs" id="levels-pack-tabs">
-          <!-- 分页 Tabs: 1-50, 51-100, 101-150 ... -->
+      <div class="rule-intro-card">
+        <div class="intro-icon">🏓</div>
+        <div class="intro-body">
+          <h4>1. 行列唯一</h4>
+          <p>每一行、每一列必须且只能有正好 <strong>1 个咚</strong>。</p>
         </div>
       </div>
-
-      <!-- 关卡卡片网格 -->
-      <div class="levels-grid-wrapper">
-        <div class="levels-grid" id="levels-grid">
-          <!-- 关卡卡片 -->
+      <div class="rule-intro-card">
+        <div class="intro-icon">🎨</div>
+        <div class="intro-body">
+          <h4>2. 领地唯一</h4>
+          <p>每一种相同颜色的领地色块必须且只能有正好 <strong>1 个咚</strong>。</p>
         </div>
       </div>
+      <div class="rule-intro-card">
+        <div class="intro-icon">🚫</div>
+        <div class="intro-body">
+          <h4>3. 八向隔离</h4>
+          <p>任意两个咚在横向、纵向及<strong>对角斜向</strong>均不能相邻相碰。</p>
+        </div>
+      </div>
+    </div>
+    <div class="rules-modal-footer">
+      <button type="button" class="btn-primary btn-got-it" id="btn-close-rules-got-it">我知道啦</button>
     </div>
   </div>
+</div>
 
-  <!-- 游戏失败弹窗 (Game Over Modal) -->
-  <div class="modal-backdrop" id="modal-gameover" style="display: none;">
-    <div class="modal-content modal-win-content modal-gameover-content">
-      <div class="gameover-icon">💔</div>
-      <h2 class="gameover-title">{i18n.gameOverTitle}</h2>
-      <p class="win-subtitle">{i18n.gameOverSubtitle}</p>
-      
-      <div class="win-avatar-showcase">
-        <div class="gameover-avatar-box"></div>
+<!-- 选关模态弹窗 (Premium Levels Modal) -->
+<div class="modal-backdrop" id="modal-levels" style="display: none;">
+  <div class="modal-content modal-levels-content">
+    <!-- 选关顶部头图与进度 -->
+    <div class="levels-modal-header">
+      <div class="levels-title-group">
+        <div class="levels-main-title">
+          <span class="title-emoji">🏆</span>
+          <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
+        </div>
+        <p class="levels-subtitle">
+          {i18n.unlockedProgress}: <strong id="levels-unlocked-count">1</strong> / 1000
+        </p>
       </div>
-
-      <div class="win-actions">
-        <button type="button" class="btn-primary" id="btn-gameover-restart">{i18n.retryLevel}</button>
-        <button type="button" class="btn-secondary" id="btn-gameover-levels">{i18n.backToLevels}</button>
+      <div class="levels-header-actions">
+        <button type="button" class="btn-jump-current" id="btn-jump-current">{i18n.jumpToCurrent}</button>
+        <button type="button" class="modal-close" id="btn-close-levels">×</button>
       </div>
     </div>
-  </div>
 
-  <!-- 通关胜利弹窗 (Win Modal) -->
-  <div class="modal-backdrop" id="modal-win" style="display: none;">
-    <div class="modal-content modal-win-content">
-      <div class="win-trophy">🏆</div>
-      <h2 class="win-title">{i18n.winTitle}</h2>
-      <p class="win-subtitle">{i18n.winSubtitle}</p>
-      
-      <div class="win-avatar-showcase">
-        <div class="win-avatar-large-box" id="win-avatar-box"></div>
-        <div class="win-gold-badge">🥇 PARIS 2024 CHAMPION</div>
+    <!-- 分包分页选项卡 -->
+    <div class="levels-pack-nav">
+      <div class="levels-pack-tabs" id="levels-pack-tabs">
+        <!-- 分页 Tabs: 1-50, 51-100, 101-150 ... -->
       </div>
+    </div>
 
-      <div class="win-stats-grid">
-        <div class="stat-box">
-          <span class="stat-label">{i18n.movesCount}</span>
-          <span class="stat-value" id="win-moves">8</span>
-        </div>
-      </div>
-
-      <div class="win-actions">
-        <button type="button" class="btn-primary" id="btn-next-level">{i18n.nextLevel}</button>
-        <button type="button" class="btn-secondary" id="btn-replay-level">{i18n.replayLevel}</button>
-        <button type="button" class="btn-secondary" id="btn-win-levels">{i18n.backToLevels}</button>
+    <!-- 关卡卡片网格 -->
+    <div class="levels-grid-wrapper">
+      <div class="levels-grid" id="levels-grid">
+        <!-- 关卡卡片 -->
       </div>
     </div>
   </div>
 </div>
 
+<!-- 游戏失败弹窗 (Game Over Modal) -->
+<div class="modal-backdrop" id="modal-gameover" style="display: none;">
+  <div class="modal-content modal-win-content modal-gameover-content">
+    <div class="gameover-icon">💔</div>
+    <h2 class="gameover-title">{i18n.gameOverTitle}</h2>
+    <p class="win-subtitle">{i18n.gameOverSubtitle}</p>
+    
+    <div class="win-avatar-showcase">
+      <div class="gameover-avatar-box"></div>
+    </div>
+
+    <div class="win-actions">
+      <button type="button" class="btn-primary" id="btn-gameover-restart">{i18n.retryLevel}</button>
+      <button type="button" class="btn-secondary" id="btn-gameover-levels">{i18n.backToLevels}</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通关胜利弹窗 (Win Modal) -->
+<div class="modal-backdrop" id="modal-win" style="display: none;">
+  <div class="modal-content modal-win-content">
+    <div class="win-trophy">🏆</div>
+    <h2 class="win-title">{i18n.winTitle}</h2>
+    <p class="win-subtitle">{i18n.winSubtitle}</p>
+    
+    <div class="win-avatar-showcase">
+      <div class="win-avatar-large-box" id="win-avatar-box"></div>
+      <div class="win-gold-badge">🥇 PARIS 2024 CHAMPION</div>
+    </div>
+
+    <div class="win-stats-grid">
+      <div class="stat-box">
+        <span class="stat-label">{i18n.movesCount}</span>
+        <span class="stat-value" id="win-moves">8</span>
+      </div>
+    </div>
+
+    <div class="win-actions">
+      <button type="button" class="btn-primary" id="btn-next-level">{i18n.nextLevel}</button>
+      <button type="button" class="btn-secondary" id="btn-replay-level">{i18n.replayLevel}</button>
+      <button type="button" class="btn-secondary" id="btn-win-levels">{i18n.backToLevels}</button>
+    </div>
+  </div>
+</div>
+
 <style>
-  /* 基础容器 */
-  .dongdoku-container {
-    max-width: 580px;
-    margin: 0 auto;
-    padding: 0.2rem 0.4rem 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #3d302c;
-    user-select: none;
-    -webkit-user-select: none;
+  /* 优雅全屏背景层 */
+  .dongdoku-page-bg {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0.8rem 2.5rem;
+    background: radial-gradient(circle at 50% 15%, #fcf9f7 0%, #f4eee9 100%);
     box-sizing: border-box;
   }
 
-  /* 顶部极简控制栏 */
-  .game-header {
+  /* 一体化精美游戏主机卡片 (Game Console Card) */
+  .dongdoku-card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 1.6rem;
+    box-shadow: 0 16px 40px rgba(85, 62, 50, 0.09), 0 2px 8px rgba(85, 62, 50, 0.04);
+    border: 1px solid #ebdcd5;
+    padding: 1.1rem 1.1rem 1.3rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    user-select: none;
+    -webkit-user-select: none;
+    animation: fadeIn 0.25s ease;
+  }
+
+  /* 顶部控制栏 */
+  .game-console-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .header-main-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.4rem;
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    border-radius: 1.1rem;
-    padding: 0.35rem 0.65rem;
-    box-shadow: 0 3px 12px rgba(78, 64, 55, 0.06);
   }
 
-  .header-left, .header-center, .header-right {
+  .level-control-group {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.45rem;
   }
 
-  .level-badge {
-    font-weight: 900;
-    font-size: 1.05rem;
-    color: #3d302c;
-    white-space: nowrap;
-  }
-
-  .lives-pill, .progress-pill {
+  .btn-console-action {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: #fdf6f0;
-    border: 1px solid #eedfd8;
-    padding: 0.25rem 0.55rem;
-    border-radius: 0.85rem;
-    font-weight: 800;
-    font-size: 0.82rem;
-    color: #705851;
-    white-space: nowrap;
-  }
-
-  .lives-display {
-    font-size: 0.85rem;
-    letter-spacing: 1px;
-  }
-
-  .btn-icon {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: #ffffff;
-    border: 1px solid #e5d5cd;
-    color: #6e554d;
-    padding: 0.32rem 0.6rem;
+    background: #fdf8f5;
+    border: 1.5px solid #ebdcd5;
+    color: #634a41;
+    padding: 0.35rem 0.65rem;
     border-radius: 0.75rem;
     font-weight: 800;
     font-size: 0.82rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: 0 1px 3px rgba(78, 64, 55, 0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
 
-  .btn-levels {
-    background: #fdf8f5;
-    border-color: #ebdcd5;
-  }
-
-  .btn-restart {
-    background: #fdfaf8;
-    color: #5d4037;
-  }
-
-  .btn-icon:hover {
-    background: #fbf5f2;
-    color: #1e88e5;
-    border-color: #bbdefb;
+  .btn-console-action:hover {
+    background: #f4ea7c;
+    background: #f0f7ff;
+    border-color: #90caf9;
+    color: #1565c0;
     transform: translateY(-1px);
   }
 
-  .btn-icon:active {
+  .btn-console-action:active {
     transform: translateY(1px);
   }
 
-  .icon-emoji {
-    font-size: 0.95rem;
+  .level-title-text {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #3d302c;
+    letter-spacing: -0.2px;
   }
 
-  /* 规则与折叠面板区域 */
-  .rules-section {
-    margin: 0.35rem 0 0.35rem;
-    background: #fdfaf8;
-    border: 1px solid #f2e6e0;
-    border-radius: 0.95rem;
-    padding: 0.35rem 0.55rem;
+  .level-title-text strong {
+    font-size: 1.25rem;
+    color: #1e88e5;
   }
 
-  .rules-bar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.3rem;
-  }
-
-  .rules-quick-summary {
+  /* 状态指示条 */
+  .status-badge-group {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    flex-wrap: wrap;
   }
 
-  .gesture-badge {
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #5c443c;
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    padding: 0.18rem 0.45rem;
-    border-radius: 0.6rem;
-    white-space: nowrap;
-  }
-
-  .btn-rules-toggle {
+  .lives-badge, .progress-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
-    background: #ffffff;
+    background: #fdf6f0;
     border: 1px solid #ebdcd5;
-    border-radius: 0.6rem;
-    padding: 0.18rem 0.45rem;
-    font-size: 0.74rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 0.75rem;
     font-weight: 800;
-    color: #1e88e5;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
+    font-size: 0.82rem;
+    color: #6d5248;
   }
 
-  .btn-rules-toggle:hover {
+  .lives-hearts {
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+  }
+
+  .pill-dong-icon {
+    font-size: 0.85rem;
+  }
+
+  .btn-restart .icon-refresh {
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* 次级指引与规则入口 */
+  .game-sub-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: #faf5f1;
+    border: 1px solid #f0e2db;
+    border-radius: 0.8rem;
+    padding: 0.32rem 0.6rem;
+  }
+
+  .quick-guide-txt {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #7d655f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-rules-pop {
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    color: #1e88e5;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.18rem 0.5rem;
+    border-radius: 0.55rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+
+  .btn-rules-pop:hover {
     background: #e3f2fd;
     border-color: #bbdefb;
   }
 
-  .toggle-arrow {
-    font-size: 0.65rem;
-    transition: transform 0.2s ease;
-  }
-
-  /* 可折叠的三大规则网格 */
-  .rules-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
-    margin-top: 0.35rem;
-    padding-top: 0.35rem;
-    border-top: 1px dashed #ebdcd5;
-    animation: fadeIn 0.2s ease;
-  }
-
-  .rule-card {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    border-radius: 0.75rem;
-    padding: 0.35rem 0.45rem;
-    box-shadow: 0 1px 3px rgba(78, 64, 55, 0.03);
-  }
-
-  .rule-icon {
-    font-size: 1.15rem;
-    flex-shrink: 0;
-  }
-
-  .rule-body h4 {
-    margin: 0;
-    font-size: 0.76rem;
-    font-weight: 800;
-    color: #3d302c;
-    white-space: nowrap;
-  }
-
-  .rule-body p {
-    margin: 0.05rem 0 0;
-    font-size: 0.65rem;
-    color: #7d655f;
-    line-height: 1.15;
-    white-space: nowrap;
-  }
-
-  /* 核心棋盘区（手机端竖屏全屏适配） */
-  .board-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0.25rem 0;
-  }
-
-  .board-container {
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    border-radius: 1.3rem;
-    padding: 0.6rem;
-    box-shadow: 0 8px 24px rgba(78, 64, 55, 0.08);
+  /* 核心游戏舞台 */
+  .board-stage {
     width: 100%;
-    max-width: min(94vw, 440px, calc(100vh - 200px));
     aspect-ratio: 1 / 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: #faf7f5;
+    border: 1.5px solid #ebdcd5;
+    border-radius: 1.25rem;
+    padding: 0.55rem;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .game-grid {
     display: grid;
     width: 100%;
     height: 100%;
-    gap: clamp(3px, 1.1vw, 7px);
+    gap: clamp(4px, 1.2vw, 8px);
     box-sizing: border-box;
   }
 
@@ -444,11 +415,11 @@ const i18n = {
     width: 100% !important;
     height: 100% !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: clamp(7px, 1.6vw, 13px) !important;
+    border-radius: clamp(8px, 1.8vw, 14px) !important;
     border: 2.2px solid #ffffff !important;
     cursor: pointer !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
-    transition: transform 0.1s ease, filter 0.1s ease !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.12s ease, filter 0.12s ease !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
     display: flex !important;
@@ -461,13 +432,13 @@ const i18n = {
   }
 
   .grid-cell:hover {
-    transform: scale(1.02);
-    filter: brightness(1.05);
+    transform: scale(1.03);
+    filter: brightness(1.06);
     z-index: 2;
   }
 
   .grid-cell:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
 
   .grid-cell.cell-locked {
@@ -482,8 +453,8 @@ const i18n = {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50%;
-    height: 50%;
+    width: 48%;
+    height: 48%;
     pointer-events: none !important;
     animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
@@ -491,7 +462,7 @@ const i18n = {
   .cross-svg {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
   }
 
   /* 单元格状态：🏓 樊振东头像容器（双击产生） */
@@ -506,7 +477,6 @@ const i18n = {
     overflow: hidden;
   }
 
-  /* 精致圆形头像（基于 background-image） */
   .cell-dong-avatar {
     width: 82% !important;
     height: 82% !important;
@@ -514,14 +484,14 @@ const i18n = {
     background-size: cover !important;
     background-position: center 20% !important;
     background-repeat: no-repeat !important;
-    border: 2.2px solid #ffffff !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28) !important;
+    border: 2.5px solid #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28) !important;
     animation: popDong 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
   }
 
-  /* 🚫 找错咚 / 错误尝试覆盖图层 */
+  /* 🚫 找错咚覆盖图层 */
   .cell-ban-overlay {
     position: absolute;
     inset: 0;
@@ -540,7 +510,6 @@ const i18n = {
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   }
 
-  /* 找错态外框警示 */
   .grid-cell.has-conflict {
     border-color: #ff1744 !important;
     animation: errorShake 0.4s ease-in-out;
@@ -550,7 +519,7 @@ const i18n = {
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(30, 20, 15, 0.65);
+    background: rgba(28, 20, 15, 0.65);
     backdrop-filter: blur(6px);
     z-index: 9999;
     display: flex;
@@ -568,6 +537,103 @@ const i18n = {
     overflow-y: auto;
     width: 100%;
     animation: scaleUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal-close {
+    background: #f5ece7;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #705851;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover {
+    background: #ebdcd5;
+    color: #000;
+  }
+
+  /* 规则弹窗 (Rules Modal) */
+  .modal-rules-content {
+    max-width: 480px;
+    padding: 1.2rem;
+  }
+
+  .modal-rules-content .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ebdcd5;
+    padding-bottom: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .modal-title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .modal-title-with-icon h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #3d302c;
+  }
+
+  .rules-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .rule-intro-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: #faf6f3;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.9rem;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .intro-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+
+  .intro-body h4 {
+    margin: 0 0 0.15rem;
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #3d302c;
+  }
+
+  .intro-body p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #6d544c;
+    line-height: 1.35;
+  }
+
+  .rules-modal-footer {
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-got-it {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    border-radius: 0.9rem;
   }
 
   /* 选关弹窗 */
@@ -647,27 +713,6 @@ const i18n = {
     border-color: #1e88e5;
   }
 
-  .modal-close {
-    background: #f5ece7;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 1.3rem;
-    cursor: pointer;
-    color: #705851;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-  }
-
-  .modal-close:hover {
-    background: #ebdcd5;
-    color: #000;
-  }
-
-  /* 选关分页 Pill 选项卡 */
   .levels-pack-nav {
     background: #faf5f2;
     border-bottom: 1px solid #ebdcd5;
@@ -715,7 +760,6 @@ const i18n = {
     box-shadow: 0 3px 10px rgba(30, 136, 229, 0.35);
   }
 
-  /* 关卡卡片网格容器 */
   .levels-grid-wrapper {
     padding: 1rem;
     overflow-y: auto;
@@ -729,7 +773,6 @@ const i18n = {
     gap: 0.65rem;
   }
 
-  /* 关卡卡片 */
   .level-card {
     aspect-ratio: 1 / 1;
     border-radius: 0.95rem;
@@ -998,35 +1041,28 @@ const i18n = {
     to { transform: translateY(-8px); }
   }
 
-  /* 手机竖屏自适应优化 */
+  /* 手机竖屏自适应微调 */
   @media (max-width: 480px) {
-    .dongdoku-container {
-      padding: 0.15rem 0.3rem 1rem;
+    .dongdoku-page-bg {
+      padding: 0.5rem 0.4rem 1.5rem;
+      min-height: auto;
     }
-    .game-header {
-      padding: 0.3rem 0.45rem;
+    .dongdoku-card {
+      padding: 0.8rem 0.8rem 1rem;
+      border-radius: 1.3rem;
+      gap: 0.65rem;
     }
-    .btn-text {
+    .level-title-text {
+      font-size: 0.98rem;
+    }
+    .action-text {
       display: none;
     }
-    .btn-icon {
-      padding: 0.3rem 0.45rem;
+    .btn-console-action {
+      padding: 0.32rem 0.5rem;
     }
-    .level-badge {
-      font-size: 0.95rem;
-    }
-    .rules-section {
-      padding: 0.3rem 0.45rem;
-    }
-    .rules-cards-grid {
-      grid-template-columns: 1fr;
-      gap: 0.3rem;
-    }
-    .rule-card {
-      padding: 0.25rem 0.4rem;
-    }
-    .board-container {
-      padding: 0.45rem;
+    .quick-guide-txt {
+      font-size: 0.72rem;
     }
   }
 </style>
@@ -1081,7 +1117,6 @@ const i18n = {
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
     private moveCount: number = 0;
     private lives: number = 3; // 3条命
-    private rulesExpanded: boolean = true;
 
     // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
@@ -1114,7 +1149,6 @@ const i18n = {
           const parsed = JSON.parse(saved);
           if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
-          if (parsed.rulesExpanded !== undefined) this.rulesExpanded = parsed.rulesExpanded;
         }
       } catch (e) {
         console.warn('Failed to parse localStorage', e);
@@ -1126,8 +1160,7 @@ const i18n = {
       try {
         const payload: any = {
           currentLevelId: this.currentLevelId,
-          maxUnlockedLevel: this.maxUnlockedLevel,
-          rulesExpanded: this.rulesExpanded
+          maxUnlockedLevel: this.maxUnlockedLevel
         };
 
         if (saveBoard) {
@@ -1182,19 +1215,6 @@ const i18n = {
     private initDOMElements() {
       this.updateLivesDisplay();
       this.updateLevelsModalProgress();
-      this.applyRulesCollapseState();
-    }
-
-    private applyRulesCollapseState() {
-      const cardsBox = document.getElementById('rules-cards-box');
-      const arrow = document.getElementById('rules-toggle-arrow');
-      const btn = document.getElementById('btn-toggle-rules');
-
-      if (cardsBox && arrow && btn) {
-        cardsBox.style.display = this.rulesExpanded ? 'grid' : 'none';
-        arrow.textContent = this.rulesExpanded ? '▲' : '▼';
-        btn.setAttribute('aria-expanded', this.rulesExpanded.toString());
-      }
     }
 
     private updateLivesDisplay() {
@@ -1211,12 +1231,10 @@ const i18n = {
     }
 
     private initEvents() {
-      // 规则折叠切换
-      document.getElementById('btn-toggle-rules')?.addEventListener('click', () => {
-        this.rulesExpanded = !this.rulesExpanded;
-        this.applyRulesCollapseState();
-        this.saveStorage(false);
-      });
+      // 规则弹窗
+      document.getElementById('btn-open-rules-modal')?.addEventListener('click', () => this.openModal('modal-rules'));
+      document.getElementById('btn-close-rules')?.addEventListener('click', () => this.closeModal('modal-rules'));
+      document.getElementById('btn-close-rules-got-it')?.addEventListener('click', () => this.closeModal('modal-rules'));
 
       // 重来
       document.getElementById('btn-restart')?.addEventListener('click', () => this.handleRestart());
