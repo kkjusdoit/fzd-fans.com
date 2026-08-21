@@ -1,4 +1,6 @@
 ---
+import { getLocalizedPath } from '../../i18n/utils';
+
 interface Props {
   lang?: 'zh' | 'en';
 }
@@ -8,15 +10,18 @@ const isEn = lang === 'en';
 
 // Text dictionary
 const i18n = {
-  title: isEn ? 'Dongdoku - Find the Dong' : '找咚 (Dongdoku)',
+  title: isEn ? 'Dongdoku' : '找咚 (Dongdoku)',
+  backToHall: isEn ? '‹ Games' : '‹ 小游戏大厅',
   rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
   rule1Desc: isEn ? '每行每列正好 1 个咚' : '每行每列正好 1 个咚',
   rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  quickGuide: isEn ? 'Tap: ✖ Cross · Double-tap: 🏓 Dong · 1 Dong per row/col/color' : '单击标 ✖ · 双击放 🏓 · 每行每列每色正好 1 咚',
-  rulesBtn: isEn ? 'Rules' : '规则 ⓘ',
+  quickGuide: isEn ? 'Tap: ✖ Cross · Double-tap: 🏓 Dong · 1 Dong per row/col/color' : '👆 单击标 ✖ · ✌️ 双击放 🏓 · 每行每列每色各 1 咚',
+  rulesBtn: isEn ? 'Rules 📖' : '规则 📖',
+  langSwitch: isEn ? '中文' : 'English',
+  langHref: isEn ? '/dongdoku' : '/en/dongdoku',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -38,62 +43,84 @@ const i18n = {
 };
 ---
 
-<div class="dongdoku-page-bg">
-  <div class="dongdoku-card" id="dongdoku-app" data-lang={lang}>
-    <!-- 1. 卡片顶部：关卡信息、生命值、状态与操作 -->
-    <header class="game-console-header">
-      <div class="header-main-row">
-        <!-- 选关按钮与当前关卡 -->
-        <div class="level-control-group">
-          <button type="button" class="btn-console-action btn-levels" id="btn-open-levels" title={i18n.levelsBtn} aria-label={i18n.levelsBtn}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+<div class="dongdoku-standalone-app" id="dongdoku-app" data-lang={lang}>
+  <!-- 1. 顶部纯享版轻量导航栏 (Pure Top Bar) -->
+  <nav class="standalone-nav">
+    <div class="nav-left">
+      <a href={getLocalizedPath('/games', lang)} class="btn-back-hub">
+        <span class="back-arrow">‹</span>
+        <span class="back-label">{i18n.backToHall}</span>
+      </a>
+    </div>
+
+    <div class="nav-center">
+      <h1 class="game-app-title">
+        <span class="title-dong-emoji">🏓</span>
+        <span>{i18n.title}</span>
+      </h1>
+    </div>
+
+    <div class="nav-right">
+      <button type="button" class="nav-tool-btn" id="btn-open-rules-modal" title="查看规则">
+        <span>{i18n.rulesBtn}</span>
+      </button>
+      <a href={i18n.langHref} class="nav-tool-btn lang-toggle-btn">
+        <span>{i18n.langSwitch}</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- 2. 纯享全屏游戏控制中心 (Console Container) -->
+  <main class="standalone-main">
+    <div class="game-console-card">
+      <!-- 关卡控制与状态显示 -->
+      <div class="console-status-row">
+        <!-- 选关与关卡号 -->
+        <div class="status-group-left">
+          <button type="button" class="btn-action-pill btn-levels" id="btn-open-levels">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
             <span>{i18n.levelsBtn}</span>
           </button>
-          <span class="level-title-text">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
+          <span class="current-level-text">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
         </div>
 
-        <!-- 3 条命 (Hearts) & 找咚进度 -->
-        <div class="status-badge-group">
-          <div class="lives-badge" id="lives-pill" title={i18n.lives}>
-            <span class="lives-hearts" id="lives-display">❤️❤️❤️</span>
+        <!-- 3 条命 (Hearts) & 找咚计数 -->
+        <div class="status-group-center">
+          <div class="pill-badge lives-badge" title={i18n.lives}>
+            <span class="hearts-text" id="lives-display">❤️❤️❤️</span>
           </div>
-          <div class="progress-badge" id="progress-pill" title={i18n.placed}>
-            <span class="pill-dong-icon">🏓</span>
+          <div class="pill-badge progress-badge" title={i18n.placed}>
+            <span class="dong-icon">🏓</span>
             <span id="placed-count">0</span>/<span id="target-count">4</span>
           </div>
         </div>
 
         <!-- 重来按钮 -->
-        <div class="action-control-group">
-          <button type="button" class="btn-console-action btn-restart" id="btn-restart" title={i18n.restartBtn} aria-label={i18n.restartBtn}>
-            <span class="icon-refresh">↻</span>
-            <span class="action-text">{i18n.restartBtn}</span>
+        <div class="status-group-right">
+          <button type="button" class="btn-action-pill btn-restart" id="btn-restart" title={i18n.restartBtn}>
+            <span class="refresh-symbol">↻</span>
+            <span class="action-name">{i18n.restartBtn}</span>
           </button>
         </div>
       </div>
 
-      <!-- 2. 玩法极简指引 + 规则气泡按钮 -->
-      <div class="game-sub-bar">
-        <div class="quick-guide-txt">
-          <span>{i18n.quickGuide}</span>
-        </div>
-        <button type="button" class="btn-rules-pop" id="btn-open-rules-modal">
-          <span>{i18n.rulesBtn}</span>
-        </button>
+      <!-- 操作极简小贴士 -->
+      <div class="console-tips-bar">
+        <span>{i18n.quickGuide}</span>
       </div>
-    </header>
 
-    <!-- 3. 核心游戏棋盘容器 -->
-    <main class="board-stage">
-      <div class="game-grid" id="game-grid">
-        <!-- 动态生成格子 -->
+      <!-- 核心游戏棋盘 (按可用屏幕高度智能全屏适配) -->
+      <div class="board-viewport">
+        <div class="game-grid" id="game-grid">
+          <!-- 动态生成格子 -->
+        </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </div>
 
 <!-- 三大规则弹窗 (Modal) -->
@@ -145,7 +172,6 @@ const i18n = {
 <!-- 选关模态弹窗 (Premium Levels Modal) -->
 <div class="modal-backdrop" id="modal-levels" style="display: none;">
   <div class="modal-content modal-levels-content">
-    <!-- 选关顶部头图与进度 -->
     <div class="levels-modal-header">
       <div class="levels-title-group">
         <div class="levels-main-title">
@@ -224,177 +250,235 @@ const i18n = {
 </div>
 
 <style>
-  /* 优雅全屏背景层 */
-  .dongdoku-page-bg {
-    min-height: calc(100vh - 120px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem 0.8rem 2.5rem;
-    background: radial-gradient(circle at 50% 15%, #fcf9f7 0%, #f4eee9 100%);
-    box-sizing: border-box;
-  }
-
-  /* 一体化精美游戏主机卡片 (Game Console Card) */
-  .dongdoku-card {
-    width: 100%;
-    max-width: 480px;
-    background: #ffffff;
-    border-radius: 1.6rem;
-    box-shadow: 0 16px 40px rgba(85, 62, 50, 0.09), 0 2px 8px rgba(85, 62, 50, 0.04);
-    border: 1px solid #ebdcd5;
-    padding: 1.1rem 1.1rem 1.3rem;
-    box-sizing: border-box;
+  /* 纯享版独立全屏视口容器 */
+  .dongdoku-standalone-app {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    background: radial-gradient(circle at 50% 10%, #faf6f3 0%, #f2ebe4 100%);
+    overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
-    animation: fadeIn 0.25s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #3d302c;
+    box-sizing: border-box;
   }
 
-  /* 顶部控制栏 */
-  .game-console-header {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-
-  .header-main-row {
+  /* 顶部纯享轻量导航栏 */
+  .standalone-nav {
+    height: 50px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #ebdcd5;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.4rem;
+    padding: 0 1rem;
+    flex-shrink: 0;
+    z-index: 100;
   }
 
-  .level-control-group {
+  .nav-left, .nav-center, .nav-right {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
   }
 
-  .btn-console-action {
+  .btn-back-hub {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: #fdfaf8;
+    border: 1px solid #e5d5cd;
+    color: #6d5248;
+    padding: 0.25rem 0.65rem;
+    border-radius: 0.7rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .btn-back-hub:hover {
+    background: #e3f2fd;
+    border-color: #bbdefb;
+    color: #1565c0;
+    text-decoration: none;
+  }
+
+  .back-arrow {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .game-app-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #3d302c;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .title-dong-emoji {
+    font-size: 1.1rem;
+  }
+
+  .nav-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #ebdcd5;
+    color: #5d4037;
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .nav-tool-btn:hover {
+    background: #fbf5f2;
+    border-color: #bbdefb;
+    color: #1e88e5;
+    text-decoration: none;
+  }
+
+  /* 主屏内容区：弹性居中，完全自适应 */
+  .standalone-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.8rem;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* 一体化游戏控制机舱卡片 */
+  .game-console-card {
+    width: 100%;
+    max-width: min(94vw, 460px, calc(100dvh - 150px));
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 14px 36px rgba(85, 62, 50, 0.08), 0 2px 6px rgba(85, 62, 50, 0.03);
+    border: 1px solid #ebdcd5;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-sizing: border-box;
+    animation: fadeIn 0.25s ease;
+  }
+
+  /* 状态行 */
+  .console-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+  }
+
+  .status-group-left, .status-group-center, .status-group-right {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .btn-action-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: #fdf8f5;
+    background: #fdfaf8;
     border: 1.5px solid #ebdcd5;
     color: #634a41;
-    padding: 0.35rem 0.65rem;
+    padding: 0.32rem 0.6rem;
     border-radius: 0.75rem;
     font-weight: 800;
     font-size: 0.82rem;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
 
-  .btn-console-action:hover {
-    background: #f4ea7c;
+  .btn-action-pill:hover {
     background: #f0f7ff;
     border-color: #90caf9;
     color: #1565c0;
     transform: translateY(-1px);
   }
 
-  .btn-console-action:active {
+  .btn-action-pill:active {
     transform: translateY(1px);
   }
 
-  .level-title-text {
+  .current-level-text {
     font-weight: 900;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #3d302c;
-    letter-spacing: -0.2px;
+    white-space: nowrap;
   }
 
-  .level-title-text strong {
-    font-size: 1.25rem;
+  .current-level-text strong {
+    font-size: 1.2rem;
     color: #1e88e5;
   }
 
-  /* 状态指示条 */
-  .status-badge-group {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-
-  .lives-badge, .progress-badge {
+  .pill-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
     background: #fdf6f0;
     border: 1px solid #ebdcd5;
-    padding: 0.3rem 0.55rem;
+    padding: 0.28rem 0.5rem;
     border-radius: 0.75rem;
     font-weight: 800;
     font-size: 0.82rem;
     color: #6d5248;
   }
 
-  .lives-hearts {
+  .hearts-text {
     font-size: 0.82rem;
     letter-spacing: 1px;
   }
 
-  .pill-dong-icon {
+  .dong-icon {
     font-size: 0.85rem;
   }
 
-  .btn-restart .icon-refresh {
-    font-size: 1rem;
+  .refresh-symbol {
+    font-size: 0.95rem;
     font-weight: 900;
     line-height: 1;
   }
 
-  /* 次级指引与规则入口 */
-  .game-sub-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
+  /* 小贴士栏 */
+  .console-tips-bar {
     background: #faf5f1;
     border: 1px solid #f0e2db;
-    border-radius: 0.8rem;
-    padding: 0.32rem 0.6rem;
-  }
-
-  .quick-guide-txt {
-    font-size: 0.76rem;
+    border-radius: 0.75rem;
+    padding: 0.28rem 0.55rem;
+    font-size: 0.74rem;
     font-weight: 700;
     color: #7d655f;
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .btn-rules-pop {
-    background: #ffffff;
-    border: 1px solid #ebdcd5;
-    color: #1e88e5;
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 0.18rem 0.5rem;
-    border-radius: 0.55rem;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s ease;
-  }
-
-  .btn-rules-pop:hover {
-    background: #e3f2fd;
-    border-color: #bbdefb;
-  }
-
-  /* 核心游戏舞台 */
-  .board-stage {
+  /* 棋盘视口 */
+  .board-viewport {
     width: 100%;
     aspect-ratio: 1 / 1;
     background: #faf7f5;
     border: 1.5px solid #ebdcd5;
-    border-radius: 1.25rem;
-    padding: 0.55rem;
+    border-radius: 1.2rem;
+    padding: 0.5rem;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -405,7 +489,7 @@ const i18n = {
     display: grid;
     width: 100%;
     height: 100%;
-    gap: clamp(4px, 1.2vw, 8px);
+    gap: clamp(3px, 1.1vw, 7px);
     box-sizing: border-box;
   }
 
@@ -415,10 +499,10 @@ const i18n = {
     width: 100% !important;
     height: 100% !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: clamp(8px, 1.8vw, 14px) !important;
+    border-radius: clamp(7px, 1.6vw, 13px) !important;
     border: 2.2px solid #ffffff !important;
     cursor: pointer !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
     transition: transform 0.12s ease, filter 0.12s ease !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
@@ -448,7 +532,7 @@ const i18n = {
     transform: none !important;
   }
 
-  /* 单元格状态：白色 ✖ 排除叉（单击产生） */
+  /* 单元格状态：白色 ✖ 排除叉 */
   .cell-cross-wrap {
     display: flex;
     align-items: center;
@@ -465,7 +549,7 @@ const i18n = {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
   }
 
-  /* 单元格状态：🏓 樊振东头像容器（双击产生） */
+  /* 单元格状态：🏓 樊振东头像容器 */
   .cell-dong-wrap {
     position: absolute;
     inset: 0;
@@ -1041,28 +1125,37 @@ const i18n = {
     to { transform: translateY(-8px); }
   }
 
-  /* 手机竖屏自适应微调 */
+  /* 手机端微调 */
   @media (max-width: 480px) {
-    .dongdoku-page-bg {
-      padding: 0.5rem 0.4rem 1.5rem;
-      min-height: auto;
+    .standalone-nav {
+      height: 46px;
+      padding: 0 0.5rem;
     }
-    .dongdoku-card {
-      padding: 0.8rem 0.8rem 1rem;
-      border-radius: 1.3rem;
-      gap: 0.65rem;
-    }
-    .level-title-text {
-      font-size: 0.98rem;
-    }
-    .action-text {
+    .back-label {
       display: none;
     }
-    .btn-console-action {
-      padding: 0.32rem 0.5rem;
+    .btn-back-hub {
+      padding: 0.2rem 0.45rem;
     }
-    .quick-guide-txt {
-      font-size: 0.72rem;
+    .game-app-title {
+      font-size: 0.95rem;
+    }
+    .game-console-card {
+      padding: 0.65rem;
+      border-radius: 1.2rem;
+      gap: 0.45rem;
+    }
+    .current-level-text {
+      font-size: 0.95rem;
+    }
+    .action-name {
+      display: none;
+    }
+    .btn-action-pill {
+      padding: 0.28rem 0.45rem;
+    }
+    .console-tips-bar {
+      font-size: 0.68rem;
     }
   }
 </style>

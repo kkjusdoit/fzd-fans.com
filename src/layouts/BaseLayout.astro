@@ -9,10 +9,14 @@ import BirthdayClickEffects from '../components/BirthdayClickEffects.astro';
 interface Props {
   title?: string;
   description?: string;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+  isGameMode?: boolean;
+  lang?: string;
 }
 
-const { title, description } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
+const { title, description, hideNav = false, hideFooter = false, isGameMode = false } = Astro.props;
+const lang = Astro.props.lang || getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const pageTitle = title ? `${title} | ${t('site.title')}` : t('site.title');
 const pageDesc = description || t('site.subtitle');
@@ -22,7 +26,7 @@ const pageDesc = description || t('site.subtitle');
 <html lang={lang === 'en' ? 'en' : 'zh-CN'}>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description" content={pageDesc} />
   <meta name="robots" content="index, follow" />
   
@@ -70,6 +74,7 @@ const pageDesc = description || t('site.subtitle');
     a { color: #1e88e5; text-decoration: none; }
     a:hover { text-decoration: underline; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+    .game-mode-main { width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; padding: 0; margin: 0; }
 
     /* 小程序推广弹窗 */
     .promo-modal {
@@ -235,13 +240,13 @@ const pageDesc = description || t('site.subtitle');
   </style>
 </head>
 <body>
-  <Navigation />
-  <main class="container">
+  {!hideNav && <Navigation />}
+  <main class:list={[isGameMode ? 'game-mode-main' : 'container']}>
     <slot />
   </main>
-  <BirthdayAudio />
-  <BirthdayClickEffects />
-  <Footer />
+  {!isGameMode && <BirthdayAudio />}
+  {!isGameMode && <BirthdayClickEffects />}
+  {!hideFooter && <Footer />}
 
   <!-- 小程序推荐弹窗 -->
   <div class="promo-modal" id="promoModal" style="display: none;">
