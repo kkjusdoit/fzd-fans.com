@@ -27,6 +27,8 @@ const i18n = {
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
   restartBtn: isEn ? 'Restart' : '重来',
+  hintBtn: isEn ? 'Hint' : '提示',
+  tutorialBtn: isEn ? 'Tutorial' : '教学',
   placed: isEn ? 'Found' : '已找到',
   lives: isEn ? 'Lives' : '生命值',
   unlockedProgress: isEn ? 'Unlocked Progress' : '已解锁进度',
@@ -40,7 +42,26 @@ const i18n = {
   backToLevels: isEn ? 'Levels Menu ≡' : '返回选关 ≡',
   jumpToCurrent: isEn ? 'Current Level 🚀' : '跳至最新关 🚀',
   rating: isEn ? 'Rating' : '本关评价',
-  close: isEn ? 'Close' : '关闭'
+  close: isEn ? 'Close' : '关闭',
+  // Onboarding & Tutorial additions
+  welcomeTitle: isEn ? 'Welcome to Dongdoku! 🏓' : '欢迎来到 找咚 (Dongdoku)！🏓',
+  welcomeSubtitle: isEn ? '30 seconds interactive guide to master deduction logic' : '30 秒手把手带你掌握大满贯级逻辑推导',
+  ruleBullet1: isEn ? 'Each row & column has exactly 1 Dong' : '每行、每列有且仅有 1 个咚',
+  ruleBullet2: isEn ? 'Each colored territory has exactly 1 Dong' : '每个颜色领地有且仅有 1 个咚',
+  ruleBullet3: isEn ? 'Dongs cannot touch each other in 8 directions (including diagonals)' : '咚咚八方向互不相邻（包含对角）',
+  startTutorial: isEn ? '🎓 Start 30s Tutorial' : '🎓 开启 30 秒新手教学 (推荐)',
+  skipTutorial: isEn ? '⚡ Skip to Level 1' : '⚡ 跳过教学，直接实战',
+  autoCrossBtn: isEn ? '⚡ Auto Mark ✖' : '⚡ 一键帮我排除',
+  tutorialTag: isEn ? 'TUTORIAL' : '新手教学',
+  stepLabel: isEn ? 'Step' : '步骤',
+  tutorialDoneTitle: isEn ? 'Tutorial Completed! 🏆' : '🎉 新手训练毕业！',
+  tutorialDoneDesc: isEn ? 'Congratulations! You have mastered all 3 core gameplay rules and deduction tactics!' : '恭喜你完全掌握「找咚」三大玩法规则与推导精髓！',
+  startLevel1: isEn ? '🚀 Start Level 1' : '🚀 开始第 1 关实战',
+  replayTutorial: isEn ? '🔄 Replay Tutorial' : '🔄 重温教学',
+  tutorialLevelName: isEn ? 'Tutorial' : '教学关',
+  hintTitle: isEn ? 'Logic Hint 💡' : '推导提示 💡',
+  shieldTitle: isEn ? '🛡️ Rookie Shield' : '🛡️ 新手免伤保护',
+  shieldUsed: isEn ? 'First mistake shielded: 0 life lost!' : '本次失误免扣生命值！'
 };
 ---
 
@@ -62,6 +83,10 @@ const i18n = {
     </div>
 
     <div class="nav-right">
+      <button type="button" class="nav-tool-btn nav-tutorial-btn" id="btn-open-tutorial" title={i18n.tutorialBtn}>
+        <span class="tutorial-icon">🎓</span>
+        <span>{i18n.tutorialBtn}</span>
+      </button>
       <a href={i18n.langHref} class="nav-tool-btn lang-toggle-btn">
         <span>{i18n.langSwitch}</span>
       </a>
@@ -83,7 +108,7 @@ const i18n = {
             </svg>
             <span>{i18n.levelsBtn}</span>
           </button>
-          <span class="current-level-text">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
+          <span class="current-level-text" id="level-title-container">{i18n.levelLabel} <strong id="cur-level-num">1</strong> {i18n.levelSuffix}</span>
         </div>
 
         <!-- 3 条命 (Hearts) & 找咚计数 -->
@@ -97,8 +122,12 @@ const i18n = {
           </div>
         </div>
 
-        <!-- 重来按钮 -->
+        <!-- 提示与重来按钮 -->
         <div class="status-group-right">
+          <button type="button" class="btn-action-pill btn-hint" id="btn-hint" title={i18n.hintBtn}>
+            <span class="hint-symbol">💡</span>
+            <span class="action-name">{i18n.hintBtn}</span>
+          </button>
           <button type="button" class="btn-action-pill btn-restart" id="btn-restart" title={i18n.restartBtn}>
             <span class="refresh-symbol">↻</span>
             <span class="action-name">{i18n.restartBtn}</span>
@@ -106,8 +135,28 @@ const i18n = {
         </div>
       </div>
 
+      <!-- 新手教学专享步骤指引卡片 (Tutorial Guide Banner) -->
+      <section class="tutorial-guide-card" id="tutorial-guide-card" style="display: none;">
+        <div class="tutorial-card-header">
+          <div class="tutorial-tag-group">
+            <span class="tutorial-mode-tag">{i18n.tutorialTag}</span>
+            <span class="tutorial-step-counter" id="tutorial-step-counter">{i18n.stepLabel} 1/4</span>
+          </div>
+          <button type="button" class="btn-skip-tutorial" id="btn-skip-tutorial">{i18n.skipTutorial}</button>
+        </div>
+        <div class="tutorial-card-body">
+          <h4 class="tutorial-step-title" id="tutorial-step-title">寻找突破口</h4>
+          <p class="tutorial-step-desc" id="tutorial-step-desc">蓝色领地只有这 1 个格子，咚必定在这里！</p>
+        </div>
+        <div class="tutorial-actions-row" id="tutorial-actions-row" style="display: none;">
+          <button type="button" class="btn-auto-cross" id="btn-auto-cross">
+            <span>{i18n.autoCrossBtn}</span>
+          </button>
+        </div>
+      </section>
+
       <!-- 可折叠的三大规则面板 -->
-      <section class="rules-collapse-section">
+      <section class="rules-collapse-section" id="rules-collapse-section">
         <div class="rules-toggle-bar">
           <div class="gesture-hints-wrap">
             <span class="gesture-pill">👆 {i18n.ruleSingle}</span>
@@ -145,6 +194,26 @@ const i18n = {
         </div>
       </section>
 
+      <!-- 动态提示浮动提示条 (Hint Toast) -->
+      <div class="game-toast hint-toast" id="toast-hint" style="display: none;">
+        <span class="toast-icon">💡</span>
+        <div class="toast-text-group">
+          <strong class="toast-title">{i18n.hintTitle}</strong>
+          <span class="toast-message" id="toast-hint-text">提示信息</span>
+        </div>
+        <button type="button" class="toast-close" id="btn-close-toast-hint">×</button>
+      </div>
+
+      <!-- 冲突/防误触解析浮层 (Mistake Conflict Toast) -->
+      <div class="game-toast conflict-toast" id="toast-conflict" style="display: none;">
+        <span class="toast-icon">⚠️</span>
+        <div class="toast-text-group">
+          <strong class="toast-title" id="toast-conflict-title">违规提醒</strong>
+          <span class="toast-message" id="toast-conflict-text">同行已有咚</span>
+        </div>
+        <button type="button" class="toast-close" id="btn-close-toast-conflict">×</button>
+      </div>
+
       <!-- 核心游戏棋盘 (按可用屏幕高度智能全屏适配) -->
       <div class="board-viewport">
         <div class="game-grid" id="game-grid">
@@ -153,6 +222,35 @@ const i18n = {
       </div>
     </div>
   </main>
+</div>
+
+<!-- 首次访问欢迎与新手引导邀请弹窗 (Welcome Tutorial Modal) -->
+<div class="modal-backdrop" id="modal-welcome" style="display: none;">
+  <div class="modal-content modal-welcome-content">
+    <div class="welcome-icon">🏓</div>
+    <h2 class="welcome-title">{i18n.welcomeTitle}</h2>
+    <p class="welcome-subtitle">{i18n.welcomeSubtitle}</p>
+    
+    <div class="welcome-rules-preview">
+      <div class="preview-item">
+        <span class="preview-emoji">1️⃣</span>
+        <span>{i18n.ruleBullet1}</span>
+      </div>
+      <div class="preview-item">
+        <span class="preview-emoji">2️⃣</span>
+        <span>{i18n.ruleBullet2}</span>
+      </div>
+      <div class="preview-item">
+        <span class="preview-emoji">3️⃣</span>
+        <span>{i18n.ruleBullet3}</span>
+      </div>
+    </div>
+
+    <div class="welcome-actions">
+      <button type="button" class="btn-primary btn-start-tutorial" id="btn-welcome-tutorial">{i18n.startTutorial}</button>
+      <button type="button" class="btn-secondary" id="btn-welcome-skip">{i18n.skipTutorial}</button>
+    </div>
+  </div>
 </div>
 
 <!-- 选关模态弹窗 (Premium Levels Modal) -->
@@ -230,6 +328,25 @@ const i18n = {
     <div class="win-actions">
       <button type="button" class="btn-primary" id="btn-next-level">{i18n.nextLevel}</button>
       <button type="button" class="btn-secondary" id="btn-win-levels">{i18n.backToLevels}</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新手教学通关结算弹窗 (Tutorial Win Modal) -->
+<div class="modal-backdrop" id="modal-tutorial-win" style="display: none;">
+  <div class="modal-content modal-win-content modal-tutorial-win-content">
+    <div class="win-trophy">🎓</div>
+    <h2 class="win-title">{i18n.tutorialDoneTitle}</h2>
+    <p class="win-subtitle">{i18n.tutorialDoneDesc}</p>
+    
+    <div class="win-avatar-showcase">
+      <div class="win-avatar-large-box" id="tutorial-win-avatar"></div>
+      <div class="win-gold-badge">🏅 DONGDOKU MASTER</div>
+    </div>
+
+    <div class="win-actions">
+      <button type="button" class="btn-primary" id="btn-tutorial-start-game">{i18n.startLevel1}</button>
+      <button type="button" class="btn-secondary" id="btn-tutorial-replay">{i18n.replayTutorial}</button>
     </div>
   </div>
 </div>
@@ -563,6 +680,11 @@ const i18n = {
     height: 100%;
     gap: clamp(3px, 1.1vw, 7px);
     box-sizing: border-box;
+    touch-action: none;
+    overscroll-behavior: contain;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 
   /* 棋盘格子 */
@@ -1097,6 +1219,345 @@ const i18n = {
     background: #ebdcd5;
   }
 
+  /* 导航栏教学快捷按钮 */
+  .nav-tutorial-btn {
+    background: #fdf6ec;
+    border-color: #f5d6a7;
+    color: #b45309;
+    gap: 0.2rem;
+  }
+  .nav-tutorial-btn:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+  }
+  .tutorial-icon {
+    font-size: 0.95rem;
+  }
+
+  /* 控制台提示按钮 */
+  .btn-hint {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #b45309;
+  }
+  .btn-hint:hover {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #78350f;
+    transform: translateY(-1px);
+  }
+  .hint-symbol {
+    font-size: 0.95rem;
+    font-weight: 900;
+  }
+
+  /* 新手教学指引卡片 (Interactive Tutorial Banner) */
+  .tutorial-guide-card {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1.5px solid #93c5fd;
+    border-radius: 0.95rem;
+    padding: 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.12);
+    animation: fadeIn 0.25s ease;
+  }
+
+  .tutorial-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+  }
+
+  .tutorial-tag-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .tutorial-mode-tag {
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.4rem;
+    letter-spacing: 0.5px;
+  }
+
+  .tutorial-step-counter {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #1d4ed8;
+  }
+
+  .btn-skip-tutorial {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid #bfdbfe;
+    color: #4b5563;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.12rem 0.4rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-skip-tutorial:hover {
+    background: #ffffff;
+    color: #111827;
+  }
+
+  .tutorial-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .tutorial-step-title {
+    margin: 0;
+    font-size: 0.84rem;
+    font-weight: 900;
+    color: #1e3a8a;
+  }
+
+  .tutorial-step-desc {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.3;
+    white-space: pre-line;
+  }
+
+  .tutorial-actions-row {
+    margin-top: 0.2rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-auto-cross {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    transition: all 0.15s ease;
+  }
+  .btn-auto-cross:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+  }
+
+  /* 浮动 Toast 消息条 */
+  .game-toast {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    animation: toastSlide 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 20;
+    box-sizing: border-box;
+  }
+
+  .hint-toast {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 1.5px solid #fcd34d;
+    color: #92400e;
+  }
+
+  .conflict-toast {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border: 1.5px solid #fca5a5;
+    color: #991b1b;
+  }
+
+  .toast-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .toast-text-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.05rem;
+  }
+
+  .toast-title {
+    font-size: 0.76rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .toast-message {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: pre-line;
+  }
+
+  .toast-close {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    padding: 0 0.2rem;
+    line-height: 1;
+  }
+  .toast-close:hover {
+    opacity: 1;
+  }
+
+  /* 欢迎引导弹窗 */
+  .modal-welcome-content {
+    max-width: 440px;
+    padding: 1.8rem 1.4rem;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .welcome-icon {
+    font-size: 3.2rem;
+    animation: bounceTrophy 0.8s infinite alternate;
+  }
+
+  .welcome-title {
+    margin: 0.4rem 0 0.2rem;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #3d302c;
+  }
+
+  .welcome-subtitle {
+    margin: 0 0 1.1rem;
+    color: #795548;
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  .welcome-rules-preview {
+    background: #faf5f1;
+    border: 1px solid #ebdcd5;
+    border-radius: 0.95rem;
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    text-align: left;
+  }
+
+  .preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #5c443c;
+  }
+
+  .preview-emoji {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .welcome-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn-start-tutorial {
+    background: linear-gradient(135deg, #1e88e5, #1565c0);
+  }
+
+  /* 教学关卡选关卡片 */
+  .level-card.tutorial-card {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+  .level-card.tutorial-card .lvl-num {
+    color: #1d4ed8;
+    font-size: 0.95rem;
+  }
+  .lvl-badge.diff-0 {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 900;
+  }
+
+  /* 棋盘格子高亮与指引小手光圈 */
+  :global(.tutorial-beacon) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 3.5px solid #2563eb !important;
+    border-radius: inherit;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.45), inset 0 0 16px rgba(37, 99, 235, 0.35);
+    animation: beaconPulse 1.1s infinite ease-in-out;
+    z-index: 10;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px;
+  }
+
+  :global(.tutorial-beacon::before) {
+    content: '👆';
+    font-size: clamp(1.25rem, 3.8vw, 1.65rem);
+    line-height: 1;
+    animation: handTapBounce 0.75s infinite alternate ease-in-out;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
+    pointer-events: none;
+  }
+
+  :global(.tutorial-beacon-label) {
+    background: rgba(15, 23, 42, 0.92);
+    color: #ffffff;
+    font-size: clamp(0.62rem, 2.1vw, 0.76rem);
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+    line-height: 1.25;
+    pointer-events: none;
+    transform: scale(0.95);
+  }
+
+  :global(.hint-beacon) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 3.5px solid #f59e0b !important;
+    border-radius: inherit;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.5), inset 0 0 16px rgba(245, 158, 11, 0.4);
+    animation: hintPulse 0.95s infinite ease-in-out;
+    z-index: 10;
+    box-sizing: border-box;
+  }
+
+  :global(.tutorial-dimmed) {
+    opacity: 0.42 !important;
+    filter: grayscale(0.2) !important;
+  }
+
   /* 动画 */
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -1144,6 +1605,26 @@ const i18n = {
     to { transform: translateY(-8px); }
   }
 
+  @keyframes beaconPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.85; }
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.05); filter: brightness(1.2); }
+  }
+
+  @keyframes handTapBounce {
+    0% { transform: translateY(2px) scale(1); }
+    100% { transform: translateY(-4px) scale(1.1); }
+  }
+
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* 手机端微调 */
   @media (max-width: 480px) {
     .standalone-nav {
@@ -1182,6 +1663,9 @@ const i18n = {
     }
     .rule-card {
       padding: 0.2rem 0.3rem;
+    }
+    .tutorial-guide-card {
+      padding: 0.35rem 0.5rem;
     }
   }
 </style>
@@ -1226,6 +1710,7 @@ const i18n = {
   // 游戏主控制器
   class DongdokuApp {
     private container: HTMLElement;
+    private isEn: boolean = false;
     private levelCache: Map<number, any> = new Map();
     private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
     
@@ -1237,6 +1722,15 @@ const i18n = {
     private moveCount: number = 0;
     private lives: number = 3; // 3条命
     private rulesExpanded: boolean = true;
+
+    // 新手引导与教学模式状态
+    private isTutorialMode: boolean = false;
+    private tutorialStep: number = 1;
+    private hasCompletedTutorial: boolean = false;
+    private shieldUsedInLevel: boolean = false;
+    private toastHintTimer: any = null;
+    private toastConflictTimer: any = null;
+    private hintHighlightTimer: any = null;
 
     // 触摸/点击防抖与双击捕获状态
     private lastTapTimes: Map<string, number> = new Map();
@@ -1250,6 +1744,7 @@ const i18n = {
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
+      this.isEn = this.container?.getAttribute('data-lang') === 'en';
       
       // 载入内嵌初始关卡
       for (const [idStr, data] of Object.entries(INITIAL_LEVELS)) {
@@ -1263,6 +1758,9 @@ const i18n = {
       // 立即加载并渲染当前关卡
       this.loadLevel(this.currentLevelId);
 
+      // 检查是否需要提示首次新手教程
+      this.checkFirstVisitTutorial();
+
       // 后台静默拉取关卡总清单
       this.fetchManifest();
     }
@@ -1273,10 +1771,13 @@ const i18n = {
         const saved = localStorage.getItem('dongdoku_save_v1');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed.currentLevelId) this.currentLevelId = parsed.currentLevelId;
+          if (parsed.currentLevelId !== undefined) {
+            this.currentLevelId = Math.max(1, parsed.currentLevelId);
+          }
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
           if (parsed.rulesExpanded !== undefined) this.rulesExpanded = parsed.rulesExpanded;
         }
+        this.hasCompletedTutorial = localStorage.getItem('dongdoku_tutorial_completed') === 'true';
       } catch (e) {
         console.warn('Failed to parse localStorage', e);
       }
@@ -1284,9 +1785,10 @@ const i18n = {
 
     // 保存到 LocalStorage
     private saveStorage(saveBoard: boolean = true) {
+      if (this.currentLevelId === 0) return; // 教学关不计入永久持久化存档
       try {
         const payload: any = {
-          currentLevelId: this.currentLevelId,
+          currentLevelId: Math.max(1, this.currentLevelId),
           maxUnlockedLevel: this.maxUnlockedLevel,
           rulesExpanded: this.rulesExpanded
         };
@@ -1303,6 +1805,18 @@ const i18n = {
       } catch (e) {
         console.warn('Failed to save to localStorage', e);
       }
+    }
+
+    // 首次进入时展示新手教学欢迎邀请（通过后或跳过后永久不再自动提示）
+    private checkFirstVisitTutorial() {
+      const hasSeen = localStorage.getItem('dongdoku_has_seen_guide_v2') === 'true';
+      const hasCompleted = localStorage.getItem('dongdoku_tutorial_completed') === 'true';
+      if (hasSeen || hasCompleted || this.maxUnlockedLevel > 1) {
+        return;
+      }
+      setTimeout(() => {
+        this.openModal('modal-welcome');
+      }, 350);
     }
 
     // 获取关卡总索引清单
@@ -1361,6 +1875,10 @@ const i18n = {
     private updateLivesDisplay() {
       const livesEl = document.getElementById('lives-display');
       if (!livesEl) return;
+      if (this.isTutorialMode) {
+        livesEl.textContent = '❤️❤️❤️ (无限)';
+        return;
+      }
       const full = '❤️'.repeat(Math.max(0, this.lives));
       const lost = '🤍'.repeat(Math.max(0, 3 - this.lives));
       livesEl.textContent = full + lost;
@@ -1372,6 +1890,11 @@ const i18n = {
     }
 
     private initEvents() {
+      // 导航栏新手教学快捷按钮
+      document.getElementById('btn-open-tutorial')?.addEventListener('click', () => {
+        this.startTutorial();
+      });
+
       // 规则折叠切换
       document.getElementById('btn-toggle-rules')?.addEventListener('click', () => {
         this.rulesExpanded = !this.rulesExpanded;
@@ -1379,8 +1902,55 @@ const i18n = {
         this.saveStorage(false);
       });
 
+      // 提示按钮
+      document.getElementById('btn-hint')?.addEventListener('click', () => this.handleHintClick());
+
       // 重来
       document.getElementById('btn-restart')?.addEventListener('click', () => this.handleRestart());
+
+      // 教学指引卡片中的跳过教学与一键排除
+      document.getElementById('btn-skip-tutorial')?.addEventListener('click', () => {
+        localStorage.setItem('dongdoku_has_seen_guide_v2', 'true');
+        this.loadLevel(1);
+      });
+      document.getElementById('btn-auto-cross')?.addEventListener('click', () => {
+        this.autoMarkTutorialCrosses();
+      });
+
+      // 欢迎引导弹窗按钮
+      document.getElementById('btn-welcome-tutorial')?.addEventListener('click', () => {
+        localStorage.setItem('dongdoku_has_seen_guide_v2', 'true');
+        this.closeModal('modal-welcome');
+        this.startTutorial();
+      });
+      document.getElementById('btn-welcome-skip')?.addEventListener('click', () => {
+        localStorage.setItem('dongdoku_has_seen_guide_v2', 'true');
+        this.closeModal('modal-welcome');
+        this.loadLevel(1);
+      });
+
+      // 教学通关弹窗按钮
+      document.getElementById('btn-tutorial-start-game')?.addEventListener('click', () => {
+        localStorage.setItem('dongdoku_tutorial_completed', 'true');
+        localStorage.setItem('dongdoku_has_seen_guide_v2', 'true');
+        this.closeModal('modal-tutorial-win');
+        this.loadLevel(1);
+      });
+      document.getElementById('btn-tutorial-replay')?.addEventListener('click', () => {
+        this.closeModal('modal-tutorial-win');
+        this.startTutorial();
+      });
+
+      // 浮动 Toast 关闭按钮
+      document.getElementById('btn-close-toast-hint')?.addEventListener('click', () => {
+        const el = document.getElementById('toast-hint');
+        if (el) el.style.display = 'none';
+        this.clearHintHighlight();
+      });
+      document.getElementById('btn-close-toast-conflict')?.addEventListener('click', () => {
+        const el = document.getElementById('toast-conflict');
+        if (el) el.style.display = 'none';
+      });
 
       // 选关弹窗
       document.getElementById('btn-open-levels')?.addEventListener('click', () => this.openLevelsModal());
@@ -1419,13 +1989,23 @@ const i18n = {
       return AVATAR_PATHS[idx];
     }
 
+    // 启动新手教学模式 (Level 0)
+    public startTutorial() {
+      this.loadLevel(0);
+    }
+
     // 加载指定关卡
     public async loadLevel(levelId: number) {
-      if (levelId < 1) levelId = 1;
+      if (levelId < 0) levelId = 0;
       if (levelId > 1000) levelId = 1000;
 
       this.currentLevelId = levelId;
-      if (levelId > this.maxUnlockedLevel) {
+      this.isTutorialMode = (levelId === 0);
+      this.shieldUsedInLevel = false;
+      this.clearAllBeacons();
+      this.hideAllToasts();
+
+      if (levelId > this.maxUnlockedLevel && levelId > 0) {
         this.maxUnlockedLevel = levelId;
       }
       this.saveStorage(false);
@@ -1439,13 +2019,22 @@ const i18n = {
       }
 
       if (!data) {
-        alert('关卡数据加载失败，请检查网络');
+        alert(this.isEn ? 'Failed to load level' : '关卡数据加载失败，请检查网络');
         return;
       }
 
       this.currentLevelData = data;
       this.initBoardState(data);
       this.renderUI(data);
+
+      if (this.isTutorialMode) {
+        this.setupTutorialMode();
+      } else {
+        const guideCard = document.getElementById('tutorial-guide-card');
+        if (guideCard) guideCard.style.display = 'none';
+        const rulesSec = document.getElementById('rules-collapse-section');
+        if (rulesSec) rulesSec.style.display = 'block';
+      }
     }
 
     // 初始化棋盘数据与暂存恢复
@@ -1455,6 +2044,11 @@ const i18n = {
       this.cellAvatars.clear();
       this.moveCount = 0;
       this.lives = 3; // 重置满血 3 条命
+
+      if (this.isTutorialMode) {
+        this.tutorialStep = 1;
+        return;
+      }
 
       try {
         const saved = localStorage.getItem('dongdoku_save_v1');
@@ -1477,10 +2071,292 @@ const i18n = {
       } catch (e) {}
     }
 
+    // 设置新手教学模式
+    private setupTutorialMode() {
+      const guideCard = document.getElementById('tutorial-guide-card');
+      if (guideCard) guideCard.style.display = 'flex';
+
+      const rulesSec = document.getElementById('rules-collapse-section');
+      if (rulesSec) rulesSec.style.display = 'none';
+
+      this.updateTutorialStepUI(1);
+    }
+
+    // 更新新手教学步骤与高亮引导
+    private updateTutorialStepUI(step: number) {
+      this.tutorialStep = step;
+      const stepHints = this.currentLevelData?.hints || [];
+      const currentHint = stepHints.find((h: any) => h.step === step);
+      if (!currentHint) return;
+
+      const counterEl = document.getElementById('tutorial-step-counter');
+      const titleEl = document.getElementById('tutorial-step-title');
+      const descEl = document.getElementById('tutorial-step-desc');
+      const actionsRow = document.getElementById('tutorial-actions-row');
+      const autoCrossBtn = document.getElementById('btn-auto-cross');
+
+      if (counterEl) counterEl.textContent = `${this.isEn ? 'Step' : '步骤'} ${step}/6`;
+      if (titleEl) titleEl.textContent = this.isEn ? currentHint.titleEn : currentHint.titleZh;
+      if (descEl) descEl.textContent = this.isEn ? currentHint.textEn : currentHint.textZh;
+
+      if (actionsRow) {
+        actionsRow.style.display = (step >= 2 && step <= 4) ? 'flex' : 'none';
+        if (autoCrossBtn) {
+          autoCrossBtn.innerHTML = `<span>${
+            step === 2 
+              ? (this.isEn ? '⚡ Auto Mark Row' : '⚡ 一键排除同行') 
+              : step === 3 
+                ? (this.isEn ? '⚡ Auto Mark Column' : '⚡ 一键排除同列') 
+                : (this.isEn ? '⚡ Auto Mark Diagonals' : '⚡ 一键排除对角')
+          }</span>`;
+        }
+      }
+
+      this.clearAllBeacons();
+
+      const isDoubleAction = (step === 1 || step === 5 || step === 6);
+      const actionLabel = isDoubleAction ? (this.isEn ? 'Double Tap' : '双击') : (this.isEn ? 'Tap' : '单击');
+
+      // 添加高亮聚焦光圈（只对未标记格子添加）
+      if (currentHint.target && this.gridState[currentHint.target.row][currentHint.target.col] === 0) {
+        this.addBeaconToCell(currentHint.target.row, currentHint.target.col, 'tutorial-beacon', actionLabel);
+      } else if (currentHint.targetCells) {
+        currentHint.targetCells.forEach((c: any) => {
+          if (this.gridState[c.row][c.col] === 0) {
+            this.addBeaconToCell(c.row, c.col, 'tutorial-beacon', actionLabel);
+          }
+        });
+      }
+    }
+
+    // 教学模式：一键自动排除
+    private autoMarkTutorialCrosses() {
+      if (!this.isTutorialMode) return;
+      const currentHint = this.currentLevelData?.hints?.find((h: any) => h.step === this.tutorialStep);
+      if (!currentHint?.targetCells) return;
+
+      currentHint.targetCells.forEach((c: any) => {
+        this.gridState[c.row][c.col] = 1;
+      });
+
+      this.updateBoardDisplay();
+      setTimeout(() => {
+        this.updateTutorialStepUI(this.tutorialStep + 1);
+      }, 300);
+    }
+
+    // 在指定格子上添加引导光圈与操作标签
+    private addBeaconToCell(r: number, c: number, className: string = 'tutorial-beacon', labelText?: string) {
+      const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+      if (!cellEl) return;
+      const beacon = document.createElement('div');
+      beacon.className = className;
+      if (labelText) {
+        const labelEl = document.createElement('span');
+        labelEl.className = 'tutorial-beacon-label';
+        labelEl.textContent = labelText;
+        beacon.appendChild(labelEl);
+      }
+      cellEl.appendChild(beacon);
+    }
+
+    private clearAllBeacons() {
+      document.querySelectorAll('.tutorial-beacon, .hint-beacon').forEach(el => el.remove());
+    }
+
+    private clearHintHighlight() {
+      document.querySelectorAll('.hint-beacon').forEach(el => el.remove());
+    }
+
+    private hideAllToasts() {
+      if (this.toastHintTimer) clearTimeout(this.toastHintTimer);
+      if (this.toastConflictTimer) clearTimeout(this.toastConflictTimer);
+      if (this.hintHighlightTimer) clearTimeout(this.hintHighlightTimer);
+      const toastHint = document.getElementById('toast-hint');
+      if (toastHint) toastHint.style.display = 'none';
+      const toastConflict = document.getElementById('toast-conflict');
+      if (toastConflict) toastConflict.style.display = 'none';
+      this.clearHintHighlight();
+    }
+
+    // 智能推导提示点击处理
+    private handleHintClick() {
+      if (this.isTutorialMode) {
+        this.showHintToast(this.isEn ? 'Please follow the current tutorial step guide.' : '当前正在教学训练中，请跟随上方步骤指引操作哦！');
+        return;
+      }
+
+      if (!this.currentLevelData) return;
+      const size = this.currentLevelData.size;
+
+      // 1. 优先从静态 hints 数组中寻找当前未放置的步骤
+      if (this.currentLevelData.hints && this.currentLevelData.hints.length > 0) {
+        for (const hint of this.currentLevelData.hints) {
+          const cells = hint.cells || (hint.target ? [hint.target] : []);
+          const hasUnplaced = cells.some((c: any) => this.gridState[c.row][c.col] !== 2);
+          if (hasUnplaced) {
+            this.clearHintHighlight();
+            cells.forEach((c: any) => {
+              if (this.gridState[c.row][c.col] !== 2) {
+                this.addBeaconToCell(c.row, c.col, 'hint-beacon');
+              }
+            });
+            const text = hint.text || (this.isEn ? hint.textEn : hint.textZh) || '请观察高亮格子';
+            this.showHintToast(text);
+            return;
+          }
+        }
+      }
+
+      // 2. 动态扫描推导：寻找只剩 1 个空格的色块或行/列
+      // 扫描色块
+      for (let reg = 0; reg < size; reg++) {
+        let emptyCells: Array<{ row: number; col: number }> = [];
+        let hasDong = false;
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (this.currentLevelData.regions[r][c] === reg) {
+              if (this.gridState[r][c] === 2) hasDong = true;
+              else if (this.gridState[r][c] === 0) emptyCells.push({ row: r, col: c });
+            }
+          }
+        }
+        if (!hasDong && emptyCells.length === 1) {
+          const target = emptyCells[0];
+          this.clearHintHighlight();
+          this.addBeaconToCell(target.row, target.col, 'hint-beacon');
+          this.showHintToast(this.isEn ? `Color territory ${reg + 1} has only 1 valid cell left!` : `提示：该颜色领地只剩 1 个空格，此处必定放咚！`);
+          return;
+        }
+      }
+
+      // 3. 兜底提示：从正确解中找到第一个尚未放置的咚
+      const unplacedSol = this.currentLevelData.solution?.find((s: any) => this.gridState[s.row][s.col] !== 2);
+      if (unplacedSol) {
+        this.clearHintHighlight();
+        this.addBeaconToCell(unplacedSol.row, unplacedSol.col, 'hint-beacon');
+        this.showHintToast(this.isEn ? `Hint: Try placing Dong at Row ${unplacedSol.row + 1}, Column ${unplacedSol.col + 1}.` : `提示：请观察第 ${unplacedSol.row + 1} 行第 ${unplacedSol.col + 1} 列的位置。`);
+        return;
+      }
+
+      this.showHintToast(this.isEn ? 'All Dongs found or no more hints available!' : '当前所有咚都已找到或盘面无需更多提示！');
+    }
+
+    // 显示提示 Toast
+    private showHintToast(message: string) {
+      if (this.toastHintTimer) clearTimeout(this.toastHintTimer);
+      if (this.hintHighlightTimer) clearTimeout(this.hintHighlightTimer);
+
+      const toast = document.getElementById('toast-hint');
+      const textEl = document.getElementById('toast-hint-text');
+      if (toast && textEl) {
+        textEl.textContent = message;
+        toast.style.display = 'flex';
+      }
+
+      this.toastHintTimer = setTimeout(() => {
+        if (toast) toast.style.display = 'none';
+      }, 5500);
+
+      this.hintHighlightTimer = setTimeout(() => {
+        this.clearHintHighlight();
+      }, 5500);
+    }
+
+    // 冲突原因分析与新手免伤保护 (Mistake Analyzer & Explainer)
+    private analyzeMistakeAndWarn(r: number, c: number) {
+      const size = this.currentLevelData.size;
+
+      let rowConflict = false;
+      for (let col = 0; col < size; col++) {
+        if (col !== c && this.gridState[r][col] === 2) rowConflict = true;
+      }
+
+      let colConflict = false;
+      for (let row = 0; row < size; row++) {
+        if (row !== r && this.gridState[row][c] === 2) colConflict = true;
+      }
+
+      let regConflict = false;
+      const myReg = this.currentLevelData.regions[r][c];
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if ((row !== r || col !== c) && this.currentLevelData.regions[row][col] === myReg && this.gridState[row][col] === 2) {
+            regConflict = true;
+          }
+        }
+      }
+
+      let adjConflict = false;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          const nr = r + dr, nc = c + dc;
+          if (nr >= 0 && nr < size && nc >= 0 && nc < size && this.gridState[nr][nc] === 2) {
+            adjConflict = true;
+          }
+        }
+      }
+
+      let title = this.isEn ? 'Rule Violation' : '违规提醒';
+      let message = '';
+
+      if (adjConflict) {
+        title = this.isEn ? '8-Direction Conflict ⚠️' : '八向相碰违规 ⚠️';
+        message = this.isEn ? 'Dongs cannot touch each other in 8 directions (including diagonals)!' : '咚咚八方向（含对角）互不相碰，旁边已有咚！';
+      } else if (rowConflict) {
+        title = this.isEn ? 'Row Conflict ⚠️' : '同行冲突违规 ⚠️';
+        message = this.isEn ? `Row ${r + 1} already has a Dong (only 1 per row)!` : `第 ${r + 1} 行已经有咚了（每行仅能放 1 个）！`;
+      } else if (colConflict) {
+        title = this.isEn ? 'Column Conflict ⚠️' : '同列冲突违规 ⚠️';
+        message = this.isEn ? `Column ${c + 1} already has a Dong (only 1 per col)!` : `第 ${c + 1} 列已经有咚了（每列仅能放 1 个）！`;
+      } else if (regConflict) {
+        title = this.isEn ? 'Territory Conflict ⚠️' : '同色领地冲突 ⚠️';
+        message = this.isEn ? 'This color territory already has a Dong (only 1 per territory)!' : '该颜色领地内已有咚（每种颜色仅能放 1 个）！';
+      } else {
+        title = this.isEn ? 'Deduction Mismatch ⚠️' : '逻辑不符 ⚠️';
+        message = this.isEn ? 'Placing here leads to impossible remaining grid. Use ✖ to exclude first!' : '该位置会导致后续领地无解，请先用 ✖ 排除观察！';
+      }
+
+      // 新手前 3 关免伤保护
+      if (!this.isTutorialMode && this.currentLevelId <= 3 && !this.shieldUsedInLevel) {
+        this.shieldUsedInLevel = true;
+        title = this.isEn ? '🛡️ Rookie Shield: 0 Life Lost!' : '🛡️ 新手免伤保护：本次免扣生命值！';
+      }
+
+      this.showConflictToast(title, message);
+    }
+
+    // 显示冲突 Toast
+    private showConflictToast(title: string, message: string) {
+      if (this.toastConflictTimer) clearTimeout(this.toastConflictTimer);
+
+      const toast = document.getElementById('toast-conflict');
+      const titleEl = document.getElementById('toast-conflict-title');
+      const textEl = document.getElementById('toast-conflict-text');
+
+      if (toast && titleEl && textEl) {
+        titleEl.textContent = title;
+        textEl.textContent = message;
+        toast.style.display = 'flex';
+      }
+
+      this.toastConflictTimer = setTimeout(() => {
+        if (toast) toast.style.display = 'none';
+      }, 4500);
+    }
+
     // 渲染 UI 与网格（手势极速分流：单击 ✖ / 双击 🏓）
     private renderUI(data: any) {
       const curLvlNum = document.getElementById('cur-level-num');
-      if (curLvlNum) curLvlNum.textContent = data.id.toString();
+      const levelTitleContainer = document.getElementById('level-title-container');
+      if (levelTitleContainer && curLvlNum) {
+        if (this.isTutorialMode) {
+          levelTitleContainer.innerHTML = `🎓 <strong>${this.isEn ? 'Tutorial' : '教学关'}</strong>`;
+        } else {
+          levelTitleContainer.innerHTML = `${this.isEn ? 'Level' : '第'} <strong id="cur-level-num">${data.id}</strong> ${this.isEn ? '' : '关'}`;
+        }
+      }
 
       const targetCount = document.getElementById('target-count');
       if (targetCount) targetCount.textContent = data.size.toString();
@@ -1490,16 +2366,17 @@ const i18n = {
       const gridEl = document.getElementById('game-grid');
       if (!gridEl) return;
 
-      gridEl.addEventListener('pointermove', (e) => {
+      gridEl.onpointermove = (e) => {
         if (!this.dragMode) return;
+        e.preventDefault();
         const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.grid-cell') as HTMLElement | null;
         if (!target || !gridEl.contains(target)) return;
         const row = Number(target.dataset.row);
         const col = Number(target.dataset.col);
         if (Number.isInteger(row) && Number.isInteger(col)) this.applyDragCell(row, col);
-      });
-      gridEl.addEventListener('pointerup', () => this.cancelLongPress());
-      gridEl.addEventListener('pointercancel', () => this.cancelLongPress());
+      };
+      gridEl.onpointerup = () => this.cancelLongPress();
+      gridEl.onpointercancel = () => this.cancelLongPress();
 
       const size = data.size;
       gridEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
@@ -1521,9 +2398,9 @@ const i18n = {
 
           const key = `${r},${c}`;
 
-          // 长按进入连续标记模式：空格起点为批量打叉，叉号起点为批量擦除。
+          // 长按进入连续标记模式
           cellEl.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0 || this.lives <= 0) return;
+            if (e.button !== 0 || (this.lives <= 0 && !this.isTutorialMode)) return;
             this.cancelLongPress();
             this.dragPointerId = e.pointerId;
             this.dragVisited.clear();
@@ -1544,15 +2421,14 @@ const i18n = {
           cellEl.addEventListener('pointerup', () => this.cancelLongPress());
           cellEl.addEventListener('pointercancel', () => this.cancelLongPress());
 
-          // 单一点击分发：第一次点击等待短窗口，第二次同格点击提交。
-          // 不再同时监听 click 和 dblclick，避免两个事件重复或互相抢占。
+          // 单一点击与双击分发
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.suppressNextClick) {
               this.suppressNextClick = false;
               return;
             }
-            if (this.lives <= 0) return;
+            if (this.lives <= 0 && !this.isTutorialMode) return;
             const currentVal = this.gridState[r][c];
             if (currentVal === 2 || currentVal === 3) return;
 
@@ -1561,7 +2437,6 @@ const i18n = {
             const isDoubleTap = lastTap > 0 && now - lastTap <= 420;
 
             if (isDoubleTap) {
-              // 判定为双击 -> 立即清除单击计时器并执行确定找咚
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
                 this.singleTapTimers.delete(key);
@@ -1569,8 +2444,6 @@ const i18n = {
               this.lastTapTimes.delete(key);
               this.handleDoubleClick(r, c);
             } else {
-              // 第一次轻点立即显示/切换 ✖；只保留短窗口用于识别第二次点击。
-              // 这样单击不再等待双击判定窗口，视觉响应接近即时。
               this.lastTapTimes.set(key, now);
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
@@ -1587,6 +2460,7 @@ const i18n = {
           // 电脑端右键单击：0 毫秒标记/清除 ✖
           cellEl.addEventListener('contextmenu', (e) => {
             e.preventDefault();
+            if (this.dragMode || this.suppressNextClick) return;
             if (this.singleTapTimers.has(key)) {
               clearTimeout(this.singleTapTimers.get(key));
               this.singleTapTimers.delete(key);
@@ -1612,7 +2486,7 @@ const i18n = {
     }
 
     private applyDragCell(r: number, c: number) {
-      if (!this.dragMode || this.lives <= 0) return;
+      if (!this.dragMode || (this.lives <= 0 && !this.isTutorialMode)) return;
       const key = `${r},${c}`;
       if (this.dragVisited.has(key)) return;
       this.dragVisited.add(key);
@@ -1626,12 +2500,12 @@ const i18n = {
       this.saveStorage(true);
     }
 
-    // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖
+    // 【单击逻辑】：标记 ✖ 排除 / 取消 ✖
     private handleSingleClick(r: number, c: number) {
-      if (this.lives <= 0) return;
+      if (this.lives <= 0 && !this.isTutorialMode) return;
 
       const currentVal = this.gridState[r][c];
-      if (currentVal === 2 || currentVal === 3) return; // 锁定格不能改
+      if (currentVal === 2 || currentVal === 3) return;
 
       const nextVal = (currentVal === 1) ? 0 : 1;
       this.gridState[r][c] = nextVal;
@@ -1639,22 +2513,35 @@ const i18n = {
 
       this.updateBoardDisplay();
       this.saveStorage(true);
+
+      // 教学模式排除步骤检查 (Step 2: 行排除, Step 3: 列排除, Step 4: 对角排除)
+      if (this.isTutorialMode && this.tutorialStep >= 2 && this.tutorialStep <= 4) {
+        const currentHint = this.currentLevelData?.hints?.find((h: any) => h.step === this.tutorialStep);
+        if (currentHint?.targetCells) {
+          const allMarked = currentHint.targetCells.every((cell: any) => this.gridState[cell.row][cell.col] === 1);
+          if (allMarked) {
+            setTimeout(() => {
+              this.updateTutorialStepUI(this.tutorialStep + 1);
+            }, 300);
+          }
+        }
+      }
     }
 
-    // 【双击逻辑】：仅针对当前格子判定找对/找错（对则亮头像，错则亮 🚫 扣 1 条命）
+    // 【双击逻辑】：判定找对/找错
     private handleDoubleClick(r: number, c: number) {
-      if (this.lives <= 0) return;
+      if (this.lives <= 0 && !this.isTutorialMode) return;
 
       const currentVal = this.gridState[r][c];
-      if (currentVal === 2 || currentVal === 3) return; // 已经确定过，无再次机会
+      if (currentVal === 2 || currentVal === 3) return;
 
       this.moveCount++;
 
-      // 核心校验：检查该格是否为本关正确解（Ground Truth Solution）
+      // 核心校验：检查是否为正确解
       const isSolutionDong = this.currentLevelData?.solution?.some((s: any) => s.row === r && s.col === c);
 
       if (isSolutionDong) {
-        // ✅ 找对了！仅在该格子点亮樊振东头像
+        // ✅ 找对了！
         this.gridState[r][c] = 2;
         if (!this.cellAvatars.has(`${r},${c}`)) {
           this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
@@ -1664,12 +2551,36 @@ const i18n = {
         foundCell?.classList.add('last-found');
         setTimeout(() => foundCell?.classList.remove('last-found'), 1250);
         this.saveStorage(true);
+
+        // 教学模式步骤推进
+        if (this.isTutorialMode) {
+          if (this.tutorialStep === 1 && r === 1 && c === 0) {
+            setTimeout(() => this.updateTutorialStepUI(2), 350);
+          } else if (this.tutorialStep === 5 && r === 2 && c === 3) {
+            // 顺便帮玩家自动打叉绿咚周围的冲突格
+            const eliminateCells = [{r: 2, c: 2}, {r: 0, c: 3}, {r: 3, c: 2}, {r: 3, c: 3}];
+            eliminateCells.forEach(cell => {
+              if (this.gridState[cell.r][cell.c] === 0) this.gridState[cell.r][cell.c] = 1;
+            });
+            this.updateBoardDisplay();
+            setTimeout(() => this.updateTutorialStepUI(6), 350);
+          }
+        }
+
         this.checkWinCondition();
       } else {
-        // ❌ 找错了！仅在该格子显示异常禁止标志 🚫 并扣除 1 条命
-        this.gridState[r][c] = 3;
+        // ❌ 找错了！
+        if (this.isTutorialMode) {
+          this.showConflictToast(this.isEn ? 'Tutorial Guide' : '教学引导', this.isEn ? 'Please double click the highlighted spot!' : '请按照当前步骤的高亮指示双击哦！');
+          return;
+        }
 
-        this.lives--;
+        this.gridState[r][c] = 3;
+        this.analyzeMistakeAndWarn(r, c);
+
+        if (!this.shieldUsedInLevel || this.currentLevelId > 3) {
+          this.lives--;
+        }
         this.updateLivesDisplay();
         this.updateBoardDisplay();
         this.saveStorage(true);
@@ -1690,9 +2601,15 @@ const i18n = {
       this.gridState = Array.from({ length: size }, () => Array(size).fill(0));
       this.cellAvatars.clear();
       this.lives = 3;
+      this.shieldUsedInLevel = false;
+      this.hideAllToasts();
       this.updateLivesDisplay();
       this.updateBoardDisplay();
       this.saveStorage(true);
+
+      if (this.isTutorialMode) {
+        this.setupTutorialMode();
+      }
     }
 
     // 刷新棋盘视图
@@ -1719,7 +2636,6 @@ const i18n = {
           cellEl.setAttribute('aria-label', `第 ${r + 1} 行第 ${c + 1} 列，${stateText}`);
 
           if (val === 1) {
-            // ✖ 排除白色交叉
             const crossWrap = document.createElement('div');
             crossWrap.className = 'cell-cross-wrap';
             crossWrap.innerHTML = `
@@ -1730,7 +2646,6 @@ const i18n = {
             `;
             cellEl.appendChild(crossWrap);
           } else if (val === 2) {
-            // ✅ 正确咚咚头像（永久锁定）
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1747,7 +2662,6 @@ const i18n = {
 
             cellEl.appendChild(dongWrap);
           } else if (val === 3) {
-            // ❌ 找错咚：只显示红色 🚫 禁止标志，不显示头像
             const dongWrap = document.createElement('div');
             dongWrap.className = 'cell-dong-wrap';
 
@@ -1772,7 +2686,8 @@ const i18n = {
 
     // 检查通关状态
     private checkWinCondition() {
-      if (!this.currentLevelData || this.lives <= 0) return;
+      if (!this.currentLevelData) return;
+      if (this.lives <= 0 && !this.isTutorialMode) return;
       const size = this.currentLevelData.size;
 
       let correctDongs = 0;
@@ -1786,11 +2701,14 @@ const i18n = {
 
       if (correctDongs === size) {
         if (this.victoryTimer) return;
-        // 给最后一个头像和玩家成绩留出欣赏时间，再打开结算弹窗。
         this.victoryTimer = setTimeout(() => {
           this.victoryTimer = null;
-          this.handleVictory();
-        }, 1200);
+          if (this.isTutorialMode) {
+            this.handleTutorialVictory();
+          } else {
+            this.handleVictory();
+          }
+        }, 1100);
       }
     }
 
@@ -1799,7 +2717,21 @@ const i18n = {
       this.openModal('modal-gameover');
     }
 
-    // 通关胜利结算
+    // 教学关通关结算
+    private handleTutorialVictory() {
+      localStorage.setItem('dongdoku_tutorial_completed', 'true');
+      localStorage.setItem('dongdoku_has_seen_guide_v2', 'true');
+      this.hasCompletedTutorial = true;
+
+      const tutAvatar = document.getElementById('tutorial-win-avatar');
+      if (tutAvatar) {
+        tutAvatar.style.backgroundImage = `url("${this.getRandomAvatar()}")`;
+      }
+
+      this.openModal('modal-tutorial-win');
+    }
+
+    // 正式关卡胜利结算
     private handleVictory() {
       if (this.currentLevelId >= this.maxUnlockedLevel) {
         this.maxUnlockedLevel = Math.min(1000, this.currentLevelId + 1);
@@ -1830,7 +2762,7 @@ const i18n = {
       if (!tabsEl || !gridEl) return;
 
       this.updateLevelsModalProgress();
-      const currentPackIdx = Math.floor((this.currentLevelId - 1) / 50);
+      const currentPackIdx = Math.max(0, Math.floor(((this.currentLevelId || 1) - 1) / 50));
 
       tabsEl.innerHTML = '';
       for (let p = 0; p < 20; p++) {
@@ -1863,6 +2795,22 @@ const i18n = {
       const gridEl = document.getElementById('levels-grid');
       if (!gridEl) return;
       gridEl.innerHTML = '';
+
+      // 在第一个分页的最前头添加 🎓 0 教学关卡
+      if (packIdx === 0) {
+        const tutCard = document.createElement('div');
+        const isCurrentTut = (this.currentLevelId === 0);
+        tutCard.className = `level-card tutorial-card ${isCurrentTut ? 'current' : ''}`;
+        tutCard.innerHTML = `
+          <span class="lvl-num">🎓 0</span>
+          <span class="lvl-badge diff-0">${this.isEn ? 'Tutorial' : '教学关'}</span>
+        `;
+        tutCard.addEventListener('click', () => {
+          this.closeModal('modal-levels');
+          this.startTutorial();
+        });
+        gridEl.appendChild(tutCard);
+      }
 
       const start = packIdx * 50 + 1;
       const end = (packIdx + 1) * 50;
