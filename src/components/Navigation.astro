@@ -11,10 +11,9 @@ const navItems = [
   { href: '/', label: t('nav.home') },
   { href: '/arena', label: t('nav.arena') },
   { href: '/matches', label: t('nav.matches') },
-  // { href: '/news', label: t('nav.news') }, // 快讯：暂时隐藏，待完善后再上线
+  // { href: '/news', label: t('nav.news') }, // 快讯：暂时隐藏
   { href: '/endorsements', label: t('nav.empire') },
   { href: '/quotes', label: t('nav.quotes') },
-  // { href: '/friends', label: t('nav.friends') }, // 暂时隐藏
   { href: '/tributes', label: t('nav.tributes') },
   { href: '/links', label: t('nav.links') },
   { href: '/stars', label: t('nav.stars') },
@@ -22,33 +21,29 @@ const navItems = [
   { href: '/ugc', label: t('nav.ugc') },
   { href: '/games', label: t('nav.games') },
   { href: '/fzd-gallery', label: t('nav.imgupload') },
-  // FZD 101 只在英文版显示
   ...(lang === 'en' ? [{ href: '/fzd101', label: t('nav.fzd101') }] : []),
-  // { href: '/quiz', label: t('nav.quiz') }, // 暂时隐藏
   { href: '/about', label: t('nav.about') },
 ];
 
 function isActive(href: string) {
-  // 获取本地化后的路径进行比较
   const localizedHref = getLocalizedPath(href, lang);
-  
   if (href === '/') {
-    // 首页特殊处理：精确匹配
     return currentPath === '/' || currentPath === '/en' || currentPath === '/en/';
   }
-  
-  // 其他页面：检查当前路径是否以本地化后的 href 开头
   return currentPath.startsWith(localizedHref);
 }
 ---
 
 <header class="header">
   <div class="container header-inner">
+    <!-- 网站 Logo 与标题 -->
     <a href={getLocalizedPath('/', lang)} class="logo">
       <img src="/favicon_io/favicon-32x32.png" alt="樊振东档案馆" class="logo-icon" width="28" height="28" />
       <span class="logo-text">{t('site.title')}</span>
     </a>
-    <nav class="nav">
+
+    <!-- 桌面端横向导航条 (仅在 PC/平板大屏显示) -->
+    <nav class="nav desktop-nav">
       {navItems.map(item => (
         <a 
           href={getLocalizedPath(item.href, lang)} 
@@ -58,48 +53,264 @@ function isActive(href: string) {
         </a>
       ))}
     </nav>
-    <LanguagePicker />
+
+    <!-- 右侧操作区：语言切换 + 移动端汉堡折叠按钮 -->
+    <div class="header-right-actions">
+      <LanguagePicker />
+      <button 
+        type="button" 
+        class="mobile-menu-btn" 
+        id="mobile-menu-toggle" 
+        aria-label="展开导航菜单"
+        aria-expanded="false"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 移动端折叠抽屉菜单 -->
+  <div class="mobile-drawer" id="mobile-nav-drawer" style="display: none;">
+    <div class="container">
+      <nav class="mobile-nav-grid">
+        {navItems.map(item => (
+          <a 
+            href={getLocalizedPath(item.href, lang)} 
+            class:list={['mobile-nav-item', { active: isActive(item.href) }]}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </div>
   </div>
 </header>
 
 <style>
   .header {
-    background: #fff;
+    background: #ffffff;
     border-bottom: 1px solid #eee;
-    padding: 1rem 0;
+    padding: 0.65rem 0;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
   }
+
   .header-inner {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    justify-content: space-between;
+    gap: 1rem;
   }
+
   .logo {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: bold;
-    font-size: 1.2rem;
+    font-weight: 800;
+    font-size: 1.15rem;
     color: #1e88e5;
+    flex-shrink: 0;
   }
+
   .logo:hover { text-decoration: none; }
-  .logo-icon { font-size: 1.5rem; display: block; border-radius: 6px; }
-  .nav {
+  .logo-icon { display: block; border-radius: 6px; }
+  .logo-text { white-space: nowrap; }
+
+  /* 桌面端导航 */
+  .desktop-nav {
     display: flex;
-    gap: 1.5rem;
+    align-items: center;
+    gap: 1.2rem;
     flex-wrap: wrap;
   }
+
   .nav-link {
     color: #555;
-    font-size: 0.9rem;
-    transition: color 0.2s;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: color 0.15s;
+    white-space: nowrap;
   }
-  .nav-link:hover { color: #1e88e5; }
+
+  .nav-link:hover {
+    color: #1e88e5;
+    text-decoration: none;
+  }
+
   .nav-link.active {
     color: #1e88e5;
-    font-weight: 600;
+    font-weight: 800;
+  }
+
+  /* 右侧动作区 */
+  .header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  /* 移动端汉堡菜单按钮 (默认隐藏) */
+  .mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    background: #f7f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu-btn:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+  }
+
+  .hamburger-bar {
+    width: 18px;
+    height: 2px;
+    background-color: #4a5568;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu-btn.is-active .hamburger-bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .mobile-menu-btn.is-active .hamburger-bar:nth-child(2) {
+    opacity: 0;
+  }
+  .mobile-menu-btn.is-active .hamburger-bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* 移动端滑出抽屉菜单 */
+  .mobile-drawer {
+    background: #ffffff;
+    border-top: 1px solid #f0f0f0;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+    padding: 0.8rem 0 1.2rem;
+    animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mobile-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.4rem;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #4a5568;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-nav-item:hover {
+    background: #edf2f7;
+    color: #1e88e5;
+    text-decoration: none;
+  }
+
+  .mobile-nav-item.active {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: #bbdefb;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 移动端媒体查询断点 (< 960px) */
+  @media (max-width: 960px) {
+    .header {
+      padding: 0.45rem 0;
+    }
+    .desktop-nav {
+      display: none;
+    }
+    .mobile-menu-btn {
+      display: inline-flex;
+    }
+    .logo-text {
+      font-size: 1.05rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .mobile-nav-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.45rem;
+    }
+    .logo-text {
+      font-size: 0.98rem;
+    }
   }
 </style>
+
+<script>
+  function setupMobileNav() {
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (!toggleBtn || !drawer) return;
+
+    // 清理旧事件监听以防热重载冲突
+    const newBtn = toggleBtn.cloneNode(true) as HTMLElement;
+    toggleBtn.parentNode?.replaceChild(newBtn, toggleBtn);
+
+    newBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = drawer.style.display !== 'none';
+      if (isOpen) {
+        drawer.style.display = 'none';
+        newBtn.classList.remove('is-active');
+        newBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        drawer.style.display = 'block';
+        newBtn.classList.add('is-active');
+        newBtn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // 点击外部区域自动收起菜单
+    document.addEventListener('click', (e) => {
+      if (drawer.style.display !== 'none' && !drawer.contains(e.target as Node) && !newBtn.contains(e.target as Node)) {
+        drawer.style.display = 'none';
+        newBtn.classList.remove('is-active');
+        newBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileNav);
+  } else {
+    setupMobileNav();
+  }
+</script>
