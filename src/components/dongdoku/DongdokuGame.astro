@@ -567,7 +567,13 @@ const i18n = {
   }
 
   /* 棋盘格子 */
-  .grid-cell {
+  :global(.grid-cell) {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font: inherit !important;
+    color: inherit !important;
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
@@ -588,25 +594,25 @@ const i18n = {
     -webkit-tap-highlight-color: transparent !important;
   }
 
-  .grid-cell:hover {
+  :global(.grid-cell:hover) {
     transform: scale(1.03);
     filter: brightness(1.06);
     z-index: 2;
   }
 
-  .grid-cell:active {
+  :global(.grid-cell:active) {
     transform: scale(0.96);
   }
 
-  .grid-cell.cell-locked {
+  :global(.grid-cell.cell-locked) {
     cursor: default !important;
   }
-  .grid-cell.cell-locked:hover {
+  :global(.grid-cell.cell-locked:hover) {
     transform: none !important;
   }
 
   /* 单元格状态：白色 ✖ 排除叉 */
-  .cell-cross-wrap {
+  :global(.cell-cross-wrap) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -616,14 +622,14 @@ const i18n = {
     animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  .cross-svg {
+  :global(.cross-svg) {
     width: 100%;
     height: 100%;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
   }
 
   /* 单元格状态：🏓 樊振东头像容器 */
-  .cell-dong-wrap {
+  :global(.cell-dong-wrap) {
     position: absolute;
     inset: 0;
     display: flex;
@@ -634,7 +640,7 @@ const i18n = {
     overflow: hidden;
   }
 
-  .cell-dong-avatar {
+  :global(.cell-dong-avatar) {
     width: 82% !important;
     height: 82% !important;
     border-radius: 50% !important;
@@ -649,7 +655,7 @@ const i18n = {
   }
 
   /* 🚫 找错咚覆盖图层 */
-  .cell-ban-overlay {
+  :global(.cell-ban-overlay) {
     position: absolute;
     inset: 0;
     display: flex;
@@ -661,13 +667,13 @@ const i18n = {
     animation: popBan 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  .ban-svg {
+  :global(.ban-svg) {
     width: 68%;
     height: 68%;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   }
 
-  .grid-cell.has-conflict {
+  :global(.grid-cell.has-conflict) {
     border-color: #ff1744 !important;
     animation: errorShake 0.4s ease-in-out;
   }
@@ -1473,7 +1479,8 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const regionId = data.regions[r][c];
-          const cellEl = document.createElement('div');
+          const cellEl = document.createElement('button');
+          cellEl.type = 'button';
           cellEl.className = 'grid-cell';
           cellEl.setAttribute('data-row', r.toString());
           cellEl.setAttribute('data-col', c.toString());
@@ -1484,7 +1491,8 @@ const i18n = {
 
           const key = `${r},${c}`;
 
-          // 核心单双击分流
+          // 单一点击分发：第一次点击等待短窗口，第二次同格点击提交。
+          // 不再同时监听 click 和 dblclick，避免两个事件重复或互相抢占。
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.lives <= 0) return;
@@ -1493,7 +1501,7 @@ const i18n = {
 
             const now = Date.now();
             const lastTap = this.lastTapTimes.get(key) || 0;
-            const isDoubleTap = (now - lastTap > 40 && now - lastTap < 350);
+            const isDoubleTap = lastTap > 0 && now - lastTap <= 420;
 
             if (isDoubleTap) {
               // 判定为双击 -> 立即清除单击计时器并执行确定找咚
@@ -1504,7 +1512,7 @@ const i18n = {
               this.lastTapTimes.delete(key);
               this.handleDoubleClick(r, c);
             } else {
-              // 第一次轻点 -> 记录时间并设置 250ms 防抖
+              // 第一次轻点 -> 记录时间并设置防抖
               this.lastTapTimes.set(key, now);
               if (this.singleTapTimers.has(key)) {
                 clearTimeout(this.singleTapTimers.get(key));
@@ -1513,21 +1521,9 @@ const i18n = {
                 this.singleTapTimers.delete(key);
                 this.lastTapTimes.delete(key);
                 this.handleSingleClick(r, c);
-              }, 250);
+              }, 420);
               this.singleTapTimers.set(key, timer);
             }
-          });
-
-          // 原生双击捕获（双保险）
-          cellEl.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (this.singleTapTimers.has(key)) {
-              clearTimeout(this.singleTapTimers.get(key));
-              this.singleTapTimers.delete(key);
-            }
-            this.lastTapTimes.delete(key);
-            this.handleDoubleClick(r, c);
           });
 
           // 电脑端右键单击：0 毫秒标记/清除 ✖
@@ -1622,11 +1618,18 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const val = this.gridState[r][c];
-          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
+          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLButtonElement;
           if (!cellEl) continue;
 
-          cellEl.classList.remove('has-conflict', 'cell-locked');
+          if (val === 2) correctDongCount++;
+          const renderedState = Number(cellEl.dataset.renderedState ?? '-1');
+          if (renderedState === val) continue;
+          cellEl.dataset.renderedState = val.toString();
+          cellEl.classList.toggle('cell-locked', val === 2 || val === 3);
+          cellEl.classList.toggle('has-conflict', val === 3);
           cellEl.innerHTML = '';
+          const stateText = val === 1 ? '已标记排除' : val === 2 ? '已找到咚' : val === 3 ? '找错咚，已锁定' : '空格';
+          cellEl.setAttribute('aria-label', `第 ${r + 1} 行第 ${c + 1} 列，${stateText}`);
 
           if (val === 1) {
             // ✖ 排除白色交叉
@@ -1641,9 +1644,6 @@ const i18n = {
             cellEl.appendChild(crossWrap);
           } else if (val === 2) {
             // ✅ 正确咚咚头像（永久锁定）
-            correctDongCount++;
-            cellEl.classList.add('cell-locked');
-
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1661,8 +1661,6 @@ const i18n = {
             cellEl.appendChild(dongWrap);
           } else if (val === 3) {
             // ❌ 找错咚：显示头像并叠加红色 🚫 禁止标志（永久锁定）
-            cellEl.classList.add('cell-locked', 'has-conflict');
-
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
