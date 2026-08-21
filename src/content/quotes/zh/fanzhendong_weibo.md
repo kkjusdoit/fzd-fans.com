@@ -1,14 +1,14 @@
 ---
 title: "微博合辑"
 titleEn: "Weibo Collection"
-description: "樊振东微博合辑（2011-2026）"
-descriptionEn: "Fan Zhendong's Weibo posts collection (2011-2026)"
+description: "樊振东微博合辑（2011-2025）"
+descriptionEn: "Fan Zhendong's Weibo posts collection (2011-2025)"
 category: quotes
 tags: ["微博", "社交媒体", "记录"]
 translated: false
 ---
 
-共 184 条微博，记录了樊振东从 2011 年到 2026 年的微博动态。网站暂只呈现文字版；如需要更好的图文并茂体验请访问：[微博书](https://www.weiboshu.com/design/um88kwgk/preview)
+共 183 条微博，记录了樊振东从 2011 年到 2025 年的微博动态。网站暂只呈现文字版；如需要更好的图文并茂体验请访问：[微博书](https://www.weiboshu.com/design/um88kwgk/preview)
 
 ---
 
@@ -770,18 +770,4 @@ translated: false
 
 ---
 
-## 2026
-
-### 2026-08-21
-
-> 是同样追求突破的决心，
-> 让我们在不同的赛道直面挑战。
-> 很高兴成为国际领先润滑油品牌 @嘉实多Castrol官方微博 冠军代言人。
-> 以技术之名，见证嘉实多有点东西！
-> 
-> 突破之路，永不止步 —— 一起向前，向上，向未来。
-> #樊振东代言嘉实多有点东西##嘉实多冠军代言人樊振东#
-
----
-
-*本合辑收录了樊振东 2011-2026 年间的微博动态，见证了一位运动员从青涩少年到大满贯冠军的成长历程。*
+*本合辑收录了樊振东 2011-2025 年间的微博动态，见证了一位运动员从青涩少年到大满贯冠军的成长历程。*
