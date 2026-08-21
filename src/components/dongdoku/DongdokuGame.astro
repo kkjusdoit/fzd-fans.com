@@ -15,7 +15,10 @@ const i18n = {
   rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
   rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
   rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
-  tipGesture: isEn ? '💡 Single click (or Right-click) to mark ✖ | Double click to find Dong 🏓' : '💡 单击/右击标记 ✖ 排除，双击确定 🏓 咚咚（找对出头像，找错亮 🚫 扣 1 条命）',
+  tipGesture: isEn ? '💡 Single-click to mark ✖ | Double-click to find Dong 🏓 (or switch mode below)' : '💡 单击/右键标 ✖ 排除，双击确定 🏓 咚咚（亦可切换下方单点模式）',
+  modeGesture: isEn ? '👆 Gesture (1-click ✖ / 2-click 🏓)' : '👆 智能手势 (单击 ✖ / 双击 🏓)',
+  modeCross: isEn ? '✖ Cross' : '✖ 标记排除',
+  modeDong: isEn ? '🏓 Dong' : '🏓 找咚确定',
   levelLabel: isEn ? 'Level' : '第',
   levelSuffix: isEn ? '' : '关',
   levelsBtn: isEn ? 'Levels' : '选关',
@@ -26,6 +29,8 @@ const i18n = {
   soundOff: isEn ? 'Sound: OFF' : '声音: 静音',
   placed: isEn ? 'Found' : '已找到',
   lives: isEn ? 'Lives' : '生命值',
+  unlockedProgress: isEn ? 'Unlocked Progress' : '已解锁进度',
+  allLevels: isEn ? '1000 Levels Total' : '共 1000 关',
   difficulty: {
     easy: isEn ? 'Easy' : '简单',
     medium: isEn ? 'Medium' : '中等',
@@ -41,6 +46,7 @@ const i18n = {
   nextLevel: isEn ? 'Next Level ➡️' : '下一关 ➡️',
   replayLevel: isEn ? 'Replay 🔄' : '再玩一次 🔄',
   backToLevels: isEn ? 'Levels Menu ≡' : '返回选关 ≡',
+  jumpToCurrent: isEn ? 'Current Level 🚀' : '跳至最新关 🚀',
   timeSpent: isEn ? 'Time' : '用时',
   movesCount: isEn ? 'Moves' : '步数',
   close: isEn ? 'Close' : '关闭'
@@ -131,9 +137,22 @@ const i18n = {
     </div>
   </section>
 
-  <!-- 操作小贴士 -->
-  <div class="gesture-tip-bar">
-    <span>{i18n.tipGesture}</span>
+  <!-- 操作模式与快捷工具条 -->
+  <div class="interaction-mode-bar">
+    <button type="button" class="mode-tab-btn active" id="btn-mode-auto">
+      <span class="tab-icon">👆</span>
+      <span class="tab-text">{i18n.modeGesture}</span>
+    </button>
+    <div class="tool-switch-group">
+      <button type="button" class="tool-btn" id="btn-tool-cross" title="单选标记排除模式">
+        <span class="tool-icon">✖</span>
+        <span class="tool-text">{i18n.modeCross}</span>
+      </button>
+      <button type="button" class="tool-btn" id="btn-tool-dong" title="单选确定找咚模式">
+        <span class="tool-icon">🏓</span>
+        <span class="tool-text">{i18n.modeDong}</span>
+      </button>
+    </div>
   </div>
 
   <!-- 提示条 / 报错提示条 (Toast Bar) -->
@@ -152,16 +171,34 @@ const i18n = {
     </div>
   </main>
 
-  <!-- 选关模态弹窗 (Levels Modal) -->
+  <!-- 选关模态弹窗 (Premium Redesigned Levels Modal) -->
   <div class="modal-backdrop" id="modal-levels" style="display: none;">
     <div class="modal-content modal-levels-content">
-      <div class="modal-header">
-        <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
-        <button type="button" class="modal-close" id="btn-close-levels">×</button>
+      <!-- 选关顶部头图与进度 -->
+      <div class="levels-modal-header">
+        <div class="levels-title-group">
+          <div class="levels-main-title">
+            <span class="title-emoji">🏆</span>
+            <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
+          </div>
+          <p class="levels-subtitle">
+            {i18n.unlockedProgress}: <strong id="levels-unlocked-count">1</strong> / 1000
+          </p>
+        </div>
+        <div class="levels-header-actions">
+          <button type="button" class="btn-jump-current" id="btn-jump-current">{i18n.jumpToCurrent}</button>
+          <button type="button" class="modal-close" id="btn-close-levels">×</button>
+        </div>
       </div>
-      <div class="levels-pack-tabs" id="levels-pack-tabs">
-        <!-- 分页 Tabs: 1-50, 51-100, 101-150 ... -->
+
+      <!-- 分包分页选项卡 -->
+      <div class="levels-pack-nav">
+        <div class="levels-pack-tabs" id="levels-pack-tabs">
+          <!-- 分页 Tabs: 1-50, 51-100, 101-150 ... -->
+        </div>
       </div>
+
+      <!-- 关卡卡片网格 -->
       <div class="levels-grid-wrapper">
         <div class="levels-grid" id="levels-grid">
           <!-- 关卡卡片 -->
@@ -372,13 +409,72 @@ const i18n = {
     white-space: nowrap;
   }
 
-  /* 手势提示条 */
-  .gesture-tip-bar {
-    text-align: center;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #8c736c;
-    margin: 0.2rem 0 0.3rem;
+  /* 操作模式与快捷工具条 */
+  .interaction-mode-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin: 0.35rem 0 0.4rem;
+    background: #fdfaf8;
+    border: 1px solid #f0e2db;
+    border-radius: 1rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .mode-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #ffffff;
+    border: 1.5px solid #ebdcd5;
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #705851;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .mode-tab-btn.active {
+    background: #1e88e5;
+    border-color: #1e88e5;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.3);
+  }
+
+  .tool-switch-group {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #ffffff;
+    border: 1.5px solid #ebdcd5;
+    padding: 0.3rem 0.55rem;
+    border-radius: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #705851;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tool-btn:hover {
+    border-color: #1e88e5;
+    color: #1e88e5;
+  }
+
+  .tool-btn.active {
+    background: #1e88e5;
+    border-color: #1e88e5;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(30, 136, 229, 0.3);
   }
 
   /* 提示与报错条 */
@@ -437,7 +533,7 @@ const i18n = {
     padding: 0.75rem;
     box-shadow: 0 10px 30px rgba(78, 64, 55, 0.10);
     width: 100%;
-    max-width: min(90vw, 490px, calc(100vh - 220px));
+    max-width: min(90vw, 490px, calc(100vh - 240px));
     aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
@@ -454,13 +550,7 @@ const i18n = {
   }
 
   /* 棋盘格子 */
-  :global(.grid-cell) {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    font: inherit !important;
-    color: inherit !important;
+  .grid-cell {
     position: relative !important;
     width: 100% !important;
     height: 100% !important;
@@ -481,26 +571,26 @@ const i18n = {
     -webkit-tap-highlight-color: transparent !important;
   }
 
-  :global(.grid-cell:hover) {
+  .grid-cell:hover {
     transform: scale(1.03);
     filter: brightness(1.06);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     z-index: 2;
   }
 
-  :global(.grid-cell:active) {
+  .grid-cell:active {
     transform: scale(0.96);
   }
 
-  :global(.grid-cell.cell-locked) {
+  .grid-cell.cell-locked {
     cursor: default !important;
   }
-  :global(.grid-cell.cell-locked:hover) {
+  .grid-cell.cell-locked:hover {
     transform: none !important;
   }
 
   /* 单元格状态：白色 ✖ 排除叉（单击产生） */
-  :global(.cell-cross-wrap) {
+  .cell-cross-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -510,14 +600,14 @@ const i18n = {
     animation: popCross 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  :global(.cross-svg) {
+  .cross-svg {
     width: 100%;
     height: 100%;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
   }
 
   /* 单元格状态：🏓 樊振东头像容器（双击产生） */
-  :global(.cell-dong-wrap) {
+  .cell-dong-wrap {
     position: absolute;
     inset: 0;
     display: flex;
@@ -529,7 +619,7 @@ const i18n = {
   }
 
   /* 精致圆形头像（基于 background-image，绝对保证为圆形且 100% 适配单元格不溢出） */
-  :global(.cell-dong-avatar) {
+  .cell-dong-avatar {
     width: 82% !important;
     height: 82% !important;
     border-radius: 50% !important;
@@ -544,7 +634,7 @@ const i18n = {
   }
 
   /* 🚫 找错咚 / 错误尝试覆盖图层 */
-  :global(.cell-ban-overlay) {
+  .cell-ban-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -556,20 +646,20 @@ const i18n = {
     animation: popBan 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
 
-  :global(.ban-svg) {
+  .ban-svg {
     width: 68%;
     height: 68%;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
   }
 
   /* 找错态外框警示 */
-  :global(.grid-cell.has-conflict) {
+  .grid-cell.has-conflict {
     border-color: #ff1744 !important;
     animation: errorShake 0.4s ease-in-out;
   }
 
   /* 提示高亮态 */
-  :global(.grid-cell.hint-active) {
+  .grid-cell.hint-active {
     animation: pulseHint 1.2s infinite;
     border-color: #ffd700 !important;
     z-index: 5;
@@ -579,8 +669,8 @@ const i18n = {
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(30, 20, 15, 0.6);
-    backdrop-filter: blur(5px);
+    background: rgba(30, 20, 15, 0.65);
+    backdrop-filter: blur(6px);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -592,26 +682,90 @@ const i18n = {
   .modal-content {
     background: #ffffff;
     border-radius: 1.5rem;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
     max-height: 90vh;
     overflow-y: auto;
     width: 100%;
     animation: scaleUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .modal-header {
+  /* ========================================================
+     全新优化：高颜值游戏级选关弹窗 (Premium Levels Modal)
+     ======================================================== */
+  .modal-levels-content {
+    max-width: 660px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #ebdcd5;
+  }
+
+  .levels-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid #f0e4dd;
+    padding: 1.1rem 1.4rem;
+    background: linear-gradient(135deg, #ffffff, #fcf8f6);
+    border-bottom: 1px solid #ebdcd5;
   }
 
-  .modal-header h2 {
+  .levels-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .levels-main-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .levels-main-title h2 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 900;
     color: #3d302c;
+  }
+
+  .title-emoji {
+    font-size: 1.4rem;
+  }
+
+  .levels-subtitle {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #8c736c;
+    font-weight: 700;
+  }
+
+  .levels-subtitle strong {
+    color: #1e88e5;
+    font-size: 0.9rem;
+  }
+
+  .levels-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-jump-current {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-jump-current:hover {
+    background: #1e88e5;
+    color: #ffffff;
+    border-color: #1e88e5;
   }
 
   .modal-close {
@@ -634,104 +788,158 @@ const i18n = {
     color: #000;
   }
 
-  /* 选关弹窗 */
-  .modal-levels-content {
-    max-width: 680px;
-    display: flex;
-    flex-direction: column;
+  /* 选关分页 Pill 选项卡 */
+  .levels-pack-nav {
+    background: #faf5f2;
+    border-bottom: 1px solid #ebdcd5;
+    padding: 0.6rem 1rem;
   }
 
   .levels-pack-tabs {
     display: flex;
-    gap: 0.4rem;
-    padding: 0.8rem 1.2rem;
+    gap: 0.45rem;
     overflow-x: auto;
-    border-bottom: 1px solid #f0e4dd;
-    background: #fcf9f7;
+    padding-bottom: 0.2rem;
+    scrollbar-width: thin;
+  }
+
+  .levels-pack-tabs::-webkit-scrollbar {
+    height: 4px;
+  }
+  .levels-pack-tabs::-webkit-scrollbar-thumb {
+    background: #ebdcd5;
+    border-radius: 2px;
   }
 
   .pack-tab-btn {
-    padding: 0.35rem 0.75rem;
-    border-radius: 0.75rem;
-    border: 1px solid #ebdcd5;
-    background: white;
-    font-size: 0.78rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 0.85rem;
+    border: 1.5px solid #ebdcd5;
+    background: #ffffff;
+    font-size: 0.8rem;
     font-weight: 800;
     color: #705851;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+
+  .pack-tab-btn:hover {
+    border-color: #1e88e5;
+    color: #1e88e5;
   }
 
   .pack-tab-btn.active {
-    background: #1e88e5;
-    color: white;
+    background: linear-gradient(135deg, #1e88e5, #1565c0);
+    color: #ffffff;
     border-color: #1e88e5;
+    box-shadow: 0 3px 10px rgba(30, 136, 229, 0.35);
   }
 
+  /* 关卡卡片网格容器 */
   .levels-grid-wrapper {
     padding: 1.2rem;
     overflow-y: auto;
-    max-height: 60vh;
+    max-height: 55vh;
+    background: #ffffff;
   }
 
   .levels-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+    gap: 0.75rem;
   }
 
+  /* 关卡精美卡片 */
   .level-card {
     aspect-ratio: 1 / 1;
-    border-radius: 0.85rem;
+    border-radius: 1rem;
     border: 1.5px solid #ebdcd5;
     background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.2rem;
     font-weight: 900;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 6px rgba(78, 64, 55, 0.05);
+    padding: 0.3rem;
+    box-sizing: border-box;
   }
 
   .level-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     border-color: #1e88e5;
-    box-shadow: 0 5px 12px rgba(30, 136, 229, 0.18);
+    box-shadow: 0 6px 16px rgba(30, 136, 229, 0.22);
   }
 
-  .level-card.completed {
-    background: #f0fbf5;
-    border-color: #a3e0bf;
-    color: #1b5e20;
-  }
-
-  .level-card.completed::after {
-    content: '★';
-    position: absolute;
-    top: 2px;
-    right: 4px;
-    font-size: 0.75rem;
-    color: #fbc02d;
-  }
-
-  .level-card.current {
-    border-color: #1e88e5;
-    background: #e3f2fd;
-    color: #1565c0;
-    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.3);
+  .level-card:active {
+    transform: scale(0.95);
   }
 
   .level-card .lvl-num {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
+    color: #3d302c;
+    line-height: 1;
   }
 
-  .level-card .lvl-size {
+  .level-card .lvl-badge {
     font-size: 0.65rem;
-    font-weight: 700;
-    opacity: 0.7;
+    font-weight: 800;
+    padding: 0.12rem 0.4rem;
+    border-radius: 0.5rem;
+    line-height: 1;
+  }
+
+  /* 卡片标签按难度配色 */
+  .lvl-badge.diff-4, .lvl-badge.diff-5 {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .lvl-badge.diff-6, .lvl-badge.diff-7 {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .lvl-badge.diff-8, .lvl-badge.diff-9 {
+    background: #f3e5f5;
+    color: #6a1b9a;
+  }
+  .lvl-badge.diff-10 {
+    background: #fffde7;
+    color: #f57f17;
+    font-weight: 900;
+  }
+
+  /* 已通关关卡 */
+  .level-card.completed {
+    background: #f0fbf5;
+    border-color: #a3e0bf;
+  }
+  .level-card.completed .lvl-num {
+    color: #1b5e20;
+  }
+  .level-card.completed::after {
+    content: '★';
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: 0.75rem;
+    color: #fbc02d;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  }
+
+  /* 当前正玩的关卡 */
+  .level-card.current {
+    border-color: #1e88e5;
+    background: #e3f2fd;
+    box-shadow: 0 0 0 2px #1e88e5, 0 4px 14px rgba(30, 136, 229, 0.3);
+  }
+  .level-card.current .lvl-num {
+    color: #1565c0;
   }
 
   /* 通关胜利弹窗与失败弹窗 */
@@ -947,6 +1155,18 @@ const i18n = {
     .btn-text {
       display: none;
     }
+    .interaction-mode-bar {
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .mode-tab-btn, .tool-switch-group {
+      width: 100%;
+      justify-content: center;
+    }
+    .tool-btn {
+      flex: 1;
+      justify-content: center;
+    }
   }
 </style>
 
@@ -1096,9 +1316,12 @@ const i18n = {
     private lives: number = 3; // 3条命
     private sounds: SoundManager;
 
-    // 单双击定时器
-    private cellTimers: Map<string, any> = new Map();
-    private lastTap: { key: string; at: number } | null = null;
+    // 操作模式: 'auto' (智能手势: 单击✖/双击🏓), 'cross' (单选标叉), 'dong' (单选找咚)
+    private activeMode: 'auto' | 'cross' | 'dong' = 'auto';
+
+    // 硬件级触摸/点击双击捕获状态
+    private lastTapTimes: Map<string, number> = new Map();
+    private singleTapTimers: Map<string, any> = new Map();
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1165,6 +1388,7 @@ const i18n = {
         const res = await fetch('/data/dongdoku/manifest.json');
         if (res.ok) {
           this.manifest = await res.json();
+          this.updateLevelsModalProgress();
         }
       } catch (e) {
         console.warn('Failed to fetch manifest', e);
@@ -1197,6 +1421,7 @@ const i18n = {
       const soundIcon = document.getElementById('sound-icon');
       if (soundIcon) soundIcon.textContent = this.sounds.enabled ? '🔊' : '🔇';
       this.updateLivesDisplay();
+      this.updateLevelsModalProgress();
     }
 
     private updateLivesDisplay() {
@@ -1207,7 +1432,28 @@ const i18n = {
       livesEl.textContent = full + lost;
     }
 
+    private updateLevelsModalProgress() {
+      const el = document.getElementById('levels-unlocked-count');
+      if (el) el.textContent = this.maxUnlockedLevel.toString();
+    }
+
     private initEvents() {
+      // 操作模式切换
+      const btnModeAuto = document.getElementById('btn-mode-auto');
+      const btnToolCross = document.getElementById('btn-tool-cross');
+      const btnToolDong = document.getElementById('btn-tool-dong');
+
+      const setMode = (m: 'auto' | 'cross' | 'dong') => {
+        this.activeMode = m;
+        btnModeAuto?.classList.toggle('active', m === 'auto');
+        btnToolCross?.classList.toggle('active', m === 'cross');
+        btnToolDong?.classList.toggle('active', m === 'dong');
+      };
+
+      btnModeAuto?.addEventListener('click', () => setMode('auto'));
+      btnToolCross?.addEventListener('click', () => setMode(this.activeMode === 'cross' ? 'auto' : 'cross'));
+      btnToolDong?.addEventListener('click', () => setMode(this.activeMode === 'dong' ? 'auto' : 'dong'));
+
       // 音效开关
       const btnSound = document.getElementById('btn-sound');
       if (btnSound) {
@@ -1240,6 +1486,12 @@ const i18n = {
       document.getElementById('btn-win-levels')?.addEventListener('click', () => {
         this.closeModal('modal-win');
         this.openLevelsModal();
+      });
+
+      // 跳至最新关
+      document.getElementById('btn-jump-current')?.addEventListener('click', () => {
+        this.closeModal('modal-levels');
+        this.loadLevel(this.maxUnlockedLevel);
       });
 
       // 胜利弹窗中的下一关 / 重玩
@@ -1297,6 +1549,7 @@ const i18n = {
         this.maxUnlockedLevel = levelId;
       }
       this.saveStorage(false);
+      this.updateLevelsModalProgress();
 
       let data = this.levelCache.get(levelId);
       if (!data) {
@@ -1349,7 +1602,7 @@ const i18n = {
       } catch (e) {}
     }
 
-    // 渲染 UI 与网格（支持单击、原生双击、右键标记）
+    // 渲染 UI 与网格（支持智能手势、单选模式、原生双击与右键）
     private renderUI(data: any) {
       const curLvlNum = document.getElementById('cur-level-num');
       if (curLvlNum) curLvlNum.textContent = data.id.toString();
@@ -1377,8 +1630,7 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const regionId = data.regions[r][c];
-          const cellEl = document.createElement('button');
-          cellEl.type = 'button';
+          const cellEl = document.createElement('div');
           cellEl.className = 'grid-cell';
           cellEl.setAttribute('data-row', r.toString());
           cellEl.setAttribute('data-col', c.toString());
@@ -1389,40 +1641,71 @@ const i18n = {
 
           const key = `${r},${c}`;
 
-          // 统一点击分发：第一次点击等待短窗口，第二次同格点击立即提交。
-          // 使用原生 button + click，兼容鼠标、触控板、触摸和键盘操作。
+          // 核心点击交互逻辑
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
             if (this.lives <= 0) return;
             const currentVal = this.gridState[r][c];
             if (currentVal === 2 || currentVal === 3) return;
 
-            const now = Date.now();
-            if (this.lastTap?.key === key && now - this.lastTap.at <= 420) {
-              this.lastTap = null;
-              if (this.cellTimers.has(key)) {
-                clearTimeout(this.cellTimers.get(key));
-                this.cellTimers.delete(key);
-              }
-              this.commitDoubleClick(r, c, key);
+            // 1. 如果处于单选找咚模式
+            if (this.activeMode === 'dong') {
+              this.handleDoubleClick(r, c);
               return;
             }
-            this.lastTap = { key, at: now };
 
-            const timer = setTimeout(() => {
-              this.cellTimers.delete(key);
+            // 2. 如果处于单选标叉模式
+            if (this.activeMode === 'cross') {
               this.handleSingleClick(r, c);
-            }, 300);
-            this.cellTimers.set(key, timer);
+              return;
+            }
+
+            // 3. 智能手势模式 (单击 ✖ / 双击 🏓)
+            const now = Date.now();
+            const lastTap = this.lastTapTimes.get(key) || 0;
+            const isDoubleTap = (now - lastTap > 40 && now - lastTap < 360);
+
+            if (isDoubleTap) {
+              // 判定为双击 -> 立即清除单击计时器并执行找咚
+              if (this.singleTapTimers.has(key)) {
+                clearTimeout(this.singleTapTimers.get(key));
+                this.singleTapTimers.delete(key);
+              }
+              this.lastTapTimes.delete(key);
+              this.handleDoubleClick(r, c);
+            } else {
+              // 第一次轻点 -> 记录时间并设置 260ms 防抖
+              this.lastTapTimes.set(key, now);
+              if (this.singleTapTimers.has(key)) {
+                clearTimeout(this.singleTapTimers.get(key));
+              }
+              const timer = setTimeout(() => {
+                this.singleTapTimers.delete(key);
+                this.lastTapTimes.delete(key);
+                this.handleSingleClick(r, c);
+              }, 260);
+              this.singleTapTimers.set(key, timer);
+            }
           });
 
-          // 3. 电脑端右键单击：直接标记 ✖（0 毫秒延迟）
+          // 原生双击捕获（系统双击双保险）
+          cellEl.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.singleTapTimers.has(key)) {
+              clearTimeout(this.singleTapTimers.get(key));
+              this.singleTapTimers.delete(key);
+            }
+            this.lastTapTimes.delete(key);
+            this.handleDoubleClick(r, c);
+          });
+
+          // 电脑端右键单击：0 毫秒标记/清除 ✖
           cellEl.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            this.lastTap = null;
-            if (this.cellTimers.has(key)) {
-              clearTimeout(this.cellTimers.get(key));
-              this.cellTimers.delete(key);
+            if (this.singleTapTimers.has(key)) {
+              clearTimeout(this.singleTapTimers.get(key));
+              this.singleTapTimers.delete(key);
             }
             this.handleSingleClick(r, c);
           });
@@ -1432,14 +1715,6 @@ const i18n = {
       }
 
       this.updateBoardDisplay();
-    }
-
-    private commitDoubleClick(r: number, c: number, key: string) {
-      if (this.cellTimers.has(key)) {
-        clearTimeout(this.cellTimers.get(key));
-        this.cellTimers.delete(key);
-      }
-      this.handleDoubleClick(r, c);
     }
 
     // 计时器
@@ -1455,13 +1730,14 @@ const i18n = {
       }, 1000);
     }
 
-    // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖（绝不影响其他任何格子）
+    // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖
     private handleSingleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
+      this.pushUndoSnapshot();
+
       const currentVal = this.gridState[r][c];
       if (currentVal === 2 || currentVal === 3) return; // 锁定格不能改
-      this.pushUndoSnapshot();
 
       const nextVal = (currentVal === 1) ? 0 : 1;
       this.gridState[r][c] = nextVal;
@@ -1472,10 +1748,11 @@ const i18n = {
       this.saveStorage(true);
     }
 
-    // 【双击逻辑】：仅针对当前格子判定找对/找错（绝不自动给四周打叉！）
+    // 【双击逻辑】：仅针对当前格子判定找对/找错（对则亮头像，错则亮 🚫 扣 1 条命）
     private handleDoubleClick(r: number, c: number) {
       if (this.lives <= 0) return;
       this.clearHintHighlights();
+      this.pushUndoSnapshot();
 
       const currentVal = this.gridState[r][c];
       if (currentVal === 2 || currentVal === 3) return; // 已经确定过，无再次机会
@@ -1528,8 +1805,6 @@ const i18n = {
 
     // 撤销操作
     private handleUndo() {
-      // 最终双击提交后不可悔棋：避免“撤销”恢复已裁决格，重新获得机会。
-      if (this.gridState.some(row => row.some(value => value === 2 || value === 3))) return;
       if (this.undoStack.length === 0) return;
       const last = this.undoStack.pop();
       if (last) {
@@ -1621,22 +1896,11 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const val = this.gridState[r][c];
-          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLButtonElement;
+          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLElement;
           if (!cellEl) continue;
 
-          if (val === 2) correctDongCount++;
-
-          // 只重绘状态真正发生变化的格子。否则已有的叉号、头像和错误标志
-          // 会被反复销毁重建，导致每次点击时全盘动画一起重新播放。
-          const renderedState = Number(cellEl.dataset.renderedState ?? '-1');
-          if (renderedState === val) continue;
-          cellEl.dataset.renderedState = val.toString();
-
-          cellEl.classList.toggle('cell-locked', val === 2 || val === 3);
-          cellEl.classList.toggle('has-conflict', val === 3);
+          cellEl.classList.remove('has-conflict', 'cell-locked');
           cellEl.innerHTML = '';
-          const stateText = val === 1 ? '已标记排除' : val === 2 ? '已找到咚' : val === 3 ? '找错咚，已锁定' : '空格';
-          cellEl.setAttribute('aria-label', `第 ${r + 1} 行第 ${c + 1} 列，${stateText}`);
 
           if (val === 1) {
             // ✖ 排除白色交叉
@@ -1651,6 +1915,9 @@ const i18n = {
             cellEl.appendChild(crossWrap);
           } else if (val === 2) {
             // ✅ 正确咚咚头像（永久锁定）
+            correctDongCount++;
+            cellEl.classList.add('cell-locked');
+
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1668,6 +1935,8 @@ const i18n = {
             cellEl.appendChild(dongWrap);
           } else if (val === 3) {
             // ❌ 找错咚：显示头像并叠加红色 🚫 禁止标志（永久锁定）
+            cellEl.classList.add('cell-locked', 'has-conflict');
+
             let avatarPath = this.cellAvatars.get(`${r},${c}`);
             if (!avatarPath) {
               avatarPath = this.getRandomAvatar();
@@ -1739,6 +2008,7 @@ const i18n = {
       }
 
       this.saveStorage(false);
+      this.updateLevelsModalProgress();
 
       const winAvatarBox = document.getElementById('win-avatar-box');
       if (winAvatarBox) {
@@ -1756,12 +2026,13 @@ const i18n = {
       this.openModal('modal-win');
     }
 
-    // 选关弹窗逻辑
+    // 选关弹窗逻辑 (高颜值重构)
     private openLevelsModal() {
       const tabsEl = document.getElementById('levels-pack-tabs');
       const gridEl = document.getElementById('levels-grid');
       if (!tabsEl || !gridEl) return;
 
+      this.updateLevelsModalProgress();
       const currentPackIdx = Math.floor((this.currentLevelId - 1) / 50);
 
       tabsEl.innerHTML = '';
@@ -1781,6 +2052,14 @@ const i18n = {
 
       this.renderLevelsGrid(currentPackIdx);
       this.openModal('modal-levels');
+
+      // 滚动选中项到视野内
+      setTimeout(() => {
+        const activeTab = tabsEl.querySelector('.pack-tab-btn.active') as HTMLElement;
+        if (activeTab) {
+          activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }, 50);
     }
 
     // 渲染选关网格
@@ -1794,17 +2073,18 @@ const i18n = {
 
       for (let lid = start; lid <= end; lid++) {
         const card = document.createElement('div');
-        const isCurrent = lid === this.currentLevelId;
-        const isCompleted = lid < this.maxUnlockedLevel;
+        const isCurrent = (lid === this.currentLevelId);
+        const isCompleted = (lid < this.maxUnlockedLevel);
         
         card.className = `level-card ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}`;
         
         const manifestItem = this.manifest.find(m => m.id === lid);
-        const sizeText = manifestItem ? `${manifestItem.size}×${manifestItem.size}` : '';
+        const size = manifestItem ? manifestItem.size : (lid <= 5 ? 4 : (lid <= 10 ? 5 : 8));
+        const sizeText = `${size}×${size}`;
 
         card.innerHTML = `
           <span class="lvl-num">${lid}</span>
-          <span class="lvl-size">${sizeText}</span>
+          <span class="lvl-badge diff-${size}">${sizeText}</span>
         `;
 
         card.addEventListener('click', () => {
