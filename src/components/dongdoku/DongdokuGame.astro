@@ -39,7 +39,7 @@ const i18n = {
   replayLevel: isEn ? 'Replay 🔄' : '再玩一次 🔄',
   backToLevels: isEn ? 'Levels Menu ≡' : '返回选关 ≡',
   jumpToCurrent: isEn ? 'Current Level 🚀' : '跳至最新关 🚀',
-  movesCount: isEn ? 'Moves' : '步数',
+  rating: isEn ? 'Rating' : '本关评价',
   close: isEn ? 'Close' : '关闭'
 };
 ---
@@ -221,9 +221,9 @@ const i18n = {
     </div>
 
     <div class="win-stats-grid">
-      <div class="stat-box">
-        <span class="stat-label">{i18n.movesCount}</span>
-        <span class="stat-value" id="win-moves">8</span>
+      <div class="rating-box" aria-label={i18n.rating}>
+        <span class="rating-label">{i18n.rating}</span>
+        <span class="rating-stars" id="win-rating">★★★</span>
       </div>
     </div>
 
@@ -1029,26 +1029,33 @@ const i18n = {
     margin-bottom: 1.2rem;
   }
 
-  .stat-box {
+  .rating-box {
     background: #fdf6f0;
     border: 1px solid #f0e0d6;
     border-radius: 1rem;
-    padding: 0.5rem 1.5rem;
+    min-width: 9rem;
+    min-height: 4.6rem;
+    padding: 0.55rem 1.5rem;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 0.2rem;
   }
 
-  .stat-label {
+  .rating-label {
     font-size: 0.72rem;
     color: #8d6e63;
     font-weight: 700;
   }
 
-  .stat-value {
-    font-size: 1.25rem;
+  .rating-stars {
+    min-width: 5.5rem;
+    font-size: 1.55rem;
+    line-height: 1;
     font-weight: 900;
-    color: #3e2723;
+    color: #ffc107;
+    text-shadow: 0 1px 2px rgba(121, 85, 0, 0.22);
   }
 
   .win-actions {
@@ -1235,6 +1242,11 @@ const i18n = {
     private lastTapTimes: Map<string, number> = new Map();
     private singleTapTimers: Map<string, any> = new Map();
     private victoryTimer: any = null;
+    private holdTimer: any = null;
+    private dragMode: 'mark' | 'erase' | null = null;
+    private dragPointerId: number | null = null;
+    private dragVisited = new Set<string>();
+    private suppressNextClick = false;
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
@@ -1478,6 +1490,17 @@ const i18n = {
       const gridEl = document.getElementById('game-grid');
       if (!gridEl) return;
 
+      gridEl.addEventListener('pointermove', (e) => {
+        if (!this.dragMode) return;
+        const target = document.elementFromPoint(e.clientX, e.clientY)?.closest('.grid-cell') as HTMLElement | null;
+        if (!target || !gridEl.contains(target)) return;
+        const row = Number(target.dataset.row);
+        const col = Number(target.dataset.col);
+        if (Number.isInteger(row) && Number.isInteger(col)) this.applyDragCell(row, col);
+      });
+      gridEl.addEventListener('pointerup', () => this.cancelLongPress());
+      gridEl.addEventListener('pointercancel', () => this.cancelLongPress());
+
       const size = data.size;
       gridEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
       gridEl.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
@@ -1498,10 +1521,37 @@ const i18n = {
 
           const key = `${r},${c}`;
 
+          // 长按进入连续标记模式：空格起点为批量打叉，叉号起点为批量擦除。
+          cellEl.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 || this.lives <= 0) return;
+            this.cancelLongPress();
+            this.dragPointerId = e.pointerId;
+            this.dragVisited.clear();
+            this.holdTimer = setTimeout(() => {
+              const value = this.gridState[r][c];
+              if (value === 2 || value === 3) return;
+              this.dragMode = value === 1 ? 'erase' : 'mark';
+              this.suppressNextClick = true;
+              this.applyDragCell(r, c);
+              try { cellEl.setPointerCapture(e.pointerId); } catch {}
+            }, 350);
+          });
+
+          cellEl.addEventListener('pointerenter', () => {
+            if (this.dragMode) this.applyDragCell(r, c);
+          });
+
+          cellEl.addEventListener('pointerup', () => this.cancelLongPress());
+          cellEl.addEventListener('pointercancel', () => this.cancelLongPress());
+
           // 单一点击分发：第一次点击等待短窗口，第二次同格点击提交。
           // 不再同时监听 click 和 dblclick，避免两个事件重复或互相抢占。
           cellEl.addEventListener('click', (e) => {
             e.preventDefault();
+            if (this.suppressNextClick) {
+              this.suppressNextClick = false;
+              return;
+            }
             if (this.lives <= 0) return;
             const currentVal = this.gridState[r][c];
             if (currentVal === 2 || currentVal === 3) return;
@@ -1549,6 +1599,31 @@ const i18n = {
       }
 
       this.updateBoardDisplay();
+    }
+
+    private cancelLongPress() {
+      if (this.holdTimer) {
+        clearTimeout(this.holdTimer);
+        this.holdTimer = null;
+      }
+      this.dragMode = null;
+      this.dragPointerId = null;
+      this.dragVisited.clear();
+    }
+
+    private applyDragCell(r: number, c: number) {
+      if (!this.dragMode || this.lives <= 0) return;
+      const key = `${r},${c}`;
+      if (this.dragVisited.has(key)) return;
+      this.dragVisited.add(key);
+      const value = this.gridState[r][c];
+      if (value === 2 || value === 3) return;
+      const next = this.dragMode === 'mark' ? 1 : 0;
+      if (value === next) return;
+      this.gridState[r][c] = next;
+      this.moveCount++;
+      this.updateBoardDisplay();
+      this.saveStorage(true);
     }
 
     // 【单击逻辑】：仅针对当前格子标记 ✖ 排除 / 取消 ✖
@@ -1738,8 +1813,12 @@ const i18n = {
         winAvatarBox.style.backgroundImage = `url("${this.getRandomAvatar()}")`;
       }
 
-      const winMoves = document.getElementById('win-moves');
-      if (winMoves) winMoves.textContent = this.moveCount.toString();
+      const winRating = document.getElementById('win-rating');
+      if (winRating) {
+        const stars = Math.max(1, Math.min(3, this.lives));
+        winRating.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+        winRating.setAttribute('aria-label', `${stars} / 3`);
+      }
 
       this.openModal('modal-win');
     }
