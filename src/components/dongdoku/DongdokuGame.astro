@@ -12,12 +12,12 @@ const isEn = lang === 'en';
 const i18n = {
   title: isEn ? 'Dongdoku' : '找咚 (Dongdoku)',
   backToHall: isEn ? '‹ Games' : '‹ 小游戏大厅',
-  rule1Title: isEn ? '1. 行列唯一' : '1. 行列唯一',
-  rule1Desc: isEn ? '每行每列正好 1 个咚' : '每行每列正好 1 个咚',
-  rule2Title: isEn ? '2. 领地唯一' : '2. 领地唯一',
-  rule2Desc: isEn ? '每个色块正好 1 个咚' : '每个色块正好 1 个咚',
-  rule3Title: isEn ? '3. 八向隔离' : '3. 八向隔离',
-  rule3Desc: isEn ? '咚咚互不相碰(含对角)' : '咚咚互不相碰(含对角)',
+  rule1Title: isEn ? '1. One per line' : '1. 行列唯一',
+  rule1Desc: isEn ? 'Exactly 1 Dong per row & column' : '每行每列正好 1 个咚',
+  rule2Title: isEn ? '2. One per territory' : '2. 领地唯一',
+  rule2Desc: isEn ? 'Exactly 1 Dong per colour block' : '每个色块正好 1 个咚',
+  rule3Title: isEn ? '3. No touching' : '3. 八向隔离',
+  rule3Desc: isEn ? 'Dongs never touch (diagonals too)' : '咚咚互不相碰(含对角)',
   ruleSingle: isEn ? 'Single: ✖' : '单击打叉 ✖ 排除',
   ruleDouble: isEn ? 'Double: 🏓' : '双击确定 🏓 找咚',
   rulesToggle: isEn ? 'Rules' : '三大规则',
@@ -31,7 +31,7 @@ const i18n = {
   tutorialBtn: isEn ? 'Tutorial' : '教学',
   placed: isEn ? 'Found' : '已找到',
   lives: isEn ? 'Lives' : '生命值',
-  unlockedProgress: isEn ? 'Unlocked Progress' : '已解锁进度',
+  unlockedProgress: isEn ? 'Best Progress' : '最高通关纪录',
   gameOverTitle: isEn ? 'Game Over' : '挑战失败 💔',
   gameOverSubtitle: isEn ? 'You used all 3 lives! Don\'t give up, try again!' : '本关 3 次机会已用尽，别灰心，再来一次！',
   retryLevel: isEn ? 'Retry Level 🔄' : '重新挑战本关 🔄',
@@ -61,7 +61,10 @@ const i18n = {
   tutorialLevelName: isEn ? 'Tutorial' : '教学关',
   hintTitle: isEn ? 'Logic Hint 💡' : '推导提示 💡',
   shieldTitle: isEn ? '🛡️ Rookie Shield' : '🛡️ 新手免伤保护',
-  shieldUsed: isEn ? 'First mistake shielded: 0 life lost!' : '本次失误免扣生命值！'
+  shieldUsed: isEn ? 'First mistake shielded: 0 life lost!' : '本次失误免扣生命值！',
+  keyboardHelp: isEn
+    ? 'Keyboard: Enter toggles the ✖ exclude mark, Shift+Enter places a 🏓 Dong.'
+    : '键盘操作：Enter 切换 ✖ 排除标记，Shift+Enter 落子 🏓 找咚。'
 };
 ---
 
@@ -195,28 +198,29 @@ const i18n = {
       </section>
 
       <!-- 动态提示浮动提示条 (Hint Toast) -->
-      <div class="game-toast hint-toast" id="toast-hint" style="display: none;">
+      <div class="game-toast hint-toast" id="toast-hint" style="display: none;" role="status" aria-live="polite">
         <span class="toast-icon">💡</span>
         <div class="toast-text-group">
           <strong class="toast-title">{i18n.hintTitle}</strong>
           <span class="toast-message" id="toast-hint-text">提示信息</span>
         </div>
-        <button type="button" class="toast-close" id="btn-close-toast-hint">×</button>
+        <button type="button" class="toast-close" id="btn-close-toast-hint" aria-label={i18n.close}>×</button>
       </div>
 
       <!-- 冲突/防误触解析浮层 (Mistake Conflict Toast) -->
-      <div class="game-toast conflict-toast" id="toast-conflict" style="display: none;">
+      <div class="game-toast conflict-toast" id="toast-conflict" style="display: none;" role="alert" aria-live="assertive">
         <span class="toast-icon">⚠️</span>
         <div class="toast-text-group">
           <strong class="toast-title" id="toast-conflict-title">违规提醒</strong>
           <span class="toast-message" id="toast-conflict-text">同行已有咚</span>
         </div>
-        <button type="button" class="toast-close" id="btn-close-toast-conflict">×</button>
+        <button type="button" class="toast-close" id="btn-close-toast-conflict" aria-label={i18n.close}>×</button>
       </div>
 
       <!-- 核心游戏棋盘 (按可用屏幕高度智能全屏适配) -->
       <div class="board-viewport">
-        <div class="game-grid" id="game-grid">
+        <p class="sr-only" id="grid-keyboard-help">{i18n.keyboardHelp}</p>
+        <div class="game-grid" id="game-grid" role="grid" aria-describedby="grid-keyboard-help">
           <!-- 动态生成格子 -->
         </div>
       </div>
@@ -225,10 +229,10 @@ const i18n = {
 </div>
 
 <!-- 首次访问欢迎与新手引导邀请弹窗 (Welcome Tutorial Modal) -->
-<div class="modal-backdrop" id="modal-welcome" style="display: none;">
+<div class="modal-backdrop" id="modal-welcome" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-welcome-title">
   <div class="modal-content modal-welcome-content">
     <div class="welcome-icon">🏓</div>
-    <h2 class="welcome-title">{i18n.welcomeTitle}</h2>
+    <h2 class="welcome-title" id="modal-welcome-title">{i18n.welcomeTitle}</h2>
     <p class="welcome-subtitle">{i18n.welcomeSubtitle}</p>
     
     <div class="welcome-rules-preview">
@@ -254,21 +258,21 @@ const i18n = {
 </div>
 
 <!-- 选关模态弹窗 (Premium Levels Modal) -->
-<div class="modal-backdrop" id="modal-levels" style="display: none;">
+<div class="modal-backdrop" id="modal-levels" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-levels-title">
   <div class="modal-content modal-levels-content">
     <div class="levels-modal-header">
       <div class="levels-title-group">
         <div class="levels-main-title">
           <span class="title-emoji">🏆</span>
-          <h2>{i18n.levelsBtn} (1 ~ 1000)</h2>
+          <h2 id="modal-levels-title">{i18n.levelsBtn} (1 ~ 1000)</h2>
         </div>
         <p class="levels-subtitle">
-          {i18n.unlockedProgress}: <strong id="levels-unlocked-count">1</strong> / 1000
+          {i18n.unlockedProgress}: <strong id="levels-unlocked-count">0</strong> / 1000
         </p>
       </div>
       <div class="levels-header-actions">
         <button type="button" class="btn-jump-current" id="btn-jump-current">{i18n.jumpToCurrent}</button>
-        <button type="button" class="modal-close" id="btn-close-levels">×</button>
+        <button type="button" class="modal-close" id="btn-close-levels" aria-label={i18n.close}>×</button>
       </div>
     </div>
 
@@ -289,10 +293,10 @@ const i18n = {
 </div>
 
 <!-- 游戏失败弹窗 (Game Over Modal) -->
-<div class="modal-backdrop" id="modal-gameover" style="display: none;">
+<div class="modal-backdrop" id="modal-gameover" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-gameover-title">
   <div class="modal-content modal-win-content modal-gameover-content">
     <div class="gameover-icon">💔</div>
-    <h2 class="gameover-title">{i18n.gameOverTitle}</h2>
+    <h2 class="gameover-title" id="modal-gameover-title">{i18n.gameOverTitle}</h2>
     <p class="win-subtitle">{i18n.gameOverSubtitle}</p>
     
     <div class="win-avatar-showcase">
@@ -307,10 +311,10 @@ const i18n = {
 </div>
 
 <!-- 通关胜利弹窗 (Win Modal) -->
-<div class="modal-backdrop" id="modal-win" style="display: none;">
+<div class="modal-backdrop" id="modal-win" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-win-title">
   <div class="modal-content modal-win-content">
     <div class="win-trophy">🏆</div>
-    <h2 class="win-title">{i18n.winTitle}</h2>
+    <h2 class="win-title" id="modal-win-title">{i18n.winTitle}</h2>
     <p class="win-subtitle">{i18n.winSubtitle}</p>
     
     <div class="win-avatar-showcase">
@@ -333,10 +337,10 @@ const i18n = {
 </div>
 
 <!-- 新手教学通关结算弹窗 (Tutorial Win Modal) -->
-<div class="modal-backdrop" id="modal-tutorial-win" style="display: none;">
+<div class="modal-backdrop" id="modal-tutorial-win" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-tutorial-win-title">
   <div class="modal-content modal-win-content modal-tutorial-win-content">
     <div class="win-trophy">🎓</div>
-    <h2 class="win-title">{i18n.tutorialDoneTitle}</h2>
+    <h2 class="win-title" id="modal-tutorial-win-title">{i18n.tutorialDoneTitle}</h2>
     <p class="win-subtitle">{i18n.tutorialDoneDesc}</p>
     
     <div class="win-avatar-showcase">
@@ -366,6 +370,19 @@ const i18n = {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #3d302c;
     box-sizing: border-box;
+  }
+
+  /* 仅供屏幕阅读器的说明文本 */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* 顶部纯享轻量导航栏 */
@@ -1551,6 +1568,35 @@ const i18n = {
     animation: hintPulse 0.95s infinite ease-in-out;
     z-index: 10;
     box-sizing: border-box;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* 提示类型区分：mark 提示是"把这些格子排除"，用冷色 + ✖ 图示，
+     避免和 cat 提示的"此处落子"混淆 */
+  :global(.hint-beacon.hint-beacon-exclude) {
+    border-color: #64748b !important;
+    box-shadow: 0 0 0 4px rgba(100, 116, 139, 0.45), inset 0 0 16px rgba(100, 116, 139, 0.35);
+  }
+
+  :global(.hint-beacon-label) {
+    background: rgba(180, 83, 9, 0.94);
+    color: #ffffff;
+    font-size: clamp(0.6rem, 2vw, 0.72rem);
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+    line-height: 1.25;
+    pointer-events: none;
+  }
+
+  :global(.hint-beacon-exclude .hint-beacon-label) {
+    background: rgba(51, 65, 85, 0.94);
   }
 
   :global(.tutorial-dimmed) {
@@ -1707,18 +1753,68 @@ const i18n = {
     return `/game/assets/image-%20${num}.webp`;
   });
 
+  // 关卡数据里的 hint.text 只有中文，英文侧按 rule 类型结构化生成说明
+  const HINT_RULE_EN: Record<string, string> = {
+    single_region: 'This colour territory has only one legal cell left.',
+    single_row: 'This row has only one legal cell left.',
+    single_col: 'This column has only one legal cell left.',
+    locked_region_row: 'This territory’s candidates all sit in one row, so the rest of that row can be excluded.',
+    locked_region_col: 'This territory’s candidates all sit in one column, so the rest of that column can be excluded.',
+    locked_row_region: 'This row’s candidates all sit in one territory, so the rest of that territory can be excluded.',
+    locked_col_region: 'This column’s candidates all sit in one territory, so the rest of that territory can be excluded.',
+    naked_set_region_row: 'These territories fill these rows exactly, so every other cell in them can be excluded.',
+    naked_set_region_col: 'These territories fill these columns exactly, so every other cell in them can be excluded.',
+    intersection_cat: 'Every remaining candidate line crosses here, so the Dong belongs on this cell.',
+    contradiction: 'Placing a Dong on these cells leaves some territory with nowhere to go — exclude them.',
+    two_step_contradiction: 'Following these cells two steps ahead reaches a dead end — exclude them.'
+  };
+
+  // 客户端文案表（模板里的 i18n 对象取不到，脚本侧单独构造一份）
+  function buildStrings(isEn: boolean) {
+    return {
+      loadingLevel: isEn ? 'Loading level…' : '正在加载关卡...',
+      loadFailTitle: isEn ? 'Load Failed ⚠️' : '加载失败 ⚠️',
+      loadFailText: isEn
+        ? 'Could not load this level. Check your connection and tap Hint or pick another level.'
+        : '关卡数据加载失败，请检查网络后重试，或先换一关。',
+      cellEmpty: isEn ? 'empty' : '空格',
+      cellCrossed: isEn ? 'marked as excluded' : '已标记排除',
+      cellDong: isEn ? 'Dong found' : '已找到咚',
+      cellWrong: isEn ? 'wrong guess, locked' : '找错咚，已锁定',
+      cellAria: (r: number, c: number, s: string) =>
+        isEn ? `Row ${r}, column ${c}, ${s}` : `第 ${r} 行第 ${c} 列，${s}`,
+      beaconPlace: isEn ? 'Place' : '落子',
+      beaconExclude: isEn ? 'Exclude ✖' : '排除 ✖',
+      hintFallbackPrefix: isEn ? 'No deduction chain left for this level, so here is the answer: ' : '这一关的推导链已走完，直接告诉你答案：',
+      hintCoords: (r: number, c: number) => (isEn ? `row ${r}, column ${c}.` : `第 ${r} 行第 ${c} 列。`),
+      hintAllDone: isEn ? 'All Dongs found or no more hints available!' : '当前所有咚都已找到或盘面无需更多提示！',
+      hintTutorialBusy: isEn ? 'Please follow the current tutorial step guide.' : '当前正在教学训练中，请跟随上方步骤指引操作哦！',
+      hintRegionLast: isEn
+        ? 'This colour territory has only 1 legal cell left — the Dong must go here!'
+        : '提示：该颜色领地只剩 1 个空格，此处必定放咚！',
+      hintFallbackGeneric: isEn ? 'Look at the highlighted cells.' : '请观察高亮格子'
+    };
+  }
+
   // 游戏主控制器
   class DongdokuApp {
     private container: HTMLElement;
     private isEn: boolean = false;
+    private T: ReturnType<typeof buildStrings>;
     private levelCache: Map<number, any> = new Map();
     private manifest: Array<{ id: number; size: number; difficulty: string; diffText: string }> = [];
-    
+    private manifestById: Map<number, { id: number; size: number; difficulty: string; diffText: string }> = new Map();
+
     private currentLevelId: number = 1;
+    // 可自由访问的关卡上限（历史存档遗留字段；现在全部关卡都可选，仅用于兼容）
     private maxUnlockedLevel: number = 1;
+    // 真实通关纪录：只有 handleVictory 才会写，跳关不会污染
+    private bestCompletedLevel: number = 0;
+    private completedLevels: Set<number> = new Set();
     private currentLevelData: any = null;
-    private gridState: number[][] = []; 
+    private gridState: number[][] = [];
     private cellAvatars: Map<string, string> = new Map(); // `${r},${c}` -> avatarPath
+    private cellEls: HTMLButtonElement[][] = [];          // 棋盘 DOM 引用，避免每次重绘全表 querySelector
     private moveCount: number = 0;
     private lives: number = 3; // 3条命
     private rulesExpanded: boolean = true;
@@ -1741,11 +1837,14 @@ const i18n = {
     private dragPointerId: number | null = null;
     private dragVisited = new Set<string>();
     private suppressNextClick = false;
+    private dragDirty = false;              // 拖拽期间攒住存档，pointerup 再落盘
+    private lastFocusedBeforeModal: HTMLElement | null = null;
 
     constructor() {
       this.container = document.getElementById('dongdoku-app')!;
       this.isEn = this.container?.getAttribute('data-lang') === 'en';
-      
+      this.T = buildStrings(this.isEn);
+
       // 载入内嵌初始关卡
       for (const [idStr, data] of Object.entries(INITIAL_LEVELS)) {
         this.levelCache.set(Number(idStr), data);
@@ -1776,6 +1875,18 @@ const i18n = {
           }
           if (parsed.maxUnlockedLevel) this.maxUnlockedLevel = parsed.maxUnlockedLevel;
           if (parsed.rulesExpanded !== undefined) this.rulesExpanded = parsed.rulesExpanded;
+
+          // 真实通关纪录。旧存档没有这两个字段：maxUnlockedLevel 曾被"跳关"顶高过，
+          // 无法反推真实战绩，所以从 0 重新累计，不拿旧数字充数。
+          if (Array.isArray(parsed.completedLevels)) {
+            this.completedLevels = new Set(parsed.completedLevels.filter((n: any) => Number.isInteger(n) && n > 0));
+          }
+          if (Number.isInteger(parsed.bestCompletedLevel)) {
+            this.bestCompletedLevel = Math.max(0, parsed.bestCompletedLevel);
+          }
+          if (this.completedLevels.size > 0) {
+            this.bestCompletedLevel = Math.max(this.bestCompletedLevel, ...this.completedLevels);
+          }
         }
         this.hasCompletedTutorial = localStorage.getItem('dongdoku_tutorial_completed') === 'true';
       } catch (e) {
@@ -1790,6 +1901,8 @@ const i18n = {
         const payload: any = {
           currentLevelId: Math.max(1, this.currentLevelId),
           maxUnlockedLevel: this.maxUnlockedLevel,
+          bestCompletedLevel: this.bestCompletedLevel,
+          completedLevels: Array.from(this.completedLevels),
           rulesExpanded: this.rulesExpanded
         };
 
@@ -1797,8 +1910,18 @@ const i18n = {
           payload.boardState = {
             levelId: this.currentLevelId,
             grid: this.gridState,
-            lives: Math.max(1, this.lives)
+            // 如实写入剩余生命：归零就是归零，不能靠刷新页面白捡一条命
+            lives: Math.max(0, this.lives)
           };
+        } else {
+          // 只更新进度类字段时必须把已存的盘面原样带回去。
+          // 否则 loadLevel 里的 saveStorage(false) 会先把 boardState 抹掉，
+          // 紧接着 initBoardState 就再也读不到盘面——断点续玩实际上一直没生效。
+          const prev = localStorage.getItem('dongdoku_save_v1');
+          if (prev) {
+            const prevBoard = JSON.parse(prev).boardState;
+            if (prevBoard) payload.boardState = prevBoard;
+          }
         }
 
         localStorage.setItem('dongdoku_save_v1', JSON.stringify(payload));
@@ -1825,6 +1948,7 @@ const i18n = {
         const res = await fetch('/data/dongdoku/manifest.json');
         if (res.ok) {
           this.manifest = await res.json();
+          this.manifestById = new Map(this.manifest.map(m => [m.id, m]));
           this.updateLevelsModalProgress();
         }
       } catch (e) {
@@ -1886,7 +2010,7 @@ const i18n = {
 
     private updateLevelsModalProgress() {
       const el = document.getElementById('levels-unlocked-count');
-      if (el) el.textContent = this.maxUnlockedLevel.toString();
+      if (el) el.textContent = this.bestCompletedLevel.toString();
     }
 
     private initEvents() {
@@ -1960,10 +2084,10 @@ const i18n = {
         this.openLevelsModal();
       });
 
-      // 跳至最新关
+      // 跳至最新关：真实通关纪录的下一关
       document.getElementById('btn-jump-current')?.addEventListener('click', () => {
         this.closeModal('modal-levels');
-        this.loadLevel(this.maxUnlockedLevel);
+        this.loadLevel(Math.min(1000, Math.max(1, this.bestCompletedLevel + 1)));
       });
 
       // 胜利弹窗中的下一关
@@ -1980,6 +2104,16 @@ const i18n = {
       document.getElementById('btn-gameover-levels')?.addEventListener('click', () => {
         this.closeModal('modal-gameover');
         this.openLevelsModal();
+      });
+
+      // Esc 关闭选关弹窗（其余弹窗是必须做选择的结算界面，保留按钮出口）
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        const levelsModal = document.getElementById('modal-levels');
+        if (levelsModal && levelsModal.style.display === 'flex') {
+          e.preventDefault();
+          this.closeModal('modal-levels');
+        }
       });
     }
 
@@ -1999,8 +2133,34 @@ const i18n = {
       if (levelId < 0) levelId = 0;
       if (levelId > 1000) levelId = 1000;
 
+      const isTutorial = (levelId === 0);
+
+      // 先把关卡数据拿到手，再提交任何状态。
+      // 否则加载失败时 currentLevelId 已经被改写并落盘，刷新页面会一直卡在拉不下来的那一关。
+      let data = this.levelCache.get(levelId);
+      if (!data) {
+        const gridEl = document.getElementById('game-grid');
+        if (gridEl) {
+          this.cellEls = [];
+          gridEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">${this.T.loadingLevel}</div>`;
+        }
+        data = await this.fetchLevelData(levelId);
+      }
+
+      if (!data) {
+        this.showConflictToast(this.T.loadFailTitle, this.T.loadFailText);
+        // 占位符把盘面清掉了，把原来那一关重新画回来，别把玩家留在空屏上
+        if (this.currentLevelData) {
+          this.renderUI(this.currentLevelData);
+        } else {
+          const gridEl = document.getElementById('game-grid');
+          if (gridEl) gridEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">${this.T.loadFailText}</div>`;
+        }
+        return;
+      }
+
       this.currentLevelId = levelId;
-      this.isTutorialMode = (levelId === 0);
+      this.isTutorialMode = isTutorial;
       this.shieldUsedInLevel = false;
       this.clearAllBeacons();
       this.hideAllToasts();
@@ -2010,18 +2170,6 @@ const i18n = {
       }
       this.saveStorage(false);
       this.updateLevelsModalProgress();
-
-      let data = this.levelCache.get(levelId);
-      if (!data) {
-        const gridEl = document.getElementById('game-grid');
-        if (gridEl) gridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">正在加载关卡...</div>';
-        data = await this.fetchLevelData(levelId);
-      }
-
-      if (!data) {
-        alert(this.isEn ? 'Failed to load level' : '关卡数据加载失败，请检查网络');
-        return;
-      }
 
       this.currentLevelData = data;
       this.initBoardState(data);
@@ -2034,6 +2182,11 @@ const i18n = {
         if (guideCard) guideCard.style.display = 'none';
         const rulesSec = document.getElementById('rules-collapse-section');
         if (rulesSec) rulesSec.style.display = 'block';
+      }
+
+      // 存档里生命值已归零：说明上次是在失败状态下离开的，直接把失败结算摆回来
+      if (!this.isTutorialMode && this.lives <= 0) {
+        this.handleGameOver();
       }
     }
 
@@ -2054,10 +2207,19 @@ const i18n = {
         const saved = localStorage.getItem('dongdoku_save_v1');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed.boardState && parsed.boardState.levelId === this.currentLevelId && parsed.boardState.grid) {
-            this.gridState = parsed.boardState.grid;
-            if (parsed.boardState.lives && parsed.boardState.lives > 0) {
-              this.lives = parsed.boardState.lives;
+          const board = parsed.boardState;
+          const gridOk = board && board.levelId === this.currentLevelId && Array.isArray(board.grid)
+            && board.grid.length === size && board.grid.every((row: any) => Array.isArray(row) && row.length === size);
+
+          // 存档里这一关已经解完了：重玩时给个干净盘面，而不是把通关状态摆回来
+          const alreadySolved = gridOk
+            && board.grid.reduce((n: number, row: number[]) => n + row.filter((v) => v === 2).length, 0) >= size;
+
+          if (gridOk && !alreadySolved) {
+            this.gridState = board.grid;
+            // 0 也要如实恢复（旧存档没有 lives 字段时才回落到满血）
+            if (Number.isInteger(board.lives)) {
+              this.lives = Math.max(0, Math.min(3, board.lives));
             }
             for (let r = 0; r < size; r++) {
               for (let c = 0; c < size; c++) {
@@ -2147,17 +2309,24 @@ const i18n = {
 
     // 在指定格子上添加引导光圈与操作标签
     private addBeaconToCell(r: number, c: number, className: string = 'tutorial-beacon', labelText?: string) {
-      const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+      const cellEl = this.getCellEl(r, c);
       if (!cellEl) return;
       const beacon = document.createElement('div');
       beacon.className = className;
       if (labelText) {
         const labelEl = document.createElement('span');
-        labelEl.className = 'tutorial-beacon-label';
+        // hint 光圈和 tutorial 光圈的标签样式不同，按所属光圈取类名
+        labelEl.className = className.includes('hint-beacon') ? 'hint-beacon-label' : 'tutorial-beacon-label';
         labelEl.textContent = labelText;
         beacon.appendChild(labelEl);
       }
       cellEl.appendChild(beacon);
+    }
+
+    // 取棋盘格子 DOM：优先用 renderUI 建好的引用表，避免每次都走属性选择器
+    private getCellEl(r: number, c: number): HTMLButtonElement | null {
+      return this.cellEls[r]?.[c]
+        ?? (document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLButtonElement | null);
     }
 
     private clearAllBeacons() {
@@ -2182,34 +2351,51 @@ const i18n = {
     // 智能推导提示点击处理
     private handleHintClick() {
       if (this.isTutorialMode) {
-        this.showHintToast(this.isEn ? 'Please follow the current tutorial step guide.' : '当前正在教学训练中，请跟随上方步骤指引操作哦！');
+        this.showHintToast(this.T.hintTutorialBusy);
         return;
       }
 
       if (!this.currentLevelData) return;
       const size = this.currentLevelData.size;
 
-      // 1. 优先从静态 hints 数组中寻找当前未放置的步骤
+      // 1. 优先从静态 hints 数组中寻找第一条还没做完的推导步骤。
+      //    关卡数据有两种 action：
+      //      cat  = 此处必定落咚，做完的判定是这些格子都变成了咚 (2)
+      //      mark = 这些格子可以排除，做完的判定是都打上了叉 (1) 或已被锁死 (3)
+      //    早先两种都按"是否已落咚"判定，mark 的格子永远不可能变成 2，
+      //    于是循环永远停在第一条 mark 提示上，提示按钮从此不再前进。
       if (this.currentLevelData.hints && this.currentLevelData.hints.length > 0) {
         for (const hint of this.currentLevelData.hints) {
           const cells = hint.cells || (hint.target ? [hint.target] : []);
-          const hasUnplaced = cells.some((c: any) => this.gridState[c.row][c.col] !== 2);
-          if (hasUnplaced) {
-            this.clearHintHighlight();
-            cells.forEach((c: any) => {
-              if (this.gridState[c.row][c.col] !== 2) {
-                this.addBeaconToCell(c.row, c.col, 'hint-beacon');
-              }
-            });
-            const text = hint.text || (this.isEn ? hint.textEn : hint.textZh) || '请观察高亮格子';
-            this.showHintToast(text);
-            return;
-          }
+          if (cells.length === 0) continue;
+
+          const isMark = hint.action === 'mark';
+          const isDone = isMark
+            ? cells.every((c: any) => this.gridState[c.row][c.col] === 1 || this.gridState[c.row][c.col] === 3)
+            : cells.every((c: any) => this.gridState[c.row][c.col] === 2);
+          if (isDone) continue;
+
+          this.clearHintHighlight();
+          const beaconClass = isMark ? 'hint-beacon hint-beacon-exclude' : 'hint-beacon';
+          const beaconLabel = isMark ? this.T.beaconExclude : this.T.beaconPlace;
+          cells.forEach((c: any) => {
+            const val = this.gridState[c.row][c.col];
+            // 已经做到的格子不再高亮，只圈出还差的部分
+            const alreadyDone = isMark ? (val === 1 || val === 3) : (val === 2);
+            if (!alreadyDone) {
+              this.addBeaconToCell(c.row, c.col, beaconClass, beaconLabel);
+            }
+          });
+
+          const text = (this.isEn ? (hint.textEn || HINT_RULE_EN[hint.rule]) : (hint.text || hint.textZh))
+            || hint.text
+            || this.T.hintFallbackGeneric;
+          this.showHintToast(text);
+          return;
         }
       }
 
-      // 2. 动态扫描推导：寻找只剩 1 个空格的色块或行/列
-      // 扫描色块
+      // 2. 动态扫描推导：寻找只剩 1 个空格的色块
       for (let reg = 0; reg < size; reg++) {
         let emptyCells: Array<{ row: number; col: number }> = [];
         let hasDong = false;
@@ -2224,22 +2410,23 @@ const i18n = {
         if (!hasDong && emptyCells.length === 1) {
           const target = emptyCells[0];
           this.clearHintHighlight();
-          this.addBeaconToCell(target.row, target.col, 'hint-beacon');
-          this.showHintToast(this.isEn ? `Color territory ${reg + 1} has only 1 valid cell left!` : `提示：该颜色领地只剩 1 个空格，此处必定放咚！`);
+          this.addBeaconToCell(target.row, target.col, 'hint-beacon', this.T.beaconPlace);
+          this.showHintToast(this.T.hintRegionLast);
           return;
         }
       }
 
-      // 3. 兜底提示：从正确解中找到第一个尚未放置的咚
+      // 3. 兜底：推导链走完了还没解出来（约 127 关的 hints 没覆盖到底），
+      //    这时直接把答案坐标给出去，并如实说明这是答案而不是推导线索。
       const unplacedSol = this.currentLevelData.solution?.find((s: any) => this.gridState[s.row][s.col] !== 2);
       if (unplacedSol) {
         this.clearHintHighlight();
-        this.addBeaconToCell(unplacedSol.row, unplacedSol.col, 'hint-beacon');
-        this.showHintToast(this.isEn ? `Hint: Try placing Dong at Row ${unplacedSol.row + 1}, Column ${unplacedSol.col + 1}.` : `提示：请观察第 ${unplacedSol.row + 1} 行第 ${unplacedSol.col + 1} 列的位置。`);
+        this.addBeaconToCell(unplacedSol.row, unplacedSol.col, 'hint-beacon', this.T.beaconPlace);
+        this.showHintToast(this.T.hintFallbackPrefix + this.T.hintCoords(unplacedSol.row + 1, unplacedSol.col + 1));
         return;
       }
 
-      this.showHintToast(this.isEn ? 'All Dongs found or no more hints available!' : '当前所有咚都已找到或盘面无需更多提示！');
+      this.showHintToast(this.T.hintAllDone);
     }
 
     // 显示提示 Toast
@@ -2264,7 +2451,9 @@ const i18n = {
     }
 
     // 冲突原因分析与新手免伤保护 (Mistake Analyzer & Explainer)
-    private analyzeMistakeAndWarn(r: number, c: number) {
+    // shielded 由调用方判定后传入：这个方法只负责解释，不再自己改 shieldUsedInLevel，
+    // 否则调用方随后读到的已经是被改写后的值，扣命判断会永久失效。
+    private analyzeMistakeAndWarn(r: number, c: number, shielded: boolean = false) {
       const size = this.currentLevelData.size;
 
       let rowConflict = false;
@@ -2318,9 +2507,8 @@ const i18n = {
         message = this.isEn ? 'Placing here leads to impossible remaining grid. Use ✖ to exclude first!' : '该位置会导致后续领地无解，请先用 ✖ 排除观察！';
       }
 
-      // 新手前 3 关免伤保护
-      if (!this.isTutorialMode && this.currentLevelId <= 3 && !this.shieldUsedInLevel) {
-        this.shieldUsedInLevel = true;
+      // 新手前 3 关免伤保护（是否生效由调用方判定）
+      if (shielded) {
         title = this.isEn ? '🛡️ Rookie Shield: 0 Life Lost!' : '🛡️ 新手免伤保护：本次免扣生命值！';
       }
 
@@ -2348,11 +2536,13 @@ const i18n = {
 
     // 渲染 UI 与网格（手势极速分流：单击 ✖ / 双击 🏓）
     private renderUI(data: any) {
-      const curLvlNum = document.getElementById('cur-level-num');
+      // 注意：教学关分支写入的 innerHTML 里没有 #cur-level-num，
+      // 所以不能把它当作 guard —— 否则玩过一次教学后这里就再也更新不了，
+      // 关卡号会永久卡在"教学关"。
       const levelTitleContainer = document.getElementById('level-title-container');
-      if (levelTitleContainer && curLvlNum) {
+      if (levelTitleContainer) {
         if (this.isTutorialMode) {
-          levelTitleContainer.innerHTML = `🎓 <strong>${this.isEn ? 'Tutorial' : '教学关'}</strong>`;
+          levelTitleContainer.innerHTML = `🎓 <strong id="cur-level-num">${this.isEn ? 'Tutorial' : '教学关'}</strong>`;
         } else {
           levelTitleContainer.innerHTML = `${this.isEn ? 'Level' : '第'} <strong id="cur-level-num">${data.id}</strong> ${this.isEn ? '' : '关'}`;
         }
@@ -2382,6 +2572,7 @@ const i18n = {
       gridEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
       gridEl.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
       gridEl.innerHTML = '';
+      this.cellEls = Array.from({ length: size }, () => new Array(size));
 
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
@@ -2392,7 +2583,8 @@ const i18n = {
           cellEl.setAttribute('data-row', r.toString());
           cellEl.setAttribute('data-col', c.toString());
           cellEl.setAttribute('data-region', regionId.toString());
-          
+          this.cellEls[r][c] = cellEl;
+
           const color = REGION_COLORS[regionId % REGION_COLORS.length];
           cellEl.style.backgroundColor = color;
 
@@ -2468,6 +2660,17 @@ const i18n = {
             this.handleSingleClick(r, c);
           });
 
+          // 键盘操作：Enter / Space 走原生 click（切换 ✖），Shift+Enter 等价于双击落子。
+          // 否则键盘用户只能靠 420ms 内连按两次 Enter 才能落子。
+          cellEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.shiftKey) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (this.lives <= 0 && !this.isTutorialMode) return;
+              this.handleDoubleClick(r, c);
+            }
+          });
+
           gridEl.appendChild(cellEl);
         }
       }
@@ -2483,6 +2686,11 @@ const i18n = {
       this.dragMode = null;
       this.dragPointerId = null;
       this.dragVisited.clear();
+      // 拖拽期间攒下的改动在这里一次性落盘
+      if (this.dragDirty) {
+        this.dragDirty = false;
+        this.saveStorage(true);
+      }
     }
 
     private applyDragCell(r: number, c: number) {
@@ -2497,7 +2705,9 @@ const i18n = {
       this.gridState[r][c] = next;
       this.moveCount++;
       this.updateBoardDisplay();
-      this.saveStorage(true);
+      // 每划过一格就 JSON.stringify 整个棋盘同步写 localStorage 会明显拖慢长距离拖拽，
+      // 攒到 pointerup / pointercancel 再写一次。
+      this.dragDirty = true;
     }
 
     // 【单击逻辑】：标记 ✖ 排除 / 取消 ✖
@@ -2547,7 +2757,7 @@ const i18n = {
           this.cellAvatars.set(`${r},${c}`, this.getRandomAvatar());
         }
         this.updateBoardDisplay();
-        const foundCell = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`);
+        const foundCell = this.getCellEl(r, c);
         foundCell?.classList.add('last-found');
         setTimeout(() => foundCell?.classList.remove('last-found'), 1250);
         this.saveStorage(true);
@@ -2576,9 +2786,16 @@ const i18n = {
         }
 
         this.gridState[r][c] = 3;
-        this.analyzeMistakeAndWarn(r, c);
 
-        if (!this.shieldUsedInLevel || this.currentLevelId > 3) {
+        // 免伤保护只吃掉本关的第一次失误：先判定，再消耗，之后照常扣命。
+        // 旧写法把标记的赋值放在 analyzeMistakeAndWarn 里，而扣命条件又去读同一个标记，
+        // 结果第 1~3 关一旦犯过一次错就再也扣不动命，整关变成无限命。
+        const shielded = this.currentLevelId <= 3 && !this.shieldUsedInLevel;
+        this.analyzeMistakeAndWarn(r, c, shielded);
+
+        if (shielded) {
+          this.shieldUsedInLevel = true;
+        } else {
           this.lives--;
         }
         this.updateLivesDisplay();
@@ -2622,18 +2839,22 @@ const i18n = {
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
           const val = this.gridState[r][c];
-          const cellEl = document.querySelector(`.grid-cell[data-row="${r}"][data-col="${c}"]`) as HTMLButtonElement;
+          if (val === 2) correctDongCount++;
+
+          const cellEl = this.cellEls[r]?.[c];
           if (!cellEl) continue;
 
-          if (val === 2) correctDongCount++;
           const renderedState = Number(cellEl.dataset.renderedState ?? '-1');
           if (renderedState === val) continue;
           cellEl.dataset.renderedState = val.toString();
           cellEl.classList.toggle('cell-locked', val === 2 || val === 3);
           cellEl.classList.toggle('has-conflict', val === 3);
           cellEl.innerHTML = '';
-          const stateText = val === 1 ? '已标记排除' : val === 2 ? '已找到咚' : val === 3 ? '找错咚，已锁定' : '空格';
-          cellEl.setAttribute('aria-label', `第 ${r + 1} 行第 ${c + 1} 列，${stateText}`);
+          const stateText = val === 1 ? this.T.cellCrossed
+            : val === 2 ? this.T.cellDong
+            : val === 3 ? this.T.cellWrong
+            : this.T.cellEmpty;
+          cellEl.setAttribute('aria-label', this.T.cellAria(r + 1, c + 1, stateText));
 
           if (val === 1) {
             const crossWrap = document.createElement('div');
@@ -2737,6 +2958,10 @@ const i18n = {
         this.maxUnlockedLevel = Math.min(1000, this.currentLevelId + 1);
       }
 
+      // 真实通关纪录只在这里增长——选关跳关不会碰它
+      this.completedLevels.add(this.currentLevelId);
+      this.bestCompletedLevel = Math.max(this.bestCompletedLevel, this.currentLevelId);
+
       this.saveStorage(false);
       this.updateLevelsModalProgress();
 
@@ -2798,7 +3023,8 @@ const i18n = {
 
       // 在第一个分页的最前头添加 🎓 0 教学关卡
       if (packIdx === 0) {
-        const tutCard = document.createElement('div');
+        const tutCard = document.createElement('button');
+        tutCard.type = 'button';
         const isCurrentTut = (this.currentLevelId === 0);
         tutCard.className = `level-card tutorial-card ${isCurrentTut ? 'current' : ''}`;
         tutCard.innerHTML = `
@@ -2816,13 +3042,16 @@ const i18n = {
       const end = (packIdx + 1) * 50;
 
       for (let lid = start; lid <= end; lid++) {
-        const card = document.createElement('div');
+        // 用 button 而不是 div，键盘用户才能 Tab 到关卡卡片
+        const card = document.createElement('button');
+        card.type = 'button';
         const isCurrent = (lid === this.currentLevelId);
-        const isCompleted = (lid < this.maxUnlockedLevel);
-        
+        // 走真实通关纪录，而不是"访问过的最大关号"
+        const isCompleted = this.completedLevels.has(lid);
+
         card.className = `level-card ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}`;
-        
-        const manifestItem = this.manifest.find(m => m.id === lid);
+
+        const manifestItem = this.manifestById.get(lid);
         const size = manifestItem ? manifestItem.size : (lid <= 5 ? 4 : (lid <= 10 ? 5 : 8));
         const sizeText = `${size}×${size}`;
 
@@ -2830,6 +3059,10 @@ const i18n = {
           <span class="lvl-num">${lid}</span>
           <span class="lvl-badge diff-${size}">${sizeText}</span>
         `;
+        card.setAttribute('aria-label', this.isEn
+          ? `Level ${lid}, ${sizeText}${isCompleted ? ', completed' : ''}`
+          : `第 ${lid} 关，${sizeText}${isCompleted ? '，已通关' : ''}`);
+        if (isCurrent) card.setAttribute('aria-current', 'true');
 
         card.addEventListener('click', () => {
           this.closeModal('modal-levels');
@@ -2843,12 +3076,26 @@ const i18n = {
     // 通用弹窗开关
     private openModal(id: string) {
       const el = document.getElementById(id);
-      if (el) el.style.display = 'flex';
+      if (!el) return;
+      // 记住触发弹窗前的焦点，关闭时还回去
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && !el.contains(active)) {
+        this.lastFocusedBeforeModal = active;
+      }
+      el.style.display = 'flex';
+      const firstBtn = el.querySelector('button, [href]') as HTMLElement | null;
+      firstBtn?.focus();
     }
 
     private closeModal(id: string) {
       const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
+      if (!el) return;
+      const hadFocus = el.contains(document.activeElement);
+      el.style.display = 'none';
+      if (hadFocus && this.lastFocusedBeforeModal?.isConnected) {
+        this.lastFocusedBeforeModal.focus();
+      }
+      this.lastFocusedBeforeModal = null;
     }
   }
 
