@@ -248,7 +248,8 @@ const pageDesc = description || t('site.subtitle');
   {!isGameMode && <BirthdayClickEffects />}
   {!hideFooter && <Footer />}
 
-  <!-- 小程序推荐弹窗 -->
+  <!-- 小程序推荐弹窗：内容与二维码都是面向国内微信用户的，英文站整块不渲染 -->
+  {lang !== 'en' && (
   <div class="promo-modal" id="promoModal" style="display: none;">
     <div class="modal-backdrop" id="modalBackdrop"></div>
     <div class="modal-card">
@@ -279,6 +280,7 @@ const pageDesc = description || t('site.subtitle');
       </div>
     </div>
   </div>
+  )}
 
   <script is:inline>
     (function() {
