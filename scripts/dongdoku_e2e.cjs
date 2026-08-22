@@ -56,12 +56,13 @@ async function testHintChainAdvances(browser) {
   await openLevel(page, 51);
 
   const seenTexts = [];
-  let solvedByHint = 0;
   let stuckCount = 0;
+  let diedEarly = false;
 
   for (let i = 0; i < 120; i++) {
     await page.click('#btn-hint');
-    await page.waitForTimeout(90);
+    await page.waitForSelector('#toast-hint', { state: 'visible' });
+    await page.waitForTimeout(150);
 
     const txt = await page.textContent('#toast-hint-text');
     if (seenTexts.length && txt === seenTexts[seenTexts.length - 1]) stuckCount++;
@@ -69,27 +70,35 @@ async function testHintChainAdvances(browser) {
     seenTexts.push(txt);
     if (stuckCount >= 3) break; // 同一条提示连给 4 次 => 卡死
 
-    const beacons = await page.$$('.hint-beacon');
-    if (beacons.length === 0) break;
+    // 先把光圈位置读成坐标再动手：每次落子/打叉都会重绘那一格并清掉光圈节点，
+    // 拿着 ElementHandle 逐个点在慢网络下会点到已脱离文档的元素上。
+    const targets = await page.$$eval('.hint-beacon', (els) =>
+      els.map((el) => {
+        const cell = el.parentElement;
+        return {
+          row: cell.dataset.row,
+          col: cell.dataset.col,
+          exclude: (el.querySelector('.hint-beacon-label')?.textContent || '').includes('排除'),
+        };
+      }));
+    if (targets.length === 0) break;
 
-    // 读第一个光圈的标签决定动作：排除 => 单击，落子 => 双击
-    for (const b of beacons) {
-      const label = (await b.$eval('.hint-beacon-label', (el) => el.textContent).catch(() => '')) || '';
-      const cell = await b.evaluateHandle((el) => el.parentElement);
-      const box = await cell.asElement().boundingBox();
-      if (!box) continue;
-      const x = box.x + box.width / 2, y = box.y + box.height / 2;
-      if (label.includes('排除')) {
-        await page.mouse.click(x, y);
+    for (const t of targets) {
+      const sel = `.grid-cell[data-row="${t.row}"][data-col="${t.col}"]`;
+      if (t.exclude) {
+        await page.click(sel);
+        await page.waitForTimeout(480); // 躲开 420ms 双击判定窗口
       } else {
-        await page.mouse.dblclick(x, y);
-        solvedByHint++;
+        await page.dblclick(sel);
+        await page.waitForTimeout(200);
       }
-      await page.waitForTimeout(60);
     }
 
-    const winVisible = await page.$eval('#modal-win', (el) => el.style.display === 'flex').catch(() => false);
-    if (winVisible) break;
+    if (await page.$eval('#modal-gameover', (el) => el.style.display === 'flex').catch(() => false)) {
+      diedEarly = true;
+      break;
+    }
+    if (await page.$eval('#modal-win', (el) => el.style.display === 'flex').catch(() => false)) break;
   }
 
   const uniqueHints = new Set(seenTexts).size;
@@ -99,7 +108,8 @@ async function testHintChainAdvances(browser) {
 
   check('提示链会前进而不是卡在同一条', uniqueHints >= 5,
     `${uniqueHints} 条不同提示 / 共点 ${seenTexts.length} 次`);
-  check('跟着提示走能通关第 51 关', winVisible, `已落子 ${placed}/8，胜利弹窗=${winVisible}`);
+  check('跟着提示走能通关第 51 关', winVisible,
+    `已落子 ${placed}/8，胜利弹窗=${winVisible}${diedEarly ? '，中途触发了失败结算' : ''}`);
   if (winVisible) {
     const stars = await page.textContent('#win-rating');
     check('通关弹窗显示星级', /[★☆]{3}/.test(stars), `rating="${stars}"`);
