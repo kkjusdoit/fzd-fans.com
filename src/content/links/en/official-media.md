@@ -15,6 +15,8 @@ translated: true
 
 - [After Fan Zhendong withdrew from the world rankings](https://eu.36kr.com/en/p/3414319759675014)
 
+- [2026-08-24 Oriental Sports Daily: Season Debut - The Unrivaled Aura of Fan Zhendong](/en/links/2026-08-24-sports-daily)
+
 ---
 
 ## How to pronounce Fan Zhendong?

@@ -1,6 +1,18 @@
 module.exports = {
   news: [
   {
+    "date": "2026-08-23",
+    "category": "match",
+    "categoryLabel": "赛事",
+    "categoryIcon": "🏓",
+    "categoryColor": "#1565c0",
+    "title": "德甲新赛季首秀独得2分率队取胜 & 留名杜塞尔多夫《城市金册》",
+    "summary": "2026-2027赛季德甲第二轮，樊振东代表新东家杜塞尔多夫出任第一单打独得2分助队主场取胜；赛前获杜塞尔多夫市长颁发城市特别荣誉并签署《城市金册》。",
+    "image": "https://fzd-fans.com/img/news/2026-08-24-sports-daily-cover.jpg",
+    "source": "/links/2026-08-24-sports-daily",
+    "highlight": true
+  },
+  {
     "date": "2026-08-21",
     "category": "business",
     "categoryLabel": "商务",

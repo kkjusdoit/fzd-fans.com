@@ -18,5 +18,7 @@ translated: false
 
 - [2026-07-20 东方体育日报：成为明星社会体育指导员，樊振东——科学去运动 人人皆冠军！](/links/2026-07-20-sports-lifestyle)
 
+- [2026-08-24 东方体育日报：赛季首秀 气质非樊——“小白鞋”与“老江湖”的羁绊](/links/2026-08-24-sports-daily)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---
