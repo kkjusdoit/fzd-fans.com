@@ -10,11 +10,20 @@ image: "/img/news/2026-08-24-sports-daily-a9.jpg"
 translated: true
 ---
 
-![东方体育日报头版](/img/news/2026-08-24-sports-daily-cover.jpg)
-*《东方体育日报》2026年8月24日头版：赛季首秀 气质非樊*
-
-![东方体育日报A9专版剪报](/img/news/2026-08-24-sports-daily-a9.jpg)
-*《东方体育日报》2026年8月24日 A9乒乓专版*
+<div class="newspaper-gallery">
+  <figure>
+    <a href="/img/news/2026-08-24-sports-daily-cover.jpg" target="_blank" title="点击查看大图">
+      <img src="/img/news/2026-08-24-sports-daily-cover.jpg" alt="东方体育日报头版：赛季首秀 气质非樊" />
+    </a>
+    <figcaption>《东方体育日报》头版：赛季首秀 气质非樊（点击看大图）</figcaption>
+  </figure>
+  <figure>
+    <a href="/img/news/2026-08-24-sports-daily-a9.jpg" target="_blank" title="点击查看大图">
+      <img src="/img/news/2026-08-24-sports-daily-a9.jpg" alt="东方体育日报A9乒乓专版剪报" />
+    </a>
+    <figcaption>《东方体育日报》A9 乒乓专版（点击看大图）</figcaption>
+  </figure>
+</div>
 
 ---
 

@@ -10,11 +10,20 @@ image: "/img/news/2026-08-24-sports-daily-a9.jpg"
 translated: true
 ---
 
-![Oriental Sports Daily Cover](/img/news/2026-08-24-sports-daily-cover.jpg)
-*Oriental Sports Daily Front Page (August 24, 2026): Season Debut - The Unrivaled Aura of Fan Zhendong*
-
-![Oriental Sports Daily Page A9](/img/news/2026-08-24-sports-daily-a9.jpg)
-*Oriental Sports Daily Page A9 Table Tennis Special Feature (August 24, 2026)*
+<div class="newspaper-gallery">
+  <figure>
+    <a href="/img/news/2026-08-24-sports-daily-cover.jpg" target="_blank" title="Click to view full image">
+      <img src="/img/news/2026-08-24-sports-daily-cover.jpg" alt="Oriental Sports Daily Front Page: Season Debut - The Unrivaled Aura of Fan Zhendong" />
+    </a>
+    <figcaption>Front Page: Season Debut - The Unrivaled Aura (Click to enlarge)</figcaption>
+  </figure>
+  <figure>
+    <a href="/img/news/2026-08-24-sports-daily-a9.jpg" target="_blank" title="Click to view full image">
+      <img src="/img/news/2026-08-24-sports-daily-a9.jpg" alt="Oriental Sports Daily Page A9 Table Tennis Special Feature" />
+    </a>
+    <figcaption>Page A9: TTBL Debut Special Feature (Click to enlarge)</figcaption>
+  </figure>
+</div>
 
 ---
 
