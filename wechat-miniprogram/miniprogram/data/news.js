@@ -1,6 +1,18 @@
 module.exports = {
   news: [
   {
+    "date": "2026-08-25",
+    "category": "media",
+    "categoryLabel": "其他",
+    "categoryIcon": "📌",
+    "categoryColor": "#78909c",
+    "title": "德国 Sportschau 专题报道：樊振东再次将乒乓狂潮带到不来梅",
+    "summary": "德国主流体育媒体《Sportschau》报道杜塞尔多夫客战不来梅引发轰动，门票早早售罄；不来梅主帅盛赞樊振东“或许是历史最佳球员（GOAT）”。",
+    "image": "https://fzd-fans.com/img/news/2026-08-25-sportschau-bremen.jpg",
+    "source": "/links/2026-08-25-sportschau-bremen-hype",
+    "highlight": false
+  },
+  {
     "date": "2026-08-23",
     "category": "match",
     "categoryLabel": "赛事",

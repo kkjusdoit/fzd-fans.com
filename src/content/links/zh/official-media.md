@@ -20,5 +20,7 @@ translated: false
 
 - [2026-08-24 东方体育日报：赛季首秀 气质非樊——“小白鞋”与“老江湖”的羁绊](/links/2026-08-24-sports-daily)
 
+- [2026-08-25 德国Sportschau：中国超级巨星再次将乒乓狂潮带到不来梅](/links/2026-08-25-sportschau-bremen-hype)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---

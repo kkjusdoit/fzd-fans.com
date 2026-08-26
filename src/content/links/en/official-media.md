@@ -17,6 +17,8 @@ translated: true
 
 - [2026-08-24 Oriental Sports Daily: Season Debut - The Unrivaled Aura of Fan Zhendong](/en/links/2026-08-24-sports-daily)
 
+- [2026-08-25 ARD Sportschau: China's Superstar Brings Table Tennis Hype Back to Bremen](/en/links/2026-08-25-sportschau-bremen-hype)
+
 ---
 
 ## How to pronounce Fan Zhendong?
