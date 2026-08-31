@@ -291,30 +291,40 @@ const pageDesc = description || t('site.subtitle');
         const backdrop = document.getElementById('modalBackdrop');
 
         if (!modal) return;
-        // 游戏页面需要持续接收棋盘指针事件，不能被全屏推广弹窗遮挡。
-        if (window.location.pathname === '/dongdoku' || window.location.pathname.startsWith('/dongdoku/') || window.location.pathname.startsWith('/en/dongdoku')) {
+
+        // 1. 限制仅在首页展示（文章页、称号页、游戏页等所有内页均不弹出）
+        const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+        if (pathname !== '/' && pathname !== '/index.html') {
           return;
         }
 
-        // Check if dismissed until date is in the future
-        const dismissedUntil = localStorage.getItem('fzd_promo_dismissed_until');
-        if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
-          return; // Don't show
+        // 2. 本次会话已展示过则不再弹出（Session 级别拦截）
+        if (sessionStorage.getItem('fzd_promo_session_shown')) {
+          return;
         }
 
-        // Show the modal with a small delay for better visual flow
+        // 3. 检查 7 天冷却期
+        const dismissedUntil = localStorage.getItem('fzd_promo_dismissed_until');
+        if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
+          return;
+        }
+
+        const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+        // 4. 延时 5 秒后展示，且一旦触发展示立即写入冷却记录（无需等待用户手动点击）
         setTimeout(function() {
           modal.style.display = 'flex';
+          sessionStorage.setItem('fzd_promo_session_shown', 'true');
+          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + SEVEN_DAYS).toString());
+
           // Trigger transition
           setTimeout(function() {
             modal.classList.add('active');
           }, 20);
-        }, 1500);
+        }, 5000);
 
         function dismissModal() {
-          // Dismiss for 3 days (covers "当天不再提示" and "三天内不再提示")
-          const threeDays = 3 * 24 * 60 * 60 * 1000;
-          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + threeDays).toString());
+          localStorage.setItem('fzd_promo_dismissed_until', (Date.now() + SEVEN_DAYS).toString());
           modal.classList.remove('active');
           setTimeout(function() {
             modal.style.display = 'none';
