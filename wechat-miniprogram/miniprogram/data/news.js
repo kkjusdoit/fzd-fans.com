@@ -1,6 +1,18 @@
 module.exports = {
   news: [
   {
+    "date": "2026-08-31",
+    "category": "media",
+    "categoryLabel": "其他",
+    "categoryIcon": "📌",
+    "categoryColor": "#78909c",
+    "title": "东方体育日报专版：两分惜败，二年级生也是樊人",
+    "summary": "《东方体育日报》A10版深度复盘德国杯1/8决赛关键战役；全国36家影院引进赛事直播引发观赛热潮，票房突破百万，樊振东成暑期档“最大黑马”。",
+    "image": "https://fzd-fans.com/img/news/2026-08-31-sports-daily-cover.jpg",
+    "source": "/links/2026-08-31-sports-daily",
+    "highlight": true
+  },
+  {
     "date": "2026-08-25",
     "category": "media",
     "categoryLabel": "其他",

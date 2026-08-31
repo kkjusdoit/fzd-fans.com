@@ -22,5 +22,10 @@ translated: false
 
 - [2026-08-25 德国Sportschau：中国超级巨星再次将乒乓狂潮带到不来梅](/links/2026-08-25-sportschau-bremen-hype)
 
+- [2026-08-29 极目新闻：樊振东1胜1负，杜塞尔多夫无缘德国杯八强](/links/2026-08-29-jimu-news-german-cup)
+
+- [2026-08-31 东方体育日报：两分惜败，二年级生也是樊人——德国杯失利复盘与暑期档影院观赛热潮](/links/2026-08-31-sports-daily)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---
+

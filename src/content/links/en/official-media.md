@@ -19,6 +19,10 @@ translated: true
 
 - [2026-08-25 ARD Sportschau: China's Superstar Brings Table Tennis Hype Back to Bremen](/en/links/2026-08-25-sportschau-bremen-hype)
 
+- [2026-08-29 Jimu News: Fan Zhendong 1 Win 1 Loss, Düsseldorf Misses German Cup Quarterfinals](/en/links/2026-08-29-jimu-news-german-cup)
+
+- [2026-08-31 Oriental Sports Daily: A Two-Point Narrow Defeat - Sophomores Are Human Too](/en/links/2026-08-31-sports-daily)
+
 ---
 
 ## How to pronounce Fan Zhendong?
