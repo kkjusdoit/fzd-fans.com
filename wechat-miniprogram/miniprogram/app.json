@@ -2,7 +2,6 @@
   "pages": [
     "pages/index/index",
     "pages/discover/discover",
-    "pages/gallery/gallery",
     "pages/category/category",
     "pages/article/article",
     "pages/about/about",
@@ -31,12 +30,6 @@
         "text": "首页",
         "iconPath": "images/house.png",
         "selectedIconPath": "images/house1.png"
-      },
-      {
-        "pagePath": "pages/gallery/gallery",
-        "text": "照片墙",
-        "iconPath": "images/Icon4.png",
-        "selectedIconPath": "images/Icon3.png"
       },
       {
         "pagePath": "pages/discover/discover",
