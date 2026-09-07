@@ -23,6 +23,8 @@ translated: true
 
 - [2026-08-31 Oriental Sports Daily: A Two-Point Narrow Defeat - Sophomores Are Human Too](/en/links/2026-08-31-sports-daily)
 
+- [2026-09-07 Media Report: Fan Zhendong's Complete Triumph! Back-to-Back 3-0 Sweeps in Bundesliga](/en/links/2026-09-07-bundesliga-revenge)
+
 ---
 
 ## How to pronounce Fan Zhendong?

@@ -26,6 +26,8 @@ translated: false
 
 - [2026-08-31 东方体育日报：两分惜败，二年级生也是樊人——德国杯失利复盘与暑期档影院观赛热潮](/links/2026-08-31-sports-daily)
 
+- [2026-09-07 媒体报道：樊振东大获全胜！德甲狂轰2场3-0，连续复仇去年战胜自己之人](/links/2026-09-07-bundesliga-revenge)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---
 

@@ -1,6 +1,36 @@
 [
   {
     "period": "当前周期",
+    "tournament": "2026-2027德甲联赛",
+    "level": "俱乐部比赛",
+    "event": "单打",
+    "date": "2026.9.5",
+    "dateSort": "2026.09.05",
+    "round": "第四轮",
+    "partner": null,
+    "assoc": "德国",
+    "opponent": "杜达",
+    "result": "胜",
+    "score": "3-0",
+    "games": "11-8，11-8，11-8"
+  },
+  {
+    "period": "当前周期",
+    "tournament": "2026-2027德甲联赛",
+    "level": "俱乐部比赛",
+    "event": "单打",
+    "date": "2026.9.5",
+    "dateSort": "2026.09.05",
+    "round": "第四轮",
+    "partner": null,
+    "assoc": "法国",
+    "opponent": "罗曼·鲁伊斯",
+    "result": "胜",
+    "score": "3-0",
+    "games": "11-7，11-7，11-8"
+  },
+  {
+    "period": "当前周期",
     "tournament": "2026-2027德国杯",
     "level": "俱乐部比赛",
     "event": "单打",
