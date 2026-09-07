@@ -9,7 +9,7 @@ const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
   friends: { zh: '贵人与朋友', en: 'Friends & Mentors' },
   tributes: { zh: '评价与祝福', en: 'Tributes' },
   ugc: { zh: '投稿', en: 'Fan Submissions' },
-  links: { zh: '媒体链接', en: 'Links' },
+  links: { zh: '相关链接', en: 'Links' },
   warrior: { zh: '孤勇者', en: 'Lone Warrior' }
 };
 
@@ -63,6 +63,11 @@ Component({
       
       const cats = new Set(content.map((c: any) => c.category));
       
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const showDomain = new Date() > targetDate;
+
       const categories = CATEGORY_ORDER
         .filter(c => {
           if (c === 'arena') return true; // 强制包含职业生涯
@@ -75,6 +80,10 @@ Component({
           }
           // Hide 'friends' in both modes (to match website)
           if (c === 'friends') {
+            return false;
+          }
+          // 抖音端隐藏「媒体链接」，个人开发者无资质发布【资讯】类目
+          if (isDouyin && c === 'links') {
             return false;
           }
           return true;
@@ -101,11 +110,6 @@ Component({
         count: (endorsements as any[]).length,
         icon: '🤝'
       });
-
-      // @ts-ignore
-      const isDouyin = typeof tt !== 'undefined';
-      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
-      const showDomain = new Date() > targetDate;
 
       this.setData({
         categories,

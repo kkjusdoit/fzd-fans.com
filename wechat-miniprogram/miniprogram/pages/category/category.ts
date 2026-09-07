@@ -8,7 +8,7 @@ const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
   friends: { zh: '贵人与朋友', en: 'Friends & Mentors' },
   tributes: { zh: '评价与祝福', en: 'Tributes' },
   ugc: { zh: '投稿', en: 'Fan Submissions' },
-  links: { zh: '媒体链接', en: 'Links' },
+  links: { zh: '相关链接', en: 'Links' },
   warrior: { zh: '孤勇者', en: 'Lone Warrior' }
 };
 
@@ -41,6 +41,13 @@ Component({
       const categoryId = this.data.categoryId;
 
       if (!categoryId) return;
+
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      if (isDouyin && categoryId === 'links') {
+        wx.switchTab({ url: '../index/index' });
+        return;
+      }
 
       const name = CATEGORY_MAP[categoryId]?.[lang] || categoryId;
 
