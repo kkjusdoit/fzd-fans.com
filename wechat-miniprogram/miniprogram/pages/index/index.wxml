@@ -1,7 +1,7 @@
 <view class="container">
   <!-- Modern Header Banner -->
   <view class="header">
-    <view class="lang-switch" bindtap="toggleLang">
+    <view class="lang-switch" bindtap="toggleLang" wx:if="{{!isDouyin}}">
       <text class="{{currentLang === 'zh' ? 'active' : ''}}">中</text>
       <text class="divider">/</text>
       <text class="{{currentLang === 'en' ? 'active' : ''}}">En</text>

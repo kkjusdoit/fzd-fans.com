@@ -11,8 +11,12 @@ App<IAppOption>({
     wx.setStorageSync('logs', logs)
     
     // 初始化语言设置
+    // @ts-ignore
+    const isDouyin = typeof tt !== 'undefined';
     const savedLang = wx.getStorageSync('lang');
-    if (savedLang) {
+    if (isDouyin) {
+      this.globalData.lang = 'zh'; // 抖音强制中文，因平台不允许外语小程序
+    } else if (savedLang) {
       this.globalData.lang = savedLang;
     }
   },

@@ -40,7 +40,8 @@ const CATEGORY_ORDER = [
 Component({
   data: {
     categories: [] as any[],
-    currentLang: 'zh'
+    currentLang: 'zh',
+    isDouyin: false
   },
   lifetimes: {
     attached() {
@@ -109,7 +110,8 @@ Component({
       this.setData({
         categories,
         currentLang: lang,
-        showDomain
+        showDomain,
+        isDouyin
       });
     },
 
