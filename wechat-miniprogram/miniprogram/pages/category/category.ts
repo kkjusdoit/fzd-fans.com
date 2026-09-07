@@ -44,7 +44,10 @@ Component({
 
       // @ts-ignore
       const isDouyin = typeof tt !== 'undefined';
-      if (isDouyin && categoryId === 'links') {
+      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const isUnlocked = new Date() > targetDate;
+
+      if (isDouyin && categoryId === 'links' && !isUnlocked) {
         wx.switchTab({ url: '../index/index' });
         return;
       }
@@ -53,7 +56,14 @@ Component({
 
       const filtered = content.filter((item: any) => 
         item.category === categoryId && item.lang === lang
-      );
+      ).filter((item: any) => {
+        if (isDouyin && !isUnlocked) {
+          if (item.title.includes('微博') || item.title.includes('剪报')) {
+            return false;
+          }
+        }
+        return true;
+      });
 
       if (categoryId === 'ugc') {
         const letters = filtered.filter((item: any) => item.id.includes('letter-'));

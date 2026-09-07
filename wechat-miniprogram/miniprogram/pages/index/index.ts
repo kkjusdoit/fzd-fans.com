@@ -82,8 +82,8 @@ Component({
           if (c === 'friends') {
             return false;
           }
-          // 抖音端隐藏「媒体链接」，个人开发者无资质发布【资讯】类目
-          if (isDouyin && c === 'links') {
+          // 抖音端审核期隐藏「媒体链接/资讯」，个人开发者无资质发布【资讯】类目，延迟开放
+          if (isDouyin && c === 'links' && !showDomain) {
             return false;
           }
           return true;
