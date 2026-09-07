@@ -104,7 +104,7 @@ Component({
 
       // @ts-ignore
       const isDouyin = typeof tt !== 'undefined';
-      const targetDate = isDouyin ? new Date('2026-10-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
       const showDomain = new Date() > targetDate;
 
       this.setData({
