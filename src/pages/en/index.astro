@@ -60,38 +60,261 @@ const slogans = [
   "Building greatness grain by grain, Fan stars shine bright",
   "Fan Zhendong, shine in Los Angeles",
 ];
+
+// Super Grand Slam Badges (English)
+const grandSlamBadges = [
+  {
+    icon: '🥇',
+    title: 'Paris 2024 Double Gold',
+    sub: 'Singles + Team Champion',
+    desc: 'Crowned with the Super Grand Slam in legendary fashion'
+  },
+  {
+    icon: '🏆',
+    title: '4x World Cup Champion',
+    sub: '4 Singles World Titles',
+    desc: 'All-time historic record holder of the ITTF World Cup'
+  },
+  {
+    icon: '🥇',
+    title: '2x World Champion',
+    sub: 'Houston + Durban Consecutive',
+    desc: 'Unquestioned supremacy on the world table tennis stage'
+  },
+  {
+    icon: '🌟',
+    title: 'Super Grand Slam',
+    sub: 'All 9 Major Singles Titles',
+    desc: 'Olympics, Worlds, World Cup, National Games & more'
+  }
+];
+
+// Career 5-Chapter Chronicle (English)
+const chronicleChapters = [
+  {
+    era: '2012 — 2016',
+    tag: 'Chapter 1',
+    title: 'The Prodigy · Storming the World Stage',
+    summary: 'From Guangzhou youth to the Bayi team, Fan burst onto the world scene with his signature ferocious backhand flick. At 16, he became the youngest ITTF World Tour singles champion.',
+    quote: 'Once I step onto the court, I leave no retreat for myself.',
+    link: getLocalizedPath('/arena', lang),
+    linkText: 'Explore early milestones →'
+  },
+  {
+    era: '2017 — 2021',
+    tag: 'Chapter 2',
+    title: 'Tempered in Fire · Resilience & Evolution',
+    summary: 'The heartbreak of the 2017 Dusseldorf Worlds fueled his relentless growth. Winning Marvellous 12 titles, Olympic team gold in Tokyo, and crowning at the 2021 Houston Worlds.',
+    quote: "You can win or lose a match, but never surrender. That's true sportsmanship.",
+    link: getLocalizedPath('/stars', lang),
+    linkText: 'Discover playing style & status →'
+  },
+  {
+    era: '2022 — 2024 Early',
+    tag: 'Chapter 3',
+    title: 'The Lone Warrior · Courage Amidst the Noise',
+    summary: 'Standing tall for genuine sporting integrity amidst external distractions. Facing adversity with dignity, withdrawing from rankings to defend the purity of table tennis.',
+    quote: "I've given my life to the sport and country. It's not something to abandon lightly.",
+    link: getLocalizedPath('/warrior/world-ranking-withdrawal', lang),
+    linkText: 'Read ranking withdrawal report →'
+  },
+  {
+    era: 'August 2024',
+    tag: 'Chapter 4 · Coronation',
+    title: 'Paris Crowning · The Grand Slam Masterpiece',
+    summary: 'Bearing the entire weight of Chinese men’s singles in Paris. Down 0-2 against a hyper-focused Harimoto, changing shirts, battling to an epic 11-7 Game 7 triumph and taking gold!',
+    quote: "Down to the wire, I told myself: I would rather fight until my last breath on that table.",
+    link: getLocalizedPath('/matches', lang),
+    linkText: 'Review Paris match records →',
+    featured: true
+  },
+  {
+    era: '2024 — Present',
+    tag: 'Chapter 5',
+    title: 'Beyond Boundaries · A Boundless Journey',
+    summary: 'Cheering at the Santiago Bernabéu for Real Madrid, embracing global fans and joining the German Bundesliga. A champion playing with pure joy and poise.',
+    quote: 'Paris was great, and the future will be even better.',
+    link: getLocalizedPath('/tributes/bundesliga-journey', lang),
+    linkText: 'Explore Bundesliga journey →'
+  }
+];
 ---
 
 <BaseLayout title={t('site.title')}>
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-badge">{t('home.badge')}</div>
-    <h1>{t('site.title')}</h1>
-    <p class="intro">
-      {t('home.intro.line1')}<br/>
-      {t('home.intro.line2')}<span class="highlight">{t('home.intro.achievements')}</span>{t('home.intro.line3')}<span class="highlight">{t('home.intro.qualities')}</span>{t('home.intro.line4')}<br/>
-      {t('home.intro.line5')}<span class="highlight">{t('home.intro.spirit')}</span>{t('home.intro.line6')}
-    </p>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <span class="stat-num">{allContent.length}</span>
-        <span class="stat-label">{t('home.stats.archives')}</span>
+  <!-- Hero Section 冠军殿堂 -->
+  <section class="hero-temple">
+    <div class="hero-temple-glow"></div>
+    <div class="container hero-temple-inner">
+      <div class="hero-badge-pill">
+        <span class="pill-spark">🏓</span>
+        <span>Men's Super Grand Slam Champion · Internet Memory Project</span>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">6</span>
-        <span class="stat-label">{t('home.stats.categories')}</span>
+
+      <div class="hero-titles">
+        <span class="hero-pretitle">THE GRAND SLAM ARCHIVE</span>
+        <h1 class="hero-main-title">Fan Zhendong Archive</h1>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-num">∞</span>
-        <span class="stat-label">{t('home.stats.support')}</span>
+
+      <p class="hero-manifesto">
+        This is not a cold encyclopedia, but an ever-growing digital temple of sports history.<br class="desktop-break"/>
+        The focus is not only on <span class="hl-gold">world-conquering victories</span>, but on his <span class="hl-gold">willpower, character, innocence, kindness, wit, and humor</span>,<br class="desktop-break"/>
+        as well as his <span class="hl-crimson">clarity and perseverance</span> amid the noise, and his <span class="hl-crimson">courage when facing adversity</span>.
+      </p>
+
+      <!-- 全满贯四大勋章矩阵 -->
+      <div class="grand-slam-grid">
+        {grandSlamBadges.map(badge => (
+          <div class="slam-badge-card">
+            <div class="badge-icon-box">{badge.icon}</div>
+            <div class="badge-text-box">
+              <div class="badge-title">{badge.title}</div>
+              <div class="badge-sub">{badge.sub}</div>
+              <div class="badge-desc">{badge.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- 硬核核心数据大屏 -->
+      <div class="temple-stats-bar">
+        <div class="temple-stat">
+          <span class="stat-big-num">23,700+</span>
+          <span class="stat-name">Match Records</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="temple-stat">
+          <span class="stat-big-num">100%</span>
+          <span class="stat-name">Major Singles Win Rate (vs Intl)</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="temple-stat">
+          <span class="stat-big-num">4 Titles</span>
+          <span class="stat-name">World Cup Record</span>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="temple-stat">
+          <span class="stat-big-num">9 Slams</span>
+          <span class="stat-name">Super Grand Slam</span>
+        </div>
+      </div>
+
+      <!-- 快捷入口胶囊 -->
+      <div class="hero-action-pills">
+        <a href="#epic-battle" class="hero-action-pill primary">⚡ Relive Paris Miracle</a>
+        <a href="#chronicle" class="hero-action-pill">📖 5-Chapter Chronicle</a>
+        <a href={getLocalizedPath('/matches', lang)} class="hero-action-pill">🏓 Full Match Database</a>
+        <a href={getLocalizedPath('/games', lang)} class="hero-action-pill">🎮 Fan Playground</a>
       </div>
     </div>
   </section>
 
   <!-- Birthday Countdown -->
   <BirthdayCountdown />
+
+  <!-- 史诗战役专栏：巴黎封神 逆转张本智和 -->
+  <section class="epic-battle-section" id="epic-battle">
+    <div class="container">
+      <div class="epic-battle-card">
+        <div class="battle-top-bar">
+          <div class="epic-battle-badge">🔥 Paris 2024 Epic Battle · Comeback of the Century</div>
+          <div class="battle-location-tag">2024.08.01 · South Paris Arena 4</div>
+        </div>
+
+        <div class="battle-main-grid">
+          <div class="battle-summary-col">
+            <h2 class="battle-h2">Fan Zhendong 4 - 3 Tomokazu Harimoto</h2>
+            <p class="battle-subtext">Men's Singles Quarterfinal · Shouldering an entire nation's hope in the ultimate test of wills</p>
+            
+            <div class="battle-quote-bubble">
+              <span class="quote-symbol">“</span>
+              <p>Down 0-2, I changed my shirt. I told myself the match had just begun. Even if it meant fighting to my very last breath, I would leave everything on that table!</p>
+              <span class="quote-sign">—— Fan Zhendong Post-Match Interview</span>
+            </div>
+
+            <div class="battle-buttons">
+              <a href={getLocalizedPath('/matches', lang)} class="battle-btn primary">🏓 Match Details & Scores</a>
+              <a href={getLocalizedPath('/ugc/fzd-vs-wcc-iq-domination', lang)} class="battle-btn secondary">⚔️ Tactical Breakdown</a>
+            </div>
+          </div>
+
+          <div class="battle-timeline-col">
+            <div class="timeline-box-title">7-Game Heart-Stopping Thriller</div>
+            <div class="games-flow-list">
+              <div class="flow-item lost">
+                <span class="f-num">Game 1</span>
+                <span class="f-score">2 - 11</span>
+                <span class="f-status">Adverse start</span>
+              </div>
+              <div class="flow-item lost">
+                <span class="f-num">Game 2</span>
+                <span class="f-score">9 - 11</span>
+                <span class="f-status">Down 0-2 on the brink</span>
+              </div>
+              <div class="flow-item win shifted">
+                <div class="shift-badge">👕 Shirt Change · Reset & Counterattack</div>
+                <span class="f-num">Game 3</span>
+                <span class="f-score">11 - 4</span>
+                <span class="f-status">Fierce backhand counter</span>
+              </div>
+              <div class="flow-item win">
+                <span class="f-num">Game 4</span>
+                <span class="f-score">11 - 7</span>
+                <span class="f-status">Leveling the match 2-2</span>
+              </div>
+              <div class="flow-item lost">
+                <span class="f-num">Game 5</span>
+                <span class="f-score">4 - 11</span>
+                <span class="f-status">Opponent claims match point lead</span>
+              </div>
+              <div class="flow-item win">
+                <span class="f-num">Game 6</span>
+                <span class="f-score">11 - 7</span>
+                <span class="f-status">Resolute defense to force Game 7!</span>
+              </div>
+              <div class="flow-item win crowned">
+                <div class="crown-badge">👑 Game 7 Decider · Crowning Moment</div>
+                <span class="f-num">Game 7</span>
+                <span class="f-score">11 - 7</span>
+                <span class="f-status">Victory! Arms outstretched in glory!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 生涯五部曲：沉浸式编年史 -->
+  <section class="chronicle-section" id="chronicle">
+    <div class="container">
+      <div class="chronicle-header">
+        <div class="section-badge">📜 Epic Narrative Thread</div>
+        <h2>Career 5-Chapter Chronicle</h2>
+        <p class="section-sub">From prodigy to Super Grand Slam champion—the journey of a modern sports icon</p>
+      </div>
+
+      <div class="chronicle-list">
+        {chronicleChapters.map((ch, idx) => (
+          <div class:list={['chronicle-card', { 'featured-chapter': ch.featured }]}>
+            <div class="chapter-badge-col">
+              <span class="chapter-tag">{ch.tag}</span>
+              <span class="chapter-era">{ch.era}</span>
+              <div class="chapter-step-dot">{idx + 1}</div>
+            </div>
+            <div class="chapter-body-col">
+              <h3 class="chapter-title">{ch.title}</h3>
+              <p class="chapter-summary">{ch.summary}</p>
+              <div class="chapter-quote-bar">
+                <span class="quote-icon">“</span>
+                <span class="quote-text">{ch.quote}</span>
+              </div>
+              <a href={ch.link} class="chapter-link-btn">{ch.linkText}</a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
 
   <!-- 滚动应援 -->
   <section class="slogan-marquee">
@@ -247,16 +470,665 @@ const slogans = [
 </BaseLayout>
 
 <style>
-  .hero { text-align: center; padding: 4rem 1rem 3rem; background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%); border-radius: 0 0 2rem 2rem; }
-  .hero-badge { display: inline-block; background: #1e88e5; color: #fff; padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.9rem; margin-bottom: 1rem; }
-  .hero h1 { font-size: 2.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #1e88e5, #0d47a1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .intro { color: #555; max-width: 650px; margin: 0 auto; line-height: 1.8; font-size: 1.05rem; }
-  .highlight { color: #1e88e5; font-weight: 500; }
-  .hero-stats { display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 2rem; padding: 1.5rem; background: #fff; border-radius: 1rem; box-shadow: 0 4px 20px rgba(30, 136, 229, 0.1); max-width: 500px; margin-left: auto; margin-right: auto; }
-  .stat-item { text-align: center; }
-  .stat-num { display: block; font-size: 2rem; font-weight: bold; color: #1e88e5; }
-  .stat-label { color: #888; font-size: 0.9rem; }
-  .stat-divider { width: 1px; height: 40px; background: #eee; }
+  /* ============================================================
+     HERO TEMPLE (Grand Slam Archive)
+     ============================================================ */
+  .hero-temple {
+    position: relative;
+    background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 45%, #080d1a 100%);
+    color: #f8fafc;
+    padding: 5rem 1rem 4.5rem;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: inset 0 -30px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-temple-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 450px;
+    background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.14) 0%, rgba(220, 38, 38, 0.08) 45%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-temple-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .hero-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fde047;
+    padding: 0.45rem 1.2rem;
+    border-radius: 9999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-pretitle {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    color: #94a3b8;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+
+  .hero-main-title {
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #fef08a 40%, #f59e0b 80%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 30px rgba(245, 158, 11, 0.25);
+  }
+
+  .hero-manifesto {
+    color: #cbd5e1;
+    max-width: 780px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.85;
+    font-size: 1.08rem;
+    font-weight: 400;
+  }
+
+  .desktop-break {
+    display: inline;
+  }
+
+  .hl-gold {
+    color: #facc15;
+    font-weight: 600;
+    text-shadow: 0 0 12px rgba(250, 204, 21, 0.3);
+  }
+
+  .hl-crimson {
+    color: #f87171;
+    font-weight: 600;
+    text-shadow: 0 0 12px rgba(248, 113, 113, 0.3);
+  }
+
+  /* 全满贯勋章矩阵 */
+  .grand-slam-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .slam-badge-card {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 16px;
+    padding: 1.3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .slam-badge-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 12px 30px rgba(245, 158, 11, 0.2);
+  }
+
+  .badge-icon-box {
+    font-size: 2rem;
+    margin-bottom: 0.6rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+
+  .badge-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin-bottom: 0.2rem;
+  }
+
+  .badge-sub {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 0.4rem;
+  }
+
+  .badge-desc {
+    font-size: 0.74rem;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
+  /* 核心数据大屏 */
+  .temple-stats-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    max-width: 820px;
+    margin: 0 auto 2.2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .temple-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-big-num {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #38bdf8;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-name {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 0.2rem;
+    font-weight: 600;
+  }
+
+  .stat-sep {
+    width: 1px;
+    height: 36px;
+    background: rgba(148, 163, 184, 0.2);
+  }
+
+  /* 快捷入口按钮组 */
+  .hero-action-pills {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-action-pill {
+    padding: 0.65rem 1.3rem;
+    border-radius: 9999px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #e2e8f0;
+  }
+
+  .hero-action-pill:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+
+  .hero-action-pill.primary {
+    background: linear-gradient(135deg, #e11d48 0%, #b91c1c 100%);
+    border-color: #f43f5e;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(225, 29, 72, 0.35);
+  }
+
+  .hero-action-pill.primary:hover {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.5);
+  }
+
+  /* ============================================================
+     史诗战役专栏 (EPIC BATTLE: 逆转张本智和)
+     ============================================================ */
+  .epic-battle-section {
+    padding: 3rem 1rem 2rem;
+    background: #f8fafc;
+  }
+
+  .epic-battle-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 2.2rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .epic-battle-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #dc2626 0%, #f59e0b 50%, #0284c7 100%);
+  }
+
+  .battle-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .epic-battle-badge {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.35rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.84rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .battle-location-tag {
+    font-size: 0.82rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .battle-main-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .battle-h2 {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.02em;
+  }
+
+  .battle-subtext {
+    font-size: 0.98rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .battle-quote-bubble {
+    background: #f8fafc;
+    border-left: 4px solid #dc2626;
+    border-radius: 0 14px 14px 0;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.8rem;
+    position: relative;
+  }
+
+  .quote-symbol {
+    font-size: 2rem;
+    color: #cbd5e1;
+    line-height: 1;
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    opacity: 0.5;
+  }
+
+  .battle-quote-bubble p {
+    font-size: 0.96rem;
+    color: #1e293b;
+    font-style: italic;
+    line-height: 1.7;
+    margin-bottom: 0.4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .quote-sign {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .battle-buttons {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .battle-btn {
+    padding: 0.65rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .battle-btn.primary {
+    background: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+  }
+
+  .battle-btn.primary:hover {
+    background: #0369a1;
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+
+  .battle-btn.secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+  }
+
+  .battle-btn.secondary:hover {
+    background: #e2e8f0;
+    text-decoration: none;
+  }
+
+  /* 7局走势表 */
+  .battle-timeline-col {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 1.3rem;
+  }
+
+  .timeline-box-title {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.8rem;
+    text-align: center;
+  }
+
+  .games-flow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .flow-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    position: relative;
+  }
+
+  .flow-item.lost {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    color: #64748b;
+  }
+
+  .flow-item.win {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+  }
+
+  .flow-item.shifted {
+    border-left: 4px solid #f59e0b;
+  }
+
+  .shift-badge {
+    position: absolute;
+    top: -9px;
+    right: 12px;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #b45309;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .flow-item.crowned {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  }
+
+  .crown-badge {
+    position: absolute;
+    top: -9px;
+    right: 12px;
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+  }
+
+  .f-num {
+    font-weight: 700;
+  }
+
+  .f-score {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+  }
+
+  .f-status {
+    font-size: 0.78rem;
+  }
+
+  /* ============================================================
+     生涯五部曲沉浸式编年史 (CHRONICLE)
+     ============================================================ */
+  .chronicle-section {
+    padding: 4rem 1rem 3rem;
+    background: #ffffff;
+  }
+
+  .chronicle-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+  }
+
+  .section-badge {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #0369a1;
+    border: 1px solid #e2e8f0;
+    padding: 0.35rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .chronicle-header h2 {
+    font-size: 2.3rem;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .chronicle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .chronicle-card {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
+  }
+
+  .chronicle-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5e1;
+  }
+
+  .chronicle-card.featured-chapter {
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 60%);
+    border: 2px solid #fde047;
+    box-shadow: 0 8px 30px rgba(245, 158, 11, 0.12);
+  }
+
+  .chapter-badge-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+    border-right: 1px solid #f1f5f9;
+    padding-right: 1.5rem;
+  }
+
+  .chapter-tag {
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .featured-chapter .chapter-tag {
+    background: #e11d48;
+  }
+
+  .chapter-era {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0f172a;
+    font-family: inherit;
+    margin-top: 0.2rem;
+  }
+
+  .chapter-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+  }
+
+  .featured-chapter .chapter-step-dot {
+    background: #f59e0b;
+    color: #ffffff;
+  }
+
+  .chapter-body-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .chapter-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.3;
+  }
+
+  .chapter-summary {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.7;
+  }
+
+  .chapter-quote-bar {
+    display: flex;
+    gap: 0.4rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.88rem;
+    color: #1e293b;
+    font-style: italic;
+  }
+
+  .quote-icon {
+    font-size: 1.2rem;
+    color: #0284c7;
+    line-height: 1;
+  }
+
+  .chapter-link-btn {
+    align-self: flex-start;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0284c7;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    margin-top: 0.3rem;
+  }
+
+  .chapter-link-btn:hover {
+    color: #0369a1;
+    text-decoration: underline;
+    transform: translateX(3px);
+  }
+
   .slogan-marquee { overflow: hidden; background: #1e88e5; padding: 0.8rem 0; margin: 2rem 0; }
   .marquee-content { display: flex; animation: marquee 20s linear infinite; white-space: nowrap; }
   .slogan-item { color: #fff; padding: 0 2rem; font-size: 1rem; }
@@ -318,13 +1190,36 @@ const slogans = [
   .footer-slogan { text-align: center; padding: 4rem 1rem; background: linear-gradient(135deg, #1e88e5, #0d47a1); color: #fff; margin-top: 2rem; }
   .slogan-main { font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; }
   .slogan-sub { font-size: 1.2rem; opacity: 0.9; }
+
+  /* 响应式 */
+  @media (max-width: 960px) {
+    .grand-slam-grid { grid-template-columns: repeat(2, 1fr); }
+    .battle-main-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .chronicle-card { grid-template-columns: 1fr; gap: 1.2rem; }
+    .chapter-badge-col { border-right: none; border-bottom: 1px solid #f1f5f9; padding-right: 0; padding-bottom: 0.8rem; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+    .chapter-step-dot { margin-top: 0; }
+  }
   @media (max-width: 768px) {
-    .hero h1 { font-size: 1.8rem; }
-    .intro { font-size: 0.95rem; }
-    .hero-stats { gap: 1rem; padding: 1rem; }
-    .stat-num { font-size: 1.5rem; }
+    .hero-temple { padding: 3.5rem 1rem 3rem; }
+    .hero-main-title { font-size: 2.3rem; }
+    .hero-manifesto { font-size: 0.95rem; }
+    .desktop-break { display: none; }
+    .temple-stats-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem 1rem; padding: 1.2rem 1rem; }
+    .stat-sep { display: none; }
+    .stat-big-num { font-size: 1.45rem; }
+    .epic-battle-card { padding: 1.5rem 1.2rem; }
+    .battle-h2 { font-size: 1.7rem; }
+    .chronicle-header h2 { font-size: 1.8rem; }
     .category-grid { grid-template-columns: repeat(2, 1fr); }
     .slogan-main { font-size: 1.5rem; }
+  }
+  @media (max-width: 520px) {
+    .grand-slam-grid { grid-template-columns: 1fr; }
+    .hero-main-title { font-size: 1.95rem; }
+    .hero-action-pills { flex-direction: column; }
+    .hero-action-pill { text-align: center; }
+    .battle-buttons { flex-direction: column; }
+    .battle-btn { justify-content: center; }
   }
 </style>
 

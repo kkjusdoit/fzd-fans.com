@@ -7,30 +7,62 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
-const navItems = [
-  { href: '/', label: t('nav.home') },
-  { href: '/arena', label: t('nav.arena') },
-  { href: '/matches', label: t('nav.matches') },
-  // { href: '/news', label: t('nav.news') }, // 快讯：暂时隐藏
-  { href: '/endorsements', label: t('nav.empire') },
-  { href: '/quotes', label: t('nav.quotes') },
-  { href: '/tributes', label: t('nav.tributes') },
-  { href: '/links', label: t('nav.links') },
-  { href: '/stars', label: t('nav.stars') },
-  { href: '/warrior', label: t('nav.warrior') },
-  { href: '/ugc', label: t('nav.ugc') },
-  { href: '/games', label: t('nav.games') },
-  { href: '/fzd-gallery', label: t('nav.imgupload') },
-  ...(lang === 'en' ? [{ href: '/fzd101', label: t('nav.fzd101') }] : []),
-  { href: '/about', label: t('nav.about') },
+// 结构化分类导航配置
+const navGroups = [
+  {
+    key: 'glory',
+    label: t('nav.group.glory'),
+    desc: t('nav.group.glory.desc'),
+    items: [
+      { href: '/matches', label: t('nav.matches'), icon: '🏓', desc: lang === 'en' ? '23,000+ match records & H2H' : '23,000+ 场比赛与交锋战绩' },
+      { href: '/arena', label: t('nav.arena'), icon: '🏆', desc: lang === 'en' ? 'Grand Slam milestones & transition' : '超级全满贯丰碑与赛场时刻' },
+      { href: '/stars', label: t('nav.stars'), icon: '⭐', desc: lang === 'en' ? 'Nicknames, techniques & legacy' : '传奇称号、技术特点与赛场声誉' },
+    ]
+  },
+  {
+    key: 'spirit',
+    label: t('nav.group.spirit'),
+    desc: t('nav.group.spirit.desc'),
+    items: [
+      { href: '/quotes', label: t('nav.quotes'), icon: '💬', desc: lang === 'en' ? 'Classic quotes & life humor' : '清醒自持的金句与生活幽默' },
+      { href: '/warrior', label: t('nav.warrior'), icon: '⚔️', desc: lang === 'en' ? 'Courage & ranking withdrawal' : '退出世界排名与直面风雨的坚守' },
+      { href: '/tributes', label: t('nav.tributes'), icon: '💝', desc: lang === 'en' ? 'Global legends & warm wishes' : '国际名宿评语与球迷真挚祝福' },
+      { href: '/links', label: t('nav.links'), icon: '🔗', desc: lang === 'en' ? 'Interviews & video collections' : '官方报道与高光集锦导航' },
+    ]
+  },
+  {
+    key: 'lifestyle',
+    label: t('nav.group.lifestyle'),
+    desc: t('nav.group.lifestyle.desc'),
+    items: [
+      { href: '/endorsements', label: t('nav.empire'), icon: '🤝', desc: lang === 'en' ? 'Brand endorsements & partnerships' : '国际顶级合作品牌矩阵' },
+      { href: '/fzd-gallery', label: t('nav.imgupload'), icon: '📷', desc: lang === 'en' ? 'HD match captures & photo wall' : '高清大片与赛场经典瞬间' },
+      { href: '/ugc', label: t('nav.ugc'), icon: '✍️', desc: lang === 'en' ? 'Tactical reviews & fan letters' : '东风论剑战术拆解与球迷来信' },
+    ]
+  },
+  {
+    key: 'play',
+    label: t('nav.group.play'),
+    desc: t('nav.group.play.desc'),
+    items: [
+      { href: '/games', label: t('nav.games'), icon: '🎮', desc: lang === 'en' ? 'Defense & breakout mini games' : '乒乓保卫战、打爆一切合集' },
+      { href: '/quiz', label: t('nav.quiz'), icon: '📝', desc: lang === 'en' ? 'Fan knowledge certification quiz' : '樊星专属球迷段位测试题' },
+      { href: '/dongdoku', label: lang === 'en' ? 'Dongdoku' : '东独数独', icon: '🧩', desc: lang === 'en' ? 'Custom Fan Zhendong sudoku' : '趣味专属益智数独挑战' },
+    ]
+  }
 ];
 
-function isActive(href: string) {
+// 辅助函数判断路径是否激活
+function isPathActive(href: string) {
   const localizedHref = getLocalizedPath(href, lang);
   if (href === '/') {
     return currentPath === '/' || currentPath === '/en' || currentPath === '/en/';
   }
   return currentPath.startsWith(localizedHref);
+}
+
+function isGroupActive(group: typeof navGroups[0]) {
+  return group.items.some(item => isPathActive(item.href));
 }
 ---
 
@@ -42,16 +74,69 @@ function isActive(href: string) {
       <span class="logo-text">{t('site.title')}</span>
     </a>
 
-    <!-- 桌面端横向导航条 (仅在 PC/平板大屏显示) -->
+    <!-- 桌面端高级分类导航 -->
     <nav class="nav desktop-nav">
-      {navItems.map(item => (
+      <!-- 首页直达 -->
+      <a 
+        href={getLocalizedPath('/', lang)} 
+        class:list={['nav-link', { active: isPathActive('/') }]}
+      >
+        {t('nav.home')}
+      </a>
+
+      <!-- 分组下拉菜单 -->
+      {navGroups.map(group => {
+        const groupActive = isGroupActive(group);
+        return (
+          <div class="nav-dropdown-wrapper">
+            <button 
+              type="button" 
+              class:list={['dropdown-trigger', { active: groupActive }]}
+              aria-haspopup="true"
+            >
+              <span>{group.label}</span>
+              <svg class="chevron-icon" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="dropdown-panel">
+              <div class="dropdown-header-note">{group.desc}</div>
+              <div class="dropdown-items">
+                {group.items.map(item => (
+                  <a 
+                    href={getLocalizedPath(item.href, lang)}
+                    class:list={['dropdown-item', { active: isPathActive(item.href) }]}
+                  >
+                    <span class="item-icon">{item.icon}</span>
+                    <div class="item-info">
+                      <span class="item-title">{item.label}</span>
+                      <span class="item-desc">{item.desc}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      <!-- 英文版特有 FZD 101 -->
+      {lang === 'en' && (
         <a 
-          href={getLocalizedPath(item.href, lang)} 
-          class:list={['nav-link', { active: isActive(item.href) }]}
+          href={getLocalizedPath('/fzd101', lang)} 
+          class:list={['nav-link', { active: isPathActive('/fzd101') }]}
         >
-          {item.label}
+          {t('nav.fzd101')}
         </a>
-      ))}
+      )}
+
+      <!-- 关于 -->
+      <a 
+        href={getLocalizedPath('/about', lang)} 
+        class:list={['nav-link', { active: isPathActive('/about') }]}
+      >
+        {t('nav.about')}
+      </a>
     </nav>
 
     <!-- 右侧操作区：语言切换 + 移动端汉堡折叠按钮 -->
@@ -71,169 +156,453 @@ function isActive(href: string) {
     </div>
   </div>
 
-  <!-- 移动端折叠抽屉菜单 -->
+  <!-- 移动端抽屉菜单 (结构化分组呈现) -->
   <div class="mobile-drawer" id="mobile-nav-drawer" style="display: none;">
-    <div class="container">
-      <nav class="mobile-nav-grid">
-        {navItems.map(item => (
+    <div class="container mobile-drawer-inner">
+      <!-- 快捷首页 & 关于 -->
+      <div class="mobile-quick-links">
+        <a 
+          href={getLocalizedPath('/', lang)} 
+          class:list={['mobile-quick-btn', { active: isPathActive('/') }]}
+        >
+          🏠 {t('nav.home')}
+        </a>
+        {lang === 'en' && (
           <a 
-            href={getLocalizedPath(item.href, lang)} 
-            class:list={['mobile-nav-item', { active: isActive(item.href) }]}
+            href={getLocalizedPath('/fzd101', lang)} 
+            class:list={['mobile-quick-btn', { active: isPathActive('/fzd101') }]}
           >
-            {item.label}
+            📖 {t('nav.fzd101')}
           </a>
-        ))}
-      </nav>
+        )}
+        <a 
+          href={getLocalizedPath('/about', lang)} 
+          class:list={['mobile-quick-btn', { active: isPathActive('/about') }]}
+        >
+          ℹ️ {t('nav.about')}
+        </a>
+      </div>
+
+      <!-- 分组展示 -->
+      {navGroups.map(group => (
+        <div class="mobile-group-section">
+          <div class="mobile-group-title">
+            <span>{group.label}</span>
+            <span class="mobile-group-sub">{group.desc}</span>
+          </div>
+          <div class="mobile-group-grid">
+            {group.items.map(item => (
+              <a 
+                href={getLocalizedPath(item.href, lang)}
+                class:list={['mobile-nav-card', { active: isPathActive(item.href) }]}
+              >
+                <span class="card-icon">{item.icon}</span>
+                <div class="card-text">
+                  <div class="card-title">{item.label}</div>
+                  <div class="card-sub">{item.desc}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 </header>
 
 <style>
   .header {
-    background: #ffffff;
-    border-bottom: 1px solid #eee;
-    padding: 0.65rem 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    padding: 0.6rem 0;
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
   }
 
   .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
   .logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     font-weight: 800;
     font-size: 1.15rem;
-    color: #1e88e5;
+    color: #0f172a;
     flex-shrink: 0;
+    letter-spacing: -0.01em;
   }
 
-  .logo:hover { text-decoration: none; }
-  .logo-icon { display: block; border-radius: 6px; }
-  .logo-text { white-space: nowrap; }
+  .logo:hover {
+    text-decoration: none;
+    color: #1e88e5;
+  }
 
-  /* 桌面端导航 */
+  .logo-icon {
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .logo-text {
+    white-space: nowrap;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 桌面端导航条 */
   .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 
   .nav-link {
-    color: #555;
-    font-size: 0.88rem;
+    color: #475569;
+    font-size: 0.92rem;
     font-weight: 600;
-    transition: color 0.15s;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    transition: all 0.18s ease;
     white-space: nowrap;
+    text-decoration: none;
   }
 
   .nav-link:hover {
     color: #1e88e5;
+    background: #f1f5f9;
     text-decoration: none;
   }
 
   .nav-link.active {
+    color: #0284c7;
+    background: #e0f2fe;
+    font-weight: 700;
+  }
+
+  /* 下拉菜单外层容器 */
+  .nav-dropdown-wrapper {
+    position: relative;
+    padding: 0.2rem 0;
+  }
+
+  .dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #475569;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .dropdown-trigger:hover,
+  .nav-dropdown-wrapper:hover .dropdown-trigger {
     color: #1e88e5;
-    font-weight: 800;
+    background: #f1f5f9;
+  }
+
+  .dropdown-trigger.active {
+    color: #0284c7;
+    background: #f0f9ff;
+    font-weight: 700;
+  }
+
+  .chevron-icon {
+    transition: transform 0.2s ease;
+  }
+
+  .nav-dropdown-wrapper:hover .chevron-icon {
+    transform: rotate(180deg);
+  }
+
+  /* 下拉卡片浮层 */
+  .dropdown-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 6px 16px -2px rgba(15, 23, 42, 0.06);
+    padding: 0.6rem;
+    min-width: 290px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1100;
+  }
+
+  .nav-dropdown-wrapper:hover .dropdown-panel,
+  .nav-dropdown-wrapper:focus-within .dropdown-panel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-header-note {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    padding: 0.3rem 0.6rem 0.45rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+
+  .dropdown-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .dropdown-item:hover {
+    background: #f8fafc;
+    text-decoration: none;
+    transform: translateX(2px);
+  }
+
+  .dropdown-item.active {
+    background: #f0f9ff;
+  }
+
+  .item-icon {
+    font-size: 1.15rem;
+    line-height: 1.3;
+    flex-shrink: 0;
+  }
+
+  .item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .item-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+  }
+
+  .dropdown-item:hover .item-title {
+    color: #0284c7;
+  }
+
+  .dropdown-item.active .item-title {
+    color: #0284c7;
+  }
+
+  .item-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.3;
   }
 
   /* 右侧动作区 */
   .header-right-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     flex-shrink: 0;
   }
 
-  /* 移动端汉堡菜单按钮 (默认隐藏) */
+  /* 移动端汉堡菜单按钮 */
   .mobile-menu-btn {
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 4px;
-    width: 36px;
-    height: 36px;
-    background: #f7f9fa;
+    gap: 4.5px;
+    width: 38px;
+    height: 38px;
+    background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     padding: 0;
     transition: all 0.2s ease;
   }
 
   .mobile-menu-btn:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
   }
 
   .hamburger-bar {
-    width: 18px;
+    width: 19px;
     height: 2px;
-    background-color: #4a5568;
+    background-color: #334155;
     border-radius: 2px;
     transition: all 0.2s ease;
   }
 
   .mobile-menu-btn.is-active .hamburger-bar:nth-child(1) {
-    transform: translateY(6px) rotate(45deg);
+    transform: translateY(6.5px) rotate(45deg);
   }
   .mobile-menu-btn.is-active .hamburger-bar:nth-child(2) {
     opacity: 0;
   }
   .mobile-menu-btn.is-active .hamburger-bar:nth-child(3) {
-    transform: translateY(-6px) rotate(-45deg);
+    transform: translateY(-6.5px) rotate(-45deg);
   }
 
   /* 移动端滑出抽屉菜单 */
   .mobile-drawer {
     background: #ffffff;
-    border-top: 1px solid #f0f0f0;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-    padding: 0.8rem 0 1.2rem;
-    animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid #f1f5f9;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.14);
+    max-height: calc(100vh - 65px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .mobile-nav-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  .mobile-drawer-inner {
+    padding: 1rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .mobile-quick-links {
+    display: flex;
     gap: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.8rem;
   }
 
-  .mobile-nav-item {
+  .mobile-quick-btn {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.6rem 0.4rem;
+    gap: 0.3rem;
+    padding: 0.6rem 0.5rem;
     background: #f8fafc;
-    border: 1px solid #edf2f7;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 0.84rem;
+    font-size: 0.86rem;
     font-weight: 700;
-    color: #4a5568;
-    text-align: center;
+    color: #334155;
+    text-decoration: none;
     transition: all 0.15s ease;
   }
 
-  .mobile-nav-item:hover {
-    background: #edf2f7;
-    color: #1e88e5;
+  .mobile-quick-btn:hover {
+    background: #f1f5f9;
+    text-decoration: none;
+    color: #0284c7;
+  }
+
+  .mobile-quick-btn.active {
+    background: #e0f2fe;
+    color: #0284c7;
+    border-color: #bae6fd;
+  }
+
+  .mobile-group-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .mobile-group-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.02em;
+    padding: 0 0.2rem;
+  }
+
+  .mobile-group-sub {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #94a3b8;
+  }
+
+  .mobile-group-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .mobile-nav-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.8rem;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-nav-card:hover {
+    background: #f1f5f9;
     text-decoration: none;
   }
 
-  .mobile-nav-item.active {
-    background: #e3f2fd;
-    color: #1565c0;
-    border-color: #bbdefb;
+  .mobile-nav-card.active {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+  }
+
+  .card-icon {
+    font-size: 1.15rem;
+  }
+
+  .card-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .mobile-nav-card.active .card-title {
+    color: #0284c7;
+  }
+
+  .card-sub {
+    font-size: 0.72rem;
+    color: #64748b;
   }
 
   @keyframes slideDown {
@@ -247,29 +616,22 @@ function isActive(href: string) {
     }
   }
 
-  /* 移动端媒体查询断点 (< 960px) */
-  @media (max-width: 960px) {
-    .header {
-      padding: 0.45rem 0;
-    }
+  /* 移动端媒体查询断点 (< 1040px) */
+  @media (max-width: 1040px) {
     .desktop-nav {
       display: none;
     }
     .mobile-menu-btn {
       display: inline-flex;
     }
-    .logo-text {
-      font-size: 1.05rem;
-    }
   }
 
-  @media (max-width: 480px) {
-    .mobile-nav-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.45rem;
+  @media (max-width: 540px) {
+    .header {
+      padding: 0.45rem 0;
     }
     .logo-text {
-      font-size: 0.98rem;
+      font-size: 1rem;
     }
   }
 </style>
