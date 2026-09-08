@@ -151,6 +151,15 @@
 .card-ugc {
   border-left: 4px solid #f97316;
 }
+.card-matches {
+  border-left: 4px solid #3b82f6;
+}
+.card-quiz {
+  border-left: 4px solid #8b5cf6;
+}
+.card-endorsements {
+  border-left: 4px solid #06b6d4;
+}
 
 .disclaimer {
   margin-top: 40px;

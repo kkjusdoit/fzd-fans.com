@@ -47,7 +47,9 @@ Component({
       const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
       const isUnlocked = new Date() > targetDate;
 
-      if (isDouyin && categoryId === 'links' && !isUnlocked) {
+      // 审核期在抖音隐藏所有长文资讯类板块，防止个人主体被判【文娱-资讯】
+      const auditHiddenCats = ['stars', 'tributes', 'ugc', 'warrior', 'links', 'fzd101', 'friends'];
+      if (isDouyin && !isUnlocked && auditHiddenCats.includes(categoryId)) {
         wx.switchTab({ url: '../index/index' });
         return;
       }

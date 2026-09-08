@@ -68,48 +68,80 @@ Component({
       const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
       const showDomain = new Date() > targetDate;
 
-      const categories = CATEGORY_ORDER
-        .filter(c => {
-          if (c === 'arena') return true; // 强制包含职业生涯
-          return cats.has(c);
-        })
-        .filter(c => {
-          // Hide 'fzd101' in Chinese mode
-          if (lang === 'zh' && c === 'fzd101') {
-            return false;
+      let categories: any[] = [];
+
+      if (isDouyin && !showDomain) {
+        // 抖音审核期纯净工具模式：隐藏所有长篇图文资讯（彻底杜绝个人主体【文娱-资讯】审核驳回），延迟至2026-12-01全量开放
+        categories = [
+          {
+            id: 'arena',
+            name: '职业生涯',
+            count: 11,
+            icon: '🏓'
+          },
+          {
+            id: 'matches',
+            name: '战绩查询',
+            count: 268,
+            icon: '📊'
+          },
+          {
+            id: 'quiz',
+            name: '球迷考试',
+            count: 10,
+            icon: '📝'
+          },
+          {
+            id: 'quotes',
+            name: '经典语录',
+            count: 4,
+            icon: '💬'
+          },
+          {
+            id: 'endorsements',
+            name: '同行者',
+            count: (endorsements as any[]).length,
+            icon: '🤝'
           }
-          // Hide 'friends' in both modes (to match website)
-          if (c === 'friends') {
-            return false;
-          }
-          // 抖音端审核期隐藏「媒体链接/资讯」，个人开发者无资质发布【资讯】类目，延迟开放
-          if (isDouyin && c === 'links' && !showDomain) {
-            return false;
-          }
-          return true;
-        })
-        .map(c => {
-          let count = content.filter((item: any) => item.category === c && item.lang === lang).length;
-          if (c === 'arena') {
-            count = 11; // 11个核心赛场时刻
-          }
-          return {
-            id: c,
-            name: CATEGORY_MAP[c]?.[lang] || c,
-            count,
-            icon: CATEGORY_ICONS[c] || '📄'
-          };
+        ];
+      } else {
+        categories = CATEGORY_ORDER
+          .filter(c => {
+            if (c === 'arena') return true; // 强制包含职业生涯
+            return cats.has(c);
+          })
+          .filter(c => {
+            // Hide 'fzd101' in Chinese mode
+            if (lang === 'zh' && c === 'fzd101') {
+              return false;
+            }
+            // Hide 'friends' in both modes (to match website)
+            if (c === 'friends') {
+              return false;
+            }
+            return true;
+          })
+          .map(c => {
+            let count = content.filter((item: any) => item.category === c && item.lang === lang).length;
+            if (c === 'arena') {
+              count = 11; // 11个核心赛场时刻
+            }
+            return {
+              id: c,
+              name: CATEGORY_MAP[c]?.[lang] || c,
+              count,
+              icon: CATEGORY_ICONS[c] || '📄'
+            };
+          });
+
+        // 注入「同行者」入口（效力球队 + 品牌代言，数据来自 endorsements.js）
+        categories.push({
+          id: 'endorsements',
+          name: lang === 'zh' ? '同行者' : 'Companions',
+          count: (endorsements as any[]).length,
+          icon: '🤝'
         });
-
-      // 「快讯」入口已暂时下掉
-
-      // 注入「同行者」入口（效力球队 + 品牌代言，数据来自 endorsements.js）
-      categories.push({
-        id: 'endorsements',
-        name: lang === 'zh' ? '同行者' : 'Companions',
-        count: (endorsements as any[]).length,
-        icon: '🤝'
-      });
+      }
 
       this.setData({
         categories,
@@ -128,6 +160,14 @@ Component({
       } else if (category === 'arena') {
         wx.navigateTo({
           url: '../timeline/timeline'
+        });
+      } else if (category === 'matches') {
+        wx.navigateTo({
+          url: '../matches/matches'
+        });
+      } else if (category === 'quiz') {
+        wx.navigateTo({
+          url: '../quiz/quiz'
         });
       } else {
         wx.navigateTo({

@@ -6,6 +6,16 @@ Component({
   },
   methods: {
     onLoad(options: any) {
+      // @ts-ignore
+      const isDouyin = typeof tt !== 'undefined';
+      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const isUnlocked = new Date() > targetDate;
+
+      if (isDouyin && !isUnlocked) {
+        wx.switchTab({ url: '../index/index' });
+        return;
+      }
+
       const id = options.id;
       const article = content.find((item: any) => item.id === id);
       
