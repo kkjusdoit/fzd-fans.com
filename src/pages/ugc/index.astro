@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MessageBoard from '../../components/MessageBoard.astro';
 import { getCollection } from 'astro:content';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
@@ -41,14 +42,35 @@ function formatDate(date: Date) {
   <section class="page-header">
     <h1>✍️ {t('ugc.title')}</h1>
     <p>{t('ugc.subtitle')}</p>
-    <a href="/ugc/guidelines" class="submit-btn">
-      <span class="btn-icon">📝</span>
-      {t('ugc.submit')}
-    </a>
+    <div class="header-actions-bar">
+      <a href="/ugc/guidelines" class="guidelines-link-btn">
+        <span class="btn-icon">📮</span>
+        投稿指南与规范
+      </a>
+    </div>
   </section>
 
-  <!-- 两大板块介绍 -->
-  <section class="sections-intro">
+  <!-- 主功能模式切换 Tabs -->
+  <div class="ugc-mode-tabs-container">
+    <div class="ugc-mode-tabs" id="ugcModeTabs">
+      <button type="button" class="mode-tab-btn active" data-tab="wall">
+        <span class="tab-emoji">💬</span> 樊星留言墙
+      </button>
+      <button type="button" class="mode-tab-btn" data-tab="articles">
+        <span class="tab-emoji">📖</span> 精选深度稿件 ({ugcItems.length})
+      </button>
+    </div>
+  </div>
+
+  <!-- 模式 1: 留言墙与在线发表 -->
+  <div id="wallModeContent" class="mode-panel active">
+    <MessageBoard lang={lang} />
+  </div>
+
+  <!-- 模式 2: 精选深度稿件收录 -->
+  <div id="articlesModeContent" class="mode-panel" style="display: none;">
+    <!-- 两大板块介绍 -->
+    <section class="sections-intro">
     <div class="section-card tactical">
       <div class="section-icon">⚔️</div>
       <h3>{t('ugc.tactical')}</h3>
@@ -104,6 +126,7 @@ function formatDate(date: Date) {
       </a>
     ))}
   </section>
+  </div>
 
   <!-- 悬浮投稿按钮 -->
   <a href="/ugc/guidelines" class="fab" title={t('ugc.submit')}>
@@ -364,6 +387,69 @@ function formatDate(date: Date) {
     color: #999;
   }
 
+  /* 主模式切换 Tabs */
+  .ugc-mode-tabs-container {
+    max-width: 900px;
+    margin: 2rem auto 1.5rem;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  .ugc-mode-tabs {
+    display: inline-flex;
+    background: #e2e8f0;
+    padding: 6px;
+    border-radius: 50px;
+    gap: 6px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .mode-tab-btn {
+    padding: 10px 24px;
+    border-radius: 40px;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mode-tab-btn:hover {
+    color: #1e88e5;
+  }
+  .mode-tab-btn.active {
+    background: #ffffff;
+    color: #1e88e5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .header-actions-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .guidelines-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(30, 136, 229, 0.1);
+    color: #1e88e5;
+    border: 1px solid #bbdefb;
+    padding: 0.6rem 1.4rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+  .guidelines-link-btn:hover {
+    background: #1e88e5;
+    color: #fff;
+  }
+
   /* 悬浮按钮 */
   .fab {
     position: fixed;
@@ -393,11 +479,43 @@ function formatDate(date: Date) {
     .sections-intro { padding: 1rem; }
     .ugc-list { padding: 1rem 0.5rem; }
     .fab { bottom: 1rem; right: 1rem; }
+    .mode-tab-btn { padding: 8px 16px; font-size: 0.9rem; }
   }
 </style>
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
+    // 模式切换
+    const modeBtns = document.querySelectorAll('.mode-tab-btn');
+    const wallContent = document.getElementById('wallModeContent');
+    const articlesContent = document.getElementById('articlesModeContent');
+
+    function switchMode(target) {
+      modeBtns.forEach(b => b.classList.remove('active'));
+      const activeBtn = document.querySelector(`.mode-tab-btn[data-tab="${target}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (target === 'articles') {
+        if (wallContent) wallContent.style.display = 'none';
+        if (articlesContent) articlesContent.style.display = 'block';
+      } else {
+        if (wallContent) wallContent.style.display = 'block';
+        if (articlesContent) articlesContent.style.display = 'none';
+      }
+    }
+
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        if (tab) switchMode(tab);
+      });
+    });
+
+    if (window.location.hash === '#articles') {
+      switchMode('articles');
+    }
+
+    // 文章分类筛选
     const tabs = document.querySelectorAll('.filter-tab');
     const cards = document.querySelectorAll('.ugc-card');
 

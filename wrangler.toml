@@ -1,7 +1,13 @@
-name = "fzd-fans-com"
+name = "fzd-archive"
 pages_build_output_dir = "dist"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "fzd-photos-db"
 database_id = "5337ea22-a722-424f-9479-cc08613108ca"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "pan-storage"
+

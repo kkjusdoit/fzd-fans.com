@@ -4,10 +4,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const SHOW_PVZ_GAME = true;
 ---
 
-<BaseLayout title="打爆一切">
+<BaseLayout title="小游戏与排行榜">
+  <script is:inline src="/js/leaderboard.js"></script>
   <div class="games-page">
     <header class="page-header">
       <h1>🎮 小游戏</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">趣味互动，挑战自我，与全球樊星共享欢乐！</p>
+      <div class="leaderboard-quick-bar">
+        <span class="lb-label">🏆 社区排行榜：</span>
+        <button class="lb-chip" onclick="window.FzdLeaderboard && window.FzdLeaderboard.show('match3')">✨ 消消乐榜</button>
+        <button class="lb-chip" onclick="window.FzdLeaderboard && window.FzdLeaderboard.show('quiz')">📝 学霸考试榜</button>
+        <button class="lb-chip" onclick="window.FzdLeaderboard && window.FzdLeaderboard.show('snake')">🐍 贪吃蛇榜</button>
+      </div>
     </header>
 
     <div class="games-grid">
@@ -182,4 +190,39 @@ const SHOW_PVZ_GAME = true;
   /* 特定样式 */
   .breakit .game-icon { color: #f44336; }
   .dong .game-icon { color: #1e88e5; }
+
+  .leaderboard-quick-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    padding: 8px 16px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    border: 1px solid #e3f2fd;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .lb-label {
+    font-weight: bold;
+    color: #455a64;
+    font-size: 0.9rem;
+  }
+  .lb-chip {
+    background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+    border: 1px solid #bbdefb;
+    color: #1e88e5;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lb-chip:hover {
+    background: #1e88e5;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(30, 136, 229, 0.2);
+  }
 </style>

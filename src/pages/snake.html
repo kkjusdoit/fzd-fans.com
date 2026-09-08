@@ -131,6 +131,7 @@
       <div class="score">得分 <span id="score-value">0</span></div>
       <div id="status-text">按方向键开始</div>
       <button id="restart-btn">开始</button>
+      <button id="lb-btn" type="button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 14px; font-weight: bold; cursor: pointer;" onclick="window.FzdLeaderboard && window.FzdLeaderboard.show('snake')">🏆 榜单</button>
     </div>
 
     <canvas id="game-canvas" data-grid="20" data-cell="20" data-tick="130"></canvas>
@@ -146,6 +147,7 @@
       </div>
     </div>
   </div>
+  <script src="/js/leaderboard.js" defer></script>
   <script src="/js/snake.js" defer></script>
 </body>
 </html>

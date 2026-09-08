@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>咚咚消消乐</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <script src="/js/leaderboard.js" defer></script>
     <style>
         body {
             margin: 0;
@@ -226,15 +227,19 @@
     <div id="ui-layer">
         <div class="header">
             <h1 style="margin-top: 40px; margin-bottom: 10px;">✨ 咚咚消消乐</h1>
-            <div class="score-box">分数: <span id="score">0</span></div>
-            <div class="score-box" style="margin-left: 10px;">目标: <span id="target">1000</span></div>
-            <div class="score-box" style="margin-left: 10px;">步数: <span id="moves">20</span></div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center;">
+                <div class="score-box">分数: <span id="score">0</span></div>
+                <div class="score-box">目标: <span id="target">1000</span></div>
+                <div class="score-box">步数: <span id="moves">20</span></div>
+                <button class="score-box" style="cursor: pointer; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; font-weight: bold;" onclick="window.FzdLeaderboard && window.FzdLeaderboard.show('match3')">🏆 排行榜</button>
+            </div>
         </div>
     </div>
 
     <div id="game-over-modal">
         <h2 id="modal-title">游戏结束</h2>
         <p id="modal-msg">分数: 0</p>
+        <button class="modal-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-bottom: 10px;" onclick="if(window.FzdLeaderboard && window.game) window.FzdLeaderboard.submitPrompt({ gameId: 'match3', score: window.game.score, scoreDisplay: window.game.score + ' 分 (第' + window.game.level + '关)', extraInfo: { level: window.game.level } })">🏆 提交战绩登榜</button>
         <button class="modal-btn" onclick="game.restart()">再玩一次</button>
     </div>
 
@@ -864,6 +869,16 @@ class Game {
         document.getElementById('modal-title').innerText = "挑战失败";
         document.getElementById('modal-msg').innerHTML = `得分: ${this.score}<br>目标: ${this.targetScore}<br>只差一点点！`;
         document.getElementById('game-over-modal').style.display = 'block';
+        if (window.FzdLeaderboard && this.score > 0) {
+            setTimeout(() => {
+                window.FzdLeaderboard.submitPrompt({
+                    gameId: 'match3',
+                    score: this.score,
+                    scoreDisplay: `${this.score} 分 (第${this.level}关)`,
+                    extraInfo: { level: this.level }
+                });
+            }, 600);
+        }
     }
 
     restart() {
@@ -963,7 +978,7 @@ class Game {
     }
 }
 
-new Game();
+window.game = new Game();
 </script>
 </body>
 </html>

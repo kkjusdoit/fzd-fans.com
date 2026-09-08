@@ -1,0 +1,1049 @@
+---
+/**
+ * 球迷留言板与投稿组件
+ * 基于 Cloudflare D1 + R2 + Astro SSR
+ */
+interface Props {
+  lang?: string;
+}
+
+const { lang = 'zh' } = Astro.props;
+---
+
+<div class="message-board-container" id="messageBoardContainer">
+  <!-- 发表留言区域卡片 -->
+  <div class="publish-card">
+    <div class="publish-header">
+      <div class="publish-icon">💌</div>
+      <div class="publish-intro">
+        <h3>写下你的寄语与心声</h3>
+        <p>让每一位樊星的鼓励与思考，都汇聚成星河</p>
+      </div>
+    </div>
+
+    <form id="messageForm" class="message-form">
+      <!-- 常用头像选择 -->
+      <div class="form-row">
+        <label class="form-label">选择头像：</label>
+        <div class="avatar-picker" id="avatarPicker">
+          {['🏓', '🥇', '🌟', '🧁', '💥', '👑', '🚀', '❤️'].map((emoji, i) => (
+            <button 
+              type="button" 
+              class:list={['avatar-opt', { active: i === 0 }]} 
+              data-emoji={emoji}
+              aria-label={`选择头像 ${emoji}`}
+            >
+              {emoji}
+            </button>
+          ))}
+          <input type="hidden" name="avatar" id="selectedAvatar" value="🏓" />
+        </div>
+      </div>
+
+      <!-- 昵称与分类 -->
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label for="msgNickname" class="form-label">你的昵称：</label>
+          <input 
+            type="text" 
+            id="msgNickname" 
+            name="nickname" 
+            class="form-input" 
+            placeholder="例如：巴黎圆梦樊星" 
+            maxlength="20" 
+            required 
+          />
+        </div>
+        <div class="form-group">
+          <label for="msgCategory" class="form-label">留言分类：</label>
+          <select id="msgCategory" name="category" class="form-select">
+            <option value="message">💬 祝福寄语 (日常打气/比赛助威)</option>
+            <option value="tactical">⚔️ 赛后感言 (技战术与赛场心得)</option>
+            <option value="letter">💌 球迷心声 (长文情感/入坑故事)</option>
+            <option value="art">🎨 图文创作 (画作/壁纸/纪念设计)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 标题 (可选) -->
+      <div class="form-group" id="titleGroup" style="display: none;">
+        <label for="msgTitle" class="form-label">投稿标题 (可选)：</label>
+        <input 
+          type="text" 
+          id="msgTitle" 
+          name="title" 
+          class="form-input" 
+          placeholder="给你的文章或作品起个标题..." 
+          maxlength="80" 
+        />
+      </div>
+
+      <!-- 留言正文 -->
+      <div class="form-group">
+        <label for="msgContent" class="form-label">内容详情：</label>
+        <textarea 
+          id="msgContent" 
+          name="content" 
+          class="form-textarea" 
+          placeholder="每一份坚守都闪闪发光...写下你想对东哥说的话，或分享难忘的高光时刻吧！" 
+          rows="4" 
+          maxlength="2000" 
+          required
+        ></textarea>
+        <div class="textarea-counter"><span id="charCount">0</span> / 2000</div>
+      </div>
+
+      <!-- 图片上传区域 (可选，直存 R2) -->
+      <div class="form-group">
+        <div class="media-upload-area">
+          <label class="upload-label" for="msgImageFile">
+            <span class="upload-btn-icon">📷</span>
+            <span id="uploadBtnText">添加配图 (可选，支持拍照/图库直传)</span>
+          </label>
+          <input 
+            type="file" 
+            id="msgImageFile" 
+            accept="image/jpeg,image/png,image/webp,image/gif" 
+            style="display: none;" 
+          />
+          <input type="hidden" name="image_url" id="uploadedImageUrl" value="" />
+        </div>
+        <!-- 上传预览缩略图 -->
+        <div id="imagePreviewBox" class="image-preview-box" style="display: none;">
+          <img id="imagePreviewImg" src="" alt="上传预览" />
+          <button type="button" id="removeImageBtn" class="remove-img-btn" title="删除图片">✕</button>
+        </div>
+      </div>
+
+      <!-- 联系方式 (折叠选填) -->
+      <details class="contact-details">
+        <summary class="contact-summary">留下联系方式（选填，仅站长后台可见，用于精选收录联系）</summary>
+        <div class="contact-box">
+          <input 
+            type="text" 
+            id="msgContact" 
+            name="contact" 
+            class="form-input" 
+            placeholder="微信 / 微博 / 邮箱 / 小红书号" 
+            maxlength="100" 
+          />
+        </div>
+      </details>
+
+      <!-- 提交按钮与状态提示 -->
+      <div class="form-actions">
+        <button type="submit" id="submitMsgBtn" class="submit-msg-btn">
+          <span>🚀 发送留言</span>
+        </button>
+        <div id="submitStatusMsg" class="submit-status-msg"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- 留言墙展示区域 -->
+  <div class="wall-section">
+    <div class="wall-header">
+      <div class="wall-title-box">
+        <h2>🌟 樊星留言墙</h2>
+        <span class="wall-count" id="totalMsgCount">共 0 条留言</span>
+      </div>
+      <!-- 类别筛选器 -->
+      <div class="category-filters" id="categoryFilters">
+        <button type="button" class="cat-filter-btn active" data-cat="all">全部</button>
+        <button type="button" class="cat-filter-btn" data-cat="message">💬 祝福寄语</button>
+        <button type="button" class="cat-filter-btn" data-cat="tactical">⚔️ 赛后感言</button>
+        <button type="button" class="cat-filter-btn" data-cat="letter">💌 球迷心声</button>
+        <button type="button" class="cat-filter-btn" data-cat="art">🎨 图文创作</button>
+      </div>
+    </div>
+
+    <!-- 留言列表瀑布流 -->
+    <div class="messages-grid" id="messagesGrid">
+      <div class="grid-loading">正在拉取留言墙...</div>
+    </div>
+
+    <!-- 加载更多按钮 -->
+    <div class="load-more-box" id="loadMoreBox" style="display: none;">
+      <button type="button" id="loadMoreBtn" class="load-more-btn">加载更多留言 ↓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 浏览器端交互逻辑
+  (() => {
+    let currentPage = 1;
+    let currentCategory = 'all';
+    let hasMore = false;
+    let isLoading = false;
+
+    const messagesGrid = document.getElementById('messagesGrid');
+    const totalMsgCount = document.getElementById('totalMsgCount');
+    const loadMoreBox = document.getElementById('loadMoreBox');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const categoryFilters = document.getElementById('categoryFilters');
+
+    const messageForm = document.getElementById('messageForm') as HTMLFormElement;
+    const msgContent = document.getElementById('msgContent') as HTMLTextAreaElement;
+    const charCount = document.getElementById('charCount');
+    const msgNickname = document.getElementById('msgNickname') as HTMLInputElement;
+    const msgCategory = document.getElementById('msgCategory') as HTMLSelectElement;
+    const titleGroup = document.getElementById('titleGroup');
+    const submitMsgBtn = document.getElementById('submitMsgBtn') as HTMLButtonElement;
+    const submitStatusMsg = document.getElementById('submitStatusMsg');
+
+    const msgImageFile = document.getElementById('msgImageFile') as HTMLInputElement;
+    const uploadedImageUrl = document.getElementById('uploadedImageUrl') as HTMLInputElement;
+    const uploadBtnText = document.getElementById('uploadBtnText');
+    const imagePreviewBox = document.getElementById('imagePreviewBox');
+    const imagePreviewImg = document.getElementById('imagePreviewImg') as HTMLImageElement;
+    const removeImageBtn = document.getElementById('removeImageBtn');
+
+    const avatarPicker = document.getElementById('avatarPicker');
+    const selectedAvatar = document.getElementById('selectedAvatar') as HTMLInputElement;
+
+    // 记忆昵称
+    const savedName = localStorage.getItem('fzd_player_name') || '';
+    if (msgNickname && savedName) {
+      msgNickname.value = savedName;
+    }
+
+    // 头像选择
+    if (avatarPicker) {
+      avatarPicker.querySelectorAll('.avatar-opt').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          avatarPicker.querySelectorAll('.avatar-opt').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          if (selectedAvatar) {
+            selectedAvatar.value = btn.getAttribute('data-emoji') || '🏓';
+          }
+        });
+      });
+    }
+
+    // 字数统计
+    if (msgContent && charCount) {
+      msgContent.addEventListener('input', () => {
+        charCount.textContent = String(msgContent.value.length);
+      });
+    }
+
+    // 动态显隐长文标题输入框
+    if (msgCategory && titleGroup) {
+      msgCategory.addEventListener('change', () => {
+        if (msgCategory.value === 'letter' || msgCategory.value === 'tactical' || msgCategory.value === 'art') {
+          titleGroup.style.display = 'block';
+        } else {
+          titleGroup.style.display = 'none';
+        }
+      });
+    }
+
+    // 图片上传处理 (直传 R2 / API)
+    if (msgImageFile) {
+      msgImageFile.addEventListener('change', async () => {
+        const file = msgImageFile.files?.[0];
+        if (!file) return;
+
+        if (file.size > 8 * 1024 * 1024) {
+          alert('图片大小不能超过 8MB');
+          msgImageFile.value = '';
+          return;
+        }
+
+        if (uploadBtnText) uploadBtnText.textContent = '正在上传图片到 R2...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('originalName', file.name);
+
+        try {
+          const res = await fetch('/api/upload-media', {
+            method: 'POST',
+            body: formData
+          });
+          const json = await res.json();
+
+          if (json.success && json.url) {
+            if (uploadedImageUrl) uploadedImageUrl.value = json.url;
+            if (imagePreviewImg) imagePreviewImg.src = json.url;
+            if (imagePreviewBox) imagePreviewBox.style.display = 'inline-flex';
+            if (uploadBtnText) uploadBtnText.textContent = '已上传配图 (点击可重新选择)';
+          } else {
+            alert(json.error || '图片上传失败，请重试');
+            if (uploadBtnText) uploadBtnText.textContent = '添加配图 (可选)';
+          }
+        } catch (e) {
+          console.error(e);
+          alert('上传网络异常');
+          if (uploadBtnText) uploadBtnText.textContent = '添加配图 (可选)';
+        }
+      });
+    }
+
+    // 移除图片
+    if (removeImageBtn) {
+      removeImageBtn.addEventListener('click', () => {
+        if (uploadedImageUrl) uploadedImageUrl.value = '';
+        if (imagePreviewBox) imagePreviewBox.style.display = 'none';
+        if (msgImageFile) msgImageFile.value = '';
+        if (uploadBtnText) uploadBtnText.textContent = '添加配图 (可选，支持拍照/图库直传)';
+      });
+    }
+
+    // 提交留言表单
+    if (messageForm) {
+      messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nickname = msgNickname.value.trim() || '樊星球迷';
+        const content = msgContent.value.trim();
+        const avatar = selectedAvatar?.value || '🏓';
+        const category = msgCategory?.value || 'message';
+        const title = (document.getElementById('msgTitle') as HTMLInputElement)?.value.trim() || '';
+        const contact = (document.getElementById('msgContact') as HTMLInputElement)?.value.trim() || '';
+        const imageUrl = uploadedImageUrl?.value || '';
+
+        if (content.length < 2) {
+          alert('留言内容至少写两个字哦');
+          return;
+        }
+
+        localStorage.setItem('fzd_player_name', nickname);
+
+        if (submitMsgBtn) {
+          submitMsgBtn.disabled = true;
+          submitMsgBtn.innerHTML = '<span>⏳ 正在发表...</span>';
+        }
+        if (submitStatusMsg) submitStatusMsg.textContent = '';
+
+        try {
+          const res = await fetch('/api/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nickname,
+              content,
+              avatar,
+              category,
+              title,
+              contact,
+              image_url: imageUrl
+            })
+          });
+
+          const json = await res.json();
+
+          if (json.success) {
+            if (submitStatusMsg) {
+              submitStatusMsg.style.color = '#16a34a';
+              submitStatusMsg.textContent = json.message || '留言发表成功！';
+            }
+            msgContent.value = '';
+            if (charCount) charCount.textContent = '0';
+            if (removeImageBtn) removeImageBtn.click();
+
+            // 重新刷新第一页并跳回全部
+            currentPage = 1;
+            fetchMessages(true);
+          } else {
+            if (submitStatusMsg) {
+              submitStatusMsg.style.color = '#dc2626';
+              submitStatusMsg.textContent = json.error || '发表失败，请重试';
+            }
+          }
+        } catch (err) {
+          if (submitStatusMsg) {
+            submitStatusMsg.style.color = '#dc2626';
+            submitStatusMsg.textContent = '网络连接异常，请稍后重试';
+          }
+        } finally {
+          if (submitMsgBtn) {
+            submitMsgBtn.disabled = false;
+            submitMsgBtn.innerHTML = '<span>🚀 发送留言</span>';
+          }
+        }
+      });
+    }
+
+    // 分类筛选
+    if (categoryFilters) {
+      categoryFilters.querySelectorAll('.cat-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          categoryFilters.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat') || 'all';
+          currentPage = 1;
+          fetchMessages(true);
+        });
+      });
+    }
+
+    // 加载更多
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        if (!isLoading && hasMore) {
+          currentPage++;
+          fetchMessages(false);
+        }
+      });
+    }
+
+    // 获取留言列表
+    async function fetchMessages(isReset = false) {
+      if (!messagesGrid) return;
+      isLoading = true;
+
+      if (isReset) {
+        messagesGrid.innerHTML = '<div class="grid-loading">正在拉取最新寄语...</div>';
+      }
+
+      try {
+        const url = `/api/messages?category=${currentCategory}&page=${currentPage}&limit=12`;
+        const res = await fetch(url);
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          if (totalMsgCount) {
+            totalMsgCount.textContent = `共 ${json.pagination?.total || 0} 条心声`;
+          }
+          hasMore = !!json.pagination?.has_more;
+
+          if (isReset) {
+            messagesGrid.innerHTML = '';
+          }
+
+          if (json.data.length === 0 && isReset) {
+            messagesGrid.innerHTML = '<div class="grid-empty">暂无该分类的留言，快来留下第一条心声吧！</div>';
+            if (loadMoreBox) loadMoreBox.style.display = 'none';
+            return;
+          }
+
+          json.data.forEach((item: any) => {
+            const card = createMessageCard(item);
+            messagesGrid.appendChild(card);
+          });
+
+          if (loadMoreBox) {
+            loadMoreBox.style.display = hasMore ? 'block' : 'none';
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load messages', e);
+        if (isReset) {
+          messagesGrid.innerHTML = '<div class="grid-empty">加载失败，请刷新页面重试</div>';
+        }
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // 格式化分类标签
+    function getCategoryBadge(cat: string) {
+      const map: Record<string, { label: string, color: string }> = {
+        message: { label: '💬 祝福', color: 'badge-blue' },
+        tactical: { label: '⚔️ 复盘', color: 'badge-red' },
+        letter: { label: '💌 心声', color: 'badge-purple' },
+        art: { label: '🎨 创作', color: 'badge-green' }
+      };
+      return map[cat] || { label: '💬 留言', color: 'badge-blue' };
+    }
+
+    // 格式化相对时间
+    function formatTime(timestamp: number) {
+      const diff = Date.now() - timestamp;
+      if (diff < 60 * 1000) return '刚刚';
+      if (diff < 60 * 60 * 1000) return `${Math.floor(diff / (60 * 1000))}分钟前`;
+      if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / (60 * 60 * 1000))}小时前`;
+      const d = new Date(timestamp);
+      return `${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+
+    // 创建留言卡片 DOM
+    function createMessageCard(item: any) {
+      const card = document.createElement('div');
+      card.className = 'message-card';
+      const badge = getCategoryBadge(item.category);
+
+      const likedStorageKey = `fzd_msg_liked_${item.id}`;
+      const isLiked = !!localStorage.getItem(likedStorageKey);
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-avatar">${item.avatar || '🏓'}</div>
+          <div class="card-meta">
+            <div class="card-name-line">
+              <span class="card-nickname">${escapeHtml(item.nickname || '樊星')}</span>
+              <span class="card-cat-badge ${badge.color}">${badge.label}</span>
+            </div>
+            <div class="card-time">${formatTime(item.created_at)}</div>
+          </div>
+        </div>
+        ${item.title ? `<h4 class="card-msg-title">${escapeHtml(item.title)}</h4>` : ''}
+        <div class="card-msg-content">${escapeHtml(item.content)}</div>
+        ${item.image_url ? `
+          <div class="card-img-wrap">
+            <img src="${item.image_url}" alt="配图" loading="lazy" onclick="window.open('${item.image_url}', '_blank')" />
+          </div>
+        ` : ''}
+        <div class="card-footer">
+          <button type="button" class="like-btn ${isLiked ? 'liked' : ''}" data-id="${item.id}">
+            <span class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+            <span class="like-count">${item.likes || 0}</span>
+          </button>
+        </div>
+      `;
+
+      // 点赞绑定
+      const likeBtn = card.querySelector('.like-btn') as HTMLButtonElement;
+      if (likeBtn) {
+        likeBtn.addEventListener('click', async () => {
+          if (likeBtn.classList.contains('liked')) return; // 防止重复点赞
+
+          const heart = likeBtn.querySelector('.heart-icon');
+          const countEl = likeBtn.querySelector('.like-count');
+          likeBtn.classList.add('liked');
+          if (heart) heart.textContent = '❤️';
+          localStorage.setItem(likedStorageKey, 'true');
+
+          const currentCount = parseInt(countEl?.textContent || '0', 10);
+          if (countEl) countEl.textContent = String(currentCount + 1);
+
+          try {
+            await fetch('/api/messages/like', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: item.id })
+            });
+          } catch (e) {
+            console.error('Like failed', e);
+          }
+        });
+      }
+
+      return card;
+    }
+
+    function escapeHtml(str: string) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 初次加载留言列表
+    fetchMessages(true);
+  })();
+</script>
+
+<style>
+  .message-board-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 0;
+  }
+
+  /* 发表卡片 */
+  .publish-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(30, 136, 229, 0.08);
+    border: 1px solid #e3f2fd;
+    margin-bottom: 2.5rem;
+  }
+
+  .publish-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .publish-icon {
+    font-size: 2.5rem;
+    background: #e3f2fd;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .publish-intro h3 {
+    font-size: 1.3rem;
+    margin: 0 0 4px 0;
+    color: #1e293b;
+    font-weight: 700;
+  }
+
+  .publish-intro p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  /* 表单布局 */
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-row {
+    margin-bottom: 1.2rem;
+  }
+
+  .avatar-picker {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .avatar-opt {
+    width: 42px;
+    height: 42px;
+    font-size: 1.3rem;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-opt:hover {
+    transform: translateY(-2px);
+    border-color: #90caf9;
+  }
+
+  .avatar-opt.active {
+    border-color: #1e88e5;
+    background: #e3f2fd;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+  }
+
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 640px) {
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: #1e88e5;
+    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.12);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+
+  .textarea-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+
+  /* 图片上传 */
+  .media-upload-area {
+    margin-top: 0.5rem;
+  }
+
+  .upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .upload-label:hover {
+    background: #e3f2fd;
+    border-color: #1e88e5;
+    color: #1e88e5;
+  }
+
+  .upload-btn-icon {
+    font-size: 1.1rem;
+  }
+
+  .image-preview-box {
+    position: relative;
+    margin-top: 10px;
+    display: inline-flex;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    max-width: 180px;
+    max-height: 180px;
+  }
+
+  .image-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .remove-img-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  /* 联系方式折叠 */
+  .contact-details {
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  .contact-summary {
+    cursor: pointer;
+    color: #1e88e5;
+    user-select: none;
+    outline: none;
+  }
+
+  .contact-box {
+    margin-top: 8px;
+  }
+
+  /* 提交操作 */
+  .form-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .submit-msg-btn {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    border: none;
+    padding: 0.9rem 2.2rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(30, 136, 229, 0.3);
+    transition: all 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .submit-msg-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+  }
+
+  .submit-msg-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .submit-status-msg {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* 留言墙列表区域 */
+  .wall-section {
+    margin-top: 2rem;
+  }
+
+  .wall-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .wall-title-box h2 {
+    font-size: 1.6rem;
+    color: #1e293b;
+    margin: 0;
+    display: inline-block;
+  }
+
+  .wall-count {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-left: 10px;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* 类别筛选按钮 */
+  .category-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cat-filter-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cat-filter-btn:hover {
+    border-color: #90caf9;
+    color: #1e88e5;
+  }
+
+  .cat-filter-btn.active {
+    background: #1e88e5;
+    color: white;
+    border-color: #1e88e5;
+    box-shadow: 0 3px 10px rgba(30, 136, 229, 0.25);
+  }
+
+  /* 留言卡片网格 */
+  .messages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .message-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .message-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(30, 136, 229, 0.1);
+    border-color: #bbdefb;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.8rem;
+  }
+
+  .card-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-meta {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .card-name-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-nickname {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-cat-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .badge-blue { background: #e3f2fd; color: #1e88e5; }
+  .badge-red { background: #fee2e2; color: #ef4444; }
+  .badge-purple { background: #f3e8ff; color: #9333ea; }
+  .badge-green { background: #dcfce7; color: #16a34a; }
+
+  .card-time {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+
+  .card-msg-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e88e5;
+    margin: 0.2rem 0 0.5rem;
+  }
+
+  .card-msg-content {
+    color: #334155;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    flex-grow: 1;
+  }
+
+  .card-img-wrap {
+    margin-bottom: 0.8rem;
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 220px;
+    cursor: zoom-in;
+  }
+
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+
+  .card-img-wrap:hover img {
+    transform: scale(1.03);
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid #f8fafc;
+    padding-top: 0.6rem;
+  }
+
+  .like-btn {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+
+  .like-btn:hover {
+    border-color: #fca5a5;
+    color: #ef4444;
+  }
+
+  .like-btn.liked {
+    border-color: #fca5a5;
+    background: #fff1f2;
+    color: #ef4444;
+    cursor: default;
+  }
+
+  .grid-loading, .grid-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+    font-size: 1rem;
+  }
+
+  .load-more-box {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .load-more-btn {
+    background: #ffffff;
+    border: 1px solid #bbdefb;
+    color: #1e88e5;
+    padding: 0.8rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.1);
+  }
+
+  .load-more-btn:hover {
+    background: #1e88e5;
+    color: white;
+  }
+</style>

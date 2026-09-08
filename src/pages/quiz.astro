@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="球迷等级考试">
+  <script is:inline src="/js/leaderboard.js"></script>
   <div id="quiz-container">
     <div id="quiz-intro">
       <h1>🏓 球迷等级考试</h1>
@@ -11,7 +12,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="copyright" style="margin-bottom: 2rem; font-size: 0.9rem; color: #888;">
       【原创】Caesar Fan 问答游戏 by <a href="https://weibo.com/baiduFZDbar" target="_blank" rel="noopener noreferrer" style="color: #1e88e5; text-decoration: none;">球迷会-天际樊星</a>
       </div>
-      <button id="start-btn">开始答题</button>
+      <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <button id="start-btn">开始答题</button>
+        <button id="quiz-lb-btn" type="button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 1rem 2rem; font-size: 1.1rem; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">🏆 学霸榜</button>
+      </div>
     </div>
     
     <div id="quiz-area" style="display: none;">
@@ -46,7 +50,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div id="surpassed-display" style="color: #666; margin-bottom: 1rem; font-size: 1.1rem;"></div>
         <div id="rank-desc"></div>
         <div id="wrong-answers"></div>
-        <button id="retry-btn">再考一次</button>
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+          <button id="quiz-submit-lb-btn" type="button" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">🏆 登记至学霸榜</button>
+          <button id="retry-btn">再考一次</button>
+        </div>
       </div>
     </div>
   </div>
@@ -844,9 +851,34 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         `;
       }
     }
+
+    // 自动提示登榜
+    if ((window as any).FzdLeaderboard) {
+      setTimeout(() => {
+        (window as any).FzdLeaderboard.submitPrompt({
+          gameId: 'quiz',
+          score: score,
+          scoreDisplay: `${score} / ${shuffledQuestions.length} 题`,
+          extraInfo: { total: shuffledQuestions.length }
+        });
+      }, 700);
+    }
   }
 
   startBtn?.addEventListener('click', startQuiz);
   retryBtn?.addEventListener('click', startQuiz);
   peekBtn?.addEventListener('click', peekAnswer);
+
+  document.getElementById('quiz-lb-btn')?.addEventListener('click', () => {
+    (window as any).FzdLeaderboard?.show('quiz');
+  });
+
+  document.getElementById('quiz-submit-lb-btn')?.addEventListener('click', () => {
+    (window as any).FzdLeaderboard?.submitPrompt({
+      gameId: 'quiz',
+      score: score,
+      scoreDisplay: `${score} / ${shuffledQuestions.length} 题`,
+      extraInfo: { total: shuffledQuestions.length }
+    });
+  });
 </script>

@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MessageBoard from '../components/MessageBoard.astro';
+---
+
+<BaseLayout title="球迷留言板 · 樊星寄语墙">
+  <div class="messages-page-wrapper">
+    <div class="page-top-hero">
+      <a href="/ugc" class="hero-back-link">← 返回投稿专区</a>
+      <h1>💌 球迷留言板</h1>
+      <p>聚沙成塔路，樊星闪耀时 · 写下你的寄语与心声</p>
+    </div>
+
+    <MessageBoard lang="zh" />
+  </div>
+</BaseLayout>
+
+<style>
+  .messages-page-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem 1rem 3rem;
+  }
+  .page-top-hero {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+    position: relative;
+  }
+  .page-top-hero h1 {
+    font-size: 2.4rem;
+    color: #1e88e5;
+    margin: 0.5rem 0;
+  }
+  .page-top-hero p {
+    color: #64748b;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  .hero-back-link {
+    display: inline-block;
+    color: #1e88e5;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+  }
+  .hero-back-link:hover {
+    opacity: 0.8;
+  }
+</style>

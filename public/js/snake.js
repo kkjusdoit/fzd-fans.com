@@ -278,6 +278,16 @@
 
     if (result.gameOver) {
       setStatus('gameover');
+      if (window.FzdLeaderboard && state.score > 0) {
+        setTimeout(() => {
+          window.FzdLeaderboard.submitPrompt({
+            gameId: 'snake',
+            score: state.score,
+            scoreDisplay: `${state.score} 分`,
+            extraInfo: { snakeLength: state.snake.length }
+          });
+        }, 500);
+      }
     }
 
     updateScore();
