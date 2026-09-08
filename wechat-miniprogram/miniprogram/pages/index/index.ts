@@ -65,13 +65,13 @@ Component({
       
       // @ts-ignore
       const isDouyin = typeof tt !== 'undefined';
-      const targetDate = isDouyin ? new Date('2026-12-01T00:00:00') : new Date('2026-07-15T00:00:00');
+      const targetDate = isDouyin ? new Date('2026-10-01T00:00:00') : new Date('2026-07-15T00:00:00');
       const showDomain = new Date() > targetDate;
 
       let categories: any[] = [];
 
       if (isDouyin && !showDomain) {
-        // 抖音审核期纯净工具模式：隐藏所有长篇图文资讯（彻底杜绝个人主体【文娱-资讯】审核驳回），延迟至2026-12-01全量开放
+        // 抖音审核期纯净工具模式：隐藏所有长篇图文资讯（彻底杜绝个人主体【文娱-资讯】审核驳回），延迟至2026-10-01全量开放
         categories = [
           {
             id: 'arena',
