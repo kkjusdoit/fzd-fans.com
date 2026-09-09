@@ -4,8 +4,10 @@ import matter from 'gray-matter';
 import { marked } from 'marked';
 
 const ASTRO_CONTENT_DIR = path.join(process.cwd(), 'src/content');
-const MINI_APP_DATA_DIR = '/Users/linkunkun/WeChatProjects/miniapp-1/miniprogram/data';
-const OUTPUT_FILE = path.join(MINI_APP_DATA_DIR, 'content.js');
+const TARGET_DIRS = [
+  path.join(process.cwd(), 'wechat-miniprogram/miniprogram/data'),
+  '/Users/linkunkun/WeChatProjects/miniapp-1/miniprogram/data'
+];
 
 // Custom marked renderer to adjust URLs if needed, but default is fine
 marked.setOptions({
@@ -119,14 +121,19 @@ async function sync() {
       });
     }
 
-    console.log(`Processed ${contentArray.length} items. Writing to ${OUTPUT_FILE}...`);
-    
-    // Ensure output directory exists
-    await fs.mkdir(MINI_APP_DATA_DIR, { recursive: true });
-
-    // Write content.js
+    console.log(`Processed ${contentArray.length} items. Writing to target directories...`);
     const contentString = `module.exports = {\n  content: ${JSON.stringify(contentArray, null, 2)}\n};\n`;
-    await fs.writeFile(OUTPUT_FILE, contentString, 'utf-8');
+
+    for (const targetDir of TARGET_DIRS) {
+      try {
+        await fs.mkdir(targetDir, { recursive: true });
+        const outputFile = path.join(targetDir, 'content.js');
+        await fs.writeFile(outputFile, contentString, 'utf-8');
+        console.log(`Wrote content.js to ${outputFile}`);
+      } catch (err) {
+        console.warn(`Failed writing to ${targetDir}:`, err.message);
+      }
+    }
     
     console.log('Sync completed successfully!');
   } catch (error) {

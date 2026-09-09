@@ -104,6 +104,12 @@ When asked "What changes do you feel coming back from Bundesliga to play the Nat
 
 > "The only constant is change. The only thing that must not change is the desire to win when facing competition. For myself, I hope to focus first on how to perform better and be more focused in the match. As for other things, I'll consider them but not now."
 
+## You Can't Always Win, But Always Want to Win
+
+Message to athletes on competitive sports and the meaning of competition:
+
+> "The meaning of competition is that it's impossible to always win, but we must always want to win."
+
 ## The Future
 
 > "Paris was great, and the future will be even better"
