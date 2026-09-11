@@ -138,6 +138,27 @@ npx astro check
 *   `KV_BINDING`: Cloudflare KV 绑定名称。
 *   图床相关配置 (API Key, Endpoints 等)。
 
+## 🔍 搜索引擎与 SEO 收录配置 (SEO & Search Indexing)
+
+本项目已完成百度搜索资源平台 (Baidu Search Resource Platform) 的所有权验证与 API 主动推送管道配置：
+
+| 模块 | 实施规范 | 凭据与调用地址 |
+| :--- | :--- | :--- |
+| **百度归属验证** | HTML 标签验证 | `<meta name="baidu-site-verification" content="codeva-61IjG7mgFt" />` |
+| **文件验证端点** | 静态验证文件 | `https://fzd-fans.com/baidu_verify_codeva-61IjG7mgFt.html` |
+| **API 准入 Token** | 专用推送密钥 | `h2SgsuGqxPpXmlmp` |
+| **API 推送地址** | 百度官方接口 | `http://data.zz.baidu.com/urls?site=https://fzd-fans.com&token=h2SgsuGqxPpXmlmp` |
+| **站点地图** | XML Sitemap | `https://fzd-fans.com/sitemap-index.xml` |
+| **爬虫规则** | Robots 协议 | `https://fzd-fans.com/robots.txt` |
+
+### 百度 URL 主动推送指令
+当发布新新闻、图文或经典语录时，可直接在终端秒级推送至百度抓取库：
+```bash
+# 推送单个或多个 URL
+curl -H 'Content-Type:text/plain' --data-binary "https://fzd-fans.com/news" "http://data.zz.baidu.com/urls?site=https://fzd-fans.com&token=h2SgsuGqxPpXmlmp"
+```
+
 ## License
 
 内容版权归原作者所有，素材大多来源于网络，如有侵权请联系删除。
+
