@@ -4,4 +4,5 @@ User-Agent: *
 Allow: /
 
 # Sitemaps
+Sitemap: https://fzd-fans.com/sitemap.xml
 Sitemap: https://fzd-fans.com/sitemap-index.xml
