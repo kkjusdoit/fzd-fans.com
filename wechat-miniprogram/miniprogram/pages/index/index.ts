@@ -1,5 +1,6 @@
 import { content } from '../../data/content';
 import { endorsements } from '../../data/endorsements';
+import { matches } from '../../data/matches';
 
 const CATEGORY_MAP: Record<string, { zh: string; en: string }> = {
   fzd101: { zh: 'FZD 101', en: 'FZD 101' },
@@ -82,7 +83,7 @@ Component({
           {
             id: 'matches',
             name: '战绩查询',
-            count: 268,
+            count: (matches as any[]).length,
             icon: '📊'
           },
           {
