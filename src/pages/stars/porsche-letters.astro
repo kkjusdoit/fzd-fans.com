@@ -31,7 +31,41 @@ const images = [1, 2, 3, 4, 5, 6].map(n => `/stars/letters/${n}.jpg`);
         </div>
       </div>
 
-    <h2 class="gallery-title">📜 家书原文</h2>
+      <h2>三、最新发声：抵制偷拍侵权与厘清边界（2026-10-21）</h2>
+      <p>针对长期遭遇的机场代拍、跟机偷拍以及网络流量自媒体的越界侵扰，樊振东于 2026 年 10 月 21 日在<a href="https://weibo.com/u/7888222767" target="_blank" rel="noopener noreferrer">个人微博</a>再次发长文，坚决抵制偷拍行为，重申相互尊重是人与人交往的底线：</p>
+      
+      <div class="latest-card">
+        <div class="latest-header">
+          <div class="author-info">
+            <span class="author-name">樊振东</span>
+            <span class="post-date">2026年10月21日 · 个人微博</span>
+          </div>
+          <a class="source-link" href="https://weibo.com/u/7888222767" target="_blank" rel="noopener noreferrer">查看微博 ↗</a>
+        </div>
+        <div class="weibo-body">
+          <p class="quote-ancient">“施诸己而不愿，亦勿施于人。”</p>
+          <p>换位思考，真的有人愿意被偷拍吗？不管偷拍者是什么身份什么心态什么目的，都无法改变这类行为不尊重他人、侵犯他人隐私的本质，即使以爱为名，即使延迟发布扩散。</p>
+          <p>边界感强不等同于冷漠。理智的球迷亦或友善的路人并不会举着手机开着摄像头跟我打招呼，我非但不抵触反而向来乐于回应他们。一边拍摄一边喊话试图交流乃至接触的，我确实无法分辨对方到底是欣赏我支持我的球迷还是运营自媒体的流量逐利者。</p>
+          <p class="quote-ancient">“敬人者，人恒敬之。”</p>
+        </div>
+        <div class="interpretation-grid">
+          <div class="interpretation-item">
+            <h4>🎯 设身处地，换位思考</h4>
+            <p>开篇引用《礼记·中庸》古训，直击偷拍者心灵：没有人愿意私生活被镜头窥视，将心比心才能懂得尊重。</p>
+          </div>
+          <div class="interpretation-item">
+            <h4>🛡️ 戳破借口，拒绝侵权</h4>
+            <p>一针见血指出无论是否打着“爱”的旗号、是否“延迟发布”，偷拍侵犯隐私与不尊重的本质绝不会改变。</p>
+          </div>
+          <div class="interpretation-item">
+            <h4>🤝 边界感强不等同于冷漠</h4>
+            <p>欣然回应不带摄像头的理智球迷与真诚路人，但拒绝被摄像头怼脸，拒绝被自媒体当作流量工具。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="gallery-title">📜 早期家书原文（2021-2022）</h2>
     <div class="gallery">
       {images.map((src, index) => (
         <div class="gallery-item">
@@ -143,6 +177,103 @@ const images = [1, 2, 3, 4, 5, 6].map(n => `/stars/letters/${n}.jpg`);
   .point p {
     margin-bottom: 0;
     font-size: 0.95rem;
+  }
+
+  .latest-card {
+    background: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+
+  .latest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .author-name {
+    font-weight: 700;
+    color: #1e88e5;
+    font-size: 1.1rem;
+  }
+
+  .post-date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  .source-link {
+    font-size: 0.85rem;
+    color: #1e88e5;
+    text-decoration: none;
+  }
+  .source-link:hover {
+    text-decoration: underline;
+  }
+
+  .weibo-body {
+    font-size: 1.02rem;
+    line-height: 1.9;
+    color: #222;
+    background: #f7fafc;
+    padding: 1.2rem 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #1e88e5;
+    margin-bottom: 1.2rem;
+  }
+
+  .weibo-body p {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+
+  .weibo-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .quote-ancient {
+    font-weight: 700;
+    color: #0d47a1 !important;
+    font-size: 1.08rem;
+  }
+
+  .interpretation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.2rem;
+  }
+
+  .interpretation-item {
+    background: #f9fbfe;
+    border: 1px solid #e3eef9;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+
+  .interpretation-item h4 {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.95rem;
+    color: #1565c0;
+  }
+
+  .interpretation-item p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #555;
+    line-height: 1.6;
   }
 
   .gallery-title {

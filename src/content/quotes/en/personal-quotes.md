@@ -110,6 +110,16 @@ Message to athletes on competitive sports and the meaning of competition:
 
 > "The meaning of competition is that it's impossible to always win, but we must always want to win."
 
+## On Covert Filming & Setting Boundaries
+
+Statement on personal Weibo on October 21, 2026, directly addressing airport paparazzi and invasive filming:
+
+> "Do not do to others what you would not have done to yourself. Thinking from the other perspective: does anyone truly want to be filmed secretly? Regardless of the secret photographer's identity, mindset, or purpose, it cannot alter the essence of such behavior—disrespecting others and violating their privacy—even if done in the name of love, and even if delayed before posting or broadcasting."
+>
+> "Having a strong sense of boundaries does not equate to being cold or distant. Rational fans or friendly passers-by do not greet me while holding up phones with cameras rolling. Far from resisting them, I have always been delighted to respond to them. But when someone films while shouting to initiate conversation or physical contact, I truly cannot distinguish whether they are genuine supporters who appreciate me or traffic-seekers operating self-media."
+>
+> "Those who respect others will constantly be respected by others."
+
 ## The Future
 
 > "Paris was great, and the future will be even better"
