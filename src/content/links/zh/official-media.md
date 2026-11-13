@@ -44,5 +44,7 @@ translated: false
 
 - [2026-09-07 东方体育日报：樊振东，输掉的比赛都夺回来——双败到双杀，樊振东依然是樊振东](/links/2026-09-07-sports-daily)
 
+- [2026-11-13 东方体育日报：樊振东走进日内瓦联合国难民署总部 关注青少年群体 用体育点亮希望](/links/2026-11-13-sports-daily)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---

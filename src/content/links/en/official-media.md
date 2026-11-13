@@ -23,6 +23,8 @@ translated: true
 
 - [2026-08-31 Oriental Sports Daily: A Two-Point Narrow Defeat - Sophomores Are Human Too](/en/links/2026-08-31-sports-daily)
 
+- [2026-11-13 Oriental Sports Daily: Fan Zhendong Visits UNHCR Headquarters in Geneva, Calling to Support Displaced Youth Through Sports](/en/links/2026-11-13-sports-daily)
+
 ---
 
 ## How to pronounce Fan Zhendong?
