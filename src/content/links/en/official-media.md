@@ -25,6 +25,8 @@ translated: true
 
 - [2026-11-13 Oriental Sports Daily: Fan Zhendong Visits UNHCR Headquarters in Geneva, Calling to Support Displaced Youth Through Sports](/en/links/2026-11-13-sports-daily)
 
+- [2026-11-23 APEA 2026 Dual Honors: Fan Zhendong Named to Asia-Pacific U30 Outstanding Young Leaders & Top 100 Most Influential Young Men](/en/links/2026-11-23-apea-u30-top100)
+
 ---
 
 ## How to pronounce Fan Zhendong?

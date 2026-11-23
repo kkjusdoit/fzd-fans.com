@@ -46,5 +46,7 @@ translated: false
 
 - [2026-11-13 东方体育日报：樊振东走进日内瓦联合国难民署总部 关注青少年群体 用体育点亮希望](/links/2026-11-13-sports-daily)
 
+- [2026-11-23 APEA 2026 亚太双榜：樊振东入选「亚太U30杰出青年领袖」与「亚太最具影响力青年男性 TOP 100」](/links/2026-11-23-apea-u30-top100)
+
 *未完待续...(欢迎投稿/推荐，请发送邮件至 <a href="mailto:kkjusdoit@gmail.com">kkjusdoit@gmail.com（点击复制）</a>）* 
 ---
